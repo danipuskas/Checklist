@@ -1,5 +1,5 @@
 // Offline cache: serves the app from the iPad, refreshes it quietly when online.
-const CACHE = 'flight-checklists-v4';
+const CACHE = 'flight-checklists-v5';
 const ASSETS = ['./', './index.html', './airports.js', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
