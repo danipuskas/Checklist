@@ -384,6 +384,22 @@ body:not(.editing) .item.info > .row:active{background:none}
 .type-seg button{display:flex;align-items:center;justify-content:center;gap:7px}
 .type-seg svg{width:18px;height:18px}
 
+/* Headings inside a section */
+.hd{background:var(--surface2);border-top:1px solid var(--line)}
+.sec-body > .hd:first-child{border-top:0}
+.hd-row{appearance:none;border:0;background:none;width:100%;display:flex;align-items:center;gap:8px;min-height:46px;padding:9px 10px 9px 12px;color:var(--accent);text-align:left;font:inherit}
+button.hd-row:active,.hd-row[role=button]:active{background:var(--press)}
+.hd-title{flex:1;min-width:0;font-size:calc(16px*var(--ts));font-weight:700;overflow-wrap:anywhere}
+.hd-count{font-size:calc(14px*var(--ts));font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:4px}
+.hd-count svg{width:16px;height:16px;stroke-width:3}
+.hd.complete .hd-count,.hd.complete .hd-title{color:var(--done)}
+.hd .chev,.hd .chev-sp{width:24px;flex:none;display:inline-grid;place-items:center}
+.hd.collapsed .chev{transform:rotate(-90deg)}
+.hd-fold{appearance:none;border:0;background:none;color:inherit;padding:0;width:30px;height:30px;margin:-4px 0;border-radius:8px;display:grid;place-items:center;flex:none}
+.hd-row .edit-hint{margin-left:2px}
+.hd-row .grip{margin:-8px -6px -8px 0}
+.hfold{display:none!important}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:88px;min-width:88px;max-width:176px;display:block;position:relative}
@@ -491,6 +507,7 @@ var I={
   textsize:sv('<path d="M3 7V5h11v2"/><path d="M8.5 5v14"/><path d="M14 12v-1.5h7V12"/><path d="M17.5 10.5V19"/>'),
   info:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 11v5.5"/><path d="M12 7.6v.1" stroke-width="2.6"/>'),
   tickbox:sv('<circle cx="12" cy="12" r="8"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/>'),
+  heading:sv('<path d="M6 5v14M17 5v14M6 12h11"/>'),
   grip:sv('<path d="M5 7.5h14M5 12h14M5 16.5h14"/>'),
   bell:sv('<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'),
   back:sv('<path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/>')
@@ -511,8 +528,10 @@ function newPad(){return {id:uid(),type:'pad',title:'Notepad',mode:'draw',text:'
 function newCd(){return {id:uid(),type:'cd',title:'Countdown',target:null,lead:0,aL:false,aZ:false,collapsed:false};}
 function newRest(){return {id:uid(),type:'rest',title:'Crew rest',start:'',end:'',n:2,buffer:0,round:true,labels:[],collapsed:false};}
 
+function newHead(){return {id:uid(),type:'head',title:'',collapsed:false};}
 function normItem(it){
   if(!it||typeof it!=='object') return null;
+  if(it.type==='head') return {id:str(it.id)||uid(),type:'head',title:str(it.title,'Heading'),collapsed:!!it.collapsed};
   if(it.type==='cd') return {id:str(it.id)||uid(),type:'cd',title:str(it.title,'Countdown'),target:typeof it.target==='number'&&isFinite(it.target)?it.target:null,
     lead:Math.max(0,Math.min(180,+it.lead||0)),aL:!!it.aL,aZ:!!it.aZ,collapsed:!!it.collapsed};
   if(it.type==='rest') return {id:str(it.id)||uid(),type:'rest',title:str(it.title,'Crew rest'),start:str(it.start),end:str(it.end),
@@ -548,7 +567,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='10';
+var APP_VERSION='11';
 var TEXT_SIZES=[[0.9,'Small',13],[1,'Default',16],[1.15,'Large',19],[1.3,'Extra large',22]];
 function applyTextScale(){document.documentElement.style.setProperty('--ts',String(state.settings.textScale||1));}
 function normSettings(st){
@@ -811,7 +830,39 @@ function calcEval(e){
 
 /* ---------- Rendering ---------- */
 function countHTML(d,t){if(!t) return '';return d===t?I.check+'<span>Done</span>':d+'/'+t;}
+function headGroups(s){
+  // progress of the items under each heading, up to the next heading
+  var m={},cur=null;
+  s.items.forEach(function(it){
+    if(it.type==='head'){cur=m[it.id]={d:0,t:0,n:0};return;}
+    if(!cur) return;
+    cur.n++;
+    if(it.type==='check'&&!it.info){cur.t++;if(it.done) cur.d++;}
+  });
+  return m;
+}
+function renderHead(hd,c){
+  c=c||{d:0,t:0,n:0};
+  var chev=c.n?'<span class="chev">'+I.chev+'</span>':'<span class="chev-sp"></span>';
+  var cnt='<span class="hd-count">'+countHTML(c.d,c.t)+'</span>';
+  var title='<span class="hd-title">'+(esc(hd.title)||'<span class="ph">Heading</span>')+'</span>';
+  var cls='hd'+(hd.collapsed&&c.n?' collapsed':'')+(c.t&&c.d===c.t?' complete':'');
+  if(editMode) return '<div class="'+cls+'" data-mod="'+hd.id+'"><div class="hd-row" data-act="editMod" data-id="'+hd.id+'" role="button" tabindex="0">'+
+    (c.n?'<button type="button" class="hd-fold" data-act="headFold" data-id="'+hd.id+'" aria-label="Fold or unfold">'+chev+'</button>':chev)+
+    title+cnt+'<span class="edit-hint">'+I.edit+'</span><span class="grip" data-drag="item" data-id="'+hd.id+'" aria-hidden="true">'+I.grip+'</span></div></div>';
+  if(!c.n) return '<div class="'+cls+'" data-mod="'+hd.id+'"><div class="hd-row">'+chev+title+cnt+'</div></div>';
+  return '<div class="'+cls+'" data-mod="'+hd.id+'"><button type="button" class="hd-row" data-act="headFold" data-id="'+hd.id+'" aria-expanded="'+!hd.collapsed+'">'+chev+title+cnt+'</button></div>';
+}
+function renderItems(s){
+  var g=headGroups(s),fold=false;
+  return s.items.map(function(it){
+    if(it.type==='head'){fold=!!it.collapsed&&g[it.id].n>0;return renderHead(it,g[it.id]);}
+    var x=renderNode(it,0);
+    return fold?x.replace('class="','class="hfold '):x;
+  }).join('');
+}
 function renderNode(it,depth){
+  if(it.type==='head'){var hf=find(it.id);return renderHead(it,hf?headGroups(hf.section)[it.id]:null);}
   if(it.type==='calc') return renderCalc(it);
   if(it.type==='pad') return renderPad(it);
   if(it.type==='cd') return renderCd(it);
@@ -908,9 +959,9 @@ function renderSection(s){
   h+='<div class="sec-head"><button type="button" class="sec-toggle" data-act="toggleSec" data-id="'+s.id+'" aria-expanded="'+!s.collapsed+'"><span class="sec-title">'+esc(s.title)+'</span><span class="sec-count">'+countHTML(c.d,c.t)+'</span><span class="chev">'+I.chev+'</span></button>';
   if(editMode) h+='<button type="button" class="ib" data-act="editSec" data-id="'+s.id+'" aria-label="Edit section">'+I.edit+'</button><span class="grip" data-drag="sec" data-id="'+s.id+'" aria-hidden="true">'+I.grip+'</span>';
   h+='</div><div class="sec-body">';
-  if(s.items.length) h+=s.items.map(function(it){return renderNode(it,0);}).join('');
+  if(s.items.length) h+=renderItems(s);
   else if(!editMode) h+='<div class="empty">No items yet. Tap Edit to add some.</div>';
-  if(editMode) h+='<div class="add-row"><button type="button" data-act="addItem" data-id="'+s.id+'">'+I.plus+'Item</button><button type="button" data-act="addCalc" data-id="'+s.id+'">'+I.calc+'Calculator</button><button type="button" data-act="addPad" data-id="'+s.id+'">'+I.pad+'Notepad</button>'+
+  if(editMode) h+='<div class="add-row"><button type="button" data-act="addItem" data-id="'+s.id+'">'+I.plus+'Item</button><button type="button" data-act="addHead" data-id="'+s.id+'">'+I.heading+'Heading</button><button type="button" data-act="addCalc" data-id="'+s.id+'">'+I.calc+'Calculator</button><button type="button" data-act="addPad" data-id="'+s.id+'">'+I.pad+'Notepad</button>'+
     '<button type="button" data-act="addCd" data-id="'+s.id+'">'+I.timer+'Countdown</button><button type="button" data-act="addRest" data-id="'+s.id+'">'+I.moon+'Crew rest</button></div>';
   h+='<div class="sec-done">'+I.check+'<span>'+esc(s.title)+' complete</span></div>';
   return h+'</div></section>';
@@ -925,7 +976,7 @@ function render(){
   editBtn.innerHTML=editMode?'Done':I.edit;
   editBtn.setAttribute('aria-label',editMode?'Done editing':'Edit');
   var h='<div class="title-row"><button type="button" class="list-title" data-act="lists" aria-label="Switch checklist, current: '+esc(L.title)+'"><span>'+esc(L.title)+'</span>'+I.chev+'</button><span class="chip" id="chip"></span></div>';
-  if(editMode) h+='<p class="edit-tip">Drag ≡ to move items, blocks and sections. Tap an item to edit it.</p>';
+  if(editMode) h+='<p class="edit-tip">Drag ≡ to reorder. A heading moves together with the items under it. Tap anything to edit it.</p>';
   if(!L.sections.length&&!editMode) h+='<div class="sec"><div class="empty">This checklist is empty. Tap Edit to add a section.</div></div>';
   h+=L.sections.map(renderSection).join('');
   if(editMode) h+='<button type="button" class="add-sec" data-act="addSection">'+I.plus+'Add section</button>';
@@ -952,6 +1003,21 @@ function updateSec(s){
   var c=secCount(s);
   el.classList.toggle('complete',c.t>0&&c.d===c.t);
   var n=el.querySelector('.sec-count');if(n) n.innerHTML=countHTML(c.d,c.t);
+  var g=headGroups(s);
+  el.querySelectorAll('.hd').forEach(function(h){
+    var hc=g[h.getAttribute('data-mod')];if(!hc) return;
+    var hn=h.querySelector('.hd-count');if(hn) hn.innerHTML=countHTML(hc.d,hc.t);
+    h.classList.toggle('complete',hc.t>0&&hc.d===hc.t);
+  });
+}
+function headFold(id){
+  var f=find(id);if(!f) return;
+  f.node.collapsed=!f.node.collapsed;save();render();
+}
+function addHead(sid){
+  var r=findSec(sid);if(!r) return;
+  var hd=newHead();r.section.items.push(hd);r.section.collapsed=false;
+  save();render();openModEditor(hd.id,true);
 }
 function refreshModule(id){
   var f=find(id),el=document.querySelector('[data-mod="'+id+'"]');
@@ -1310,12 +1376,13 @@ function openItemEditor(id,isNew){
   t.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('save');}});
   if(isNew) t.focus();
 }
-function openModEditor(id){
+function openModEditor(id,isNew){
   var f=find(id);if(!f) return;
-  var m=f.node,h=m.h,idx=f.arr.indexOf(m);
+  var m=f.node,h=m.h,idx=f.arr.indexOf(m),isHead=m.type==='head';
   var sizes=[['S',200],['M',300],['L',480],['XL',720]];
-  openSheet('<h3>'+({calc:'Calculator',pad:'Notepad',cd:'Countdown',rest:'Crew rest'}[m.type]||'Block')+'</h3>'+
-    '<label class="fld"><span class="fl">Title</span><input id="fTitle" type="text" value="'+esc(m.title)+'" autocomplete="off"></label>'+
+  openSheet('<h3>'+(isHead?(isNew?'New heading':'Heading'):({calc:'Calculator',pad:'Notepad',cd:'Countdown',rest:'Crew rest'}[m.type]||'Block'))+'</h3>'+
+    '<label class="fld"><span class="fl">Title</span><input id="fTitle" type="text" value="'+esc(m.title)+'" placeholder="'+(isHead?'e.g. Before TOD':'')+'" autocomplete="off"></label>'+
+    (isHead?'<p class="hint">Items below a heading, up to the next one, belong to it. Tap the heading in the checklist to fold them away.</p>':'')+
     (m.type==='pad'?'<div class="fld"><span class="fl">Drawing height</span><div class="seg big" id="fH">'+sizes.map(function(s){return '<button type="button" class="'+(m.h===s[1]?'on':'')+'" data-sact="h" data-v="'+s[1]+'">'+s[0]+'</button>';}).join('')+'</div></div>':'')+
     '<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
     '<button type="button" class="btn small" data-sact="down"'+(idx===f.arr.length-1?' disabled':'')+'>'+I.down+'Down</button>'+
@@ -1328,16 +1395,25 @@ function openModEditor(id){
       case 'h':
         h=+btn.getAttribute('data-v');
         sheetEl.querySelectorAll('#fH button').forEach(function(b){b.classList.toggle('on',b===btn);});break;
-      case 'save': commit();save();closeSheet();render();break;
+      case 'save':
+        commit();
+        if(isHead&&!m.title){if(isNew) removeNode(f);else{$('#fTitle').focus();return;}}
+        save();closeSheet();render();break;
       case 'up': case 'down':
-        commit();i=f.arr.indexOf(m);j=i+(act==='up'?-1:1);
+        commit();if(isHead&&!m.title) m.title='Heading';
+        i=f.arr.indexOf(m);j=i+(act==='up'?-1:1);
         if(j<0||j>=f.arr.length) return;
         f.arr.splice(i,1);f.arr.splice(j,0,m);save();closeSheet();render();flash(id);break;
       case 'del':
-        confirmSheet('Delete “'+esc(m.title)+'”?','Delete',function(){removeNode(f);save();render();},function(){openModEditor(id);});break;
-      default: closeSheet();
+        confirmSheet(isHead?'Delete the heading “'+esc(m.title||'Heading')+'”? The items under it stay.':'Delete “'+esc(m.title)+'”?','Delete',function(){removeNode(f);save();render();},function(){openModEditor(id,isNew);});break;
+      default:
+        if(isNew&&isHead){removeNode(f);save();render();}
+        closeSheet();
     }
   });
+  var ti=$('#fTitle');
+  ti.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('save');}});
+  if(isNew) ti.focus();
 }
 function openSecEditor(sid){
   var r=findSec(sid);if(!r) return;
@@ -2011,26 +2087,29 @@ lbPrev.addEventListener('click',function(){lbShow(lbIdx-1);});
 lbNext.addEventListener('click',function(){lbShow(lbIdx+1);});
 
 /* ---------- Drag to reorder (Edit mode) ---------- */
-var drag=null,dragEndT=0;
+var drag=null,dragEndT=0,dragSuppress=false;
 function dragLabel(kind,id){
   if(kind==='sec'){var r=findSec(id);return {t:r?r.section.title:'',s:''};}
   var f=find(id);if(!f) return {t:'',s:''};
   var n=f.node,k=n.type==='check'?n.children.length:0;
+  if(n.type==='head'){var g=headGroups(f.section)[n.id]||{n:0};return {t:n.title||'Heading',s:g.n?g.n+' item'+(g.n>1?'s':''):''};}
   return {t:n.type==='check'?(n.text||'Untitled item'):n.title,s:k?k+' sub-item'+(k>1?'s':''):''};
 }
 function dragSibs(box,kind){
   return Array.prototype.filter.call(box.children,function(el){
-    if(el===drag.orig) return false;
+    if(el===drag.orig||(drag.group&&drag.group.indexOf(el)>=0)) return false;
     if(kind==='sec') return el.classList.contains('sec');
     if(kind==='sub') return el.classList.contains('item');
-    return el.classList.contains('item')||el.classList.contains('module');
+    if(drag.isHead&&drag.group&&drag.group.length) return el.classList.contains('hd'); // a heading with items lands between groups
+    return el.classList.contains('item')||el.classList.contains('module')||el.classList.contains('hd');
   });
 }
 function dragNoScroll(e){if(drag) e.preventDefault();}
 function dragStart(g,e){
   var kind=g.getAttribute('data-drag'),id=g.getAttribute('data-id');
-  if(kind==='item'){var f=find(id);if(!f) return;kind=f.anc.length?'sub':'top';}
-  drag={kind:kind,id:id,g:g,pid:e.pointerId,x0:e.clientX,y0:e.clientY,y:e.clientY,started:false};
+  var isHead=false;
+  if(kind==='item'){var f=find(id);if(!f) return;kind=f.anc.length?'sub':'top';isHead=f.node.type==='head';}
+  drag={kind:kind,id:id,isHead:isHead,group:null,g:g,pid:e.pointerId,x0:e.clientX,y0:e.clientY,y:e.clientY,started:false};
   try{g.setPointerCapture(e.pointerId);}catch(_){}
   window.addEventListener('pointermove',dragOnMove,true);
   window.addEventListener('pointerup',dragOnUp,true);
@@ -2046,12 +2125,17 @@ function dragBegin(){
     document.body.classList.add('secdrag');
     var t1=orig.getBoundingClientRect().top;
     if(t1!==t0) window.scrollBy(0,t1-t0);
-  }else orig=d.g.closest('.item,.module');
+  }else orig=d.g.closest('.item,.module,.hd');
+  if(d.isHead){
+    d.group=[];
+    for(var nx=orig.nextElementSibling;nx&&(nx.classList.contains('item')||nx.classList.contains('module'));nx=nx.nextElementSibling) d.group.push(nx);
+  }
   var r=orig.getBoundingClientRect(),ph=document.createElement('div');
   ph.className='drag-ph';
   ph.style.height=(d.kind==='sec'?r.height:Math.min(r.height,56))+'px';
   orig.parentNode.insertBefore(ph,orig);
   orig.classList.add('drag-hidden');
+  if(d.group) d.group.forEach(function(el){el.classList.add('drag-hidden');});
   var lab=dragLabel(d.kind==='sec'?'sec':'item',d.id),gh=document.createElement('div');
   gh.className='drag-ghost';
   gh.innerHTML=I.grip+'<span>'+esc(lab.t)+'</span>'+(lab.s?'<small>'+esc(lab.s)+'</small>':'');
@@ -2121,7 +2205,8 @@ function dragApply(d){
   var idx=0,n=box.firstElementChild;
   for(;n&&n!==ph;n=n.nextElementSibling){
     if(n===d.orig) continue;
-    if(d.kind==='sec'?n.classList.contains('sec'):d.kind==='sub'?n.classList.contains('item'):(n.classList.contains('item')||n.classList.contains('module'))) idx++;
+    if(d.group&&d.group.indexOf(n)>=0) continue;
+    if(d.kind==='sec'?n.classList.contains('sec'):d.kind==='sub'?n.classList.contains('item'):(n.classList.contains('item')||n.classList.contains('module')||n.classList.contains('hd'))) idx++;
   }
   if(d.kind==='sec'){
     var L=cur(),r=findSec(d.id);if(!r) return;
@@ -2130,7 +2215,16 @@ function dragApply(d){
     var f=find(d.id);if(!f) return;
     var arr=f.arr;
     if(d.kind==='top'){var ts=findSec(ph.closest('.sec').getAttribute('data-sec'));if(!ts) return;arr=ts.section.items;}
-    f.arr.splice(f.arr.indexOf(f.node),1);arr.splice(idx,0,f.node);
+    if(f.node.type==='head'){
+      var st=f.arr.indexOf(f.node),len=1;
+      while(st+len<f.arr.length&&f.arr[st+len].type!=='head') len++;
+      var chunk=f.arr.splice(st,len);
+      arr.splice.apply(arr,[idx,0].concat(chunk));
+    }else{
+      f.arr.splice(f.arr.indexOf(f.node),1);arr.splice(idx,0,f.node);
+      // dropped into a folded heading group: unfold it so the item stays visible
+      for(var j=idx-1;j>=0;j--){if(arr[j].type==='head'){arr[j].collapsed=false;break;}}
+    }
   }
   save();
 }
@@ -2144,7 +2238,7 @@ function dragFinish(commit){
   try{d.g.releasePointerCapture(d.pid);}catch(_){}
   if(!d.started) return;
   cancelAnimationFrame(d.raf);clearTimeout(d.springT);
-  dragEndT=Date.now();
+  dragEndT=Date.now();dragSuppress=true;
   var at=(commit?d.ph:d.orig).getBoundingClientRect().top;
   if(!commit) d.orig.classList.remove('drag-hidden');
   if(commit) dragApply(d);
@@ -2157,6 +2251,7 @@ function dragFinish(commit){
   window.scrollBy(0,el.getBoundingClientRect().top-at);
   if(commit){el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(function(){el.classList.remove('flash');},1400);}
 }
+window.addEventListener('pointerdown',function(){dragSuppress=false;},true); // a new touch is a real tap
 app.addEventListener('pointerdown',function(e){
   var g=e.target.closest('.grip');
   if(!g||!editMode||drag) return;
@@ -2168,7 +2263,8 @@ app.addEventListener('pointerdown',function(e){
 /* ---------- Events ---------- */
 function onAct(e){
   if(e.target.closest('a')) return;
-  if(e.target.closest('.grip')||Date.now()-dragEndT<400) return;
+  if(e.target.closest('.grip')){dragSuppress=false;return;}
+  if(dragSuppress){dragSuppress=false;if(Date.now()-dragEndT<300) return;}
   var root=e.currentTarget,el=e.target.closest('[data-act]');if(!el||!root.contains(el)) return;
   var id=el.getAttribute('data-id'),c;
   switch(el.getAttribute('data-act')){
@@ -2193,6 +2289,8 @@ function onAct(e){
     case 'padExtend': padExtend(id);break;
     case 'addCd': addModule(id,newCd());break;
     case 'addRest': addModule(id,newRest());break;
+    case 'addHead': addHead(id);break;
+    case 'headFold': headFold(id);break;
     case 'cdSet': openCdEditor(id);break;
     case 'cdNudge': cdNudge(id,+el.getAttribute('data-d'));break;
     case 'cdClear': cdClear(id);break;
@@ -2215,7 +2313,7 @@ function onAct(e){
 app.addEventListener('click',onAct);
 toolPanel.addEventListener('click',onAct);
 app.addEventListener('keydown',function(e){
-  if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('row')){e.preventDefault();e.target.click();}
+  if((e.key==='Enter'||e.key===' ')&&e.target.classList&&(e.target.classList.contains('row')||(e.target.classList.contains('hd-row')&&e.target.tagName!=='BUTTON'))){e.preventDefault();e.target.click();}
 });
 function onInput(e){
   var t=e.target;
