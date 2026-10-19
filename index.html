@@ -365,10 +365,17 @@ body.finger .canvas-wrap canvas{touch-action:none}
 .drag-hidden{display:none!important}
 .drag-ph{margin:6px 10px;border:2px dashed var(--accent);border-radius:12px;background:var(--accent-weak)}
 .kids > .drag-ph{margin-left:44px}
+.d1 > .kids > .drag-ph{margin-left:78px}
+.d2 > .kids > .drag-ph,.d3 > .kids > .drag-ph{margin-left:112px}
+.row.drop-into{background:var(--accent-weak)!important;box-shadow:inset 0 0 0 2px var(--accent);border-radius:10px}
 #app > .drag-ph{margin:0 0 14px;border-radius:16px}
 .drag-ghost{position:fixed;z-index:90;pointer-events:none;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1.5px solid var(--accent);box-shadow:var(--shadow);color:var(--text);font-weight:600;font-size:calc(17px*var(--ts))}
 .drag-ghost svg{width:20px;height:20px;color:var(--accent)}
 .drag-ghost span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drag-ghost .gh-t{display:flex;flex-direction:column}
+.drag-ghost .gh-into{display:none;font-style:normal;font-size:calc(13px*var(--ts));font-weight:600;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drag-ghost.nest{border-style:dashed}
+.drag-ghost.nest .gh-into{display:block}
 .drag-ghost small{flex:none;color:var(--muted);font-weight:500;font-size:calc(14px*var(--ts))}
 body.dragging,body.dragging *{-webkit-user-select:none;user-select:none;cursor:grabbing}
 body.secdrag .sec .sec-body{display:none}
@@ -567,7 +574,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='11';
+var APP_VERSION='12';
 var TEXT_SIZES=[[0.9,'Small',13],[1,'Default',16],[1.15,'Large',19],[1.3,'Extra large',22]];
 function applyTextScale(){document.documentElement.style.setProperty('--ts',String(state.settings.textScale||1));}
 function normSettings(st){
@@ -976,7 +983,7 @@ function render(){
   editBtn.innerHTML=editMode?'Done':I.edit;
   editBtn.setAttribute('aria-label',editMode?'Done editing':'Edit');
   var h='<div class="title-row"><button type="button" class="list-title" data-act="lists" aria-label="Switch checklist, current: '+esc(L.title)+'"><span>'+esc(L.title)+'</span>'+I.chev+'</button><span class="chip" id="chip"></span></div>';
-  if(editMode) h+='<p class="edit-tip">Drag ≡ to reorder. A heading moves together with the items under it. Tap anything to edit it.</p>';
+  if(editMode) h+='<p class="edit-tip">Drag ≡ to reorder, in or out of sub-items. Hold an item over another for a moment to put it inside. A heading moves with the items under it.</p>';
   if(!L.sections.length&&!editMode) h+='<div class="sec"><div class="empty">This checklist is empty. Tap Edit to add a section.</div></div>';
   h+=L.sections.map(renderSection).join('');
   if(editMode) h+='<button type="button" class="add-sec" data-act="addSection">'+I.plus+'Add section</button>';
@@ -2108,8 +2115,13 @@ function dragNoScroll(e){if(drag) e.preventDefault();}
 function dragStart(g,e){
   var kind=g.getAttribute('data-drag'),id=g.getAttribute('data-id');
   var isHead=false;
-  if(kind==='item'){var f=find(id);if(!f) return;kind=f.anc.length?'sub':'top';isHead=f.node.type==='head';}
-  drag={kind:kind,id:id,isHead:isHead,group:null,g:g,pid:e.pointerId,x0:e.clientX,y0:e.clientY,y:e.clientY,started:false};
+  var subH=0;
+  if(kind==='item'){
+    var f=find(id);if(!f) return;
+    if(f.node.type==='check'){kind='chk';subH=nodeHeight(f.node);}
+    else{kind='top';isHead=f.node.type==='head';}
+  }
+  drag={kind:kind,id:id,isHead:isHead,subH:subH,group:null,intoEl:null,intoCand:null,g:g,pid:e.pointerId,x0:e.clientX,y0:e.clientY,y:e.clientY,started:false};
   try{g.setPointerCapture(e.pointerId);}catch(_){}
   window.addEventListener('pointermove',dragOnMove,true);
   window.addEventListener('pointerup',dragOnUp,true);
@@ -2138,8 +2150,8 @@ function dragBegin(){
   if(d.group) d.group.forEach(function(el){el.classList.add('drag-hidden');});
   var lab=dragLabel(d.kind==='sec'?'sec':'item',d.id),gh=document.createElement('div');
   gh.className='drag-ghost';
-  gh.innerHTML=I.grip+'<span>'+esc(lab.t)+'</span>'+(lab.s?'<small>'+esc(lab.s)+'</small>':'');
-  gh.style.left=r.left+'px';gh.style.width=r.width+'px';
+  gh.innerHTML=I.grip+'<span class="gh-t"><span>'+esc(lab.t)+'</span><em class="gh-into"></em></span>'+(lab.s?'<small>'+esc(lab.s)+'</small>':'');
+  gh.style.left=r.left+'px';gh.style.width=r.width+'px';d.ghL=r.left;d.ghW=r.width;
   document.body.appendChild(gh);
   d.orig=orig;d.ph=ph;d.gh=gh;d.off=Math.max(12,Math.min(d.y0-r.top,40));d.started=true;
   document.body.classList.add('dragging');
@@ -2157,9 +2169,70 @@ function dragSpring(sec){
     drag.spring=null;dragPlace();
   },450);
 }
+function nodeHeight(n){var h=0;(n.children||[]).forEach(function(c){h=Math.max(h,1+nodeHeight(c));});return h;}
+function isVis(el){return el.getClientRects().length>0;}
+function rowDepth(el,body){var k=0;for(var q=el.parentNode;q&&q!==body;q=q.parentNode){if(q.classList&&q.classList.contains('kids')) k++;}return k;}
+function dragInto(E){
+  var d=drag;if(d.intoEl===E) return;
+  if(d.intoEl){var r0=d.intoEl.querySelector(':scope > .row');if(r0) r0.classList.remove('drop-into');}
+  d.intoEl=E;
+  if(E){var r1=E.querySelector(':scope > .row');if(r1) r1.classList.add('drop-into');}
+  if(d.gh){
+    var lb=E&&E.querySelector(':scope > .row .label'),ie=d.gh.querySelector('.gh-into');
+    d.gh.classList.toggle('nest',!!E);
+    if(ie) ie.textContent=E?'Inside “'+(lb?lb.textContent:'item')+'”':'';
+    d.gh.style.left=(d.ghL+(E?36:0))+'px';d.gh.style.width=(d.ghW-(E?36:0))+'px';
+  }
+}
+var MAXD=3; // deepest sub-item level
+function dragPlaceChk(y){
+  var d=drag,best=null,bd=1e9;
+  app.querySelectorAll('.sec').forEach(function(sc){
+    var b=sc.getBoundingClientRect(),dist=y<b.top?b.top-y:(y>b.bottom?y-b.bottom:0);
+    if(dist<bd){bd=dist;best=sc;}
+  });
+  if(!best) return;
+  var folded=best.classList.contains('collapsed');
+  dragSpring(folded&&bd===0?best:null);
+  if(folded) return;
+  var body=best.querySelector('.sec-body'),addRow=body.querySelector('.add-row');
+  // every visible row at any level, in screen order
+  var rows=Array.prototype.filter.call(body.querySelectorAll(':scope > .module, :scope > .hd, .item > .row'),isVis);
+  if(!rows.length){dragInto(null);d.ph.style.display='';if(d.ph.parentNode!==body||d.ph.nextSibling!==addRow) body.insertBefore(d.ph,addRow);return;}
+  var pick=null,pd=1e9,pr=null;
+  rows.forEach(function(r){var q=r.getBoundingClientRect(),dist=y<q.top?q.top-y:(y>q.bottom?y-q.bottom:0);if(dist<pd){pd=dist;pick=r;pr=q;}});
+  var isRow=pick.classList.contains('row'),E=isRow?pick.parentNode:pick;
+  var depth=isRow?rowDepth(E,body):0,H=d.subH,kids=null,openKids=false;
+  var f=(Math.min(Math.max(y,pr.top),pr.bottom)-pr.top)/Math.max(pr.height,1),mode;
+  if(!isRow) mode=f<0.5?'before':'after';
+  else{
+    kids=E.querySelector(':scope > .kids');
+    openKids=!!kids&&!E.classList.contains('kclosed')&&Array.prototype.some.call(kids.children,function(k){return k!==d.orig&&k.classList.contains('item')&&isVis(k);});
+    var canNest=depth+1+H<=MAXD;
+    if(openKids) mode=f<0.5||!canNest?'before':'first';
+    else if(canNest&&f>=0.3&&f<=0.7) mode='into';
+    else mode=f<0.5?'before':'after';
+  }
+  // Putting an item inside another needs a short hold, so quick drags past it don't nest by accident
+  if(mode==='into'){
+    if(d.intoCand!==E){d.intoCand=E;d.intoT=Date.now();clearTimeout(d.intoTimer);d.intoTimer=setTimeout(dragPlace,420);}
+    if(Date.now()-d.intoT<400) mode=f<0.5?'before':'after';
+  }else{d.intoCand=null;clearTimeout(d.intoTimer);}
+  var nd=(mode==='first'||mode==='into')?depth+1:depth;
+  if(nd+H>MAXD) return;
+  if(mode==='into'){dragInto(E);d.ph.style.display='none';return;}
+  dragInto(null);d.ph.style.display='';
+  var box,ref;
+  if(mode==='before'){box=E.parentNode;ref=E;}
+  else if(mode==='after'){box=E.parentNode;ref=E.nextSibling;}
+  else{box=kids;ref=kids.firstChild;}
+  if(d.ph.parentNode===box&&d.ph.nextSibling===(ref||null)) return;
+  box.insertBefore(d.ph,ref||null);
+}
 function dragPlace(){
   var d=drag;if(!d||!d.started) return;
   d.gh.style.top=(d.y-d.off)+'px';
+  if(d.kind==='chk'){dragPlaceChk(d.y);return;}
   var y=d.y,box,sibs,ref=null,i,q;
   if(d.kind==='sec'){box=app;sibs=dragSibs(app,'sec');ref=app.querySelector('.add-sec');}
   else if(d.kind==='sub'){box=d.orig.parentNode;sibs=dragSibs(box,'sub');}
@@ -2200,7 +2273,34 @@ function dragOnMove(e){
 }
 function dragOnUp(e){if(drag&&e.pointerId===drag.pid) dragFinish(true);}
 function dragOnCancel(e){if(drag&&e.pointerId===drag.pid) dragFinish(false);}
+function dragApplyChk(d){
+  var f=find(d.id);if(!f) return;
+  var node=f.node,oldParent=f.anc.length?f.anc[f.anc.length-1]:null,newParent=null,arr,idx=0;
+  if(d.intoEl){
+    var tf=find(d.intoEl.getAttribute('data-item'));if(!tf||tf.node===node) return;
+    newParent=tf.node;
+    f.arr.splice(f.arr.indexOf(node),1);newParent.children.push(node);
+  }else{
+    var box=d.ph.parentNode;if(!box) return;
+    var inKids=box.classList.contains('kids');
+    for(var n=box.firstElementChild;n&&n!==d.ph;n=n.nextElementSibling){
+      if(n===d.orig) continue;
+      if(inKids?n.classList.contains('item'):(n.classList.contains('item')||n.classList.contains('module')||n.classList.contains('hd'))) idx++;
+    }
+    if(inKids){var pf=find(box.parentNode.getAttribute('data-item'));if(!pf) return;newParent=pf.node;arr=newParent.children;}
+    else{var ts=findSec(box.closest('.sec').getAttribute('data-sec'));if(!ts) return;arr=ts.section.items;}
+    f.arr.splice(f.arr.indexOf(node),1);arr.splice(idx,0,node);
+    if(!inKids){for(var j=idx-1;j>=0;j--){if(arr[j].type==='head'){arr[j].collapsed=false;break;}}}
+  }
+  if(newParent){newParent.open=true;if(!node.info&&!node.done) newParent.done=false;}
+  if(oldParent&&oldParent!==newParent&&!oldParent.info){
+    var tk=oldParent.children.filter(function(c){return !c.info;});
+    if(tk.length&&tk.every(function(c){return c.done;})) oldParent.done=true;
+  }
+  save();
+}
 function dragApply(d){
+  if(d.kind==='chk'){dragApplyChk(d);return;}
   var ph=d.ph,box=ph.parentNode;if(!box) return;
   var idx=0,n=box.firstElementChild;
   for(;n&&n!==ph;n=n.nextElementSibling){
@@ -2237,18 +2337,21 @@ function dragFinish(commit){
   document.removeEventListener('touchmove',dragNoScroll,{passive:false});
   try{d.g.releasePointerCapture(d.pid);}catch(_){}
   if(!d.started) return;
-  cancelAnimationFrame(d.raf);clearTimeout(d.springT);
+  cancelAnimationFrame(d.raf);clearTimeout(d.springT);clearTimeout(d.intoTimer);
   dragEndT=Date.now();dragSuppress=true;
-  var at=(commit?d.ph:d.orig).getBoundingClientRect().top;
+  // keep the drop spot steady on screen: the item itself, or the item it went into
+  var anchorId=commit&&d.intoEl?d.intoEl.getAttribute('data-item'):d.id;
+  var at=(commit?(d.intoEl||d.ph):d.orig).getBoundingClientRect().top;
   if(!commit) d.orig.classList.remove('drag-hidden');
   if(commit) dragApply(d);
   d.gh.remove();
   document.body.classList.remove('dragging','secdrag');
   render();
   // Keep what was moved where the finger let go
+  var an=app.querySelector('[data-sec="'+anchorId+'"],[data-item="'+anchorId+'"],[data-mod="'+anchorId+'"]');
+  if(an) window.scrollBy(0,an.getBoundingClientRect().top-at);
   var el=app.querySelector('[data-sec="'+d.id+'"],[data-item="'+d.id+'"],[data-mod="'+d.id+'"]');
   if(!el) return;
-  window.scrollBy(0,el.getBoundingClientRect().top-at);
   if(commit){el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(function(){el.classList.remove('flash');},1400);}
 }
 window.addEventListener('pointerdown',function(){dragSuppress=false;},true); // a new touch is a real tap
