@@ -373,6 +373,17 @@ body.finger .canvas-wrap canvas{touch-action:none}
 body.dragging,body.dragging *{-webkit-user-select:none;user-select:none;cursor:grabbing}
 body.secdrag .sec .sec-body{display:none}
 
+/* Info items: not tickable */
+.ibox{flex:none;width:26px;height:26px;display:grid;place-items:center;margin-top:-1px;color:var(--accent)}
+.ibox svg{width:22px;height:22px;stroke-width:1.9}
+.d1 > .row .ibox,.d2 > .row .ibox,.d3 > .row .ibox{width:23px;height:23px}
+.d1 > .row .ibox svg,.d2 > .row .ibox svg,.d3 > .row .ibox svg{width:20px;height:20px}
+body:not(.editing) .item.info > .row{cursor:default}
+body:not(.editing) .item.info > .row:active{background:none}
+.type-seg{display:grid;grid-template-columns:1fr 1fr}
+.type-seg button{display:flex;align-items:center;justify-content:center;gap:7px}
+.type-seg svg{width:18px;height:18px}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:88px;min-width:88px;max-width:176px;display:block;position:relative}
@@ -478,6 +489,8 @@ var I={
   timer:sv('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2"/><path d="M9.5 2.8h5"/><path d="M12 2.8V6"/>'),
   moon:sv('<path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/>'),
   textsize:sv('<path d="M3 7V5h11v2"/><path d="M8.5 5v14"/><path d="M14 12v-1.5h7V12"/><path d="M17.5 10.5V19"/>'),
+  info:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 11v5.5"/><path d="M12 7.6v.1" stroke-width="2.6"/>'),
+  tickbox:sv('<circle cx="12" cy="12" r="8"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/>'),
   grip:sv('<path d="M5 7.5h14M5 12h14M5 16.5h14"/>'),
   bell:sv('<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'),
   back:sv('<path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/>')
@@ -492,7 +505,7 @@ var storageOK=true;
 try{localStorage.setItem('__fc','1');localStorage.removeItem('__fc');}catch(e){storageOK=false;}
 
 /* ---------- Data ---------- */
-function newCheck(text){return {id:uid(),type:'check',text:text||'',note:'',links:[],imgs:[],done:false,open:true,children:[]};}
+function newCheck(text){return {id:uid(),type:'check',text:text||'',note:'',links:[],imgs:[],info:false,done:false,open:true,children:[]};}
 function newCalc(){return {id:uid(),type:'calc',title:'Calculator',expr:'',hist:[],collapsed:false};}
 function newPad(){return {id:uid(),type:'pad',title:'Notepad',mode:'draw',text:'',strokes:[],h:300,collapsed:false};}
 function newCd(){return {id:uid(),type:'cd',title:'Countdown',target:null,lead:0,aL:false,aZ:false,collapsed:false};}
@@ -513,7 +526,7 @@ function normItem(it){
   return {id:str(it.id)||uid(),type:'check',text:str(it.text),note:str(it.note),
     links:Array.isArray(it.links)?it.links.filter(function(l){return l&&l.url;}).map(function(l){return {label:str(l.label),url:str(l.url)};}):[],
     imgs:Array.isArray(it.imgs)?it.imgs.filter(function(x){return typeof x==='string'&&x;}):[],
-    done:!!it.done,open:it.open!==false,
+    info:!!it.info,done:!it.info&&!!it.done,open:it.open!==false,
     children:Array.isArray(it.children)?it.children.map(normItem).filter(function(x){return x&&x.type==='check';}):[]};
 }
 function normalize(o){
@@ -535,7 +548,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='9';
+var APP_VERSION='10';
 var TEXT_SIZES=[[0.9,'Small',13],[1,'Default',16],[1.15,'Large',19],[1.3,'Extra large',22]];
 function applyTextScale(){document.documentElement.style.setProperty('--ts',String(state.settings.textScale||1));}
 function normSettings(st){
@@ -698,7 +711,7 @@ function findSec(id){
   return null;
 }
 function removeNode(f){var i=f.arr.indexOf(f.node);if(i>=0) f.arr.splice(i,1);}
-function secCount(s){var d=0,t=0;s.items.forEach(function(it){if(it.type==='check'){t++;if(it.done)d++;}});return {d:d,t:t};}
+function secCount(s){var d=0,t=0;s.items.forEach(function(it){if(it.type==='check'&&!it.info){t++;if(it.done)d++;}});return {d:d,t:t};}
 function listCount(L){var d=0,t=0;L.sections.forEach(function(s){var c=secCount(s);d+=c.d;t+=c.t;});return {d:d,t:t};}
 function untickItems(arr){arr.forEach(function(n){if(n.type==='check'){n.done=false;untickItems(n.children);}});}
 function newFlight(L){
@@ -807,16 +820,18 @@ function renderNode(it,depth){
 }
 function renderCheck(it,depth){
   var kids=it.children||[];
-  var kd=kids.filter(function(k){return k.done;}).length;
-  var cls='item d'+Math.min(depth,3)+(it.done?' done':'')+(kids.length&&it.open===false?' kclosed':'');
+  var kt=kids.filter(function(k){return !k.info;}),kd=kt.filter(function(k){return k.done;}).length;
+  var cls='item d'+Math.min(depth,3)+(it.info?' info':'')+(it.done?' done':'')+(kids.length&&it.open===false?' kclosed':'');
   var h='<div class="'+cls+'" data-item="'+it.id+'">';
-  h+='<div class="row" data-act="'+(editMode?'editItem':'tick')+'" data-id="'+it.id+'" tabindex="0" role="'+(editMode?'button':'checkbox')+'"'+(editMode?'':' aria-checked="'+it.done+'"')+'>';
-  h+='<span class="box">'+I.check+'</span><div class="txt"><div class="label">'+(esc(it.text)||'<span class="ph">Untitled item</span>')+'</div>';
+  if(editMode) h+='<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">';
+  else if(it.info) h+='<div class="row" data-id="'+it.id+'">';
+  else h+='<div class="row" data-act="tick" data-id="'+it.id+'" tabindex="0" role="checkbox" aria-checked="'+it.done+'">';
+  h+=(it.info?'<span class="ibox" aria-hidden="true">'+I.info+'</span>':'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(esc(it.text)||'<span class="ph">Untitled item</span>')+'</div>';
   if(it.note) h+='<div class="note">'+linkify(esc(it.note))+'</div>';
   if(it.links.length) h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
   h+='</div>';
-  if(kids.length) h+='<button type="button" class="kid-toggle" data-act="toggleKids" data-id="'+it.id+'" aria-label="Show or hide sub-items">'+kd+'/'+kids.length+'<span class="chev">'+I.chev+'</span></button>';
+  if(kids.length) h+='<button type="button" class="kid-toggle" data-act="toggleKids" data-id="'+it.id+'" aria-label="Show or hide sub-items">'+(kt.length?kd+'/'+kt.length:kids.length)+'<span class="chev">'+I.chev+'</span></button>';
   if(editMode) h+='<span class="edit-hint">'+I.edit+'</span><span class="grip" data-drag="item" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>';
   h+='</div>';
   if(kids.length) h+='<div class="kids">'+kids.map(function(k){return renderCheck(k,depth+1);}).join('')+'</div>';
@@ -957,10 +972,11 @@ function flash(id){
 /* ---------- Actions ---------- */
 function tick(id){
   var f=find(id);if(!f) return;
-  var it=f.node;it.done=!it.done;
+  var it=f.node;if(it.info) return;
+  it.done=!it.done;
   for(var i=f.anc.length-1;i>=0;i--){
-    var p=f.anc[i];
-    if(it.done){if(p.children.every(function(c){return c.done;})) p.done=true;else break;}
+    var p=f.anc[i];if(p.info) break;
+    if(it.done){if(p.children.every(function(c){return c.done||c.info;})) p.done=true;else break;}
     else{if(p.done) p.done=false;else break;}
   }
   save();
@@ -1213,8 +1229,12 @@ function edThumbsHTML(imgs){
 }
 function openItemEditor(id,isNew){
   var f=find(id);if(!f) return;
-  var it=f.node,n=f.arr.length,imgs=(it.imgs||[]).slice(),busy=0;
+  var it=f.node,n=f.arr.length,imgs=(it.imgs||[]).slice(),busy=0,info=!!it.info;
   openSheet('<h3>'+(isNew?'New item':'Edit item')+'</h3>'+
+    '<div class="fld"><div class="seg big type-seg" id="fType" role="radiogroup" aria-label="Item type">'+
+      '<button type="button" role="radio" aria-checked="'+!info+'" class="'+(info?'':'on')+'" data-sact="type" data-v="check">'+I.tickbox+'Checkbox</button>'+
+      '<button type="button" role="radio" aria-checked="'+info+'" class="'+(info?'on':'')+'" data-sact="type" data-v="info">'+I.info+'Info</button></div>'+
+    '<p class="hint" id="fTypeHint" style="margin:8px 0 0">'+(info?'Info items have no tick and aren’t counted in the progress.':'Tap the item in the checklist to tick it.')+'</p></div>'+
     '<label class="fld"><span class="fl">Item</span><input id="fText" type="text" value="'+esc(it.text)+'" placeholder="e.g. TCAS BELOW" autocomplete="off"></label>'+
     '<label class="fld"><span class="fl">Note <em>(shown under the item)</em></span><textarea id="fNote" rows="3" placeholder="Optional">'+esc(it.note)+'</textarea></label>'+
     '<div class="fld"><span class="fl">Links</span><div id="fLinks">'+it.links.map(linkRowHTML).join('')+'</div>'+
@@ -1233,10 +1253,16 @@ function openItemEditor(id,isNew){
       it.note=$('#fNote').value.replace(/\s+$/,'');
       it.links=Array.prototype.map.call(sheetEl.querySelectorAll('.link-row'),function(r){return {label:r.querySelector('.lLabel').value.trim(),url:r.querySelector('.lUrl').value.trim()};}).filter(function(l){return l.url;});
       it.imgs=imgs.slice();
+      it.info=info;if(info) it.done=false;
     }
     if(busy&&['save','up','down','sub','del'].indexOf(act)>=0){toast('Still adding photos…');return;}
     var j,k;
     switch(act){
+      case 'type':
+        info=btn.getAttribute('data-v')==='info';
+        sheetEl.querySelectorAll('#fType button').forEach(function(b){var on=b===btn;b.classList.toggle('on',on);b.setAttribute('aria-checked',String(on));});
+        $('#fTypeHint').textContent=info?'Info items have no tick and aren’t counted in the progress.':'Tap the item in the checklist to tick it.';
+        break;
       case 'addLink':
         var d=document.createElement('div');d.innerHTML=linkRowHTML({label:'',url:''});
         var row=d.firstElementChild;$('#fLinks').appendChild(row);row.querySelector('.lLabel').focus();break;
