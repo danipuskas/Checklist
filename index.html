@@ -70,6 +70,25 @@ svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 #barFill{height:100%;width:0;background:var(--accent);transition:width .25s ease}
 #barFill.complete{background:var(--done)}
 .tb-r{display:flex;justify-content:flex-end;align-items:center;gap:6px}
+.tb-l{display:flex;justify-content:flex-start;align-items:center;min-width:0}
+.restchip{appearance:none;border:0;border-radius:12px;padding:5px 9px 5px 7px;display:flex;align-items:center;gap:6px;min-width:0;max-width:100%;background:var(--done-weak);color:var(--done);text-align:left}
+.restchip[hidden]{display:none}
+.restchip svg{width:16px;height:16px;flex:none}
+.rc-main{display:flex;flex-direction:column;min-width:0;line-height:1.12}
+.rc-main b{font:700 16px/1.1 -apple-system,"SF Pro Display",system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rc-main small{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.restchip.wait{background:var(--surface2);color:var(--muted)}
+.restchip.wait b{color:var(--text)}
+.restchip.soon{background:var(--warn-weak);color:var(--warn)}
+@media (max-width:420px){
+  .topbar{column-gap:4px;padding-left:8px;padding-right:8px}
+  .restchip{padding:5px 8px;gap:0}
+  .restchip svg{display:none}
+  .utc{font-size:19px}
+  .loc{font-size:11.5px}
+  .tb-r{gap:4px}
+  .tb-r .ib.round{width:36px;height:36px}
+}
 .clock{appearance:none;border:0;background:none;color:var(--text);display:flex;flex-direction:column;align-items:center;padding:3px 10px;border-radius:12px;min-width:0}
 .clock:active{background:var(--press)}
 .utc{font:650 21px/1.08 -apple-system,"SF Pro Display",system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
@@ -448,7 +467,7 @@ button.hd-row:active,.hd-row[role=button]:active{background:var(--press)}
 </head>
 <body>
 <header class="topbar">
-  <span aria-hidden="true"></span>
+  <span class="tb-l"><button class="restchip" id="restChip" type="button" hidden><span id="rcIcon"></span><span class="rc-main"><b id="rcTime"></b><small id="rcName"></small></span></button></span>
   <button class="clock" id="clockBtn" type="button" aria-label="UTC clock. Tap to choose the destination airport">
     <span class="utc" id="utc">--:--:--<small>Z</small></span>
     <span class="loc noset" id="loc">Set destination</span>
@@ -574,7 +593,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='13';
+var APP_VERSION='14';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -1759,6 +1778,40 @@ function allCds(){
   state.lists.forEach(function(L){L.sections.forEach(function(s){s.items.forEach(function(n){if(n.type==='cd') out.push({node:n,list:L});});});});
   return out;
 }
+function restTop(m,now){
+  // what the top bar shows for a rest plan: current break, next break, or time to rest start
+  var r=restCalc(m);if(r.err) return null;
+  var d=new Date(now),nowMin=d.getUTCHours()*60+d.getUTCMinutes()+d.getUTCSeconds()/60;
+  var rel=((nowMin-r.s)%1440+1440)%1440,abs=r.s+rel;
+  if(rel<r.total){
+    for(var i=0;i<r.rows.length;i++){
+      var x=r.rows[i];
+      if(abs>=x.s&&abs<x.e) return {mode:'on',min:x.e-abs,name:m.labels[i]||'Break '+(i+1)};
+      if(abs<x.s) return {mode:'gap',min:x.s-abs,name:'to '+(m.labels[i]||'Break '+(i+1))};
+    }
+    return null;
+  }
+  var wait=1440-rel;
+  return wait<=720?{mode:'wait',min:wait,name:'to rest'}:null;
+}
+function restSource(){
+  if(!restCalc(state.tools.rest).err) return state.tools.rest;
+  var L=cur(),found=null;
+  L.sections.forEach(function(s){s.items.forEach(function(n){if(!found&&n.type==='rest'&&!restCalc(n).err) found=n;});});
+  return found;
+}
+var restChip=$('#restChip');
+$('#rcIcon').outerHTML=I.moon;
+function paintRestChip(now){
+  var m=restSource(),t=m&&restTop(m,now);
+  if(!t){restChip.hidden=true;return;}
+  var mins=Math.ceil(t.min),txt=Math.floor(mins/60)+':'+pad2(mins%60);
+  $('#rcTime').textContent=txt;$('#rcName').textContent=t.name;
+  restChip.className='restchip'+(t.mode==='on'?(t.min<=10?' soon':''):' wait');
+  restChip.setAttribute('aria-label',t.mode==='on'?t.name+' rest, '+txt+' left':'Next rest in '+txt);
+  restChip.hidden=false;
+}
+restChip.addEventListener('click',function(){openTool('rest');});
 function clockTick(){
   var now=Date.now();
   paintClock(now);
@@ -1772,6 +1825,7 @@ function clockTick(){
     el.classList.toggle('warn',diff<=0||(!!f.node.lead&&diff<=f.node.lead*60000));
   });
   paintAlert();
+  paintRestChip(now);
 }
 
 /* Countdown and crew rest from the menu */
