@@ -466,6 +466,7 @@ button.hd-row:active,.hd-row[role=button]:active{background:var(--press)}
 .cbx{flex:none;width:22px;height:22px;border-radius:6px;border:2px solid var(--box);display:grid;place-items:center}
 .cbx svg{width:15px;height:15px;stroke:var(--on-accent);stroke-width:3.2;opacity:0}
 .cbr.on .cbx{background:var(--accent);border-color:var(--accent)}
+.cbr.rad .cbx{border-radius:50%}
 .cbr.on .cbx svg{opacity:1}
 .cbr:not(.on){color:var(--muted)}
 .esr{display:flex;align-items:center;gap:2px;padding:6px 4px 6px 8px;border-top:1px solid var(--line-soft);background:var(--surface2)}
@@ -620,12 +621,16 @@ function newRest(){return {id:uid(),type:'rest',title:'Crew rest',start:'',end:'
 
 function newApn(){return {id:uid(),type:'apn',title:'Airport notes',which:'dest',secs:null,fold:{},collapsed:false};}
 function newNote(){var n=newCheck('');n.info=true;return n;}
+function newCdBlock(){return {id:uid(),type:'cd',link:true,ref:null,collapsed:false};}
+function newRestBlock(){return {id:uid(),type:'rest',link:true,collapsed:false};}
 function newHead(){return {id:uid(),type:'head',title:'',collapsed:false};}
 function normItem(it){
   if(!it||typeof it!=='object') return null;
   if(it.type==='apn') return {id:str(it.id)||uid(),type:'apn',title:'Airport notes',which:it.which==='dep'?'dep':'dest',
     secs:Array.isArray(it.secs)?it.secs.filter(function(x){return typeof x==='string';}):null,
     fold:(it.fold&&typeof it.fold==='object')?Object.keys(it.fold).reduce(function(a,k){if(it.fold[k]) a[k]=true;return a;},{}):{},collapsed:!!it.collapsed};
+  if(it.type==='cd'&&it.link===true) return {id:str(it.id)||uid(),type:'cd',link:true,ref:typeof it.ref==='string'&&it.ref?it.ref:null,collapsed:!!it.collapsed};
+  if(it.type==='rest'&&it.link===true) return {id:str(it.id)||uid(),type:'rest',link:true,collapsed:!!it.collapsed};
   if(it.type==='head') return {id:str(it.id)||uid(),type:'head',title:str(it.title,'Heading'),collapsed:!!it.collapsed};
   if(it.type==='cd') return {id:str(it.id)||uid(),type:'cd',title:str(it.title,'Countdown'),target:typeof it.target==='number'&&isFinite(it.target)?it.target:null,
     lead:Math.max(0,Math.min(180,+it.lead||0)),aL:!!it.aL,aZ:!!it.aZ,collapsed:!!it.collapsed};
@@ -649,8 +654,9 @@ function normalize(o){
     sections:Array.isArray(l.sections)?l.sections.map(function(s){return {id:str(s.id)||uid(),title:str(s.title,'Section'),collapsed:!!s.collapsed,
       items:Array.isArray(s.items)?s.items.map(normItem).filter(Boolean):[]};}):[]};});
   var current=lists.some(function(l){return l.id===o.current;})?o.current:lists[0].id;
-  var secs=normApSecs(o.apSections);
-  return {v:1,current:current,settings:normSettings(o.settings),tools:normTools(o.tools),apSections:secs,apNotes:normApNotes(o.apNotes,secs),lists:lists};
+  var secs=normApSecs(o.apSections),tools=normTools(o.tools);
+  linkBlocks(lists,tools);
+  return {v:1,current:current,settings:normSettings(o.settings),tools:tools,apSections:secs,apNotes:normApNotes(o.apNotes,secs),lists:lists};
 }
 var AP_SECS_DEFAULT=['General','Arrival','Departure','On ground','Safety reports','Layover'];
 function normApSecs(a){
@@ -674,6 +680,23 @@ function normApNotes(o,secs){
   });
   return out;
 }
+var blocksMigrated=false;
+function restUsed(r){return !!(r.start||r.end||r.labels.some(function(x){return x;}));}
+function linkBlocks(lists,T){
+  // Older versions kept separate times in each block. Move them into the menu ones and link the blocks.
+  lists.forEach(function(L){L.sections.forEach(function(s){s.items.forEach(function(n,i){
+    if(n.type==='cd'&&!n.link){
+      var key=n.title.trim().toLowerCase(),c=T.cds.filter(function(x){return x.title.trim().toLowerCase()===key;})[0];
+      if(c){if(c.target===null&&n.target!==null){c.target=n.target;c.lead=n.lead;c.aL=n.aL;c.aZ=n.aZ;}}
+      else if(T.cds.length<20){c={id:uid(),type:'cd',title:n.title,target:n.target,lead:n.lead,aL:n.aL,aZ:n.aZ,collapsed:false};T.cds.push(c);}
+      s.items[i]={id:n.id,type:'cd',link:true,ref:c?c.id:null,collapsed:n.collapsed};blocksMigrated=true;
+    }else if(n.type==='rest'&&!n.link){
+      var r=T.rest;
+      if(!restUsed(r)&&restUsed(n)){r.start=n.start;r.end=n.end;r.n=n.n;r.buffer=n.buffer;r.round=n.round;r.labels=n.labels.slice();}
+      s.items[i]={id:n.id,type:'rest',link:true,collapsed:n.collapsed};blocksMigrated=true;
+    }else if(n.type==='cd'&&n.ref&&!T.cds.some(function(x){return x.id===n.ref;})) n.ref=null;
+  });});});
+}
 function normTools(t){
   t=t||{};
   var cds=(Array.isArray(t.cds)?t.cds:(t.cd?[t.cd]:[])).map(normItem).filter(function(x){return x&&x.type==='cd';}).slice(0,20);
@@ -686,7 +709,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='18';
+var APP_VERSION='19';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -870,8 +893,6 @@ function newFlight(L){
     s.items.forEach(function(n){
       if(n.type==='calc'){n.expr='';n.hist=[];fresh.delete(n.id);}
       if(n.type==='pad'){n.strokes=[];n.text='';}
-      if(n.type==='cd'){n.target=null;n.aL=n.aZ=false;alerting.delete(n.id);}
-      if(n.type==='rest'){n.start='';n.end='';}
     });
   });
   var T=state.tools;
@@ -997,8 +1018,8 @@ function renderNode(it,depth){
   if(it.type==='head'){var hf=find(it.id);return renderHead(it,hf?headGroups(hf.section)[it.id]:null);}
   if(it.type==='calc') return renderCalc(it);
   if(it.type==='pad') return renderPad(it);
-  if(it.type==='cd') return renderCd(it);
-  if(it.type==='rest') return renderRest(it);
+  if(it.type==='cd') return it.link?renderCdBlock(it):renderCd(it);
+  if(it.type==='rest') return it.link?renderRest(state.tools.rest,it):renderRest(it);
   if(it.type==='apn') return renderApn(it);
   return renderCheck(it,depth);
 }
@@ -1064,8 +1085,16 @@ function renderPad(m){
   }
   return '<div class="module pad'+(m.collapsed?' collapsed':'')+'" data-mod="'+m.id+'">'+modHead(m,I.pad)+'<div class="mod-body">'+body+'</div></div>';
 }
-function renderCd(m){
-  return '<div class="module cd'+(m.collapsed?' collapsed':'')+'" data-mod="'+m.id+'">'+modHead(m,I.timer)+
+function cdById(id){for(var i=0;i<state.tools.cds.length;i++){if(state.tools.cds[i].id===id) return state.tools.cds[i];}return null;}
+function renderCdBlock(b){
+  var c=b.ref&&cdById(b.ref);
+  if(c) return renderCd(c,b);
+  return '<div class="module cd unlinked'+(b.collapsed?' collapsed':'')+'" data-mod="'+b.id+'">'+modHead({id:b.id,title:'Countdown'},I.timer)+
+    '<div class="mod-body"><div class="apn-empty">No countdown chosen. <button type="button" class="lnkbtn" data-act="cdPick" data-id="'+b.id+'">Choose one</button></div></div></div>';
+}
+function renderCd(m,blk){
+  var b=blk||m;
+  return '<div class="module cd'+(b.collapsed?' collapsed':'')+'" data-mod="'+b.id+'"'+(blk?' data-ref="'+m.id+'"':'')+'>'+modHead({id:b.id,title:m.title},I.timer)+
     '<div class="mod-body"><button type="button" class="cd-time" data-act="cdSet" data-id="'+m.id+'" aria-label="Set countdown time">'+
     '<span class="cd-rem" data-rem></span><span class="cd-sub" data-sub></span></button>'+
     '<div class="cd-alert" role="alert"><span data-amsg></span><button type="button" data-act="cdAck" data-id="'+m.id+'">OK</button></div>'+
@@ -1075,9 +1104,10 @@ function renderCd(m){
     '<button type="button" class="btn small opt" data-act="cdClear" data-id="'+m.id+'">Clear</button></div>'+
     '<div class="cd-meta" data-meta></div></div></div>';
 }
-function renderRest(m){
+function renderRest(m,blk){
+  var b=blk||m;
   var bufs=[0,5,10,15,20,30].map(function(v){return '<option value="'+v+'"'+(m.buffer===v?' selected':'')+'>'+(v?v+' min':'None')+'</option>';}).join('');
-  return '<div class="module rest'+(m.collapsed?' collapsed':'')+'" data-mod="'+m.id+'">'+modHead(m,I.moon)+
+  return '<div class="module rest'+(b.collapsed?' collapsed':'')+'" data-mod="'+b.id+'"'+(blk?' data-ref="'+m.id+'"':'')+'>'+modHead({id:b.id,title:m.title},I.moon)+
     '<div class="mod-body"><div class="rest-in">'+
     '<label class="tin"><span>Start</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="HHMM" data-rest="start" data-id="'+m.id+'" value="'+esc(m.start)+'"><i>Z</i></label>'+
     '<label class="tin"><span>End</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="HHMM" data-rest="end" data-id="'+m.id+'" value="'+esc(m.end)+'"><i>Z</i></label></div>'+
@@ -1729,7 +1759,7 @@ function openMenu(){
       case 'untick':
         confirmSheet('Untick every item in “'+esc(L.title)+'”?','Untick all',function(){L.sections.forEach(function(s){untickItems(s.items);});save();render();toast('All items unticked');},openMenu);break;
       case 'flight':
-        confirmSheet('Start a new flight in “'+esc(L.title)+'”? This unticks every item, clears its calculators, notepads, countdowns and rest times, clears the menu countdowns and crew rest, and unticks airport note checkboxes.','New flight',function(){newFlight(L);save();render();window.scrollTo(0,0);toast('Ready for a new flight');},openMenu);break;
+        confirmSheet('Start a new flight in “'+esc(L.title)+'”? This unticks every item, clears its calculators and notepads, clears all countdowns and the crew rest times, and unticks airport note checkboxes.','New flight',function(){newFlight(L);save();render();window.scrollTo(0,0);toast('Ready for a new flight');},openMenu);break;
       case 'sound':
         state.settings.sound=!snd;save();if(state.settings.sound){audioUnlock();beep(1);}openMenu();break;
       case 'finger':
@@ -1997,12 +2027,7 @@ function restTop(m,now){
   var wait=1440-rel;
   return wait<=720?{mode:'wait',min:wait,name:'to rest'}:null;
 }
-function restSource(){
-  if(!restCalc(state.tools.rest).err) return state.tools.rest;
-  var L=cur(),found=null;
-  L.sections.forEach(function(s){s.items.forEach(function(n){if(!found&&n.type==='rest'&&!restCalc(n).err) found=n;});});
-  return found;
-}
+function restSource(){return restCalc(state.tools.rest).err?null:state.tools.rest;}
 var restChip=$('#restChip');
 $('#rcIcon').outerHTML=I.moon;
 function paintRestChip(now){
@@ -2019,9 +2044,8 @@ function clockTick(){
   var now=Date.now();
   paintClock(now);
   state.tools.cds.forEach(function(c){cdCheck(c,now);});
-  allCds().forEach(function(c){cdCheck(c.node,now);});
-  document.querySelectorAll('.module.cd').forEach(function(el){var f=find(el.getAttribute('data-mod'));if(f) cdPaint(f.node,el,now);});
-  document.querySelectorAll('.module.rest').forEach(function(el){var f=find(el.getAttribute('data-mod'));if(f) restStatus(f.node,el,now);});
+  document.querySelectorAll('.module.cd:not(.unlinked)').forEach(function(el){var f=find(el.getAttribute('data-ref')||el.getAttribute('data-mod'));if(f) cdPaint(f.node,el,now);});
+  document.querySelectorAll('.module.rest').forEach(function(el){var f=find(el.getAttribute('data-ref')||el.getAttribute('data-mod'));if(f) restStatus(f.node,el,now);});
   document.querySelectorAll('[data-ocd]').forEach(function(el){
     var f=find(el.getAttribute('data-ocd'));if(!f||f.node.target===null){el.textContent='–';return;}
     var diff=f.node.target-now;el.textContent=(diff<=0?'+':'')+durClock(diff);
@@ -2063,10 +2087,6 @@ function openTool(kind){
         '<button type="button" class="ib" data-act="toolCdDel" data-id="'+c.id+'" aria-label="Delete '+esc(c.title)+'">'+I.trash+'</button></div>'+renderCd(c)+'</div>';
     }).join('');
     h+='<button type="button" class="btn small ghost tcd-add" data-act="toolCdAdd">'+I.plus+'Add countdown</button>';
-    var others=allCds().filter(function(c){return c.node.target!==null;});
-    if(others.length) h+='<div class="others"><span class="fl">Running in your checklists</span>'+others.map(function(c){
-      return '<div class="orow"><span>'+esc(c.node.title)+'<small>'+esc(c.list.title)+'</small></span><b data-ocd="'+c.node.id+'"></b></div>';
-    }).join('')+'</div>';
   }else if(kind==='apn') h+=apnPanelHTML();
   else h+=renderRest(T.rest);
   toolPanel.innerHTML=h;toolOpen=true;
@@ -2174,13 +2194,16 @@ function toolCdAdd(){
 }
 function toolCdDel(id){
   var f=find(id);if(!f||!f.tool) return;
-  confirmSheet('Delete the countdown “'+esc(f.node.title)+'”?','Delete',function(){
+  var nb=cdBlocks(id).length;
+  confirmSheet('Delete the countdown “'+esc(f.node.title)+'”?'+(nb?' It’s also shown in '+(nb===1?'a checklist block':nb+' checklist blocks')+'.':''),'Delete',function(){
     var i=state.tools.cds.indexOf(f.node);if(i>=0) state.tools.cds.splice(i,1);
-    alerting.delete(id);save();refreshTool();clockTick();
+    cdBlocks(id).forEach(function(b){b.ref=null;});
+    alerting.delete(id);save();refreshTool();refreshShared(id);clockTick();
   });
 }
 function closeTool(){
   if(!toolOpen) return;toolKind=null;
+  refreshShared();
   if(document.activeElement&&toolPanel.contains(document.activeElement)) document.activeElement.blur();
   toolOpen=false;toolWrap.classList.remove('show');
   if(sheetWrap.hidden||!sheetWrap.classList.contains('show')) document.body.classList.remove('noscroll');
@@ -2213,9 +2236,9 @@ function openCdEditor(id,isNew){
       m.lead=lead;audioUnlock();
       var now=Date.now();cdSetTarget(m,targetFromHM(min,now),now);
       save();closeSheet();
-      if(f.tool) refreshTool();else refreshModule(id);
+      if(f.tool){refreshTool();refreshShared(id);}else refreshModule(id);
     }else{
-      if(isNew&&f.tool){var i=state.tools.cds.indexOf(m);if(i>=0) state.tools.cds.splice(i,1);save();refreshTool();}
+      if(isNew&&f.tool){var i=state.tools.cds.indexOf(m);if(i>=0) state.tools.cds.splice(i,1);cdBlocks(m.id).forEach(function(b){b.ref=null;});save();refreshTool();refreshShared(m.id);}
       closeSheet();
     }
   });
@@ -2223,6 +2246,82 @@ function openCdEditor(id,isNew){
   t.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('save');}});
   if(isNew){var nmI=$('#fCdName');nmI.focus();nmI.select();}
   else if(m.target===null) t.focus();
+}
+function cdBlocks(cid){
+  var out=[];
+  state.lists.forEach(function(L){L.sections.forEach(function(s){s.items.forEach(function(n){if(n.type==='cd'&&n.link&&n.ref===cid) out.push(n);});});});
+  return out;
+}
+function cdShort(c,now){
+  if(c.target===null) return 'Not set';
+  return (c.target>now?'':'passed ')+hmZ(new Date(c.target).getUTCHours()*60+new Date(c.target).getUTCMinutes());
+}
+function openCdBlockEditor(id,isNew){
+  var f=find(id);if(!f) return;
+  var b=f.node,T=state.tools,idx=f.arr.indexOf(b),sel=b.ref&&cdById(b.ref)?b.ref:null;
+  if(!sel&&T.cds.length){
+    var shown={};cur().sections.forEach(function(s){s.items.forEach(function(n){if(n.type==='cd'&&n.link&&n.ref) shown[n.ref]=1;});});
+    sel=(T.cds.filter(function(c){return !shown[c.id];})[0]||T.cds[0]).id;
+  }
+  function rows(){
+    var now=Date.now();
+    return T.cds.map(function(c){
+      var on=c.id===sel;
+      return '<button type="button" class="cbr rad'+(on?' on':'')+'" data-sact="pick" data-v="'+c.id+'" role="radio" aria-checked="'+on+'"><span class="cbx">'+I.check+'</span><span>'+esc(c.title)+'</span><small>'+esc(cdShort(c,now))+'</small></button>';
+    }).join('');
+  }
+  openSheet('<h3>Countdown block</h3><p class="hint">Shows one of your countdowns from the menu. Setting it here or in the menu is the same thing.</p>'+
+    '<div class="fld"><span class="fl">Countdown</span>'+(T.cds.length?'<div class="cbl" id="fCdPick" role="radiogroup">'+rows()+'</div>':'<p class="hint">You have no countdowns yet.</p>')+
+    '<button type="button" class="btn small ghost tcd-add" data-sact="new">'+I.plus+'New countdown</button></div>'+
+    (isNew?'':'<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
+    '<button type="button" class="btn small" data-sact="down"'+(idx===f.arr.length-1?' disabled':'')+'>'+I.down+'Down</button>'+
+    '<button type="button" class="btn small danger" data-sact="del">'+I.trash+'Delete</button></div>')+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Save</button></div>',
+  function(act,btn){
+    var i,j;
+    switch(act){
+      case 'pick':
+        sel=btn.getAttribute('data-v');
+        sheetEl.querySelectorAll('#fCdPick .cbr').forEach(function(x){var on=x===btn;x.classList.toggle('on',on);x.setAttribute('aria-checked',String(on));});break;
+      case 'new':
+        if(T.cds.length>=20){toast('That’s the maximum of 20 countdowns');break;}
+        var c=newCd();c.title='Countdown '+(T.cds.length+1);T.cds.push(c);b.ref=c.id;
+        save();closeSheet();render();openCdEditor(c.id,true);break;
+      case 'save':
+        if(!sel){toast('Choose a countdown, or tap New countdown');return;}
+        b.ref=sel;save();closeSheet();render();break;
+      case 'up': case 'down':
+        i=f.arr.indexOf(b);j=i+(act==='up'?-1:1);
+        if(j<0||j>=f.arr.length) return;
+        f.arr.splice(i,1);f.arr.splice(j,0,b);save();closeSheet();render();flash(id);break;
+      case 'del':
+        confirmSheet('Delete this countdown block? The countdown stays in the menu.','Delete',function(){removeNode(f);save();render();},function(){openCdBlockEditor(id);});break;
+      default:
+        if(isNew){removeNode(f);save();render();}
+        closeSheet();
+    }
+  });
+}
+function openRestBlockEditor(id){
+  var f=find(id);if(!f) return;
+  var b=f.node,idx=f.arr.indexOf(b);
+  openSheet('<h3>Crew rest block</h3><p class="hint">Shows the crew rest from the menu, the same plan as under the clock. Change it here or in the menu.</p>'+
+    '<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
+    '<button type="button" class="btn small" data-sact="down"'+(idx===f.arr.length-1?' disabled':'')+'>'+I.down+'Down</button>'+
+    '<button type="button" class="btn small danger" data-sact="del">'+I.trash+'Delete</button></div>'+
+    '<div class="sh-actions"><button type="button" class="btn primary" data-sact="cancel">Done</button></div>',
+  function(act){
+    var i,j;
+    switch(act){
+      case 'up': case 'down':
+        i=f.arr.indexOf(b);j=i+(act==='up'?-1:1);
+        if(j<0||j>=f.arr.length) return;
+        f.arr.splice(i,1);f.arr.splice(j,0,b);save();closeSheet();render();flash(id);break;
+      case 'del':
+        confirmSheet('Delete this crew rest block? The crew rest plan stays in the menu.','Delete',function(){removeNode(f);save();render();},function(){openRestBlockEditor(id);});break;
+      default: closeSheet();
+    }
+  });
 }
 function cdNudge(id,d){
   var f=find(id);if(!f||f.node.target===null) return;
@@ -2236,10 +2335,15 @@ function cdAck(id){alerting.delete(id);clockTick();}
 
 /* Crew rest actions */
 function restRefresh(m){
-  var el=document.querySelector('[data-mod="'+m.id+'"]');if(!el) return;
-  var out=el.querySelector('[data-out]');if(out) out.innerHTML=restOutHTML(m);
-  var nb=el.querySelector('[data-n]');if(nb) nb.textContent=m.n;
-  restStatus(m,el,Date.now());
+  document.querySelectorAll('[data-mod="'+m.id+'"],[data-ref="'+m.id+'"]').forEach(function(el){
+    var out=el.querySelector('[data-out]');if(out) out.innerHTML=restOutHTML(m);
+    var nb=el.querySelector('[data-n]');if(nb) nb.textContent=m.n;
+    restStatus(m,el,Date.now());
+  });
+}
+function refreshShared(id){
+  // re-draw the checklist blocks that show this countdown or crew rest (all of them without an id)
+  app.querySelectorAll(id?'.module[data-ref="'+id+'"]':'.module[data-ref]').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
 }
 
 /* Destination picker */
@@ -2854,7 +2958,14 @@ function onAct(e){
     case 'addSection': addSection();break;
     case 'lists': openLists();break;
     case 'modToggle': modToggle(id);break;
-    case 'editMod': var mf=find(id);if(mf&&mf.node.type==='apn') openApnEditor(id);else openModEditor(id);break;
+    case 'editMod':
+      var mf=find(id);
+      if(mf&&mf.node.type==='apn') openApnEditor(id);
+      else if(mf&&mf.node.link&&mf.node.type==='cd') openCdBlockEditor(id);
+      else if(mf&&mf.node.link&&mf.node.type==='rest') openRestBlockEditor(id);
+      else openModEditor(id);
+      break;
+    case 'cdPick': openCdBlockEditor(id);break;
     case 'calcKey': calcKey(id,el.getAttribute('data-k'));break;
     case 'calcHist': calcHist(id,el.getAttribute('data-r'));break;
     case 'padMode': padMode(id,el.getAttribute('data-m'));break;
@@ -2862,8 +2973,8 @@ function onAct(e){
     case 'padUndo': c=ctl.get(id);if(c) c.undo();break;
     case 'padClear': padClear(id);break;
     case 'padExtend': padExtend(id);break;
-    case 'addCd': addModule(id,newCd());break;
-    case 'addRest': addModule(id,newRest());break;
+    case 'addCd': var nb=newCdBlock();addModule(id,nb);openCdBlockEditor(nb.id,true);break;
+    case 'addRest': addModule(id,newRestBlock());break;
     case 'addApn': addModule(id,newApn());break;
     case 'apnFold': apnFold(id,el.getAttribute('data-apsec'));break;
     case 'openFlight': openFlight();break;
@@ -2961,6 +3072,7 @@ if(window.matchMedia){
 render();
 tickLoop();
 if(loadedOK) setTimeout(gcImages,4000);
+if(loadedOK&&blocksMigrated) save();
 if(!storageOK) toast('Storage is off here, so changes won’t be kept');
 if('serviceWorker' in navigator&&location.protocol==='https:'){var hadCtl=!!navigator.serviceWorker.controller,swReloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(!hadCtl||swReloaded) return;swReloaded=true;try{save();}catch(e){}location.reload();});navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible') navigator.serviceWorker.getRegistration().then(function(r){if(r) r.update();}).catch(function(){});});}
 })();
