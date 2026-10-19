@@ -354,6 +354,25 @@ body.finger .canvas-wrap canvas{touch-action:none}
 .alert-bar button{appearance:none;border:0;border-radius:9px;background:var(--surface);color:var(--text);font-weight:700;font-size:calc(16px*var(--ts));padding:9px 18px;flex:none}
 @keyframes abpulse{50%{box-shadow:var(--shadow),0 0 0 4px var(--warn-weak)}}
 
+/* Drag to reorder */
+.grip{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:10px;color:var(--muted);touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.grip svg{width:22px;height:22px}
+.grip:active{background:var(--press);color:var(--accent)}
+.row .grip{margin:-8px -6px -8px 0}
+.sec-head .grip{margin-right:2px}
+.mod-head .grip{width:36px;height:36px}
+.edit-tip{margin:-8px 6px 14px;color:var(--muted);font-size:calc(14px*var(--ts))}
+.drag-hidden{display:none!important}
+.drag-ph{margin:6px 10px;border:2px dashed var(--accent);border-radius:12px;background:var(--accent-weak)}
+.kids > .drag-ph{margin-left:44px}
+#app > .drag-ph{margin:0 0 14px;border-radius:16px}
+.drag-ghost{position:fixed;z-index:90;pointer-events:none;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1.5px solid var(--accent);box-shadow:var(--shadow);color:var(--text);font-weight:600;font-size:calc(17px*var(--ts))}
+.drag-ghost svg{width:20px;height:20px;color:var(--accent)}
+.drag-ghost span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drag-ghost small{flex:none;color:var(--muted);font-weight:500;font-size:calc(14px*var(--ts))}
+body.dragging,body.dragging *{-webkit-user-select:none;user-select:none;cursor:grabbing}
+body.secdrag .sec .sec-body{display:none}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:88px;min-width:88px;max-width:176px;display:block;position:relative}
@@ -459,6 +478,7 @@ var I={
   timer:sv('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2"/><path d="M9.5 2.8h5"/><path d="M12 2.8V6"/>'),
   moon:sv('<path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/>'),
   textsize:sv('<path d="M3 7V5h11v2"/><path d="M8.5 5v14"/><path d="M14 12v-1.5h7V12"/><path d="M17.5 10.5V19"/>'),
+  grip:sv('<path d="M5 7.5h14M5 12h14M5 16.5h14"/>'),
   bell:sv('<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'),
   back:sv('<path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/>')
 };
@@ -515,7 +535,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='8';
+var APP_VERSION='9';
 var TEXT_SIZES=[[0.9,'Small',13],[1,'Default',16],[1.15,'Large',19],[1.3,'Extra large',22]];
 function applyTextScale(){document.documentElement.style.setProperty('--ts',String(state.settings.textScale||1));}
 function normSettings(st){
@@ -797,14 +817,14 @@ function renderCheck(it,depth){
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
   h+='</div>';
   if(kids.length) h+='<button type="button" class="kid-toggle" data-act="toggleKids" data-id="'+it.id+'" aria-label="Show or hide sub-items">'+kd+'/'+kids.length+'<span class="chev">'+I.chev+'</span></button>';
-  if(editMode) h+='<span class="edit-hint">'+I.edit+'</span>';
+  if(editMode) h+='<span class="edit-hint">'+I.edit+'</span><span class="grip" data-drag="item" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>';
   h+='</div>';
   if(kids.length) h+='<div class="kids">'+kids.map(function(k){return renderCheck(k,depth+1);}).join('')+'</div>';
   return h+'</div>';
 }
 function modHead(m,icon,extra){
   return '<div class="mod-head"><button type="button" class="mod-toggle" data-act="modToggle" data-id="'+m.id+'">'+icon+'<span class="mod-title">'+esc(m.title)+'</span><span class="chev">'+I.chev+'</span></button>'+(extra||'')+
-    (editMode?'<button type="button" class="ib" data-act="editMod" data-id="'+m.id+'" aria-label="Edit '+esc(m.title)+'">'+I.edit+'</button>':'')+'</div>';
+    (editMode?'<button type="button" class="ib" data-act="editMod" data-id="'+m.id+'" aria-label="Edit '+esc(m.title)+'">'+I.edit+'</button><span class="grip" data-drag="item" data-id="'+m.id+'" aria-hidden="true">'+I.grip+'</span>':'')+'</div>';
 }
 var KEYS=[
   {k:'C',c:'fn',a:'Clear'},{k:'del',l:I.back,c:'fn',a:'Delete last'},{k:'÷',c:'op',a:'Divide'},{k:'×',c:'op',a:'Multiply'},
@@ -871,7 +891,7 @@ function renderSection(s){
   var c=secCount(s),complete=c.t>0&&c.d===c.t;
   var h='<section class="sec'+(s.collapsed?' collapsed':'')+(complete?' complete':'')+'" data-sec="'+s.id+'">';
   h+='<div class="sec-head"><button type="button" class="sec-toggle" data-act="toggleSec" data-id="'+s.id+'" aria-expanded="'+!s.collapsed+'"><span class="sec-title">'+esc(s.title)+'</span><span class="sec-count">'+countHTML(c.d,c.t)+'</span><span class="chev">'+I.chev+'</span></button>';
-  if(editMode) h+='<button type="button" class="ib" data-act="editSec" data-id="'+s.id+'" aria-label="Edit section">'+I.edit+'</button>';
+  if(editMode) h+='<button type="button" class="ib" data-act="editSec" data-id="'+s.id+'" aria-label="Edit section">'+I.edit+'</button><span class="grip" data-drag="sec" data-id="'+s.id+'" aria-hidden="true">'+I.grip+'</span>';
   h+='</div><div class="sec-body">';
   if(s.items.length) h+=s.items.map(function(it){return renderNode(it,0);}).join('');
   else if(!editMode) h+='<div class="empty">No items yet. Tap Edit to add some.</div>';
@@ -890,6 +910,7 @@ function render(){
   editBtn.innerHTML=editMode?'Done':I.edit;
   editBtn.setAttribute('aria-label',editMode?'Done editing':'Edit');
   var h='<div class="title-row"><button type="button" class="list-title" data-act="lists" aria-label="Switch checklist, current: '+esc(L.title)+'"><span>'+esc(L.title)+'</span>'+I.chev+'</button><span class="chip" id="chip"></span></div>';
+  if(editMode) h+='<p class="edit-tip">Drag ≡ to move items, blocks and sections. Tap an item to edit it.</p>';
   if(!L.sections.length&&!editMode) h+='<div class="sec"><div class="empty">This checklist is empty. Tap Edit to add a section.</div></div>';
   h+=L.sections.map(renderSection).join('');
   if(editMode) h+='<button type="button" class="add-sec" data-act="addSection">'+I.plus+'Add section</button>';
@@ -1963,9 +1984,165 @@ $('#lbClose').addEventListener('click',closeViewer);
 lbPrev.addEventListener('click',function(){lbShow(lbIdx-1);});
 lbNext.addEventListener('click',function(){lbShow(lbIdx+1);});
 
+/* ---------- Drag to reorder (Edit mode) ---------- */
+var drag=null,dragEndT=0;
+function dragLabel(kind,id){
+  if(kind==='sec'){var r=findSec(id);return {t:r?r.section.title:'',s:''};}
+  var f=find(id);if(!f) return {t:'',s:''};
+  var n=f.node,k=n.type==='check'?n.children.length:0;
+  return {t:n.type==='check'?(n.text||'Untitled item'):n.title,s:k?k+' sub-item'+(k>1?'s':''):''};
+}
+function dragSibs(box,kind){
+  return Array.prototype.filter.call(box.children,function(el){
+    if(el===drag.orig) return false;
+    if(kind==='sec') return el.classList.contains('sec');
+    if(kind==='sub') return el.classList.contains('item');
+    return el.classList.contains('item')||el.classList.contains('module');
+  });
+}
+function dragNoScroll(e){if(drag) e.preventDefault();}
+function dragStart(g,e){
+  var kind=g.getAttribute('data-drag'),id=g.getAttribute('data-id');
+  if(kind==='item'){var f=find(id);if(!f) return;kind=f.anc.length?'sub':'top';}
+  drag={kind:kind,id:id,g:g,pid:e.pointerId,x0:e.clientX,y0:e.clientY,y:e.clientY,started:false};
+  try{g.setPointerCapture(e.pointerId);}catch(_){}
+  window.addEventListener('pointermove',dragOnMove,true);
+  window.addEventListener('pointerup',dragOnUp,true);
+  window.addEventListener('pointercancel',dragOnCancel,true);
+  document.addEventListener('touchmove',dragNoScroll,{passive:false});
+}
+function dragBegin(){
+  var d=drag,orig;
+  if(d.kind==='sec'){
+    // Fold every section to its title while a section is moving, keeping the grabbed one under the finger
+    orig=d.g.closest('.sec');
+    var t0=orig.getBoundingClientRect().top;
+    document.body.classList.add('secdrag');
+    var t1=orig.getBoundingClientRect().top;
+    if(t1!==t0) window.scrollBy(0,t1-t0);
+  }else orig=d.g.closest('.item,.module');
+  var r=orig.getBoundingClientRect(),ph=document.createElement('div');
+  ph.className='drag-ph';
+  ph.style.height=(d.kind==='sec'?r.height:Math.min(r.height,56))+'px';
+  orig.parentNode.insertBefore(ph,orig);
+  orig.classList.add('drag-hidden');
+  var lab=dragLabel(d.kind==='sec'?'sec':'item',d.id),gh=document.createElement('div');
+  gh.className='drag-ghost';
+  gh.innerHTML=I.grip+'<span>'+esc(lab.t)+'</span>'+(lab.s?'<small>'+esc(lab.s)+'</small>':'');
+  gh.style.left=r.left+'px';gh.style.width=r.width+'px';
+  document.body.appendChild(gh);
+  d.orig=orig;d.ph=ph;d.gh=gh;d.off=Math.max(12,Math.min(d.y0-r.top,40));d.started=true;
+  document.body.classList.add('dragging');
+  d.raf=requestAnimationFrame(dragAuto);
+}
+function dragSpring(sec){
+  // Hovering over a folded section opens it after a moment, so items can be dropped inside
+  var d=drag;if(d.spring===sec) return;
+  clearTimeout(d.springT);d.spring=sec;
+  if(sec) d.springT=setTimeout(function(){
+    if(!drag) return;
+    var r=findSec(sec.getAttribute('data-sec'));if(!r) return;
+    r.section.collapsed=false;sec.classList.remove('collapsed');
+    var b=sec.querySelector('.sec-toggle');if(b) b.setAttribute('aria-expanded','true');
+    drag.spring=null;dragPlace();
+  },450);
+}
+function dragPlace(){
+  var d=drag;if(!d||!d.started) return;
+  d.gh.style.top=(d.y-d.off)+'px';
+  var y=d.y,box,sibs,ref=null,i,q;
+  if(d.kind==='sec'){box=app;sibs=dragSibs(app,'sec');ref=app.querySelector('.add-sec');}
+  else if(d.kind==='sub'){box=d.orig.parentNode;sibs=dragSibs(box,'sub');}
+  else{
+    var best=null,bd=1e9;
+    app.querySelectorAll('.sec').forEach(function(sc){
+      var b=sc.getBoundingClientRect(),dist=y<b.top?b.top-y:(y>b.bottom?y-b.bottom:0);
+      if(dist<bd){bd=dist;best=sc;}
+    });
+    if(!best) return;
+    var folded=best.classList.contains('collapsed');
+    dragSpring(folded&&bd===0?best:null);
+    if(folded) return;
+    box=best.querySelector('.sec-body');sibs=dragSibs(box,'top');ref=box.querySelector('.add-row');
+  }
+  for(i=0;i<sibs.length;i++){q=sibs[i].getBoundingClientRect();if(y<q.top+q.height/2){ref=sibs[i];break;}}
+  var nx=d.ph.nextSibling;if(nx===d.orig) nx=nx.nextSibling;
+  if(d.ph.parentNode===box&&nx===ref) return;
+  if(ref) box.insertBefore(d.ph,ref);else box.appendChild(d.ph);
+}
+function dragAuto(){
+  var d=drag;if(!d||!d.started) return;
+  var tb=document.querySelector('.topbar').getBoundingClientRect().bottom,top=tb+48,bot=window.innerHeight-56,v=0;
+  if(d.y<top) v=-Math.min(20,2+(top-d.y)/3);
+  else if(d.y>bot) v=Math.min(20,2+(d.y-bot)/3);
+  if(v){var sy=window.scrollY;window.scrollBy(0,v);if(window.scrollY!==sy) dragPlace();}
+  d.raf=requestAnimationFrame(dragAuto);
+}
+function dragOnMove(e){
+  if(!drag||e.pointerId!==drag.pid) return;
+  drag.y=e.clientY;
+  if(!drag.started){
+    if(Math.abs(e.clientX-drag.x0)+Math.abs(e.clientY-drag.y0)<5) return;
+    dragBegin();
+  }
+  e.preventDefault();
+  dragPlace();
+}
+function dragOnUp(e){if(drag&&e.pointerId===drag.pid) dragFinish(true);}
+function dragOnCancel(e){if(drag&&e.pointerId===drag.pid) dragFinish(false);}
+function dragApply(d){
+  var ph=d.ph,box=ph.parentNode;if(!box) return;
+  var idx=0,n=box.firstElementChild;
+  for(;n&&n!==ph;n=n.nextElementSibling){
+    if(n===d.orig) continue;
+    if(d.kind==='sec'?n.classList.contains('sec'):d.kind==='sub'?n.classList.contains('item'):(n.classList.contains('item')||n.classList.contains('module'))) idx++;
+  }
+  if(d.kind==='sec'){
+    var L=cur(),r=findSec(d.id);if(!r) return;
+    L.sections.splice(L.sections.indexOf(r.section),1);L.sections.splice(idx,0,r.section);
+  }else{
+    var f=find(d.id);if(!f) return;
+    var arr=f.arr;
+    if(d.kind==='top'){var ts=findSec(ph.closest('.sec').getAttribute('data-sec'));if(!ts) return;arr=ts.section.items;}
+    f.arr.splice(f.arr.indexOf(f.node),1);arr.splice(idx,0,f.node);
+  }
+  save();
+}
+function dragFinish(commit){
+  var d=drag;if(!d) return;
+  drag=null;
+  window.removeEventListener('pointermove',dragOnMove,true);
+  window.removeEventListener('pointerup',dragOnUp,true);
+  window.removeEventListener('pointercancel',dragOnCancel,true);
+  document.removeEventListener('touchmove',dragNoScroll,{passive:false});
+  try{d.g.releasePointerCapture(d.pid);}catch(_){}
+  if(!d.started) return;
+  cancelAnimationFrame(d.raf);clearTimeout(d.springT);
+  dragEndT=Date.now();
+  var at=(commit?d.ph:d.orig).getBoundingClientRect().top;
+  if(!commit) d.orig.classList.remove('drag-hidden');
+  if(commit) dragApply(d);
+  d.gh.remove();
+  document.body.classList.remove('dragging','secdrag');
+  render();
+  // Keep what was moved where the finger let go
+  var el=app.querySelector('[data-sec="'+d.id+'"],[data-item="'+d.id+'"],[data-mod="'+d.id+'"]');
+  if(!el) return;
+  window.scrollBy(0,el.getBoundingClientRect().top-at);
+  if(commit){el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(function(){el.classList.remove('flash');},1400);}
+}
+app.addEventListener('pointerdown',function(e){
+  var g=e.target.closest('.grip');
+  if(!g||!editMode||drag) return;
+  if(e.pointerType==='mouse'&&e.button!==0) return;
+  e.preventDefault();
+  dragStart(g,e);
+});
+
 /* ---------- Events ---------- */
 function onAct(e){
   if(e.target.closest('a')) return;
+  if(e.target.closest('.grip')||Date.now()-dragEndT<400) return;
   var root=e.currentTarget,el=e.target.closest('[data-act]');if(!el||!root.contains(el)) return;
   var id=el.getAttribute('data-id'),c;
   switch(el.getAttribute('data-act')){
