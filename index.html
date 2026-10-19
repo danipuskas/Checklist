@@ -302,6 +302,7 @@ body.finger .canvas-wrap canvas{touch-action:none}
 .selbox span{font-size:calc(13px*var(--ts));font-weight:600;color:var(--muted)}
 .selbox select{border:0;background:none;color:var(--text);font:600 calc(15px*var(--ts)) -apple-system,system-ui,sans-serif;height:38px;outline:none}
 .togbtn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:10px;height:40px;padding:0 12px;font-size:calc(14px*var(--ts));font-weight:600}
+.togbtn svg{width:15px;height:15px;margin-right:5px;vertical-align:-2px}
 .togbtn.on{background:var(--accent-weak);border-color:transparent;color:var(--accent)}
 .rest-out{margin-top:10px;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .rest-msg{padding:14px;color:var(--muted);font-size:calc(15px*var(--ts))}
@@ -594,7 +595,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='15';
+var APP_VERSION='16';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -981,7 +982,8 @@ function renderRest(m){
     '<div class="rest-opts"><span class="stepper"><span>Breaks</span><button type="button" data-act="restN" data-id="'+m.id+'" data-d="-1" aria-label="Fewer breaks">−</button><b data-n>'+m.n+'</b>'+
     '<button type="button" data-act="restN" data-id="'+m.id+'" data-d="1" aria-label="More breaks">+</button></span>'+
     '<label class="selbox"><span>Handover</span><select data-rest="buffer" data-id="'+m.id+'">'+bufs+'</select></label>'+
-    '<button type="button" class="togbtn'+(m.round?' on':'')+'" data-act="restRound" data-id="'+m.id+'" aria-pressed="'+m.round+'">Round to 5 min</button></div>'+
+    '<button type="button" class="togbtn'+(m.round?' on':'')+'" data-act="restRound" data-id="'+m.id+'" aria-pressed="'+m.round+'">Round to 5 min</button>'+
+    '<button type="button" class="togbtn" data-act="restClear" data-id="'+m.id+'">'+I.reset+'Clear times</button></div>'+
     '<div class="rest-out" data-out>'+restOutHTML(m)+'</div></div></div>';
 }
 function renderSection(s){
@@ -2461,6 +2463,15 @@ function onAct(e){
     case 'restN':
       var rf=find(id);
       if(rf){rf.node.n=Math.max(1,Math.min(8,rf.node.n+(+el.getAttribute('data-d'))));saveSoon();restRefresh(rf.node);}
+      break;
+    case 'restClear':
+      var rc=find(id);
+      if(rc){
+        rc.node.start='';rc.node.end='';saveSoon();
+        var rm=el.closest('.module');
+        if(rm) rm.querySelectorAll('[data-rest="start"],[data-rest="end"]').forEach(function(i){i.value='';});
+        restRefresh(rc.node);clockTick();
+      }
       break;
     case 'restRound':
       var rr=find(id);
