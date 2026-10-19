@@ -343,6 +343,19 @@ body.finger .canvas-wrap canvas{touch-action:none}
 #toolWrap{z-index:45}
 .tp-head{display:flex;align-items:center;gap:8px;margin:-4px -2px 14px 0}
 .tp-head h3{flex:1;margin:0}
+.tcd + .tcd{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.tcd-head{display:flex;align-items:center;gap:8px;margin:0 -6px 6px 0}
+.tcd-title{flex:1;min-width:0;font-weight:650;font-size:calc(16px*var(--ts));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcd-head .ib{width:36px;height:36px;color:var(--muted)}
+.tcd-add{width:100%;margin-top:14px}
+.tcd .cd-time{padding:7px 10px 6px}
+.tcd .cd-rem{font-size:calc(30px*var(--ts))}
+.tcd .cd-sub{font-size:calc(13px*var(--ts));margin-top:2px}
+.tcd .cd-ctl{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:6px}
+.tcd .cd-ctl .btn{padding:8px 2px;font-size:calc(13px*var(--ts));white-space:nowrap}
+.tcd .cd-ctl .btn svg{display:none}
+.tcd .cd-meta{margin-top:5px;font-size:calc(12px*var(--ts))}
+.tcd .cd-alert{margin-top:6px}
 .tool-panel .module{margin:0;background:none;border:0;border-radius:0}
 .tool-panel .mod-head{display:none}
 .tool-panel .module.collapsed .mod-body{display:block}
@@ -586,16 +599,17 @@ function normalize(o){
 }
 function normTools(t){
   t=t||{};
-  var c=normItem(t.cd),r=normItem(t.rest);
-  if(!c||c.type!=='cd'){c=newCd();c.title='TOD';c.lead=20;}
+  var cds=(Array.isArray(t.cds)?t.cds:(t.cd?[t.cd]:[])).map(normItem).filter(function(x){return x&&x.type==='cd';}).slice(0,20);
+  if(!Array.isArray(t.cds)&&!cds.length){var c=newCd();c.title='TOD';c.lead=20;cds=[c];}
+  var r=normItem(t.rest);
   if(!r||r.type!=='rest') r=newRest();
-  return {cd:c,rest:r};
+  return {cds:cds,rest:r};
 }
 function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='16';
+var APP_VERSION='17';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -752,7 +766,7 @@ function find(id){
   for(var a=0;a<state.lists.length;a++){var L=state.lists[a];
     for(var b=0;b<L.sections.length;b++){var r=walk(L.sections[b].items,[],id);if(r){r.section=L.sections[b];r.list=L;return r;}}}
   var T=state.tools;
-  if(T&&T.cd.id===id) return {node:T.cd,arr:[T.cd],idx:0,anc:[],tool:true};
+  if(T) for(var k=0;k<T.cds.length;k++){if(T.cds[k].id===id) return {node:T.cds[k],arr:T.cds,idx:k,anc:[],tool:true};}
   if(T&&T.rest.id===id) return {node:T.rest,arr:[T.rest],idx:0,anc:[],tool:true};
   return null;
 }
@@ -776,7 +790,7 @@ function newFlight(L){
     });
   });
   var T=state.tools;
-  T.cd.target=null;T.cd.aL=T.cd.aZ=false;alerting.delete(T.cd.id);
+  T.cds.forEach(function(c){c.target=null;c.aL=c.aZ=false;alerting.delete(c.id);});
   T.rest.start='';T.rest.end='';
 }
 function cloneList(L){
@@ -1507,7 +1521,7 @@ function openMenu(){
   var fd=state.settings.fingerDraw,snd=state.settings.sound;
   var now=Date.now();
   openSheet('<h3>Menu</h3><div class="menu">'+
-    '<button type="button" data-sact="tcd">'+I.timer+'<span class="mt">Countdown<small>'+esc(cdSummary(now))+'</small></span></button>'+
+    '<button type="button" data-sact="tcd">'+I.timer+'<span class="mt">Countdowns<small>'+esc(cdSummary(now))+'</small></span></button>'+
     '<button type="button" data-sact="trest">'+I.moon+'<span class="mt">Crew rest<small>'+esc(restSummary(now))+'</small></span></button><hr>'+
     '<button type="button" data-sact="lists">'+I.list+'<span class="mt">Checklists<small>Switch, add, rename or duplicate</small></span></button>'+
     '<button type="button" data-sact="untick">'+I.reset+'<span class="mt">Untick all<small>Every item in this checklist</small></span></button>'+
@@ -1819,7 +1833,7 @@ restChip.addEventListener('click',function(){openTool('rest');});
 function clockTick(){
   var now=Date.now();
   paintClock(now);
-  cdCheck(state.tools.cd,now);
+  state.tools.cds.forEach(function(c){cdCheck(c,now);});
   allCds().forEach(function(c){cdCheck(c.node,now);});
   document.querySelectorAll('.module.cd').forEach(function(el){var f=find(el.getAttribute('data-mod'));if(f) cdPaint(f.node,el,now);});
   document.querySelectorAll('.module.rest').forEach(function(el){var f=find(el.getAttribute('data-mod'));if(f) restStatus(f.node,el,now);});
@@ -1834,33 +1848,60 @@ function clockTick(){
 
 /* Countdown and crew rest from the menu */
 function cdSummary(now){
-  var m=state.tools.cd;
-  if(m.target===null) return 'Not set';
-  var diff=m.target-now;
-  return diff>0?m.title+' in '+durClock(diff):m.title+' passed '+durClock(diff)+' ago';
+  var set=state.tools.cds.filter(function(c){return c.target!==null;});
+  if(!set.length) return state.tools.cds.length>1?state.tools.cds.length+' countdowns, none set':'Not set';
+  var up=set.filter(function(c){return c.target>now;}).sort(function(a,b){return a.target-b.target;});
+  var m=up[0]||set.sort(function(a,b){return b.target-a.target;})[0],diff=m.target-now;
+  var txt=diff>0?m.title+' in '+durClock(diff):m.title+' passed '+durClock(diff)+' ago';
+  return txt+(set.length>1?' (+'+(set.length-1)+' more)':'');
 }
 function restSummary(now){
   var m=state.tools.rest,info=restInfo(m,now),r=restCalc(m);
   if(!info) return 'Not set';
   return info.txt||(hmZ(r.s).slice(0,4)+'–'+hmZ(r.e));
 }
+var toolKind=null;
+function refreshTool(){
+  if(!toolOpen||!toolKind) return;
+  var y=toolWrap.scrollTop;openTool(toolKind);toolWrap.scrollTop=y;
+}
 function openTool(kind){
-  clearTimeout(toolHideT);
-  var T=state.tools,h='<div class="tp-head"><h3>'+(kind==='cd'?'Countdown':'Crew rest')+'</h3><button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button></div>';
+  clearTimeout(toolHideT);toolKind=kind;
+  var T=state.tools,h='<div class="tp-head"><h3>'+(kind==='cd'?'Countdowns':'Crew rest')+'</h3>'+
+    (kind==='cd'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
+    '<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button></div>';
   if(kind==='cd'){
-    h+=renderCd(T.cd);
+    if(!T.cds.length) h+='<p class="hint">No countdowns yet. Tap + to add one.</p>';
+    h+=T.cds.map(function(c){
+      return '<div class="tcd"><div class="tcd-head"><span class="tcd-title">'+esc(c.title)+'</span>'+
+        '<button type="button" class="ib" data-act="toolCdDel" data-id="'+c.id+'" aria-label="Delete '+esc(c.title)+'">'+I.trash+'</button></div>'+renderCd(c)+'</div>';
+    }).join('');
+    h+='<button type="button" class="btn small ghost tcd-add" data-act="toolCdAdd">'+I.plus+'Add countdown</button>';
     var others=allCds().filter(function(c){return c.node.target!==null;});
     if(others.length) h+='<div class="others"><span class="fl">Running in your checklists</span>'+others.map(function(c){
       return '<div class="orow"><span>'+esc(c.node.title)+'<small>'+esc(c.list.title)+'</small></span><b data-ocd="'+c.node.id+'"></b></div>';
     }).join('')+'</div>';
   }else h+=renderRest(T.rest);
   toolPanel.innerHTML=h;toolOpen=true;
+  toolWrap.setAttribute('data-kind',kind);
   toolWrap.hidden=false;toolWrap.scrollTop=0;void toolWrap.offsetWidth;
   toolWrap.classList.add('show');document.body.classList.add('noscroll');
   clockTick();
 }
+function toolCdAdd(){
+  var c=newCd();c.title='Countdown '+(state.tools.cds.length+1);
+  state.tools.cds.push(c);save();refreshTool();
+  openCdEditor(c.id,true);
+}
+function toolCdDel(id){
+  var f=find(id);if(!f||!f.tool) return;
+  confirmSheet('Delete the countdown “'+esc(f.node.title)+'”?','Delete',function(){
+    var i=state.tools.cds.indexOf(f.node);if(i>=0) state.tools.cds.splice(i,1);
+    alerting.delete(id);save();refreshTool();clockTick();
+  });
+}
 function closeTool(){
-  if(!toolOpen) return;
+  if(!toolOpen) return;toolKind=null;
   if(document.activeElement&&toolPanel.contains(document.activeElement)) document.activeElement.blur();
   toolOpen=false;toolWrap.classList.remove('show');
   if(sheetWrap.hidden||!sheetWrap.classList.contains('show')) document.body.classList.remove('noscroll');
@@ -1872,7 +1913,7 @@ function tickLoop(){clockTick();clearTimeout(tickT);tickT=setTimeout(tickLoop,10
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible') tickLoop();});
 
 /* Countdown actions */
-function openCdEditor(id){
+function openCdEditor(id,isNew){
   var f=find(id);if(!f) return;
   var m=f.node,lead=m.lead,cur0=m.target===null?'':hmZ(new Date(m.target).getUTCHours()*60+new Date(m.target).getUTCMinutes()).slice(0,4);
   var leads=[0,5,10,15,20,30];
@@ -1892,12 +1933,17 @@ function openCdEditor(id){
       var nm=$('#fCdName').value.trim();if(nm) m.title=nm;
       m.lead=lead;audioUnlock();
       var now=Date.now();cdSetTarget(m,targetFromHM(min,now),now);
-      save();closeSheet();refreshModule(id);
-    }else closeSheet();
+      save();closeSheet();
+      if(f.tool) refreshTool();else refreshModule(id);
+    }else{
+      if(isNew&&f.tool){var i=state.tools.cds.indexOf(m);if(i>=0) state.tools.cds.splice(i,1);save();refreshTool();}
+      closeSheet();
+    }
   });
   var t=$('#fCdTime');
   t.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('save');}});
-  if(m.target===null) t.focus();
+  if(isNew){var nmI=$('#fCdName');nmI.focus();nmI.select();}
+  else if(m.target===null) t.focus();
 }
 function cdNudge(id,d){
   var f=find(id);if(!f||f.node.target===null) return;
@@ -2482,6 +2528,8 @@ function onAct(e){
       if(vf&&vf.node.imgs.length) openViewer(vf.node.imgs,+el.getAttribute('data-n')||0);
       break;
     case 'toolClose': closeTool();break;
+    case 'toolCdAdd': toolCdAdd();break;
+    case 'toolCdDel': toolCdDel(id);break;
   }
 }
 app.addEventListener('click',onAct);
