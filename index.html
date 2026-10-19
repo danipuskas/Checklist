@@ -228,8 +228,8 @@ body.finger .canvas-wrap canvas{touch-action:none}
 .fld{display:block;margin:0 0 14px}
 .fld > .fl{display:block;font-size:calc(14px*var(--ts));font-weight:600;color:var(--muted);margin:0 0 6px}
 .fl em{font-style:normal;font-weight:400}
-.sheet input[type=text],.sheet textarea{display:block;width:100%;font:max(16px,calc(17px*var(--ts)))/1.35 -apple-system,system-ui,sans-serif;color:var(--text);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;-webkit-appearance:none;appearance:none}
-.sheet input[type=text]:focus,.sheet textarea:focus{border-color:var(--accent)}
+.sheet input[type=text],.sheet input[type=password],.sheet textarea{display:block;width:100%;font:max(16px,calc(17px*var(--ts)))/1.35 -apple-system,system-ui,sans-serif;color:var(--text);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;-webkit-appearance:none;appearance:none}
+.sheet input[type=text]:focus,.sheet input[type=password]:focus,.sheet textarea:focus{border-color:var(--accent)}
 .sheet textarea{resize:vertical}
 .sheet .code{font:calc(13px*var(--ts))/1.4 ui-monospace,"SF Mono",Menlo,monospace}
 .link-row{display:grid;grid-template-columns:1fr auto;gap:6px;margin-bottom:8px;padding:8px;border:1px solid var(--line);border-radius:12px}
@@ -486,6 +486,26 @@ button.hd-row:active,.hd-row[role=button]:active{background:var(--press)}
 .back-all svg{width:16px;height:16px}
 @media (max-width:420px){.loc.hasdep .wd{display:none}body.editing .apn-tag{display:none}}
 
+/* Online backup */
+.cl-stat{border-radius:12px;background:var(--surface2);padding:11px 13px;margin:0 0 12px;font-size:15px;line-height:1.35}
+.cl-stat b{display:block;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:2px}
+.cl-stat.bad{background:var(--warn-weak);color:var(--warn)}
+.cl-stat.bad b{color:inherit}
+.cl-stat.busy{color:var(--accent)}
+.howto{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 14px;font-size:14.5px;line-height:1.4}
+.howto summary{font-weight:650;color:var(--accent);cursor:pointer}
+.howto ol{margin:8px 0 2px;padding-left:20px}
+.howto li{margin:5px 0}
+.cl-row{display:flex;gap:8px;margin:0 0 10px}
+.cl-row .btn{flex:1;white-space:nowrap;padding-left:6px;padding-right:6px}
+@media (max-width:420px){.cl-row .btn svg{display:none}}
+.cl-sw{margin:0 -6px 6px}
+.cl-repo{font-size:14px;color:var(--muted);margin:0 2px 12px;overflow-wrap:anywhere}
+.menu small.warn{color:var(--warn);font-weight:600}
+#cvList{margin-bottom:4px}
+#cvList button{align-items:center}
+#cvList span{color:var(--text)}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -597,6 +617,7 @@ var I={
   info:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 11v5.5"/><path d="M12 7.6v.1" stroke-width="2.6"/>'),
   tickbox:sv('<circle cx="12" cy="12" r="8"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/>'),
   heading:sv('<path d="M6 5v14M17 5v14M6 12h11"/>'),
+  cloud:sv('<path d="M7 18.5h10.5a4 4 0 0 0 .4-7.98A6 6 0 0 0 6.3 9.1 4.7 4.7 0 0 0 7 18.5z"/><path d="M12 15.5v-5M9.6 12.6 12 10.2l2.4 2.4"/>'),
   pin:sv('<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>'),
   swap:sv('<path d="M8 4v15M4 15l4 4 4-4"/><path d="M16 20V5M12 9l4-4 4 4"/>'),
   grip:sv('<path d="M5 7.5h14M5 12h14M5 16.5h14"/>'),
@@ -709,7 +730,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='19';
+var APP_VERSION='20';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -795,14 +816,16 @@ function imgPut(id,v){return idbRun('readwrite',function(st){st.put(v,id);});}
 function imgPutMany(map){return idbRun('readwrite',function(st){Object.keys(map).forEach(function(id){var v=map[id];if(v&&typeof v.f==='string'&&typeof v.t==='string') st.put({f:v.f,t:v.t},id);});});}
 function imgKeys(){return idbRun('readonly',function(st){return st.getAllKeys();});}
 function imgDelMany(ids){return idbRun('readwrite',function(st){ids.forEach(function(id){st.delete(id);});});}
-function allImgIds(){
+function allImgIds(o){
+  o=o||state;
   var set=new Set();
   function w(arr){arr.forEach(function(n){if(n.type==='check'){(n.imgs||[]).forEach(function(i){set.add(i);});w(n.children);}});}
-  state.lists.forEach(function(L){L.sections.forEach(function(s){w(s.items);});});
-  Object.keys(state.apNotes||{}).forEach(function(ic){var a=state.apNotes[ic];Object.keys(a).forEach(function(k){w(a[k]);});});
+  o.lists.forEach(function(L){L.sections.forEach(function(s){w(s.items);});});
+  Object.keys(o.apNotes||{}).forEach(function(ic){var a=o.apNotes[ic];Object.keys(a).forEach(function(k){w(a[k]);});});
   return set;
 }
 function gcImages(){
+  if(!sheetWrap.hidden){setTimeout(gcImages,30000);return;}
   var used=allImgIds();
   imgKeys().then(function(keys){
     var gone=(keys||[]).filter(function(k){return !used.has(k);});
@@ -1737,11 +1760,12 @@ function openMenu(){
     '<button type="button" data-sact="tapn">'+I.pin+'<span class="mt">Airport notes<small>'+esc(apnSummary())+'</small></span></button><hr>'+
     '<button type="button" data-sact="lists">'+I.list+'<span class="mt">Checklists<small>Switch, add, rename or duplicate</small></span></button>'+
     '<button type="button" data-sact="untick">'+I.reset+'<span class="mt">Untick all<small>Every item in this checklist</small></span></button>'+
-    '<button type="button" data-sact="flight">'+I.plane+'<span class="mt">New flight<small>Untick and clear this checklist, and clear the menu countdown and crew rest</small></span></button>'+
+    '<button type="button" data-sact="flight">'+I.plane+'<span class="mt">New flight<small>Untick and clear this checklist, countdowns and crew rest times</small></span></button>'+
     '<button type="button" data-sact="finger" role="switch" aria-checked="'+fd+'">'+I.hand+'<span class="mt">Draw with finger<small>'+(fd?'On: one finger draws in notepads':'Off: Apple Pencil draws, finger scrolls')+'</small></span><span class="tog'+(fd?' on':'')+'"></span></button>'+
     '<div class="menu-row">'+I.textsize+'<span class="mt">Text size</span><div class="seg ts" role="radiogroup" aria-label="Text size">'+
       TEXT_SIZES.map(function(t){var on=state.settings.textScale===t[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="ts" data-v="'+t[0]+'" aria-label="'+t[1]+'"><span style="font-size:'+t[2]+'px">A</span></button>';}).join('')+'</div></div>'+
     '<button type="button" data-sact="sound" role="switch" aria-checked="'+snd+'">'+I.bell+'<span class="mt">Alert sound<small>'+(snd?'On: countdown alerts beep while the app is open':'Off: countdown alerts are silent')+'</small></span><span class="tog'+(snd?' on':'')+'"></span></button>'+
+    '<button type="button" data-sact="cloud">'+I.cloud+'<span class="mt">Online backup<small'+(cloud.on&&cloud.err?' class="warn"':'')+'>'+esc(cloudMenuText())+'</small></span></button>'+
     '<button type="button" data-sact="export">'+I.share+'<span class="mt">Back up<small>Copy or share everything as a backup</small></span></button>'+
     '<button type="button" data-sact="import">'+I.restore+'<span class="mt">Restore<small>Load a backup</small></span></button>'+
     '</div><div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button></div><p class="ver">App version '+APP_VERSION+'</p>',
@@ -1764,6 +1788,7 @@ function openMenu(){
         state.settings.sound=!snd;save();if(state.settings.sound){audioUnlock();beep(1);}openMenu();break;
       case 'finger':
         state.settings.fingerDraw=!fd;save();document.body.classList.toggle('finger',state.settings.fingerDraw);openMenu();break;
+      case 'cloud': openCloud();break;
       case 'export': openExport();break;
       case 'import': openImport();break;
       default: closeSheet();
@@ -1831,6 +1856,263 @@ function openImport(){
     rd.onerror=function(){toast('Could not read that file');};
     rd.readAsText(file);
   });
+}
+
+/* ---------- Online backup: a private GitHub repository, while the app is open and online ---------- */
+var CKEY='flightChecklist.cloud',CLOUD_QUIET=60000,CLOUD_GAP=180000;
+function loadCloud(){
+  var c=null;try{c=JSON.parse(localStorage.getItem(CKEY)||'null');}catch(e){}
+  if(!c||typeof c!=='object') c={};
+  return {repo:str(c.repo),token:str(c.token),on:!!(c.on&&c.repo&&c.token),photos:c.photos!==false,sha:str(c.sha),hash:str(c.hash),
+    last:+c.last||0,err:str(c.err),kind:str(c.kind),up:Array.isArray(c.up)?c.up.filter(function(x){return typeof x==='string';}):[]};
+}
+var cloud=loadCloud(),cloudUp=new Set(cloud.up),cloudBusy=false,cloudProg='',cloudTickHash='',cloudChangedAt=0,cloudRetryAt=0;
+function saveCloud(){cloud.up=Array.from(cloudUp);try{localStorage.setItem(CKEY,JSON.stringify(cloud));}catch(e){}}
+function strHash(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(36)+'.'+s.length;}
+function b64utf8(s){var b=new TextEncoder().encode(s),out='';for(var i=0;i<b.length;i+=0x8000) out+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(out);}
+function ghFetch(repo,token,method,path,body,accept){
+  var o={method:method,cache:'no-store',headers:{'Authorization':'Bearer '+token,'Accept':accept||'application/vnd.github+json'}};
+  if(body){o.headers['Content-Type']='application/json';o.body=JSON.stringify(body);}
+  return fetch('https://api.github.com/repos/'+repo+path,o);
+}
+function gh(method,path,body,accept){return ghFetch(cloud.repo,cloud.token,method,path,body,accept);}
+function ghErr(r){
+  var e=new Error('GitHub '+r.status);e.status=r.status;
+  if((r.status===403||r.status===429)&&(r.headers.get('retry-after')||r.headers.get('x-ratelimit-remaining')==='0')) e.status=429; // asked to slow down
+  return e;
+}
+function okJson(r){if(!r.ok) throw ghErr(r);return r.json();}
+function whenZ(ms){
+  var d=new Date(ms),n=new Date(),z=hmZ(d.getUTCHours()*60+d.getUTCMinutes());
+  if(d.toISOString().slice(0,10)===n.toISOString().slice(0,10)) return z;
+  return d.getUTCDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()]+' '+z;
+}
+function cloudPending(){
+  var json=JSON.stringify(state,null,1);
+  return {json:json,h:strHash(json),photos:cloud.photos?Array.from(allImgIds()).filter(function(id){return !cloudUp.has(id);}):[]};
+}
+function cloudDataSha(){
+  return gh('GET','/contents/data.json',null,'application/vnd.github.object+json').then(function(r){
+    if(r.status===404) return '';
+    return okJson(r).then(function(j){return j.sha||'';});
+  });
+}
+function cloudPutData(json){
+  var body={message:'Backup '+new Date().toISOString().slice(0,16).replace('T',' ')+'Z',content:b64utf8(json)};
+  if(cloud.sha) body.sha=cloud.sha;
+  return gh('PUT','/contents/data.json',body).then(function(r){
+    if(r.status!==409&&r.status!==422) return r;
+    // the copy on GitHub changed (or we don't know it yet): fetch its id and try once more
+    return cloudDataSha().then(function(sha){if(sha) body.sha=sha;else delete body.sha;return gh('PUT','/contents/data.json',body);});
+  }).then(okJson).then(function(j){cloud.sha=(j.content&&j.content.sha)||'';});
+}
+function cloudPutPhoto(id){
+  return imgGet(id).then(function(v){
+    if(!v||typeof v.f!=='string'){cloudUp.add(id);return;}
+    return gh('PUT','/contents/photos/'+id+'.jpg',{message:'Photo '+id,content:v.f.slice(v.f.indexOf(',')+1)}).then(function(r){
+      if(r.ok||r.status===422){cloudUp.add(id);return;} // 422: it is already there
+      throw ghErr(r);
+    });
+  });
+}
+function cloudFail(e){
+  var st=e&&e.status,now=Date.now();
+  if(!st){cloud.err='';cloud.kind='net';cloudRetryAt=now+60000;return;}
+  if(st===429){cloud.err='';cloud.kind='wait';cloudRetryAt=now+900000;return;}
+  if(st===401){cloud.kind='auth';cloud.err='GitHub no longer accepts the access token. It may have expired. Make a new one and enter it in Online backup.';cloudRetryAt=now+1800000;}
+  else if(st===403||st===404){cloud.kind='access';cloud.err='The token can’t write to '+cloud.repo+'. It needs Contents: Read and write for that repository.';cloudRetryAt=now+1800000;}
+  else{cloud.kind='other';cloud.err='GitHub had a problem ('+st+'). The app will try again.';cloudRetryAt=now+300000;}
+}
+function cloudRun(withData,p){
+  if(cloudBusy||!cloud.on) return Promise.resolve(false);
+  p=p||cloudPending();cloudBusy=true;cloudProg='Backing up…';cloudPaint();
+  var chain=Promise.resolve(),ids=p.photos;
+  if(withData&&p.h!==cloud.hash) chain=chain.then(function(){return cloudPutData(p.json);}).then(function(){cloud.hash=p.h;cloud.last=Date.now();saveCloud();});
+  ids.forEach(function(id,i){
+    chain=chain.then(function(){return i?new Promise(function(res){setTimeout(res,1200);}):null;}) // GitHub limits uploads per minute
+      .then(function(){cloudProg='Uploading photo '+(i+1)+' of '+ids.length;cloudPaint();return cloudPutPhoto(id);})
+      .then(function(){if(i%5===4) saveCloud();});
+  });
+  return chain.then(function(){cloud.err='';cloud.kind='';cloudRetryAt=0;return true;},function(e){cloudFail(e);return false;})
+    .then(function(ok){cloudBusy=false;cloudProg='';saveCloud();cloudPaint();return ok;});
+}
+function cloudMaybe(){
+  if(!cloud.on||cloudBusy||navigator.onLine===false||Date.now()<cloudRetryAt) return;
+  var p=cloudPending(),now=Date.now();
+  if(p.h!==cloudTickHash){cloudTickHash=p.h;cloudChangedAt=now;}
+  // a minute after the last change, and not more often than every few minutes
+  var due=p.h!==cloud.hash&&now-cloudChangedAt>=CLOUD_QUIET&&now-cloud.last>=CLOUD_GAP;
+  if(due||p.photos.length) cloudRun(due,p);
+}
+function cloudStatus(){
+  if(!cloud.on) return {txt:'Off',bad:false};
+  if(cloudBusy) return {txt:cloudProg||'Backing up…',busy:true};
+  if(cloud.err) return {txt:cloud.err,bad:true};
+  var p=cloudPending(),t;
+  if(!cloud.last) t='Not backed up yet';
+  else t='Last backup '+whenZ(cloud.last);
+  var waiting=[];
+  if(p.h!==cloud.hash) waiting.push('changes');
+  if(p.photos.length) waiting.push(p.photos.length+' photo'+(p.photos.length>1?'s':''));
+  if(waiting.length) t+=(navigator.onLine===false||cloud.kind==='net'?' · waiting for internet: ':' · to upload: ')+waiting.join(', ');
+  return {txt:t,bad:false};
+}
+function cloudMenuText(){
+  if(!cloud.on) return 'Off: back up automatically to GitHub';
+  var s=cloudStatus();
+  return s.bad?'Needs attention':s.txt;
+}
+function cloudPaint(){
+  var el=$('#cloudStat');if(!el) return;
+  var s=cloudStatus();
+  el.className='cl-stat'+(s.bad?' bad':'')+(s.busy?' busy':'');
+  el.innerHTML='<b>Status</b>'+esc(s.txt);
+}
+function ghOwnerGuess(){var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname);return m?m[1]+'/checklist-backup':'';}
+function openCloud(){
+  if(!cloud.on){
+    var photos=cloud.photos;
+    openSheet('<h3>Online backup</h3><p class="hint">While the app is open and online, it saves a copy of everything to a private GitHub repository about a minute after you change something. GitHub keeps every version, so you can go back to an earlier one.</p>'+
+      '<details class="howto"><summary>How to set it up (once, about 5 minutes)</summary><ol>'+
+      '<li>On github.com tap <b>+</b> → <b>New repository</b>. Name it, e.g. <b>checklist-backup</b>, choose <b>Private</b>, and create it.</li>'+
+      '<li>Profile picture → <b>Settings</b> → <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>'+
+      '<li>Choose an expiration. Under <b>Repository access</b> pick <b>Only select repositories</b> and your backup repository. Under <b>Permissions</b> set <b>Contents</b> to <b>Read and write</b>.</li>'+
+      '<li>Tap <b>Generate token</b>, copy it, and paste it below with the repository name.</li></ol></details>'+
+      '<label class="fld"><span class="fl">Repository</span><input id="fRepo" type="text" value="'+esc(cloud.repo||ghOwnerGuess())+'" placeholder="yourname/checklist-backup" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label>'+
+      '<label class="fld"><span class="fl">Access token</span><input id="fTok" type="password" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label>'+
+      '<div class="menu cl-sw"><button type="button" data-sact="photos" role="switch" aria-checked="'+photos+'">'+I.photo+'<span class="mt">Include photos<small>Each photo is uploaded once</small></span><span class="tog'+(photos?' on':'')+'"></span></button></div>'+
+      '<p class="hint">The token stays on this iPad and isn’t part of manual backups.</p>'+
+      '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="connect">Connect</button></div>',
+    function(act,btn){
+      if(act==='photos'){photos=!photos;btn.setAttribute('aria-checked',String(photos));btn.querySelector('.tog').classList.toggle('on',photos);return;}
+      if(act!=='connect'){closeSheet();return;}
+      var repo=$('#fRepo').value.trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\.git$/,'').replace(/\/+$/,''),tok=$('#fTok').value.trim();
+      if(!/^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+$/.test(repo)){toast('Enter the repository as yourname/repository');$('#fRepo').focus();return;}
+      if(!tok){toast('Paste the access token');$('#fTok').focus();return;}
+      btn.disabled=true;btn.textContent='Connecting…';
+      cloudConnect(repo,tok,photos).catch(function(e){
+        if(!sheetEl.contains(btn)) return;
+        btn.disabled=false;btn.textContent='Connect';toast(e.message,4500);
+      });
+    });
+    return;
+  }
+  openSheet('<h3>Online backup</h3><div class="cl-stat" id="cloudStat"></div><p class="cl-repo">To the private repository <b>'+esc(cloud.repo)+'</b> on GitHub.</p>'+
+    '<div class="cl-row"><button type="button" class="btn" data-sact="now">'+I.cloud+'Back up now</button><button type="button" class="btn" data-sact="restore">'+I.restore+'Restore…</button></div>'+
+    '<div class="menu cl-sw"><button type="button" data-sact="photos" role="switch" aria-checked="'+cloud.photos+'">'+I.photo+'<span class="mt">Include photos<small>Each photo is uploaded once</small></span><span class="tog'+(cloud.photos?' on':'')+'"></span></button>'+
+    (cloud.kind==='auth'||cloud.kind==='access'?'<button type="button" data-sact="token">'+I.edit+'<span class="mt">Enter a new token</span></button>':'')+
+    '<button type="button" data-sact="off">'+I.x+'<span class="mt">Turn off<small>Removes the token from this iPad. Your backups stay on GitHub.</small></span></button></div>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button></div>',
+  function(act,btn){
+    switch(act){
+      case 'now':
+        if(cloudBusy){toast('Already backing up');break;}
+        cloudRetryAt=0;
+        cloudRun(true).then(function(ok){toast(ok?'Backed up':(cloud.kind==='net'?'No internet connection':'Backup didn’t work'));});break;
+      case 'restore': openCloudRestore();break;
+      case 'photos':
+        cloud.photos=!cloud.photos;saveCloud();btn.setAttribute('aria-checked',String(cloud.photos));btn.querySelector('.tog').classList.toggle('on',cloud.photos);cloudPaint();
+        if(cloud.photos) cloudMaybe();break;
+      case 'token': cloud.on=false;cloud.token='';saveCloud();openCloud();break;
+      case 'off':
+        confirmSheet('Turn off online backup? The token is removed from this iPad. The backups stay in your GitHub repository.','Turn off',function(){
+          cloud.on=false;cloud.token='';cloud.err='';cloud.kind='';saveCloud();toast('Online backup is off');
+        },openCloud);break;
+      default: closeSheet();
+    }
+  });
+  cloudPaint();
+}
+function cloudConnect(repo,tok,photos){
+  function msg(t){return new Error(t);}
+  return ghFetch(repo,tok,'GET','',null).then(function(r){
+    if(r.status===401) throw msg('GitHub didn’t accept the token. Check you copied all of it.');
+    if(r.status===403||r.status===404) throw msg('Repository not found. Check the name, and that the token has access to it.');
+    if(!r.ok) throw msg('GitHub answered '+r.status+'. Try again in a moment.');
+    return r.json();
+  },function(){throw msg('No connection to GitHub. Check the internet and try again.');}).then(function(j){
+    if(!j.private) throw msg('That repository is public. Make it private first, so your notes stay private.');
+    return ghFetch(repo,tok,'GET','/commits?path=data.json&per_page=1',null).then(function(r){
+      if(r.status===409) return []; // empty repository
+      return okJson(r);
+    });
+  }).then(function(list){
+    var keepUp=cloud.repo===repo;
+    cloud={repo:repo,token:tok,on:true,photos:photos,sha:'',hash:'',last:0,err:'',kind:'',up:[]};
+    if(!keepUp) cloudUp=new Set();
+    cloudRetryAt=0;saveCloud();
+    if(!list.length){closeSheet();cloudRun(true).then(function(ok){toast(ok?'Online backup is on':'Online backup is on, but the first backup didn’t work yet',3000);});return;}
+    var when=list[0].commit&&list[0].commit.committer?Date.parse(list[0].commit.committer.date):0;
+    openSheet('<h3>Backup found</h3><p class="hint">'+esc(repo)+' already has a backup'+(when?' from '+esc(whenZ(when)):'')+'. What would you like to do?</p>'+
+      '<div class="menu"><button type="button" data-sact="get">'+I.restore+'<span class="mt">Restore it to this iPad<small>Replaces what’s on this iPad</small></span></button>'+
+      '<button type="button" data-sact="put">'+I.cloud+'<span class="mt">Back up this iPad<small>The backup on GitHub becomes an older version</small></span></button></div>'+
+      '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',
+    function(act){
+      if(act==='get'){closeSheet();cloudRestore(list[0].sha,true);}
+      else if(act==='put'){closeSheet();cloudRun(true).then(function(ok){toast(ok?'Online backup is on':'Backup didn’t work yet',3000);});}
+      else{cloud.on=false;cloud.token='';saveCloud();closeSheet();}
+    });
+  });
+}
+function openCloudRestore(){
+  openSheet('<h3>Restore from online backup</h3><p class="hint">Choose a version. It replaces everything on this iPad.</p>'+
+    '<div class="aplist" id="cvList"><p class="hint" style="margin:12px 14px">Loading versions…</p></div>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button></div>',
+  function(act,btn){
+    if(act==='ver'){
+      var sha=btn.getAttribute('data-v'),label=btn.getAttribute('data-l'),latest=btn.hasAttribute('data-latest');
+      confirmSheet('Replace everything on this iPad with the online backup from '+esc(label)+'?','Restore',function(){cloudRestore(sha,latest);},openCloudRestore);
+    }else closeSheet();
+  });
+  gh('GET','/commits?path=data.json&per_page=20').then(function(r){if(r.status===409) return [];return okJson(r);}).then(function(list){
+    var box=$('#cvList');if(!box) return;
+    if(!list.length){box.innerHTML='<p class="hint" style="margin:12px 14px">No online backups yet.</p>';return;}
+    box.innerHTML=list.map(function(c,i){
+      var t=Date.parse(c.commit.committer.date),d=new Date(t),lab=whenZ(t);
+      var day=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getUTCDay()]+' '+d.getUTCDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()];
+      return '<button type="button" data-sact="ver" data-v="'+esc(c.sha)+'" data-l="'+esc(lab)+'"'+(i===0?' data-latest':'')+'><b>'+day+'</b><span>'+hmZ(d.getUTCHours()*60+d.getUTCMinutes())+'</span>'+(i===0?'<small>Latest</small>':'')+'</button>';
+    }).join('');
+  }).catch(function(e){
+    var box=$('#cvList');if(box) box.innerHTML='<p class="hint" style="margin:12px 14px">'+(e&&e.status===401?'GitHub didn’t accept the token.':'Couldn’t load the versions. Check the internet and try again.')+'</p>';
+  });
+}
+function photoFromBlob(b){
+  return new Promise(function(res,rej){
+    var rd=new FileReader();
+    rd.onerror=function(){rej(new Error('read'));};
+    rd.onload=function(){
+      var f='data:image/jpeg;base64,'+String(rd.result).slice(String(rd.result).indexOf(',')+1),img=new Image();
+      img.onload=function(){try{res({f:f,t:scaleImage(img,360,0.78)});}catch(e){rej(e);}};
+      img.onerror=function(){rej(new Error('image'));};
+      img.src=f;
+    };
+    rd.readAsDataURL(b);
+  });
+}
+function cloudRestore(sha,latest){
+  toast('Restoring…',60000);
+  return gh('GET','/contents/data.json?ref='+encodeURIComponent(sha),null,'application/vnd.github.raw+json').then(function(r){
+    if(!r.ok) throw ghErr(r);return r.text();
+  }).then(function(txt){
+    var o=null;try{o=normalize(JSON.parse(txt));}catch(e){}
+    if(!o) throw new Error('bad');
+    var ids=Array.from(allImgIds(o)),miss=[];
+    return Promise.all(ids.map(function(id){return imgGet(id).then(function(v){if(!v) miss.push(id);},function(){miss.push(id);});})).then(function(){
+      var fails=0,chain=Promise.resolve();
+      miss.forEach(function(id,i){
+        chain=chain.then(function(){
+          toast('Restoring photo '+(i+1)+' of '+miss.length,60000);
+          return gh('GET','/contents/photos/'+id+'.jpg',null,'application/vnd.github.raw+json').then(function(r){if(!r.ok) throw ghErr(r);return r.blob();}).then(photoFromBlob);
+        }).then(function(v){return imgPut(id,v).then(function(){thumbCache.set(id,v.t);cloudUp.add(id);});}).catch(function(){fails++;});
+      });
+      return chain.then(function(){
+        state=o;fresh.clear();editMode=false;save();
+        if(latest){var p=cloudPending();cloud.hash=p.h;cloudTickHash=p.h;} // already the newest online version
+        saveCloud();render();window.scrollTo(0,0);
+        toast(fails?'Restored, but '+fails+' photo'+(fails>1?'s':'')+' couldn’t be loaded':'Restored from the online backup',3500);
+      });
+    });
+  }).catch(function(e){toast(e&&e.status===401?'GitHub didn’t accept the token':'Couldn’t restore. Check the internet and try again.',3500);});
 }
 
 var toastT=0;
@@ -3072,6 +3354,21 @@ if(window.matchMedia){
 render();
 tickLoop();
 if(loadedOK) setTimeout(gcImages,4000);
+setInterval(cloudMaybe,30000);
+var cloudWasOn=cloud.on;
+setTimeout(function(){
+  // changes made last time but not yet backed up can go straight away
+  if(!cloud.on||!cloudWasOn) return;
+  var p=cloudPending();cloudTickHash=p.h;cloudChangedAt=Date.now()-CLOUD_QUIET;cloudMaybe();
+  if(cloud.kind==='auth'||cloud.kind==='access') toast('Online backup needs attention. Open Menu → Online backup.',4500);
+},5000);
+window.addEventListener('online',function(){cloudRetryAt=0;cloudMaybe();});
+document.addEventListener('visibilitychange',function(){
+  if(!cloud.on||cloudBusy) return;
+  if(document.visibilityState==='visible'){cloudMaybe();return;}
+  // leaving the app: send any waiting changes now
+  if(navigator.onLine!==false&&Date.now()>=cloudRetryAt){var p=cloudPending();if(p.h!==cloud.hash) cloudRun(true,p);}
+});
 if(loadedOK&&blocksMigrated) save();
 if(!storageOK) toast('Storage is off here, so changes won’t be kept');
 if('serviceWorker' in navigator&&location.protocol==='https:'){var hadCtl=!!navigator.serviceWorker.controller,swReloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(!hadCtl||swReloaded) return;swReloaded=true;try{save();}catch(e){}location.reload();});navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible') navigator.serviceWorker.getRegistration().then(function(r){if(r) r.update();}).catch(function(){});});}
