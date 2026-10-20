@@ -20,3 +20,7 @@ The installed app updates after you open it twice while online.
 ONLINE BACKUP (optional): Menu > Online backup copies everything to a PRIVATE GitHub repository
 while the app is open and online. You need a private repository and a fine-grained access token
 limited to that repository with Contents: Read and write. The steps are shown in the app.
+
+WEATHER (optional): Menu > Weather shows METAR and TAF from aviationweather.gov through a small
+free Cloudflare Worker you create once. Paste weather-relay-worker.js into a new "Hello World" Worker,
+deploy it, and enter its address (https://….workers.dev) in Menu > Weather.
