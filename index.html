@@ -446,7 +446,10 @@ button.hd-row:active,.hd-row[role=button]:active{background:var(--press)}
 .apn .mod-body{padding:0 0 2px}
 .apn .item,.pn .item{background:var(--paper)}
 .apn .item + .item,.pn .item + .item{border-top:1px solid var(--line-soft)}
-.apn .row,.pn .row{padding-left:calc(12px*var(--sp))}
+.apn .d0 > .row,.pn .d0 > .row{padding-left:calc(12px*var(--sp))}
+.apn .d1 > .row,.pn .d1 > .row{padding-left:calc(46px*var(--sp))}
+.apn .d2 > .row,.pn .d2 > .row{padding-left:calc(80px*var(--sp))}
+.apn .d3 > .row,.pn .d3 > .row{padding-left:calc(114px*var(--sp))}
 .apn-empty{padding:10px 14px 12px;color:var(--muted);font-size:calc(14px*var(--ts))}
 .lnkbtn{appearance:none;border:0;background:none;color:var(--accent);font:inherit;font-weight:650;padding:0;text-decoration:underline;text-underline-offset:2px}
 .hd-fold-all{appearance:none;border:0;background:none;color:inherit;font:inherit;display:flex;align-items:center;gap:8px;flex:1;min-width:0;text-align:left;padding:0;align-self:stretch}
@@ -877,7 +880,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='22';
+var APP_VERSION='23';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
