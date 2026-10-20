@@ -637,6 +637,11 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .wxm{font-size:calc(12px*var(--ts));color:var(--muted);margin-top:3px;font-weight:600}
 .wxm.old{color:var(--warn)}
 .wxnone{color:var(--muted);font-size:calc(13.5px*var(--ts))}
+.wxraw.atis{cursor:pointer}
+.wxraw.atis.clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.wxmore{font-size:calc(12px*var(--ts));color:var(--accent);font-weight:650;margin-top:3px}
+.wxl .letter{display:inline-block;min-width:20px;text-align:center;background:var(--accent);color:var(--on-accent);border-radius:5px;padding:0 4px;margin:0 2px;font-size:12px}
+.wxhint{background:var(--warn-weak);color:var(--warn);border-radius:10px;padding:8px 11px;font-size:13.5px;margin:0 0 8px;line-height:1.35}
 .wxx{appearance:none;border:0;background:none;color:var(--muted);width:30px;height:30px;margin:-6px -6px -6px 0;display:grid;place-items:center;flex:none}
 .wxx svg{width:16px;height:16px}
 .wxadd{display:flex;gap:8px;margin-top:12px}
@@ -911,7 +916,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='24';
+var APP_VERSION='25';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -1816,13 +1821,40 @@ function wxFetch(ids){
     var now=Date.now();
     ids.forEach(function(ic){
       var o=wx[ic]||{},m=j.metar&&j.metar[ic],t=j.taf&&j.taf[ic];
-      wx[ic]={m:m&&m.raw?{raw:String(m.raw),time:+m.time||null,cat:str(m.cat)}:(o.m||null),t:t&&t.raw?{raw:String(t.raw),time:+t.time||null}:(o.t||null),f:now};
+      wx[ic]={m:m&&m.raw?{raw:String(m.raw),time:+m.time||null,cat:str(m.cat)}:(o.m||null),t:t&&t.raw?{raw:String(t.raw),time:+t.time||null}:(o.t||null),f:now,a:wxAtisOf(j,ic,o)};
     });
-    wxSave();wxSt.err='';wxSt.ok=now;wxSt.retry=0;
+    wxSave();wxSt.err='';wxSt.ok=now;wxSt.retry=0;wxSt.oldRelay=!j.atis;
   }).catch(function(e){
     wxSt.err=navigator.onLine===false||(e&&e.name==='AbortError')||(e instanceof TypeError)?'No internet':String(e&&e.message||e);
     wxSt.retry=Date.now()+60000;
   }).then(function(){clearTimeout(tm);wxSt.busy=false;wxRefreshViews();});
+}
+function wxUS(ic){return /^[KP]/.test(ic);}
+function wxAtisOf(j,ic,o){
+  if(!wxUS(ic)) return null;
+  if(!j.atis||typeof j.atis!=='object') return o.a||null; // relay without D-ATIS: keep what we had
+  var a=j.atis[ic];
+  if(!Array.isArray(a)) return [];
+  return a.filter(function(x){return x&&x.text;}).slice(0,3).map(function(x){return {type:str(x.type)||'combined',code:str(x.code).slice(0,2),text:String(x.text).slice(0,4000),time:str(x.time),updated:+x.updated||null};});
+}
+function atisTime(x){
+  var m=/^(\d{2})(\d{2})$/.exec(x.time||'');
+  if(!m) return x.updated||null;
+  var n=new Date(),t=Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate(),+m[1],+m[2]);
+  if(t>Date.now()+10*60000) t-=86400000;
+  return t;
+}
+var wxAtisOpen=new Set();
+function wxAtisHTML(ic,list){
+  var now=Date.now();
+  if(!list.length) return '<div class="wxl">D-ATIS</div><div class="wxnone">None right now</div>';
+  return list.map(function(x){
+    var t=atisTime(x),age=t?now-t:0,key=ic+'|'+x.type,open=wxAtisOpen.has(key);
+    var kind=x.type==='arr'?' · Arrival':x.type==='dep'?' · Departure':'';
+    return '<div class="wxl">D-ATIS'+(x.code?' <span class="letter">'+esc(x.code)+'</span>':'')+kind+'</div>'+
+      '<div class="wxraw atis'+(open?'':' clamp')+'" data-act="wxAtis" data-v="'+esc(key)+'">'+esc(x.text)+'</div>'+
+      '<div class="wxm'+(age>60*60000?' old':'')+'">'+(t?hmOf(t)+' · '+ageText(age)+' old':'')+(open?'':'<span class="wxmore"> · tap to read all</span>')+'</div>';
+  }).join('');
 }
 function wxRefreshViews(){
   app.querySelectorAll('.module.wx').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
@@ -1872,6 +1904,7 @@ function wxCardHTML(a,removable){
     var ot=wxObsTime(d.m.raw,d.m.time),age=ot?now-ot:0;
     h+='<div class="wxl">METAR</div><div class="wxraw">'+wxSig(d.m.raw)+'</div>'+(ot?'<div class="wxm'+(age>75*60000?' old':'')+'">'+hmOf(ot)+' · '+ageText(age)+' old</div>':'');
   }else h+='<div class="wxl">METAR</div><div class="wxnone">None available</div>';
+  if(Array.isArray(d.a)) h+=wxAtisHTML(a.ic,d.a);
   if(d.t) h+='<div class="wxl">TAF</div><div class="wxraw">'+wxSig(wxTafLines(d.t.raw))+'</div>'+(d.t.time?'<div class="wxm">Issued '+hmOf(d.t.time)+'</div>':'');
   else h+='<div class="wxl">TAF</div><div class="wxnone">None available</div>';
   return h+'</div>';
@@ -1927,6 +1960,7 @@ function wxPanelHTML(){
       '<button type="button" class="btn primary" data-act="wxSetUrl" style="width:100%;margin-top:10px">Save and test</button></div>';
   var aps=wxAirports();
   var h=wxStatusHTML();
+  if(wxSt.oldRelay&&aps.some(function(a){return wxUS(a.ic);})) h+='<div class="wxhint">For D-ATIS at US airports, update your relay: paste the new relay code from Claude into your Cloudflare Worker and deploy.</div>';
   if(!aps.length) h+='<p class="hint">Set the flight (tap the clock) or add an airport below.</p>';
   h+=aps.map(function(a){return wxCardHTML(a,a.role==='Watching');}).join('');
   h+='<div class="wxadd"><input type="text" class="fl-in" id="wxAddIn" maxlength="4" placeholder="Add ICAO" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off"><button type="button" class="btn" data-act="wxWatch">'+I.plus+'Add</button></div>';
@@ -4174,6 +4208,11 @@ function onAct(e){
       if(!wxAirports().length){toast('Set the flight first');break;}
       wxSt.retry=0;wxFetch(wxAirports().map(function(x){return x.ic;}).slice(0,12));break;
     case 'wxOpen': openTool('wx');break;
+    case 'wxAtis':
+      var ak=el.getAttribute('data-v');if(wxAtisOpen.has(ak)) wxAtisOpen.delete(ak);else wxAtisOpen.add(ak);
+      el.classList.toggle('clamp',!wxAtisOpen.has(ak));
+      var am=el.nextElementSibling&&el.nextElementSibling.querySelector('.wxmore');if(am) am.style.display=wxAtisOpen.has(ak)?'none':'';
+      break;
     case 'wxSetUrl': wxSetUrl();break;
     case 'wxChangeUrl': confirmSheet('Change the weather relay address?','Change',function(){state.settings.wxUrl='';save();openTool('wx');});break;
     case 'wxWatch':
