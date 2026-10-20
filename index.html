@@ -652,6 +652,16 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .wxsetup ol{margin:6px 0 10px;padding-left:20px}
 .wxsetup .fl-in{margin-top:8px}
 
+/* Menu header and settings */
+.menu-head{display:flex;align-items:center;gap:8px;margin:-4px -2px 10px 0}
+.menu-head h3{flex:1;margin:0}
+.menu-head .ib.round{position:relative;color:var(--accent)}
+.menu-head .dot{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 2px var(--surface)}
+.menu .mt.one{display:flex;align-items:center}
+.set-h{font-size:12px;color:var(--muted);font-weight:700;margin:14px 6px 2px;letter-spacing:.04em;text-transform:uppercase}
+.menu-head .back{appearance:none;border:0;background:none;color:var(--accent);font-weight:600;font-size:16px;display:inline-flex;align-items:center;gap:2px;padding:6px 6px 6px 0}
+.menu-head .back svg{width:18px;height:18px}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -770,6 +780,7 @@ var I={
   chart:sv('<path d="M4 20h16"/><path d="M7 16.5v-5M12 16.5V7M17 16.5v-8"/>'),
   search:sv('<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/>'),
   wx:sv('<path d="M8.5 19h8.8a3.6 3.6 0 0 0 .5-7.17A5 5 0 0 0 8.3 11a4 4 0 0 0 .2 8z"/><path d="M4.6 10.6A4 4 0 0 1 11 6.2"/><path d="M7.5 2.5v1.4M2.5 7.5h1.4M3.9 3.9l1 1"/>'),
+  gear:sv('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
   pin:sv('<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>'),
   swap:sv('<path d="M8 4v15M4 15l4 4 4-4"/><path d="M16 20V5M12 9l4-4 4 4"/>'),
   grip:sv('<path d="M5 7.5h14M5 12h14M5 16.5h14"/>'),
@@ -916,7 +927,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='25';
+var APP_VERSION='26';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -2562,34 +2573,25 @@ function openLists(){
   });
 }
 function openMenu(){
-  var fd=state.settings.fingerDraw,snd=state.settings.sound;
-  var now=Date.now();
-  openSheet('<h3>Menu</h3><div class="menu">'+
-    '<button type="button" data-sact="search">'+I.search+'<span class="mt">Search<small>Checklists, airport notes and flight log</small></span></button>'+
+  var now=Date.now(),warn=cloud.on&&!!cloud.err;
+  openSheet('<div class="menu-head"><h3>Menu</h3>'+
+    '<button type="button" class="ib round" data-sact="search" aria-label="Search">'+I.search+'</button>'+
+    '<button type="button" class="ib round" data-sact="settings" aria-label="Settings'+(warn?', needs attention':'')+'">'+I.gear+(warn?'<span class="dot"></span>':'')+'</button></div>'+
+    '<div class="menu">'+
     '<button type="button" data-sact="tcd">'+I.timer+'<span class="mt">Countdowns<small>'+esc(cdSummary(now))+'</small></span></button>'+
     '<button type="button" data-sact="trest">'+I.moon+'<span class="mt">Crew rest<small>'+esc(restSummary(now))+'</small></span></button>'+
     '<button type="button" data-sact="tapn">'+I.pin+'<span class="mt">Airport notes<small>'+esc(apnSummary())+'</small></span></button>'+
     '<button type="button" data-sact="tflog">'+I.log+'<span class="mt">Flight log<small>'+esc(flogSummary())+'</small></span></button>'+
     '<button type="button" data-sact="twx">'+I.wx+'<span class="mt">Weather<small>'+esc(wxSummary())+'</small></span></button><hr>'+
-    '<button type="button" data-sact="lists">'+I.list+'<span class="mt">Checklists<small>Switch, add, rename or duplicate</small></span></button>'+
-    '<button type="button" data-sact="untick">'+I.reset+'<span class="mt">Untick all<small>Every item in this checklist</small></span></button>'+
-    '<button type="button" data-sact="flight">'+I.plane+'<span class="mt">New flight<small>Untick and clear this checklist, countdowns and crew rest times</small></span></button>'+
-    '<button type="button" data-sact="finger" role="switch" aria-checked="'+fd+'">'+I.hand+'<span class="mt">Draw with finger<small>'+(fd?'On: one finger draws in notepads':'Off: Apple Pencil draws, finger scrolls')+'</small></span><span class="tog'+(fd?' on':'')+'"></span></button>'+
-    '<div class="menu-row">'+I.textsize+'<span class="mt">Text size</span><div class="seg ts" role="radiogroup" aria-label="Text size">'+
-      TEXT_SIZES.map(function(t){var on=state.settings.textScale===t[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="ts" data-v="'+t[0]+'" aria-label="'+t[1]+'"><span style="font-size:'+t[2]+'px">A</span></button>';}).join('')+'</div></div>'+
-    '<button type="button" data-sact="sound" role="switch" aria-checked="'+snd+'">'+I.bell+'<span class="mt">Alert sound<small>'+(snd?'On: countdown alerts beep while the app is open':'Off: countdown alerts are silent')+'</small></span><span class="tog'+(snd?' on':'')+'"></span></button>'+
-    '<button type="button" data-sact="cloud">'+I.cloud+'<span class="mt">Online backup<small'+(cloud.on&&cloud.err?' class="warn"':'')+'>'+esc(cloudMenuText())+'</small></span></button>'+
-    '<button type="button" data-sact="export">'+I.share+'<span class="mt">Back up<small>Copy or share everything as a backup</small></span></button>'+
-    '<button type="button" data-sact="import">'+I.restore+'<span class="mt">Restore<small>Load a backup</small></span></button>'+
-    '</div><div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button></div><p class="ver">App version '+APP_VERSION+'</p>',
-  function(act,btn){
+    '<button type="button" data-sact="lists">'+I.list+'<span class="mt one">Checklists</span></button>'+
+    '<button type="button" data-sact="untick">'+I.reset+'<span class="mt one">Untick all</span></button>'+
+    '<button type="button" data-sact="flight">'+I.plane+'<span class="mt one">New flight</span></button>'+
+    '</div><div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button></div>',
+  function(act){
     var L=cur();
     switch(act){
-      case 'ts':
-        state.settings.textScale=+btn.getAttribute('data-v');applyTextScale();save();
-        sheetEl.querySelectorAll('[data-sact="ts"]').forEach(function(b){b.classList.toggle('on',b===btn);b.setAttribute('aria-checked',String(b===btn));});
-        break;
       case 'search': openSearch();break;
+      case 'settings': openSettings();break;
       case 'tcd': openTool('cd');closeSheet();break;
       case 'trest': openTool('rest');closeSheet();break;
       case 'tapn': toolApnSel=null;toolApnIcao=null;toolApnView='notes';openTool('apn');closeSheet();break;
@@ -2600,10 +2602,33 @@ function openMenu(){
         confirmSheet('Untick every item in “'+esc(L.title)+'”?','Untick all',function(){L.sections.forEach(function(s){untickItems(s.items);});save();render();toast('All items unticked');},openMenu);break;
       case 'flight':
         confirmSheet('Start a new flight in “'+esc(L.title)+'”? This unticks every item, clears its calculators and notepads, clears all countdowns and the crew rest times, and unticks airport note checkboxes.','New flight',function(){newFlight(L);save();render();window.scrollTo(0,0);toast('Ready for a new flight');},openMenu);break;
+      default: closeSheet();
+    }
+  });
+}
+function openSettings(){
+  var fd=state.settings.fingerDraw,snd=state.settings.sound;
+  openSheet('<div class="menu-head"><button type="button" class="back" data-sact="menu">'+I.left+'Menu</button><h3 style="text-align:center;margin-right:58px">Settings</h3></div><div class="menu">'+
+    '<div class="menu-row">'+I.textsize+'<span class="mt">Text size</span><div class="seg ts" role="radiogroup" aria-label="Text size">'+
+      TEXT_SIZES.map(function(t){var on=state.settings.textScale===t[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="ts" data-v="'+t[0]+'" aria-label="'+t[1]+'"><span style="font-size:'+t[2]+'px">A</span></button>';}).join('')+'</div></div>'+
+    '<button type="button" data-sact="finger" role="switch" aria-checked="'+fd+'">'+I.hand+'<span class="mt">Draw with finger<small>'+(fd?'On: one finger draws in notepads':'Off: Apple Pencil draws, finger scrolls')+'</small></span><span class="tog'+(fd?' on':'')+'"></span></button>'+
+    '<button type="button" data-sact="sound" role="switch" aria-checked="'+snd+'">'+I.bell+'<span class="mt">Alert sound<small>'+(snd?'On: alerts beep while the app is open':'Off: alerts are silent')+'</small></span><span class="tog'+(snd?' on':'')+'"></span></button>'+
+    '</div><div class="set-h">Backup</div><div class="menu">'+
+    '<button type="button" data-sact="cloud">'+I.cloud+'<span class="mt">Online backup<small'+(cloud.on&&cloud.err?' class="warn"':'')+'>'+esc(cloudMenuText())+'</small></span></button>'+
+    '<button type="button" data-sact="export">'+I.share+'<span class="mt">Back up<small>Copy or share everything as a backup</small></span></button>'+
+    '<button type="button" data-sact="import">'+I.restore+'<span class="mt">Restore<small>Load a backup</small></span></button>'+
+    '</div><div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Done</button></div><p class="ver">App version '+APP_VERSION+'</p>',
+  function(act,btn){
+    switch(act){
+      case 'menu': openMenu();break;
+      case 'ts':
+        state.settings.textScale=+btn.getAttribute('data-v');applyTextScale();save();
+        sheetEl.querySelectorAll('[data-sact="ts"]').forEach(function(b){b.classList.toggle('on',b===btn);b.setAttribute('aria-checked',String(b===btn));});
+        break;
       case 'sound':
-        state.settings.sound=!snd;save();if(state.settings.sound){audioUnlock();beep(1);}openMenu();break;
+        state.settings.sound=!snd;save();if(state.settings.sound){audioUnlock();beep(1);}openSettings();break;
       case 'finger':
-        state.settings.fingerDraw=!fd;save();document.body.classList.toggle('finger',state.settings.fingerDraw);openMenu();break;
+        state.settings.fingerDraw=!fd;save();document.body.classList.toggle('finger',state.settings.fingerDraw);openSettings();break;
       case 'cloud': openCloud();break;
       case 'export': openExport();break;
       case 'import': openImport();break;
@@ -4339,7 +4364,7 @@ setTimeout(function(){
   // changes made last time but not yet backed up can go straight away
   if(!cloud.on||!cloudWasOn) return;
   var p=cloudPending();cloudTickHash=p.h;cloudChangedAt=Date.now()-CLOUD_QUIET;cloudMaybe();
-  if(cloud.kind==='auth'||cloud.kind==='access') toast('Online backup needs attention. Open Menu → Online backup.',4500);
+  if(cloud.kind==='auth'||cloud.kind==='access') toast('Online backup needs attention. Open Menu → Settings → Online backup.',4500);
 },5000);
 window.addEventListener('online',function(){cloudRetryAt=0;cloudMaybe();});
 document.addEventListener('visibilitychange',function(){

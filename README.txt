@@ -17,7 +17,7 @@ Deleting the Home Screen icon deletes its data, so use Menu > Back up now and th
 UPDATING LATER: in the repository tap Add file > Upload files, upload the new files over the old ones and commit.
 The installed app updates after you open it twice while online.
 
-ONLINE BACKUP (optional): Menu > Online backup copies everything to a PRIVATE GitHub repository
+ONLINE BACKUP (optional): Menu > Settings > Online backup copies everything to a PRIVATE GitHub repository
 while the app is open and online. You need a private repository and a fine-grained access token
 limited to that repository with Contents: Read and write. The steps are shown in the app.
 
