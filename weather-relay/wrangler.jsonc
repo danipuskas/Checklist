@@ -1,0 +1,7 @@
+// Cloudflare Worker settings for the weather relay (deployed from this folder).
+{
+  "name": "weather-relay",
+  "main": "worker.js",
+  "compatibility_date": "2025-06-01",
+  "workers_dev": true
+}
