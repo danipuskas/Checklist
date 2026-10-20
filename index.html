@@ -538,16 +538,16 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .sumline{font-size:13px;color:var(--muted);margin:6px 2px 0}
 .log-h{font-size:12px;color:var(--muted);font-weight:700;margin:16px 2px 6px;letter-spacing:.04em;text-transform:uppercase}
 .log{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper)}
-.lrow{appearance:none;border:0;border-top:1px solid var(--line-soft);background:none;color:var(--text);width:100%;display:flex;gap:11px;padding:10px 10px 10px 12px;align-items:center;text-align:left}
-.lrow:first-child{border-top:0}
-.lrow:active{background:var(--press)}
+.flrow{appearance:none;border:0;border-top:1px solid var(--line-soft);background:none;color:var(--text);width:100%;display:flex;gap:11px;padding:10px 10px 10px 12px;align-items:center;text-align:left}
+.flrow:first-child{border-top:0}
+.flrow:active{background:var(--press)}
 .ld{width:30px;flex:none;text-align:center;line-height:1.05}
 .ld b{display:block;font-size:19px;font-variant-numeric:tabular-nums}
 .ld span{font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase}
 .lm{flex:1;min-width:0}
 .lm b{font-size:16px}
 .lm div{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
-.lrow > svg{width:16px;height:16px;color:var(--muted);transform:rotate(-90deg);flex:none}
+.flrow > svg{width:16px;height:16px;color:var(--muted);transform:rotate(-90deg);flex:none}
 .live{font-size:10.5px;font-weight:700;color:var(--done);background:var(--done-weak);padding:1px 6px;border-radius:999px;margin-right:3px}
 .lm > b{white-space:nowrap}
 .sheet input.upc{text-transform:uppercase}
@@ -580,6 +580,40 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .mini .last b{color:var(--text)}
 .apview{display:grid;grid-template-columns:1fr 1fr;margin:0 0 14px}
 .apview button small{opacity:.7;margin-left:4px;font-size:12px}
+
+/* Undo in the toast */
+.toast.has-act{display:flex;align-items:center;gap:14px;padding:7px 7px 7px 18px}
+.toast.has-act.show{pointer-events:auto}
+.toast-act{appearance:none;border:0;background:var(--accent);color:var(--on-accent);font:700 15px -apple-system,system-ui,sans-serif;border-radius:999px;padding:8px 15px}
+/* Reminders */
+.remchip{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:calc(12.5px*var(--ts));font-weight:650;color:var(--accent);background:var(--accent-weak);border-radius:999px;padding:2px 9px 2px 7px;max-width:100%}
+.remchip svg{width:13px;height:13px;flex:none}
+.remchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.remchip.soon{color:var(--warn);background:var(--warn-weak)}
+.item.rem-due > .row{background:var(--warn-weak)}
+#alertMsg{cursor:pointer}
+.rem-body{margin-top:10px}
+.rem-body .fl{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 6px}
+.rem-cd{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.sheet .rem-min input[type=text]{width:62px;flex:none;text-align:center;padding-left:6px;padding-right:6px}
+.rem-min{display:flex;align-items:center;gap:6px}
+.rem-min span{font-size:14px;color:var(--muted);font-weight:600;white-space:nowrap}
+.seg.lead{display:grid;grid-template-columns:1.7fr repeat(4,1fr);margin-top:8px}
+.seg.lead button{padding:8px 2px}
+/* Search */
+#srRes{margin-top:12px}
+.sr-h{font-size:12px;color:var(--muted);font-weight:700;margin:14px 2px 6px;letter-spacing:.04em;text-transform:uppercase}
+.sr-list{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.sr{appearance:none;border:0;border-top:1px solid var(--line-soft);background:var(--surface2);color:var(--text);width:100%;display:block;text-align:left;padding:10px 12px;font-size:15.5px;line-height:1.3}
+.sr:first-child{border-top:0}
+.sr:active{background:var(--press)}
+.sr b{font-weight:650;display:block}
+.sr .srp{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:600}
+.sr .srn{display:block;font-size:13.5px;color:var(--muted);margin-top:3px}
+.sr mark{background:var(--accent-weak);color:var(--accent);border-radius:3px;padding:0 1px}
+.sr-more{font-size:13px;color:var(--muted);margin:6px 4px 0}
+.flash-note{animation:flashnote 1.4s ease}
+@keyframes flashnote{0%,60%{background:var(--accent-weak)}100%{background:transparent}}
 
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
@@ -697,6 +731,7 @@ var I={
   takeoff:sv('<path d="M3 20h18"/><path d="M4 14.5l1.8-1 3.8 1.8 3.9-2.1-4.6-5.2 2.1-1.1 7.2 3.7 2.6-1.4a1.6 1.6 0 0 1 1.5 2.8L8.8 18.3 4 14.5z"/>'),
   landing:sv('<path d="M3 20h18"/><path d="M4.5 9.5l2-.6 3.3 2.6 4.2-1.2-3.6-6 2.2-.6 6.3 5 2.8-.8a1.6 1.6 0 0 1 .9 3.1l-14.5 4.2-4.1-3.8z"/>'),
   chart:sv('<path d="M4 20h16"/><path d="M7 16.5v-5M12 16.5V7M17 16.5v-8"/>'),
+  search:sv('<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/>'),
   pin:sv('<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>'),
   swap:sv('<path d="M8 4v15M4 15l4 4 4-4"/><path d="M16 20V5M12 9l4-4 4 4"/>'),
   grip:sv('<path d="M5 7.5h14M5 12h14M5 16.5h14"/>'),
@@ -726,6 +761,14 @@ function newRestBlock(){return {id:uid(),type:'rest',link:true,collapsed:false};
 function newFlogBlock(){return {id:uid(),type:'flog',part:'both',collapsed:false};}
 function newApstBlock(){return {id:uid(),type:'apst',which:'dest',collapsed:false};}
 function newHead(){return {id:uid(),type:'head',title:'',collapsed:false};}
+function normRem(r){
+  if(!r||typeof r!=='object') return null;
+  if(r.mode==='cd') return {mode:'cd',cd:str(r.cd),min:Math.max(0,Math.min(600,Math.round(+r.min||0))),lastT:typeof r.lastT==='number'?r.lastT:null};
+  var t=Array.isArray(r.times)?r.times.map(String).filter(function(x){return /^\d{4}$/.test(x)&&+x.slice(0,2)<24&&+x.slice(2)<60;}):[];
+  t=t.filter(function(x,i){return t.indexOf(x)===i;}).sort().slice(0,12);
+  if(!t.length) return null;
+  return {mode:'at',times:t,lead:[0,5,10,15,30].indexOf(+r.lead)>=0?+r.lead:0,last:+r.last||0};
+}
 function normItem(it){
   if(!it||typeof it!=='object') return null;
   if(it.type==='apn') return {id:str(it.id)||uid(),type:'apn',title:'Airport notes',which:it.which==='dep'?'dep':'dest',
@@ -749,7 +792,7 @@ function normItem(it){
   return {id:str(it.id)||uid(),type:'check',text:str(it.text),note:str(it.note),
     links:Array.isArray(it.links)?it.links.filter(function(l){return l&&l.url;}).map(function(l){return {label:str(l.label),url:str(l.url)};}):[],
     imgs:Array.isArray(it.imgs)?it.imgs.filter(function(x){return typeof x==='string'&&x;}):[],
-    info:!!it.info,done:!it.info&&!!it.done,open:it.open!==false,
+    info:!!it.info,done:!it.info&&!!it.done,open:it.open!==false,rem:normRem(it.rem),
     children:Array.isArray(it.children)?it.children.map(normItem).filter(function(x){return x&&x.type==='check';}):[]};
 }
 function normalize(o){
@@ -834,7 +877,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='21';
+var APP_VERSION='22';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -1165,6 +1208,7 @@ function renderCheck(it,depth,o){
   h+=(it.info?'<span class="ibox" aria-hidden="true">'+I.info+'</span>':'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(esc(it.text)||'<span class="ph">Untitled item</span>')+'</div>';
   if(it.note) h+='<div class="note">'+linkify(esc(it.note))+'</div>';
   if(it.links.length) h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
+  if(it.rem&&!nt) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
   h+='</div>';
   if(kids.length) h+='<button type="button" class="kid-toggle" data-act="toggleKids" data-id="'+it.id+'" aria-label="Show or hide sub-items">'+(kt.length?kd+'/'+kt.length:kids.length)+'<span class="chev">'+I.chev+'</span></button>';
@@ -1481,7 +1525,7 @@ function flListHTML(){
   list.forEach(function(f){
     var mk=f.date.slice(0,7);
     if(mk!==month){if(month) h+='</div>';month=mk;h+='<div class="log-h">'+MONTHS[+mk.slice(5,7)-1]+' '+mk.slice(0,4)+'</div><div class="log">';}
-    h+='<button type="button" class="lrow" data-act="flOpen" data-id="'+f.id+'"><span class="ld"><b>'+(+f.date.slice(8,10))+'</b><span>'+MON[+f.date.slice(5,7)-1]+'</span></span>'+
+    h+='<button type="button" class="flrow" data-act="flOpen" data-id="'+f.id+'"><span class="ld"><b>'+(+f.date.slice(8,10))+'</b><span>'+MON[+f.date.slice(5,7)-1]+'</span></span>'+
       '<span class="lm"><b>'+esc((f.dep.icao||'—')+' → '+(f.arr.icao||'—'))+'</b>'+
       '<div>'+(f.id===state.flightCur&&f.date===today?'<span class="live">Current</span> ':'')+esc(flRouteSub(f))+'</div></span>'+I.chev+'</button>';
   });
@@ -1617,6 +1661,83 @@ function openApstEditor(id){
       default: closeSheet();
     }
   });
+}
+/* Reminders: at UTC times every day, or a set time before a countdown */
+function remDue(r,now){
+  if(r.mode==='cd'){
+    var c=cdById(r.cd);if(!c||c.target===null) return {prev:null,next:null,c:c};
+    var t=c.target-r.min*60000;return t<=now?{prev:t,next:null,c:c}:{prev:null,next:t,c:c};
+  }
+  var day=Math.floor(now/86400000)*86400000,prev=null,next=null;
+  r.times.forEach(function(x){
+    var m=(+x.slice(0,2))*60+(+x.slice(2));
+    [-1,0,1].forEach(function(k){var t=day+k*86400000+(m-r.lead)*60000;if(t<=now){if(prev===null||t>prev) prev=t;}else if(next===null||t<next) next=t;});
+  });
+  return {prev:prev,next:next};
+}
+function hmOf(t){var d=new Date(t);return hmZ(d.getUTCHours()*60+d.getUTCMinutes());}
+function remText(r,now){
+  if(r.mode==='cd'){
+    var c=cdById(r.cd);if(!c) return 'Countdown deleted';
+    return c.title+' − '+r.min+' min'+(c.target!==null?' · '+hmOf(c.target-r.min*60000):'');
+  }
+  var d=remDue(r,now);
+  return hmOf(d.next+r.lead*60000)+(r.times.length>1?' · '+r.times.length+' a day':'')+(r.lead?' · alert '+r.lead+' min before':'');
+}
+function remWalk(fn){
+  state.lists.forEach(function(L){L.sections.forEach(function(s){
+    (function w(arr){arr.forEach(function(n){if(n.type==='check'){if(n.rem) fn(n);w(n.children);}});})(s.items);
+  });});
+}
+function remMsg(it,r,d,now){
+  var name=it.text||'Reminder',late=now-d.prev>120000;
+  if(r.mode==='cd') return name+' · '+r.min+' min to '+(d.c?d.c.title:'countdown');
+  return name+(r.lead?' in '+r.lead+' min':'')+(late?' (was due '+hmOf(d.prev+r.lead*60000)+')':'');
+}
+function remCheck(now){
+  remWalk(function(it){
+    var r=it.rem,d=remDue(r,now);
+    if(d.prev===null) return;
+    if(r.mode==='cd'){
+      if(r.lastT!==null&&Math.abs(d.c.target-r.lastT)<20*60000) return;
+      r.lastT=d.c.target;
+    }else{
+      if(d.prev<=r.last) return;
+      r.last=d.prev;
+    }
+    saveSoon();
+    if(now-d.prev<15*60000) remFire(it,remMsg(it,r,d,now));
+  });
+}
+function remFire(it,msg){
+  if(!it.info&&it.done) tick(it.id); // a ticked item comes back as to-do
+  alerting.delete(it.id);alerting.set(it.id,msg);paintAlert();beep(3);
+}
+function remPaint(now){
+  document.querySelectorAll('[data-remid]').forEach(function(el){
+    var f=find(el.getAttribute('data-remid'));if(!f||!f.node.rem) return;
+    var r=f.node.rem,t=remText(r,now),sp=el.querySelector('span');
+    if(sp&&sp.textContent!==t) sp.textContent=t;
+    var d=remDue(r,now);el.classList.toggle('soon',d.next!==null&&d.next-now<=10*60000);
+    var item=el.closest('.item');if(item) item.classList.toggle('rem-due',alerting.has(f.node.id));
+  });
+}
+function remMark(r){
+  // a reminder that is already past when you set it doesn't go off straight away
+  var now=Date.now(),d=remDue(r,now);
+  if(r.mode==='cd') r.lastT=d.prev!==null&&d.c?d.c.target:null;
+  else r.last=d.prev||0;
+  return r;
+}
+function revealItem(id){
+  var f=find(id);if(!f||!f.list) return;
+  state.current=f.list.id;f.section.collapsed=false;
+  f.anc.forEach(function(a){a.open=true;});
+  var top=f.anc[0]||f.node,i=f.section.items.indexOf(top);
+  for(var j=i-1;j>=0;j--){var n=f.section.items[j];if(n.type==='head'){n.collapsed=false;break;}}
+  if(toolOpen) closeTool();
+  save();render();
+  setTimeout(function(){flash(id);},80);
 }
 function renderSection(s){
   var c=secCount(s),complete=c.t>0&&c.d===c.t;
@@ -1943,7 +2064,14 @@ sheetWrap.addEventListener('click',function(e){
 });
 function confirmSheet(msg,okLabel,onOk,onCancel){
   openSheet('<p class="confirm">'+msg+'</p><div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn danger-fill" data-sact="ok">'+esc(okLabel)+'</button></div>',
-    function(act){closeSheet();if(act==='ok') onOk();else if(onCancel) onCancel();});
+    function(act){
+      closeSheet();
+      if(act!=='ok'){if(onCancel) onCancel();return;}
+      var before=JSON.stringify(state);toastLast='';
+      onOk();
+      // anything the confirmation changed can be taken back for a few seconds
+      if(JSON.stringify(state)!==before) offerUndo(before,toastLast||{'Delete':'Deleted','Clear':'Cleared','Untick all':'Unticked'}[okLabel]||'Done');
+    });
 }
 function promptSheet(title,value,ph,onOk,onCancel){
   openSheet('<h3>'+esc(title)+'</h3><div class="fld"><input id="fPrompt" type="text" value="'+esc(value)+'" placeholder="'+esc(ph)+'" autocomplete="off"></div>'+
@@ -1966,6 +2094,40 @@ function edThumbsHTML(imgs){
 function openItemEditor(id,isNew){
   var f=find(id);if(!f) return;
   var it=f.node,n=f.arr.length,imgs=(it.imgs||[]).slice(),busy=0,info=!!it.info;
+  var r0=it.rem,remMode=r0?r0.mode:'off',remLead=r0&&r0.mode==='at'?r0.lead:0,remTimes=r0&&r0.mode==='at'?r0.times.join(' '):'',
+      remCd=r0&&r0.mode==='cd'?r0.cd:(state.tools.cds[0]?state.tools.cds[0].id:''),remMin=r0&&r0.mode==='cd'?String(r0.min):'';
+  function remBodyHTML(){
+    if(remMode==='at') return '<div class="rem-body"><input id="fRemTimes" type="text" inputmode="numeric" value="'+esc(remTimes)+'" placeholder="e.g. 0430 1030 1630" autocomplete="off">'+
+      '<div class="seg lead" id="fRemLead">'+[[0,'On time'],[5,'−5'],[10,'−10'],[15,'−15'],[30,'−30']].map(function(x){return '<button type="button" data-sact="remLead" data-v="'+x[0]+'" class="'+(remLead===x[0]?'on':'')+'">'+x[1]+'</button>';}).join('')+'</div>'+
+      '<p class="hint" style="margin:6px 0 0">UTC times, every day. Alert on time or minutes before, while the app is open. A ticked item is unticked when its reminder comes.</p></div>';
+    if(remMode==='cd'){
+      if(!state.tools.cds.length) return '<p class="hint" style="margin:10px 0 0">Add a countdown in Menu → Countdowns first, e.g. TOD.</p>';
+      return '<div class="rem-body rem-cd"><select id="fRemCd" class="ap-tz">'+state.tools.cds.map(function(c){return '<option value="'+c.id+'"'+(c.id===remCd?' selected':'')+'>'+esc(c.title)+'</option>';}).join('')+'</select>'+
+        '<label class="rem-min"><input id="fRemMin" type="text" inputmode="numeric" maxlength="3" value="'+esc(remMin)+'" placeholder="40"><span>min before</span></label></div>'+
+        '<p class="hint" style="margin:6px 0 0">Goes off that long before the countdown’s time, e.g. 40 min before TOD.</p>';
+    }
+    return '';
+  }
+  function remRead(){
+    var a=$('#fRemTimes');if(a) remTimes=a.value;
+    var b=$('#fRemCd');if(b) remCd=b.value;
+    var c=$('#fRemMin');if(c) remMin=c.value;
+  }
+  function remBuild(strict){
+    remRead();
+    if(f.apn||remMode==='off') return {ok:true,rem:null};
+    if(remMode==='at'){
+      var parts=remTimes.split(/[\s,;\/]+/).filter(Boolean),out=[],bad=false;
+      parts.forEach(function(x){var m=parseHM(x);if(m===null) bad=true;else out.push(hmZ(m).slice(0,4));});
+      if(strict&&(bad||!out.length)) return {ok:false,msg:'Enter the times as HHMM, e.g. 0430 1030'};
+      var r=normRem({mode:'at',times:out,lead:remLead});
+      return {ok:true,rem:r};
+    }
+    var mn=parseInt(String(remMin).replace(/[^0-9]/g,''),10);
+    if(strict&&(!remCd||!isFinite(mn))) return {ok:false,msg:remCd?'Enter the minutes before the countdown':'Add a countdown first'};
+    return {ok:true,rem:remCd&&isFinite(mn)?normRem({mode:'cd',cd:remCd,min:mn}):null};
+  }
+  function remSame(a,b){return JSON.stringify(a&&{m:a.mode,t:a.times,l:a.lead,c:a.cd,n:a.min})===JSON.stringify(b&&{m:b.mode,t:b.times,l:b.lead,c:b.cd,n:b.min});}
   openSheet('<h3>'+(f.apn?(isNew?'New note for '+esc(f.apn.icao):'Edit note'):(isNew?'New item':'Edit item'))+'</h3>'+
     '<div class="fld"><div class="seg big type-seg" id="fType" role="radiogroup" aria-label="Item type">'+
       '<button type="button" role="radio" aria-checked="'+!info+'" class="'+(info?'':'on')+'" data-sact="type" data-v="check">'+I.tickbox+'Checkbox</button>'+
@@ -1979,6 +2141,9 @@ function openItemEditor(id,isNew){
     '<div class="fld"><span class="fl">Photos <em>(tap one in the checklist to enlarge it)</em></span><div class="ed-thumbs" id="fImgs">'+edThumbsHTML(imgs)+'</div>'+
     '<input type="file" id="fPhoto" class="vh" accept="image/*" multiple>'+
     '<label class="btn small ghost" for="fPhoto">'+I.photo+'Add photo</label></div>'+
+    (f.apn?'':'<div class="fld"><span class="fl">Reminder</span><div class="seg big" id="fRem" style="display:grid;grid-template-columns:.8fr 1fr 1.2fr">'+
+      [['off','Off'],['at','Times'],['cd','Countdown']].map(function(x){return '<button type="button" data-sact="remMode" data-v="'+x[0]+'" class="'+(remMode===x[0]?'on':'')+'">'+x[1]+'</button>';}).join('')+
+      '</div><div id="fRemBody"></div></div>')+
     '<div class="tools"><button type="button" class="btn small" data-sact="sub">'+I.plus+'Sub-item</button>'+
     '<button type="button" class="btn small" data-sact="up"'+(f.idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
     '<button type="button" class="btn small" data-sact="down"'+(f.idx===n-1?' disabled':'')+'>'+I.down+'Down</button>'+
@@ -1991,8 +2156,13 @@ function openItemEditor(id,isNew){
       it.links=Array.prototype.map.call(sheetEl.querySelectorAll('.link-row'),function(r){return {label:r.querySelector('.lLabel').value.trim(),url:r.querySelector('.lUrl').value.trim()};}).filter(function(l){return l.url;});
       it.imgs=imgs.slice();
       it.info=info;if(info) it.done=false;
+      var rb=remBuild(false);
+      if(!remSame(rb.rem,it.rem)) it.rem=rb.rem?remMark(rb.rem):null;
     }
     if(busy&&['save','up','down','sub','del'].indexOf(act)>=0){toast('Still adding photos…');return;}
+    if(act==='remMode'){remRead();remMode=btn.getAttribute('data-v');sheetEl.querySelectorAll('#fRem button').forEach(function(b){b.classList.toggle('on',b===btn);});$('#fRemBody').innerHTML=remBodyHTML();var ft=$('#fRemTimes')||$('#fRemMin');if(ft) ft.focus();return;}
+    if(act==='remLead'){remLead=+btn.getAttribute('data-v');sheetEl.querySelectorAll('#fRemLead button').forEach(function(b){b.classList.toggle('on',b===btn);});return;}
+    if(act==='save'){var rv=remBuild(true);if(!rv.ok){toast(rv.msg);var fx=$('#fRemTimes')||$('#fRemMin');if(fx) fx.focus();return;}}
     var j,k;
     switch(act){
       case 'type':
@@ -2033,6 +2203,7 @@ function openItemEditor(id,isNew){
     }
   });
   function refreshThumbs(){var box=$('#fImgs');if(box){box.innerHTML=edThumbsHTML(imgs);fillImages(box);}}
+  var rbx=$('#fRemBody');if(rbx) rbx.innerHTML=remBodyHTML();
   fillImages(sheetEl);
   $('#fPhoto').addEventListener('change',function(e){
     var files=Array.from(e.target.files||[]);
@@ -2149,6 +2320,7 @@ function openMenu(){
   var fd=state.settings.fingerDraw,snd=state.settings.sound;
   var now=Date.now();
   openSheet('<h3>Menu</h3><div class="menu">'+
+    '<button type="button" data-sact="search">'+I.search+'<span class="mt">Search<small>Checklists, airport notes and flight log</small></span></button>'+
     '<button type="button" data-sact="tcd">'+I.timer+'<span class="mt">Countdowns<small>'+esc(cdSummary(now))+'</small></span></button>'+
     '<button type="button" data-sact="trest">'+I.moon+'<span class="mt">Crew rest<small>'+esc(restSummary(now))+'</small></span></button>'+
     '<button type="button" data-sact="tapn">'+I.pin+'<span class="mt">Airport notes<small>'+esc(apnSummary())+'</small></span></button>'+
@@ -2171,6 +2343,7 @@ function openMenu(){
         state.settings.textScale=+btn.getAttribute('data-v');applyTextScale();save();
         sheetEl.querySelectorAll('[data-sact="ts"]').forEach(function(b){b.classList.toggle('on',b===btn);b.setAttribute('aria-checked',String(b===btn));});
         break;
+      case 'search': openSearch();break;
       case 'tcd': openTool('cd');closeSheet();break;
       case 'trest': openTool('rest');closeSheet();break;
       case 'tapn': toolApnSel=null;toolApnIcao=null;toolApnView='notes';openTool('apn');closeSheet();break;
@@ -2512,9 +2685,111 @@ function cloudRestore(sha,latest){
 }
 
 var toastT=0;
-function toast(msg,ms){
-  toastEl.textContent=msg;toastEl.classList.add('show');
-  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},ms||1900);
+/* ---------- Search: checklists, airport notes and the flight log ---------- */
+function srWords(q){return q.toLowerCase().split(/\s+/).filter(Boolean);}
+function srRx(words){return new RegExp('('+words.map(function(w){return w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','gi');}
+function srHL(text,words){
+  if(!text) return '';
+  return String(text).split(srRx(words)).map(function(part,i){return i%2?'<mark>'+esc(part)+'</mark>':esc(part);}).join('');
+}
+function srSnip(text,words){
+  text=String(text||'').replace(/\s+/g,' ').trim();if(!text) return '';
+  var low=text.toLowerCase(),i=-1;
+  words.forEach(function(w){var k=low.indexOf(w);if(k>=0&&(i<0||k<i)) i=k;});
+  if(i<0) return text.length>110?srHL(text.slice(0,110),words)+'…':srHL(text,words);
+  var a=Math.max(0,i-35),b=Math.min(text.length,i+85);
+  return (a>0?'…':'')+srHL(text.slice(a,b),words)+(b<text.length?'…':'');
+}
+function searchAll(q){
+  var words=srWords(q);if(!words.length) return null;
+  function hit(){var t=Array.prototype.join.call(arguments,' ').toLowerCase();return words.every(function(w){return t.indexOf(w)>=0;});}
+  var items=[],notes=[],flights=[];
+  state.lists.forEach(function(L){L.sections.forEach(function(sec){
+    (function w(arr,path){arr.forEach(function(n){
+      if(n.type==='head'){if(hit(n.title)) items.push({id:n.id,t:n.title,p:L.title+' › '+sec.title,n:''});}
+      else if(n.type==='check'){
+        if(hit(n.text,n.note,n.links.map(function(l){return l.label;}).join(' '))) items.push({id:n.id,t:n.text,p:L.title+' › '+sec.title+(path.length?' › '+path.join(' › '):''),n:n.note});
+        w(n.children,path.concat([n.text]));
+      }else if(n.type==='pad'&&n.text&&hit(n.title,n.text)) items.push({id:n.id,t:n.title,p:L.title+' › '+sec.title,n:n.text});
+    });})(sec.items,[]);
+  });});
+  Object.keys(state.apNotes).sort().forEach(function(ic){
+    var a=state.apNotes[ic];
+    state.apSections.forEach(function(sx){
+      (function w(arr){(arr||[]).forEach(function(n){
+        if(hit(ic,n.text,n.note,n.links.map(function(l){return l.label;}).join(' '))) notes.push({id:n.id,ic:ic,sec:sx.id,t:n.text,p:ic+' · '+sx.name,n:n.note});
+        w(n.children);
+      });})(a[sx.id]);
+    });
+  });
+  flSorted().forEach(function(f){
+    var d=f.dep,a=f.arr;
+    if(hit(fmtDay(f.date),f.date,f.fno,f.reg,d.icao,d.stand,d.rwy,d.taxi,d.notes,a.icao,a.app,a.rwy,a.taxi,a.stand,a.notes))
+      flights.push({id:f.id,t:fmtDay(f.date)+' · '+(d.icao||'—')+' → '+(a.icao||'—')+(f.fno?' · '+f.fno:''),p:flRouteSub(f),n:[d.notes,a.notes].filter(Boolean).join(' / ')});
+  });
+  return {words:words,items:items,notes:notes,flights:flights};
+}
+function searchHTML(q){
+  var R=searchAll(q);
+  if(!R) return '<p class="hint">Type a word, an airport code, a runway or a stand.</p>';
+  var w=R.words,h='';
+  function group(title,list,kind){
+    if(!list.length) return;
+    h+='<div class="sr-h">'+title+' ('+list.length+')</div><div class="sr-list">'+list.slice(0,25).map(function(x){
+      var snip=x.n?srSnip(x.n,w):'';
+      return '<button type="button" class="sr" data-sact="go" data-k="'+kind+'" data-v="'+x.id+'"'+(x.ic?' data-ic="'+x.ic+'" data-sec="'+x.sec+'"':'')+'><b>'+(srHL(x.t,w)||'<span class="ph">Untitled</span>')+'</b><span class="srp">'+srHL(x.p,w)+'</span>'+(snip?'<span class="srn">'+snip+'</span>':'')+'</button>';
+    }).join('')+'</div>'+(list.length>25?'<p class="sr-more">'+(list.length-25)+' more. Add another word to narrow it down.</p>':'');
+  }
+  group('Checklists',R.items,'item');group('Airport notes',R.notes,'note');group('Flight log',R.flights,'flight');
+  return h||'<p class="hint">Nothing found for “'+esc(q.trim())+'”.</p>';
+}
+var srLast='';
+function openSearch(){
+  openSheet('<h3>Search</h3><input id="fSearch" type="text" enterkeyhint="search" value="'+esc(srLast)+'" placeholder="Checklists, airport notes, flight log" autocomplete="off" autocorrect="off" spellcheck="false">'+
+    '<div id="srRes">'+searchHTML(srLast)+'</div><div class="sh-actions" style="margin-top:14px"><button type="button" class="btn" data-sact="cancel">Close</button></div>',
+  function(act,btn){
+    if(act!=='go'){closeSheet();return;}
+    var k=btn.getAttribute('data-k'),id=btn.getAttribute('data-v');
+    closeSheet();
+    if(k==='item') revealItem(id);
+    else if(k==='note') revealNote(id,btn.getAttribute('data-ic'),btn.getAttribute('data-sec'));
+    else if(k==='flight'){toolFlFilter='';openTool('flog');openFlEntry(id);}
+  });
+  var inp=$('#fSearch'),t=0;
+  inp.addEventListener('input',function(){srLast=inp.value;clearTimeout(t);t=setTimeout(function(){var r=$('#srRes');if(r) r.innerHTML=searchHTML(srLast);},120);});
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();inp.blur();}});
+  inp.focus();inp.select();
+}
+function revealNote(id,ic,sec){
+  var f=find(id);if(f) f.anc.forEach(function(a){a.open=true;});
+  toolApnSel='all';toolApnIcao=ic;toolApnView='notes';if(sec) toolApnFold[sec]=false;
+  openTool('apn');
+  setTimeout(function(){
+    var el=toolPanel.querySelector('[data-item="'+id+'"]');if(!el) return;
+    el.scrollIntoView({block:'center',behavior:'smooth'});
+    el.classList.remove('flash-note');void el.offsetWidth;el.classList.add('flash-note');
+  },120);
+}
+var toastLast='',toastFn=null;
+function toast(msg,ms,act,fn){
+  toastLast=msg;toastFn=fn||null;
+  toastEl.textContent=msg;
+  if(fn){var b=document.createElement('button');b.type='button';b.className='toast-act';b.textContent=act;toastEl.appendChild(b);}
+  toastEl.classList.toggle('has-act',!!fn);toastEl.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');toastFn=null;},ms||1900);
+}
+toastEl.addEventListener('click',function(e){
+  if(!e.target.closest('.toast-act')||!toastFn) return;
+  var f=toastFn;toastFn=null;clearTimeout(toastT);toastEl.classList.remove('show');f();
+});
+function offerUndo(before,msg){toast(msg,6500,'Undo',function(){undoTo(before);});}
+function undoTo(json){
+  var o=null;try{o=normalize(JSON.parse(json));}catch(e){}
+  if(!o){toast('Couldn’t undo');return;}
+  state=o;fresh.clear();save();
+  if(!sheetWrap.hidden) closeSheet();
+  render();if(toolOpen) refreshTool();clockTick();
+  toast('Undone');
 }
 
 /* ---------- Time: UTC clock, destination, countdowns, crew rest ---------- */
@@ -2626,6 +2901,11 @@ function paintAlert(){
   var tb=document.querySelector('.topbar');if(tb) alertBar.style.top=(tb.getBoundingClientRect().bottom+6)+'px';
 }
 $('#alertOk').addEventListener('click',function(){alerting.delete(alertBar.getAttribute('data-id'));clockTick();});
+$('#alertMsg').addEventListener('click',function(){
+  var id=alertBar.getAttribute('data-id'),f=id&&find(id);if(!f) return;
+  if(f.list){if(f.node.type==='check') revealItem(id);else{state.current=f.list.id;f.section.collapsed=false;save();render();setTimeout(function(){flash(id);},80);}}
+  else if(f.tool) openTool(f.node.type==='rest'?'rest':'cd');
+});
 function cdSetTarget(m,t,now){
   m.target=t;alerting.delete(m.id);
   m.aL=t===null||!m.lead||now>=t-m.lead*60000;
@@ -2722,6 +3002,7 @@ function clockTick(){
   var now=Date.now();
   paintClock(now);
   state.tools.cds.forEach(function(c){cdCheck(c,now);});
+  remCheck(now);remPaint(now);
   document.querySelectorAll('.module.cd:not(.unlinked)').forEach(function(el){var f=find(el.getAttribute('data-ref')||el.getAttribute('data-mod'));if(f) cdPaint(f.node,el,now);});
   document.querySelectorAll('.module.rest').forEach(function(el){var f=find(el.getAttribute('data-ref')||el.getAttribute('data-mod'));if(f) restStatus(f.node,el,now);});
   document.querySelectorAll('[data-ocd]').forEach(function(el){
@@ -3014,8 +3295,10 @@ function cdNudge(id,d){
   var now=Date.now();cdSetTarget(f.node,f.node.target+d*60000,now);save();clockTick();
 }
 function cdClear(id){
-  var f=find(id);if(!f) return;
+  var f=find(id);if(!f||f.node.target===null) return;
+  var before=JSON.stringify(state);
   cdSetTarget(f.node,null,Date.now());save();clockTick();
+  offerUndo(before,'Countdown cleared');
 }
 function cdAck(id){alerting.delete(id);clockTick();}
 
@@ -3693,6 +3976,7 @@ function onAct(e){
     case 'restClear':
       var rc=find(id);
       if(rc){
+        if(rc.node.start||rc.node.end) offerUndo(JSON.stringify(state),'Rest times cleared');
         rc.node.start='';rc.node.end='';saveSoon();
         var rm=el.closest('.module');
         if(rm) rm.querySelectorAll('[data-rest="start"],[data-rest="end"]').forEach(function(i){i.value='';});
@@ -3750,6 +4034,7 @@ app.addEventListener('change',onChange);
 toolPanel.addEventListener('change',onChange);
 editBtn.addEventListener('click',function(){editMode=!editMode;render();});
 menuBtn.addEventListener('click',openMenu);
+document.addEventListener('keydown',function(e){if((e.metaKey||e.ctrlKey)&&(e.key==='f'||e.key==='F')){e.preventDefault();openSearch();}});
 document.addEventListener('keydown',function(e){
   if(!lb.hidden){
     if(e.key==='Escape') closeViewer();
