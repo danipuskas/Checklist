@@ -831,6 +831,12 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .apn-addsec{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:9px 12px;border-top:1px solid var(--line);background:var(--paper);font-size:calc(13px*var(--ts));color:var(--muted)}
 .apn-addsec button{appearance:none;border:1px dashed var(--line-strong);background:none;color:var(--accent);border-radius:999px;padding:4px 10px;font:600 calc(13px*var(--ts)) -apple-system,system-ui,sans-serif}
 
+/* Airport sections: style picked per section */
+.esr{flex-wrap:wrap}
+.esr-lay{flex-basis:100%;display:flex;align-items:center;gap:8px;padding:6px 2px 2px;font-size:calc(13px*var(--ts));color:var(--muted)}
+.esr-lay .seg button{padding:5px 12px}
+.apl.rows .txt.stack .note{text-align:left;flex-basis:100%}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -1041,8 +1047,8 @@ function normalize(o){
 }
 var AP_SECS_DEFAULT=['General','Arrival','Departure','On ground','Safety reports','Layover'];
 function normApSecs(a){
-  var out=Array.isArray(a)?a.filter(function(x){return x&&typeof x.name==='string';}).map(function(x){return {id:str(x.id)||uid(),name:x.name.slice(0,40)||'Section'};}):[];
-  if(!out.length) out=AP_SECS_DEFAULT.map(function(n){return {id:'s_'+n.toLowerCase().replace(/[^a-z]+/g,'_'),name:n};});
+  var out=Array.isArray(a)?a.filter(function(x){return x&&typeof x.name==='string';}).map(function(x){return {id:str(x.id)||uid(),name:x.name.slice(0,40)||'Section',lay:x.lay==='text'?'text':'rows'};}):[];
+  if(!out.length) out=AP_SECS_DEFAULT.map(function(n){return {id:'s_'+n.toLowerCase().replace(/[^a-z]+/g,'_'),name:n,lay:'rows'};});
   return out.slice(0,20);
 }
 function normApNotes(o,secs){
@@ -1110,7 +1116,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='32';
+var APP_VERSION='33';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -1613,23 +1619,21 @@ function renderApn(m){
       var arr=notes[x.id]||[];if(!arr.length) return;
       var fo=!!m.fold[x.id];
       parts+=apnHeadHTML(x,arr,fo,'apnFold',m.id,false);
-      if(!fo) parts+='<div class="apl text">'+arr.map(function(it){return renderCheck(it,0,{note:true});}).join('')+'</div>';
+      if(!fo) parts+='<div class="apl '+(x.lay==='text'?'text':'rows')+'">'+arr.map(function(it){return renderCheck(it,0,{note:true});}).join('')+'</div>';
     });
     h+=parts||'<div class="apn-empty">No notes for '+esc(ap.icao)+' yet. <button type="button" class="lnkbtn" data-act="apnOpen" data-v="'+m.which+'">Add a note</button></div>';
   }
   return h+'</div></div>';
 }
 function apnFit(root){
-  (root||document).querySelectorAll('.apl').forEach(function(box){
+  (root||document).querySelectorAll('.apl.rows').forEach(function(box){
     if(!box.offsetParent) return;
-    box.classList.remove('text');box.classList.add('rows');
-    var long=false;
-    box.querySelectorAll('.txt').forEach(function(t){
-      if(long) return;
+    var ts=box.querySelectorAll('.txt');
+    ts.forEach(function(t){t.classList.remove('stack');});
+    ts.forEach(function(t){
       var l=t.querySelector('.label'),n=t.querySelector('.note');if(!l||!n) return;
-      if(/\n/.test(n.textContent)||n.getBoundingClientRect().top>l.getBoundingClientRect().top+3) long=true;
+      if(/\n/.test(n.textContent)||n.getBoundingClientRect().top>l.getBoundingClientRect().top+3) t.classList.add('stack');
     });
-    if(long){box.classList.remove('rows');box.classList.add('text');}
   });
 }
 var apnFitT=0;
@@ -4037,7 +4041,7 @@ function apnPanelHTML(){
   h+='<div class="pn">'+state.apSections.map(function(x){
     var arr=notes[x.id]||[],fo=!!toolApnFold[x.id];
     if(!arr.length){empty.push(x);return '';}
-    return apnHeadHTML(x,arr,fo,'apnPFold','',true)+(fo?'':'<div class="apl text">'+arr.map(function(it){return renderCheck(it,0,{note:true,edit:true});}).join('')+'</div>');
+    return apnHeadHTML(x,arr,fo,'apnPFold','',true)+(fo?'':'<div class="apl '+(x.lay==='text'?'text':'rows')+'">'+arr.map(function(it){return renderCheck(it,0,{note:true,edit:true});}).join('')+'</div>');
   }).join('')+
     (empty.length?'<div class="apn-addsec"><span>'+(empty.length===state.apSections.length?'No notes yet. Add to:':'Empty:')+'</span>'+empty.map(function(x){return '<button type="button" data-act="apnAdd" data-v="'+x.id+'" aria-label="Add note to '+esc(x.name)+'">+ '+esc(x.name)+'</button>';}).join('')+'</div>':'')+'</div>';
   h+='<button type="button" class="btn small ghost tcd-add" data-act="apnSecs">'+I.list+'Edit sections</button>';
@@ -4061,18 +4065,21 @@ function apnSummary(){
   return out.length?out.join(', '):'Your notes per airport, by section';
 }
 function openApSecs(){
-  var secs=state.apSections.map(function(x){return {id:x.id,name:x.name};});
+  var secs=state.apSections.map(function(x){return {id:x.id,name:x.name,lay:x.lay==='text'?'text':'rows'};});
   function rowsHTML(){
     return secs.map(function(x,i){
       return '<div class="esr"><input type="text" data-si="'+i+'" value="'+esc(x.name)+'" placeholder="Section name" autocomplete="off">'+
         '<button type="button" class="ib" data-sact="sup" data-i="'+i+'"'+(i===0?' disabled':'')+' aria-label="Move up">'+I.up+'</button>'+
         '<button type="button" class="ib" data-sact="sdown" data-i="'+i+'"'+(i===secs.length-1?' disabled':'')+' aria-label="Move down">'+I.down+'</button>'+
-        '<button type="button" class="ib danger" data-sact="sdel" data-i="'+i+'" aria-label="Delete section">'+I.trash+'</button></div>';
+        '<button type="button" class="ib danger" data-sact="sdel" data-i="'+i+'" aria-label="Delete section">'+I.trash+'</button>'+
+        '<div class="esr-lay"><span>Style</span><div class="seg" role="radiogroup" aria-label="Style for '+esc(x.name)+'">'+[['rows','Rows'],['text','Text']].map(function(o){
+          var on=x.lay===o[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="lay" data-i="'+i+'" data-v="'+o[0]+'">'+o[1]+'</button>';
+        }).join('')+'</div></div></div>';
     }).join('');
   }
   function sync(){sheetEl.querySelectorAll('[data-si]').forEach(function(inp){secs[+inp.getAttribute('data-si')].name=inp.value;});}
   function redraw(){$('#fSecRows').innerHTML=rowsHTML();}
-  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own.</p>'+
+  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own. <b>Rows</b> puts each note on one line with its value on the right; <b>Text</b> reads like a briefing, for longer notes.</p>'+
     '<div class="cbl" id="fSecRows">'+rowsHTML()+'</div>'+
     '<button type="button" class="btn small ghost tcd-add" data-sact="sadd">'+I.plus+'Add section</button>'+
     '<p class="hint" style="margin:12px 0 0">Deleting a section moves its notes to the first section.</p>'+
@@ -4081,12 +4088,13 @@ function openApSecs(){
     if(act!=='cancel') sync();
     var i=btn?+btn.getAttribute('data-i'):-1,t;
     switch(act){
+      case 'lay': secs[i].lay=btn.getAttribute('data-v')==='text'?'text':'rows';redraw();break;
       case 'sup': if(i>0){t=secs[i];secs[i]=secs[i-1];secs[i-1]=t;redraw();}break;
       case 'sdown': if(i<secs.length-1){t=secs[i];secs[i]=secs[i+1];secs[i+1]=t;redraw();}break;
       case 'sdel': if(secs.length<2){toast('Keep at least one section');break;}secs.splice(i,1);redraw();break;
       case 'sadd':
         if(secs.length>=20){toast('That’s the maximum of 20 sections');break;}
-        secs.push({id:uid(),name:''});redraw();
+        secs.push({id:uid(),name:'',lay:'rows'});redraw();
         var ins=sheetEl.querySelectorAll('[data-si]');ins[ins.length-1].focus();break;
       case 'save':
         secs.forEach(function(x){x.name=x.name.trim().slice(0,40)||'Untitled';});
