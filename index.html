@@ -799,6 +799,38 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .altcap{font-size:calc(13px*var(--ts));color:var(--muted);margin:-6px 0 6px}
 .altm{margin:0 0 6px}
 
+/* Airport notes: short notes as rows (value on the right), sections with longer notes as briefing text */
+.aph .hd-row{min-height:0;padding-top:calc(6px*var(--sp));padding-bottom:calc(6px*var(--sp))}
+.apl .item.info > .row > .ibox,.apl .edit-hint{display:none}
+.apl .item > .row{min-height:0}
+.apl .d1 > .row{padding-left:calc(32px*var(--sp))}
+.apl .d2 > .row{padding-left:calc(48px*var(--sp))}
+.apl .d3 > .row{padding-left:calc(64px*var(--sp))}
+.apl .kids{position:relative}
+.apl .kids::before{content:"";position:absolute;left:calc(18px*var(--sp));top:5px;bottom:7px;width:2px;border-radius:1px;background:var(--line)}
+.apl .kid-toggle{transform:scale(.86);transform-origin:right center;margin-top:-3px;margin-bottom:-3px}
+.apl.rows .item > .row{padding-top:calc(9px*var(--sp));padding-bottom:calc(9px*var(--sp));align-items:center}
+.apl.rows .kids .item > .row{padding-top:calc(6px*var(--sp));padding-bottom:calc(6px*var(--sp))}
+.apl.rows .txt{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:14px;row-gap:1px}
+.apl.rows .label{flex:0 1 auto;min-width:0}
+.apl.rows .note{flex:1 1 auto;text-align:right;margin:0}
+.apl.rows .txt > .links,.apl.rows .txt > .thumbs{flex-basis:100%}
+.apl.text .item > .row{padding-top:calc(4px*var(--sp));padding-bottom:calc(4px*var(--sp))}
+.apl.text > .item:first-child > .row{padding-top:calc(10px*var(--sp))}
+.apl.text > .item:last-child > .row,.apl.text > .item.kclosed:last-child > .row{padding-bottom:calc(10px*var(--sp))}
+.apl.text > .item:last-child:not(.kclosed) > .kids > .item:last-child > .row{padding-bottom:calc(10px*var(--sp))}
+.apl.text .item + .item,.apl.text .kids > .item{border-top:0}
+.apl.text .txt{display:block;line-height:1.38}
+.apl.text .label{display:inline;font-weight:650}
+.apl.text .note{display:inline;margin:0 0 0 .4em}
+.apl.text .kids .txt::before{content:"– ";color:var(--muted)}
+.apl.text .kids::before{display:none}
+.aphead{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.aphead .apname{flex:1;min-width:0;margin:0 0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aphead .apview{display:flex;margin:0}
+.apn-addsec{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:9px 12px;border-top:1px solid var(--line);background:var(--paper);font-size:calc(13px*var(--ts));color:var(--muted)}
+.apn-addsec button{appearance:none;border:1px dashed var(--line-strong);background:none;color:var(--accent);border-radius:999px;padding:4px 10px;font:600 calc(13px*var(--ts)) -apple-system,system-ui,sans-serif}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -1078,7 +1110,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='31';
+var APP_VERSION='32';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -1563,7 +1595,7 @@ function apnSecsFor(m){return state.apSections.filter(function(x){return m.secs=
 function apnHeadHTML(sec,arr,folded,act,id,addBtn){
   var d=0,t=0;arr.forEach(function(it){if(!it.info){t++;if(it.done)d++;}});
   var cnt=t?countHTML(d,t):String(arr.length);
-  return '<div class="hd'+(folded?' collapsed':'')+(t&&d===t?' complete':'')+'"><div class="hd-row"><button type="button" class="hd-fold-all" data-act="'+act+'" data-id="'+id+'" data-apsec="'+sec.id+'" aria-expanded="'+!folded+'">'+
+  return '<div class="hd aph'+(folded?' collapsed':'')+(t&&d===t?' complete':'')+'"><div class="hd-row"><button type="button" class="hd-fold-all" data-act="'+act+'" data-id="'+id+'" data-apsec="'+sec.id+'" aria-expanded="'+!folded+'">'+
     '<span class="chev">'+I.chev+'</span><span class="hd-title">'+esc(sec.name)+'</span><span class="hd-count">'+cnt+'</span></button>'+
     (addBtn?'<button type="button" class="hd-add" data-act="apnAdd" data-v="'+sec.id+'" aria-label="Add note to '+esc(sec.name)+'">'+I.plus+'</button>':'')+'</div></div>';
 }
@@ -1581,12 +1613,27 @@ function renderApn(m){
       var arr=notes[x.id]||[];if(!arr.length) return;
       var fo=!!m.fold[x.id];
       parts+=apnHeadHTML(x,arr,fo,'apnFold',m.id,false);
-      if(!fo) parts+=arr.map(function(it){return renderCheck(it,0,{note:true});}).join('');
+      if(!fo) parts+='<div class="apl text">'+arr.map(function(it){return renderCheck(it,0,{note:true});}).join('')+'</div>';
     });
     h+=parts||'<div class="apn-empty">No notes for '+esc(ap.icao)+' yet. <button type="button" class="lnkbtn" data-act="apnOpen" data-v="'+m.which+'">Add a note</button></div>';
   }
   return h+'</div></div>';
 }
+function apnFit(root){
+  (root||document).querySelectorAll('.apl').forEach(function(box){
+    if(!box.offsetParent) return;
+    box.classList.remove('text');box.classList.add('rows');
+    var long=false;
+    box.querySelectorAll('.txt').forEach(function(t){
+      if(long) return;
+      var l=t.querySelector('.label'),n=t.querySelector('.note');if(!l||!n) return;
+      if(/\n/.test(n.textContent)||n.getBoundingClientRect().top>l.getBoundingClientRect().top+3) long=true;
+    });
+    if(long){box.classList.remove('rows');box.classList.add('text');}
+  });
+}
+var apnFitT=0;
+window.addEventListener('resize',function(){clearTimeout(apnFitT);apnFitT=setTimeout(function(){apnFit();},120);});
 function apnFold(id,sid){
   var f=find(id);if(!f) return;
   f.node.fold[sid]=!f.node.fold[sid];save();render();
@@ -2331,6 +2378,7 @@ function render(){
   if(editMode) h+='<button type="button" class="add-sec" data-act="addSection">'+I.plus+'Add section</button>';
   h+='<p class="foot">Saved on this device. Back up from the menu.</p>';
   app.innerHTML=h;
+  apnFit(app);
   app.querySelectorAll('.module.pad').forEach(mountIfDraw);
   fillImages(app);
   updateProgress();
@@ -2420,13 +2468,13 @@ function toggleSec(id){
   var r=findSec(id);if(!r) return;
   r.section.collapsed=!r.section.collapsed;
   var el=app.querySelector('[data-sec="'+id+'"]');
-  if(el){el.classList.toggle('collapsed',r.section.collapsed);var b=el.querySelector('.sec-toggle');if(b) b.setAttribute('aria-expanded',String(!r.section.collapsed));}
+  if(el){el.classList.toggle('collapsed',r.section.collapsed);var b=el.querySelector('.sec-toggle');if(b) b.setAttribute('aria-expanded',String(!r.section.collapsed));apnFit(el);}
   save();
 }
 function modToggle(id){
   var f=find(id);if(!f) return;
   f.node.collapsed=!f.node.collapsed;
-  var el=app.querySelector('[data-mod="'+id+'"]');if(el) el.classList.toggle('collapsed',f.node.collapsed);
+  var el=app.querySelector('[data-mod="'+id+'"]');if(el){el.classList.toggle('collapsed',f.node.collapsed);apnFit(el);}
   save();
 }
 function addItem(sid){
@@ -3953,6 +4001,7 @@ function openTool(kind){
   }
   toolWrap.setAttribute('data-kind',kind);
   toolWrap.hidden=false;toolWrap.scrollTop=0;void toolWrap.offsetWidth;
+  apnFit(toolPanel);
   toolWrap.classList.add('show');document.body.classList.add('noscroll');
   clockTick();
 }
@@ -3978,16 +4027,19 @@ function apnPanelHTML(){
     return h;
   }
   if(toolApnSel==='all') h+='<button type="button" class="back-all" data-act="apnSel" data-v="all">'+I.left+'All airports</button>';
-  h+='<div class="apname">'+esc(icao)+' '+esc(apName(icao))+'</div>';
   var nf=state.flights.filter(function(f){return f.dep.icao===icao||f.arr.icao===icao;}).length,nn=apNoteCount(icao);
-  h+='<div class="seg big apview"><button type="button" class="'+(toolApnView==='stats'?'':'on')+'" data-act="apnView" data-v="notes">Notes'+(nn?'<small>'+nn+'</small>':'')+'</button>'+
-    '<button type="button" class="'+(toolApnView==='stats'?'on':'')+'" data-act="apnView" data-v="stats">My stats'+(nf?'<small>'+nf+'</small>':'')+'</button></div>';
+  var apn=apName(icao).replace(/\s*\([A-Z-]{2}\)$/,'');
+  h+='<div class="aphead"><div class="apname">'+(toolApnSel==='all'||!apn?esc(icao)+' ':'')+esc(apn)+'</div><div class="seg apview"><button type="button" class="'+(toolApnView==='stats'?'':'on')+'" data-act="apnView" data-v="notes">Notes'+(nn?'<small>'+nn+'</small>':'')+'</button>'+
+    '<button type="button" class="'+(toolApnView==='stats'?'on':'')+'" data-act="apnView" data-v="stats">My stats'+(nf?'<small>'+nf+'</small>':'')+'</button></div></div>';
   if(toolApnView==='stats') return h+apStatsHTML(icao);
   var notes=state.apNotes[icao]||{};
+  var empty=[];
   h+='<div class="pn">'+state.apSections.map(function(x){
     var arr=notes[x.id]||[],fo=!!toolApnFold[x.id];
-    return apnHeadHTML(x,arr,fo,'apnPFold','',true)+(fo?'':arr.map(function(it){return renderCheck(it,0,{note:true,edit:true});}).join(''));
-  }).join('')+'</div>';
+    if(!arr.length){empty.push(x);return '';}
+    return apnHeadHTML(x,arr,fo,'apnPFold','',true)+(fo?'':'<div class="apl text">'+arr.map(function(it){return renderCheck(it,0,{note:true,edit:true});}).join('')+'</div>');
+  }).join('')+
+    (empty.length?'<div class="apn-addsec"><span>'+(empty.length===state.apSections.length?'No notes yet. Add to:':'Empty:')+'</span>'+empty.map(function(x){return '<button type="button" data-act="apnAdd" data-v="'+x.id+'" aria-label="Add note to '+esc(x.name)+'">+ '+esc(x.name)+'</button>';}).join('')+'</div>':'')+'</div>';
   h+='<button type="button" class="btn small ghost tcd-add" data-act="apnSecs">'+I.list+'Edit sections</button>';
   return h;
 }
