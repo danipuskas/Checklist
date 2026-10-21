@@ -770,6 +770,35 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .wxraw .tl.on{border-left-color:var(--accent);background:var(--accent-weak)}
 .wxraw .tl.off{opacity:.36}
 
+/* Compact Flight sheet: airport and time side by side, name and local time inside the airport box */
+.fgrid{display:grid;grid-template-columns:minmax(0,1fr) calc(92px*var(--ts));column-gap:8px;row-gap:5px;align-items:stretch}
+.fgrid > .fl{font-size:calc(14px*var(--ts));font-weight:600;color:var(--muted)}
+.fgrid > .fl.c{text-align:center}
+.apbox,.tbox{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:7px 11px 8px;min-width:0;cursor:text}
+.tbox{padding-left:6px;padding-right:6px}
+.apbox:focus-within,.tbox:focus-within{border-color:var(--accent)}
+.sheet .apbox input[type=text],.sheet .tbox input[type=text]{border:0;background:none;padding:0;border-radius:0;width:100%;min-width:0}
+.sheet .tbox input.icao-in{font-size:max(16px,calc(22px*var(--ts)))!important;text-align:center;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.apinfo{font-size:calc(13px*var(--ts));color:var(--muted);line-height:1.32;margin-top:2px;font-variant-numeric:tabular-nums}
+.apinfo .apn1{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.apinfo b{color:var(--text);font-weight:650}
+.apinfo .apcount{display:inline;color:var(--accent);font-weight:700;font-size:inherit;margin:0}
+.tinfo{font-size:calc(12.5px*var(--ts));color:var(--muted);text-align:center;line-height:1.32;margin-top:2px;font-variant-numeric:tabular-nums}
+.tinfo b{color:var(--text);font-weight:650}
+.tinfo.warn,.tinfo.warn b{color:var(--warn)}
+.icao-res.c{margin:6px 0 0;min-height:0}
+.icao-res.c:empty{display:none}
+.fmid{display:grid;grid-template-columns:minmax(0,1fr) calc(92px*var(--ts));column-gap:8px;align-items:center;margin:6px 0 2px}
+.fmid .ib.round{width:34px;height:34px;justify-self:center}
+.fmid .ib.round svg{width:18px;height:18px}
+.fflt{font-size:calc(13px*var(--ts));color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.fflt b{color:var(--text);font-weight:650}
+.recent.top{flex-wrap:nowrap;overflow-x:auto;margin:-4px -20px 12px;padding:0 20px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.recent.top::-webkit-scrollbar{display:none}
+.recent.top button,.recent.top .fl{flex:none}
+.altcap{font-size:calc(13px*var(--ts));color:var(--muted);margin:-6px 0 6px}
+.altm{margin:0 0 6px}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -1049,7 +1078,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='29';
+var APP_VERSION='30';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -4290,8 +4319,11 @@ function openFlight(){
   var st=state.settings,dbOK=null,routes=st.routes;
   var picks={dep:st.dep?Object.assign({},st.dep):null,dest:st.dest?Object.assign({},st.dest):null};
   var tv={etd:st.etdT?hmOf(st.etdT).slice(0,4):'',eta:st.etaT?hmOf(st.etaT).slice(0,4):''},altVals={};
-  function tfld(k,label){
-    return '<div class="fld"><span class="fl">'+label+' <em>(UTC, optional)</em></span><div class="eta-row"><input id="fT_'+k+'" class="icao-in etain" type="text" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="HHMM" value="'+tv[k]+'" aria-label="'+label+' in UTC"><span class="hint" id="fTH_'+k+'"></span></div></div>';
+  function apRow(k,label,tk,tlabel){
+    return '<div class="fgrid"><span class="fl">'+label+'</span><span class="fl c">'+tlabel+' <em>UTC</em></span>'+
+      '<div class="apbox"><input id="fI_'+k+'" class="icao-in" type="text" maxlength="30" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="ICAO" value="'+esc(picks[k]?picks[k].icao:'')+'" aria-label="'+label+' airport"><div class="apinfo" id="fA_'+k+'"></div></div>'+
+      '<div class="tbox"><input id="fT_'+tk+'" class="icao-in" type="text" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="HHMM" value="'+tv[tk]+'" aria-label="'+tlabel+' in UTC, optional"><div class="tinfo" id="fTH_'+tk+'"></div></div>'+
+      '</div><div class="icao-res c" id="fR_'+k+'"></div>';
   }
   function hmNear(min,now){var d0=Math.floor(now/86400000)*86400000+min*60000,t=d0-86400000;while(t<=now-4*3600000) t+=86400000;return t;}
   function hmAfter(min,ref){var t=Math.floor(ref/86400000)*86400000+min*60000;while(t<=ref) t+=86400000;return t;}
@@ -4304,34 +4336,32 @@ function openFlight(){
   }
   function tHint(k,r){
     var el=$('#fTH_'+k),v=$('#fT_'+k).value.trim(),t=k==='etd'?r.etdT:r.etaT;if(!el) return;
-    if(!v){el.textContent='';el.classList.remove('warn');return;}
-    if(!t){el.textContent='Use HHMM, e.g. 1245';el.classList.add('warn');return;}
-    var p=picks[k==='etd'?'dep':'dest'],li=p&&tzInfo(p.tz,t);
     el.classList.remove('warn');
-    el.textContent=relT(t,Date.now())+(li?' · '+li.hm+(li.wd&&tzInfo(p.tz,Date.now()).wd!==li.wd?' '+li.wd:'')+' local':'')+(k==='eta'&&r.etdT?' · '+durM(t-r.etdT,false)+' after ETD':'');
+    if(!v){el.textContent='optional';return;}
+    if(!t){el.textContent='use HHMM';el.classList.add('warn');return;}
+    var p=picks[k==='etd'?'dep':'dest'],li=p&&tzInfo(p.tz,t),wd=li&&li.wd!==tzInfo(p.tz,Date.now()).wd;
+    el.innerHTML='<b>'+relT(t,Date.now())+'</b>'+(li?'<br>'+li.hm+(wd?' '+li.wd:'')+' LT':'');
   }
+  function fltRow(r){var el=$('#fFlt');if(el) el.innerHTML=r.etdT&&r.etaT?'<b>'+durM(r.etaT-r.etdT,false)+'</b> flight':'';}
   function altKeys(){
     var d=picks.dest;if(!d) return [];
     return normIcaoList($('#fAlts').value.split(/[^A-Za-z0-9]+/),4).filter(function(x){return x!==d.icao&&!(picks.dep&&x===picks.dep.icao);}).map(function(a){return {a:a,k:d.icao+'>'+a};});
   }
   function altVal(k){return k in altVals?altVals[k]:(typeof st.altMin[k]==='number'?String(st.altMin[k]):'');}
-  function altMeta(k,r){var n=parseInt(altVal(k),10);return 'min after '+esc(picks.dest.icao)+(r.etaT&&isFinite(n)&&n>=0?' · ETA ≈ '+hmOf(r.etaT+n*60000):'');}
+  function altMeta(k,r){var n=parseInt(altVal(k),10);return 'min'+(r.etaT&&isFinite(n)&&n>=0?' · ETA ≈ '+hmOf(r.etaT+n*60000):'');}
   function altRows(r){
     var box=$('#fAltMin');if(!box) return;
-    box.innerHTML=altKeys().map(function(x){
+    var ks=altKeys();
+    box.innerHTML=(ks.length?'<div class="altcap">Diversion time from '+esc(picks.dest.icao)+'</div>':'')+ks.map(function(x){
       return '<div class="altm"><b>'+esc(x.a)+'</b><input type="text" data-alt="'+esc(x.k)+'" value="'+esc(altVal(x.k))+'" inputmode="numeric" maxlength="3" placeholder="–" aria-label="Minutes from '+esc(picks.dest.icao)+' to '+esc(x.a)+'"><span>'+altMeta(x.k,r)+'</span></div>';
     }).join('');
   }
-  function refreshT(){var r=resolveTimes();tHint('etd',r);tHint('eta',r);altRows(r);}
-  function fld(k,label,ph){
-    return '<div class="fld"><span class="fl">'+label+'</span><input id="fI_'+k+'" class="icao-in" type="text" maxlength="30" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="'+ph+'" value="'+esc(picks[k]?picks[k].icao:'')+'"></div>'+
-      '<div class="icao-res" id="fR_'+k+'"></div>';
-  }
-  var rec=routes.length?'<div class="recent"><span class="fl">Recent</span>'+routes.map(function(r,i){return '<button type="button" data-sact="route" data-i="'+i+'">'+esc((r.dep?r.dep.icao+' → ':'→ ')+r.dest.icao)+'</button>';}).join('')+'</div>':'';
-  openSheet('<h3>Flight</h3>'+fld('dep','From','ICAO, e.g. OMDB')+tfld('etd','ETD')+
-    '<div class="swap"><button type="button" class="ib round" data-sact="swap" aria-label="Swap From and To">'+I.swap+'</button></div>'+
-    fld('dest','To','ICAO, e.g. YBBN')+tfld('eta','ETA')+
-    '<div class="fld"><span class="fl">Alternates <em>(optional, for weather)</em></span><input id="fAlts" class="icao-in" type="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="e.g. YBCG YSSY" value="'+esc(st.alts.join(' '))+'"></div><div id="fAltMin"></div>'+rec+
+  function refreshT(){var r=resolveTimes();tHint('etd',r);tHint('eta',r);fltRow(r);altRows(r);}
+  var rec=routes.length?'<div class="recent top"><span class="fl">Recent</span>'+routes.map(function(r,i){return '<button type="button" data-sact="route" data-i="'+i+'">'+esc((r.dep?r.dep.icao+' → ':'→ ')+r.dest.icao)+'</button>';}).join('')+'</div>':'';
+  openSheet('<h3>Flight</h3>'+rec+apRow('dep','From','etd','ETD')+
+    '<div class="fmid"><button type="button" class="ib round" data-sact="swap" aria-label="Swap From and To">'+I.swap+'</button><span class="fflt" id="fFlt"></span></div>'+
+    apRow('dest','To','eta','ETA')+
+    '<div class="fld" style="margin-top:14px"><span class="fl">Alternates <em>(optional, for weather)</em></span><input id="fAlts" class="icao-in" type="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="e.g. YBCG YSSY" value="'+esc(st.alts.join(' '))+'"></div><div id="fAltMin"></div>'+
     '<div class="sh-actions">'+((st.dep||st.dest||st.etdT||st.etaT)?'<button type="button" class="btn danger" data-sact="clear">Clear</button>':'')+
     '<button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Save</button></div>',
   function(act,btn){
@@ -4369,12 +4399,12 @@ function openFlight(){
   function res(k){return $('#fR_'+k);}
   function show(k){
     setTimeout(refreshT,0);
-    var p=picks[k],r=res(k);if(!r) return;
-    if(!p){r.innerHTML='';return;}
+    var p=picks[k],r=res(k),a=$('#fA_'+k);if(!r||!a) return;
+    r.innerHTML='';
+    if(!p){a.innerHTML=inp(k).value.trim()?'':'ICAO or name';return;}
     var info=tzInfo(p.tz,Date.now()),n=apNoteCount(p.icao);
-    r.innerHTML='<div class="ap-card"><div class="ap-name">'+(p.icao?esc(p.icao)+' ':'')+esc(p.name||p.tz)+'</div>'+
-      '<div class="ap-meta">Local time <b>'+(info?info.hm+' '+info.wd:'–')+'</b>, '+(info?fmtOff(info.off):'')+'</div>'+
-      (n?'<div class="apcount">'+n+' note'+(n>1?'s':'')+'</div>':'')+'</div>';
+    a.innerHTML='<div class="apn1">'+esc(String(p.name||p.tz).replace(/_/g,' '))+'</div>'+
+      '<div>'+(info?'<b>'+info.hm+'</b> '+info.wd+' · '+fmtOff(info.off):'')+(n?' · <span class="apcount">'+n+' note'+(n>1?'s':'')+'</span>':'')+'</div>';
   }
   function manual(k,code,msg){
     picks[k]=null;
@@ -4387,8 +4417,9 @@ function openFlight(){
     });
   }
   function lookup(k){
-    var q=inp(k).value.trim().toUpperCase(),r=res(k);
-    if(!q){picks[k]=null;r.innerHTML='';return;}
+    var q=inp(k).value.trim().toUpperCase(),r=res(k),ai=$('#fA_'+k);
+    if(ai) ai.innerHTML='';
+    if(!q){picks[k]=null;show(k);return;}
     if(picks[k]&&picks[k].icao===q){show(k);return;}
     if(dbOK===false){
       if(/^[A-Z0-9]{4}$/.test(q)) manual(k,q,'The airport list isn’t available here. Choose the time zone for '+esc(q)+':');
@@ -4418,6 +4449,7 @@ function openFlight(){
     t.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('save');}});
   });
   $('#fAlts').addEventListener('input',function(){altRows(resolveTimes());});
+  sheetEl.querySelectorAll('.apbox,.tbox').forEach(function(b){b.addEventListener('click',function(e){if(e.target.tagName!=='INPUT') b.querySelector('input').focus();});});
   $('#fAltMin').addEventListener('input',function(e){
     var i=e.target.closest('[data-alt]');if(!i) return;
     var k=i.getAttribute('data-alt');altVals[k]=i.value;
