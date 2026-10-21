@@ -1078,7 +1078,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='30';
+var APP_VERSION='31';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -4358,7 +4358,7 @@ function openFlight(){
   }
   function refreshT(){var r=resolveTimes();tHint('etd',r);tHint('eta',r);fltRow(r);altRows(r);}
   var rec=routes.length?'<div class="recent top"><span class="fl">Recent</span>'+routes.map(function(r,i){return '<button type="button" data-sact="route" data-i="'+i+'">'+esc((r.dep?r.dep.icao+' → ':'→ ')+r.dest.icao)+'</button>';}).join('')+'</div>':'';
-  openSheet('<h3>Flight</h3>'+rec+apRow('dep','From','etd','ETD')+
+  openSheet('<h3>Flight</h3>'+apRow('dep','From','etd','ETD')+
     '<div class="fmid"><button type="button" class="ib round" data-sact="swap" aria-label="Swap From and To">'+I.swap+'</button><span class="fflt" id="fFlt"></span></div>'+
     apRow('dest','To','eta','ETA')+
     '<div class="fld" style="margin-top:14px"><span class="fl">Alternates <em>(optional, for weather)</em></span><input id="fAlts" class="icao-in" type="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="e.g. YBCG YSSY" value="'+esc(st.alts.join(' '))+'"></div><div id="fAltMin"></div>'+
