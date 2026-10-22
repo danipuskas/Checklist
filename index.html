@@ -891,12 +891,12 @@ textarea.fl-in{resize:vertical;min-height:58px}
 
 /* Flight number: in the line under the clock, and a small box beside the Flight sheet's title */
 .loc .fno{color:var(--text);font-weight:750;letter-spacing:.02em}
-.fl-head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.fl-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 12px}
 .fl-head h3{flex:1;margin:0}
-.fno-in{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:2px 6px 2px 10px;cursor:text}
+.fno-in{flex:none;margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:2px 6px 2px 10px;cursor:text}
 .fno-in:focus-within{border-color:var(--accent)}
-.fno-in span{font-size:calc(12px*var(--ts));font-weight:700;color:var(--muted);letter-spacing:.05em}
-.sheet .fno-in input[type=text]{width:calc(84px*var(--ts));border:0;background:none;padding:6px 2px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.fno-in span{white-space:nowrap;font-size:calc(12px*var(--ts));font-weight:700;color:var(--muted);letter-spacing:.05em}
+.sheet .fno-in input[type=text]{width:9ch;flex:none;font-variant-numeric:tabular-nums;border:0;background:none;padding:6px 2px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .tb-chips .updchip{margin:1px 0 3px;padding:3px 11px 3px 8px;font-size:13px}
 
 /* Photos */
@@ -1157,11 +1157,12 @@ function normFlPart(p,arr){
   var t=parseInt(p.tmin,10);
   var o={icao:icaoClean(p.icao),stand:str(p.stand).slice(0,12),rwy:str(p.rwy).slice(0,8),taxi:str(p.taxi).slice(0,80),tmin:isFinite(t)&&t>=0?Math.min(t,240):null,notes:str(p.notes).slice(0,3000),nid:str(p.nid)};
   if(arr){o.app=str(p.app).slice(0,24);o.star=str(p.star).slice(0,24);}
+  else o.sid=str(p.sid).slice(0,24);
   return o;
 }
 function newFlEntry(){return {id:uid(),date:todayZ(),fno:'',reg:'',dep:normFlPart({},false),arr:normFlPart({},true)};}
 function flEmpty(f){
-  function e(p){return !p.icao&&!p.stand&&!p.rwy&&!p.taxi&&p.tmin===null&&!p.notes&&!p.app&&!p.star;}
+  function e(p){return !p.icao&&!p.stand&&!p.rwy&&!p.taxi&&p.tmin===null&&!p.notes&&!p.app&&!p.star&&!p.sid;}
   return !f.fno&&!f.reg&&e(f.dep)&&e(f.arr);
 }
 function normFlights(a){
@@ -1182,7 +1183,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='42';
+var APP_VERSION='43';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1832,7 +1833,10 @@ function flFormHTML(f,fid,part,ic,A){
         return '<button type="button" class="opt'+(ca===d.toUpperCase()?' on':'')+'" '+A+'="flChip" data-fid="'+fid+'" data-part="'+part+'" data-k="app" data-v="'+esc(d)+'">'+esc(d)+'</button>';}));
     h=fld('Arrival route','star','STAR, e.g. RIVET 1A',sr,'up')+
       '<div class="ff"><div class="ff-l">Approach and runway</div><div class="app-row">'+inp('app','e.g. ILS Z')+inp('rwy','RWY','up',' autocapitalize="characters"')+'</div><div class="opts">'+apc.join('')+'</div></div>'+taxi('Taxi in')+fld('Stand','stand','e.g. 77',S('stand'),'up');
-  }else h=fld('Stand','stand','e.g. C42',S('stand'),'up')+taxi('Taxi out')+fld('Runway','rwy','e.g. 30R',S('rwy'),'up');
+  }else{
+    var sd=S('sid');if(sd.length<4&&!sd.some(function(x){return x.v.toUpperCase()==='VECTORS';})) sd.push({v:'Vectors',n:0});
+    h=fld('Stand','stand','e.g. C42',S('stand'),'up')+taxi('Taxi out')+fld('Runway','rwy','e.g. 30R',S('rwy'),'up')+fld('Departure route','sid','SID, e.g. RIDS 2G',sd,'up');
+  }
   h+='<div class="ff"><div class="ff-l">Notes</div><textarea class="fl-in" rows="2" data-fl="notes" data-part="'+part+'" data-fid="'+fid+'" placeholder="Optional">'+esc(val('notes'))+'</textarea>';
   if(ic){
     var linked=p.nid&&find(p.nid),lab=linked&&linked.apn?'Update the '+ic+' airport note':'Add to '+ic+' airport notes';
@@ -1864,7 +1868,7 @@ function flInput(t){
   if(k==='tmin'){var n=parseInt(v.replace(/[^0-9]/g,''),10);v=isFinite(n)?Math.min(n,240):null;}
   else if(k==='notes') v=v.replace(/\s+$/,'');
   else if(k==='date'){if(!/^\d{4}-\d{2}-\d{2}$/.test(v)) return;}
-  else{v=v.trim();if(/^(rwy|stand|fno|reg)$/.test(k)) v=v.toUpperCase();}
+  else{v=v.trim();if(/^(rwy|stand|fno|reg|star|sid)$/.test(k)) v=v.toUpperCase();}
   if(k==='depicao'||k==='arricao'){
     v=icaoClean(v);f[k==='depicao'?'dep':'arr'].icao=v;
     var box=$('#flForms');if(box&&(v.length===4||!v)) box.innerHTML=flEntryForms(f);
@@ -1933,7 +1937,7 @@ function openFlogBlockEditor(id,isNew){
   });
 }
 function flRouteSub(f){
-  var d=[f.dep.rwy,f.dep.stand].filter(Boolean).join(' · '),a=[f.arr.star,(f.arr.app+' '+f.arr.rwy).trim(),f.arr.stand].filter(Boolean).join(' · ');
+  var d=[f.dep.stand,f.dep.rwy,f.dep.sid].filter(Boolean).join(' · '),a=[f.arr.star,(f.arr.app+' '+f.arr.rwy).trim(),f.arr.stand].filter(Boolean).join(' · ');
   if(d||a) return (d||'–')+' → '+(a||'–');
   return [f.fno,f.reg].filter(Boolean).join(' · ')||'No details yet';
 }
@@ -2024,7 +2028,7 @@ function apStats(ic){
     tin:tm(A,function(f){return f.arr.tmin;}),tout:tm(D,function(f){return f.dep.tmin;}),
     arrStand:cnt(A,function(f){return f.arr.stand;}),depStand:cnt(D,function(f){return f.dep.stand;}),
     stands:cnt(A.map(function(f){return {s:f.arr.stand};}).concat(D.map(function(f){return {s:f.dep.stand};})),function(x){return x.s;}),
-    depRwy:cnt(D,function(f){return f.dep.rwy;}),notes:notes};
+    depRwy:cnt(D,function(f){return f.dep.rwy;}),sid:cnt(D,function(f){return f.dep.sid;}),notes:notes};
 }
 function barsHTML(list,max){
   var tot=list.reduce(function(a,x){return a+x.n;},0);
@@ -2042,6 +2046,7 @@ function apStatsHTML(ic){
     (S.tout?'<div class="tile"><b>'+S.tout.avg+' <small>min</small></b><span>out'+(S.tout.min!==S.tout.max?' · '+S.tout.min+'–'+S.tout.max:'')+'</span></div>':'<div class="tile"><b>–</b><span>out</span></div>')+'</div>';
   if(S.stands.length) h+='<div class="st-h">Stands</div><div class="stand-chips">'+S.stands.slice(0,10).map(function(x){return '<span>'+esc(x.v)+'<small>'+x.n+'</small></span>';}).join('')+'</div>';
   if(S.depRwy.length) h+='<div class="st-h">Departure runway</div>'+barsHTML(S.depRwy);
+  if(S.sid.length) h+='<div class="st-h">Departure route</div>'+barsHTML(S.sid);
   if(S.notes.length) h+='<div class="st-h">From your flight notes</div>'+S.notes.slice(0,4).map(function(n){return '<div class="rn"><small>'+esc(fmtDay(n.d))+' · '+n.k+'</small>'+esc(n.t)+'</div>';}).join('');
   return h;
 }
@@ -2060,6 +2065,7 @@ function renderApst(m){
     if(a0.n>=2&&(S.app.length===1||a0.n>S.app[1].n)) h+='<p>Usually <b>'+esc(a0.v)+'</b> ('+a0.n+' of '+n+')</p>';
     else h+='<p>Approaches <b>'+S.app.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
   }
+  if(!arr&&S.sid.length) h+='<p>Departure <b>'+S.sid.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
   if(arr&&S.star.length) h+='<p>Arrival <b>'+S.star.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
   if(t) h+='<p>Taxi '+(arr?'in':'out')+' about <b>'+t.avg+' min</b>'+(t.min!==t.max?' ('+t.min+'–'+t.max+')':'')+'</p>';
   if(st.length) h+='<p>Stands <b>'+st.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
@@ -3791,7 +3797,7 @@ function searchAll(q){
   });
   flSorted().forEach(function(f){
     var d=f.dep,a=f.arr;
-    if(hit(fmtDay(f.date),f.date,f.fno,f.reg,d.icao,d.stand,d.rwy,d.taxi,d.notes,a.icao,a.star,a.app,a.rwy,a.taxi,a.stand,a.notes))
+    if(hit(fmtDay(f.date),f.date,f.fno,f.reg,d.icao,d.stand,d.rwy,d.sid,d.taxi,d.notes,a.icao,a.star,a.app,a.rwy,a.taxi,a.stand,a.notes))
       flights.push({id:f.id,t:fmtDay(f.date)+' · '+(d.icao||'—')+' → '+(a.icao||'—')+(f.fno?' · '+f.fno:''),p:flRouteSub(f),n:[d.notes,a.notes].filter(Boolean).join(' / ')});
   });
   return {words:words,items:items,notes:notes,flights:flights};
