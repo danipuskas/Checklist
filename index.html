@@ -888,6 +888,16 @@ textarea.fl-in{resize:vertical;min-height:58px}
 :root[data-theme="night"] .lb-btn,:root[data-theme="night"] .lb-count,:root[data-theme="night"] .ed-x,:root[data-theme="red"] .lb-btn,:root[data-theme="red"] .lb-count,:root[data-theme="red"] .ed-x{color:var(--text)}
 .seg.thm button{padding:7px 2px;font-size:calc(13px*var(--ts))}
 
+/* Flight number: in the line under the clock, and a small box beside the Flight sheet's title */
+.loc .fno{color:var(--text);font-weight:750;letter-spacing:.02em}
+.fl-head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.fl-head h3{flex:1;margin:0}
+.fno-in{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:2px 6px 2px 10px;cursor:text}
+.fno-in:focus-within{border-color:var(--accent)}
+.fno-in span{font-size:calc(12px*var(--ts));font-weight:700;color:var(--muted);letter-spacing:.05em}
+.sheet .fno-in input[type=text]{width:calc(90px*var(--ts));border:0;background:none;padding:6px 2px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.tb-chips .updchip{margin:1px 0 3px;padding:3px 11px 3px 8px;font-size:13px}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -930,13 +940,13 @@ textarea.fl-in{resize:vertical;min-height:58px}
 </head>
 <body>
 <header class="topbar">
-  <span class="tb-l"><button class="updchip" id="updBtn" type="button" hidden aria-label="A new version is ready. Tap to restart the app"></button></span>
+  <span class="tb-l" aria-hidden="true"></span>
   <div class="tb-c">
     <button class="clock" id="clockBtn" type="button" aria-label="UTC clock. Tap to set the flight">
       <span class="utc" id="utc">--:--:--<small>Z</small></span>
       <span class="loc noset" id="loc">Set flight</span>
     </button>
-    <div class="tb-chips"><button class="restchip" id="restChip" type="button" hidden><span id="rcIcon"></span><b id="rcTime"></b><small id="rcName"></small></button><button class="etachip" id="etaChip" type="button" hidden><span id="ecIcon"></span><b id="ecTime"></b><small id="ecName"></small></button></div>
+    <div class="tb-chips"><button class="updchip" id="updBtn" type="button" hidden aria-label="A new version is ready. Tap to restart the app"></button><button class="restchip" id="restChip" type="button" hidden><span id="rcIcon"></span><b id="rcTime"></b><small id="rcName"></small></button><button class="etachip" id="etaChip" type="button" hidden><span id="ecIcon"></span><b id="ecTime"></b><small id="ecName"></small></button></div>
   </div>
   <span class="tb-r">
     <button class="ib round" id="editBtn" type="button" aria-label="Edit"></button>
@@ -1171,7 +1181,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='37';
+var APP_VERSION='38';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1209,7 +1219,7 @@ function normAltMin(o){
 function normSettings(st){
   st=st||{};
   var ts=+st.textScale;
-  return {theme:['light','dark','night','red'].indexOf(st.theme)>=0?st.theme:'auto',fingerDraw:!!st.fingerDraw,sound:st.sound!==false,dest:normDest(st.dest),dep:normDest(st.dep),routes:normRoutes(st),alts:normIcaoList(st.alts,4),wxUrl:normWxUrl(st.wxUrl),wxWatch:normIcaoList(st.wxWatch,6),textScale:ts>0?TEXT_SIZES.reduce(function(a,x){return Math.abs(x[0]-ts)<Math.abs(a-ts)?x[0]:a;},1):1,
+  return {fno:str(st.fno).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8),theme:['light','dark','night','red'].indexOf(st.theme)>=0?st.theme:'auto',fingerDraw:!!st.fingerDraw,sound:st.sound!==false,dest:normDest(st.dest),dep:normDest(st.dep),routes:normRoutes(st),alts:normIcaoList(st.alts,4),wxUrl:normWxUrl(st.wxUrl),wxWatch:normIcaoList(st.wxWatch,6),textScale:ts>0?TEXT_SIZES.reduce(function(a,x){return Math.abs(x[0]-ts)<Math.abs(a-ts)?x[0]:a;},1):1,
     recent:Array.isArray(st.recent)?st.recent.map(normDest).filter(Boolean).slice(0,6):[],
     etdT:numT(st.etdT),etaT:numT(st.etaT),altMin:normAltMin(st.altMin)};
 }
@@ -1389,7 +1399,7 @@ function newFlight(L){
   T.cds.forEach(function(c){c.target=null;c.aL=c.aZ=false;alerting.delete(c.id);});
   T.rest.start='';T.rest.end='';
   state.flightCur=null;
-  state.settings.etdT=0;state.settings.etaT=0;
+  state.settings.etdT=0;state.settings.etaT=0;state.settings.fno='';
   Object.keys(state.apNotes).forEach(function(ic){var a=state.apNotes[ic];Object.keys(a).forEach(function(k){untickItems(a[k]);});});
 }
 function cloneList(L){
@@ -1777,7 +1787,7 @@ function curFlight(create){
   var f=state.flightCur&&flById(state.flightCur);
   if(f&&f.dep.icao===dep&&f.arr.icao===arr) return f;
   if(!create) return null;
-  f=newFlEntry();f.dep.icao=dep;f.arr.icao=arr;state.flights.push(f);state.flightCur=f.id;
+  f=newFlEntry();f.dep.icao=dep;f.arr.icao=arr;f.fno=st.fno||'';state.flights.push(f);state.flightCur=f.id;
   return f;
 }
 function flSugg(ic,part,key,excl){
@@ -3347,7 +3357,7 @@ function openMenu(){
       case 'untick':
         confirmSheet('Untick every item in “'+esc(L.title)+'”?','Untick all',function(){L.sections.forEach(function(s){untickItems(s.items);});save();render();toast('All items unticked');},openMenu);break;
       case 'flight':
-        confirmSheet('Start a new flight in “'+esc(L.title)+'”? This unticks every item, clears its calculators and notepads, clears all countdowns, the crew rest times and the ETD and ETA, and unticks airport note checkboxes.','New flight',function(){newFlight(L);save();render();window.scrollTo(0,0);toast('Ready for a new flight');},openMenu);break;
+        confirmSheet('Start a new flight in “'+esc(L.title)+'”? This unticks every item, clears its calculators and notepads, clears all countdowns, the crew rest times, the flight number and the ETD and ETA, and unticks airport note checkboxes.','New flight',function(){newFlight(L);save();render();window.scrollTo(0,0);toast('Ready for a new flight');},openMenu);break;
       default: closeSheet();
     }
   });
@@ -3984,13 +3994,14 @@ function paintClock(now){
   utcEl.innerHTML=pad2(d.getUTCHours())+':'+pad2(d.getUTCMinutes())+':'+pad2(d.getUTCSeconds())+'<small>Z</small>';
   var dest=state.settings.dest,info=dest&&tzInfo(dest.tz,now);
   locEl.classList.toggle('noset',!info);
-  if(!info){locEl.textContent='Set flight';locEl.removeAttribute('data-k');return;}
+  var fno=state.settings.fno;
+  if(!info){if(fno){locEl.classList.remove('noset');locEl.innerHTML='<b class="fno">'+esc(fno)+'</b> <span style="color:var(--accent)">· Set flight</span>';}else locEl.textContent='Set flight';locEl.removeAttribute('data-k');return;}
   var dep=state.settings.dep;
-  locEl.classList.toggle('hasdep',!!dep);
-  var key=(dep?dep.icao:'')+dest.icao+info.hm+info.wd+info.off;
+  locEl.classList.toggle('hasdep',!!(dep||fno));
+  var key=fno+'|'+(dep?dep.icao:'')+dest.icao+info.hm+info.wd+info.off;
   if(locEl.getAttribute('data-k')===key) return;
   locEl.setAttribute('data-k',key);
-  locEl.innerHTML=(dep?'<span class="route">'+esc(dep.icao)+' → </span>':'')+(dest.icao?'<b>'+esc(dest.icao)+'</b> ':'')+'<span>'+info.hm+'</span><span class="wd"> '+info.wd+'</span> '+fmtOff(info.off).replace('UTC','');
+  locEl.innerHTML=(fno?'<span class="route"><b class="fno">'+esc(fno)+'</b> → </span>':dep?'<span class="route">'+esc(dep.icao)+' → </span>':'')+(dest.icao?'<b>'+esc(dest.icao)+'</b> ':'')+'<span>'+info.hm+'</span><span class="wd"> '+info.wd+'</span> '+fmtOff(info.off).replace('UTC','');
 }
 
 var tickT=0;
@@ -4536,7 +4547,7 @@ function openFlight(){
   }
   function refreshT(){var r=resolveTimes();tHint('etd',r);tHint('eta',r);fltRow(r);altRows(r);}
   var rec=routes.length?'<div class="recent top"><span class="fl">Recent</span>'+routes.map(function(r,i){return '<button type="button" data-sact="route" data-i="'+i+'">'+esc((r.dep?r.dep.icao+' → ':'→ ')+r.dest.icao)+'</button>';}).join('')+'</div>':'';
-  openSheet('<h3>Flight</h3>'+apRow('dep','From','etd','ETD')+
+  openSheet('<div class="fl-head"><h3>Flight</h3><label class="fno-in"><span>NO.</span><input id="fFno" type="text" maxlength="8" value="'+esc(st.fno)+'" placeholder="EK000" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Flight number"></label></div>'+apRow('dep','From','etd','ETD')+
     '<div class="fmid"><button type="button" class="ib round" data-sact="swap" aria-label="Swap From and To">'+I.swap+'</button><span class="fflt" id="fFlt"></span></div>'+
     apRow('dest','To','eta','ETA')+
     '<div class="fld" style="margin-top:14px"><span class="fl">Alternates <em>(optional, for weather)</em></span><input id="fAlts" class="icao-in" type="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="e.g. YBCG YSSY" value="'+esc(st.alts.join(' '))+'"></div><div id="fAltMin"></div>'+
@@ -4566,11 +4577,13 @@ function openFlight(){
         st.routes=[{dep:st.dep,dest:st.dest,alts:st.alts.slice()}].concat(st.routes.filter(function(x){return (x.dep?x.dep.icao:'')+'>'+x.dest.icao!==key;})).slice(0,6);
       }
       st.etdT=tr.etdT;st.etaT=tr.etaT;
+      st.fno=$('#fFno').value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
+      var cf=curFlight(false);if(cf&&st.fno) cf.fno=st.fno;
       sheetEl.querySelectorAll('[data-alt]').forEach(function(i){var k=i.getAttribute('data-alt'),n=parseInt(i.value,10);if(isFinite(n)&&n>=0&&n<=600){delete st.altMin[k];st.altMin[k]=n;}else delete st.altMin[k];});
       var ak=Object.keys(st.altMin);if(ak.length>80) ak.slice(0,ak.length-80).forEach(function(k){delete st.altMin[k];});
       save();closeSheet();locEl.removeAttribute('data-k');render();wxMaybe();clockTick();
     }else if(act==='clear'){
-      st.dep=null;st.dest=null;st.alts=[];st.etdT=0;st.etaT=0;save();clockTick();closeSheet();locEl.removeAttribute('data-k');render();
+      st.dep=null;st.dest=null;st.alts=[];st.etdT=0;st.etaT=0;st.fno='';save();clockTick();closeSheet();locEl.removeAttribute('data-k');render();
     }else closeSheet();
   });
   function inp(k){return $('#fI_'+k);}
