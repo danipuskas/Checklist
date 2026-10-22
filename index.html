@@ -53,6 +53,30 @@
   --grid:rgba(255,255,255,.075); --press:rgba(255,255,255,.06);
   --shadow:0 14px 44px rgba(0,0,0,.55);
 }
+:root[data-theme="night"]{
+  color-scheme:dark;
+  --bg:#06080a; --bg-glass:rgba(6,8,10,.92);
+  --surface:#0d1013; --surface2:#12161a; --paper:#0a0d10;
+  --line:#1b2126; --line-soft:#151a1e; --line-strong:#283037;
+  --text:#868f99; --muted:#4e5862;
+  --accent:#33748a; --accent-weak:rgba(51,116,138,.15); --on-accent:#02121a;
+  --done:#357e53; --done-weak:rgba(53,126,83,.15); --on-done:#03130a;
+  --box:#39424a; --danger:#a9524a; --ink:#8e97a1; --warn:#a9803c; --warn-weak:rgba(169,128,60,.15);
+  --grid:rgba(255,255,255,.045); --press:rgba(255,255,255,.04);
+  --shadow:0 14px 44px rgba(0,0,0,.7);
+}
+:root[data-theme="red"]{
+  color-scheme:dark;
+  --bg:#060101; --bg-glass:rgba(6,1,1,.93);
+  --surface:#100404; --surface2:#160606; --paper:#0c0303;
+  --line:#2a0c0b; --line-soft:#1d0807; --line-strong:#3c1412;
+  --text:#c4483a; --muted:#7d2c24;
+  --accent:#e05a44; --accent-weak:rgba(224,90,68,.14); --on-accent:#170202;
+  --done:#a8432f; --done-weak:rgba(168,67,47,.16); --on-done:#170202;
+  --box:#5a1c17; --danger:#ff6a4f; --ink:#c94b3d; --warn:#f07a3c; --warn-weak:rgba(240,122,60,.16);
+  --grid:rgba(255,60,40,.06); --press:rgba(255,60,40,.06);
+  --shadow:0 14px 44px rgba(0,0,0,.8);
+}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);-webkit-text-size-adjust:100%;touch-action:manipulation}
@@ -854,6 +878,16 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .apn-foot .tcd-add{margin-top:0}
 .apn-foot.one{grid-template-columns:1fr}
 
+/* Night themes: nothing stays bright white; photos and badges dimmed, or turned red */
+:root[data-theme="night"] .btn.danger-fill,:root[data-theme="night"] .ab.sel.n,:root[data-theme="night"] .via b.n,:root[data-theme="night"] .brrow b.n,:root[data-theme="night"] .crumb b.n,:root[data-theme="night"] .mvl b.n,
+:root[data-theme="red"] .btn.danger-fill,:root[data-theme="red"] .ab.sel.n,:root[data-theme="red"] .via b.n,:root[data-theme="red"] .brrow b.n,:root[data-theme="red"] .crumb b.n,:root[data-theme="red"] .mvl b.n{color:var(--on-accent)}
+:root[data-theme="night"] .tog::after,:root[data-theme="red"] .tog::after{background:var(--text)}
+:root[data-theme="night"] .thumb img,:root[data-theme="night"] .ed-thumb img,:root[data-theme="night"] .wxcat{filter:brightness(.6) saturate(.8)}
+:root[data-theme="night"] .lb-img{filter:brightness(.8)}
+:root[data-theme="red"] .thumb img,:root[data-theme="red"] .ed-thumb img,:root[data-theme="red"] .lb-img,:root[data-theme="red"] .wxcat{filter:grayscale(1) sepia(1) saturate(4) hue-rotate(-30deg) brightness(.6)}
+:root[data-theme="night"] .lb-btn,:root[data-theme="night"] .lb-count,:root[data-theme="night"] .ed-x,:root[data-theme="red"] .lb-btn,:root[data-theme="red"] .lb-count,:root[data-theme="red"] .ed-x{color:var(--text)}
+.seg.thm button{padding:7px 2px;font-size:calc(13px*var(--ts))}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -892,6 +926,7 @@ textarea.fl-in{resize:vertical;min-height:58px}
   *,*::before,*::after{transition:none!important;animation:none!important}
 }
 </style>
+<script>/* night themes apply before the first paint, so there's no bright flash */try{var t0=localStorage.getItem('flightChecklist.theme');if(t0&&t0!=='auto')document.documentElement.setAttribute('data-theme',t0);}catch(e){}</script>
 </head>
 <body>
 <header class="topbar">
@@ -960,6 +995,7 @@ var I={
   right:sv('<path d="M9 5l7 7-7 7"/>'),
   photo:sv('<rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="10" r="1.8"/><path d="M21 15.5l-5-5L7 19"/>'),
   timer:sv('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2"/><path d="M9.5 2.8h5"/><path d="M12 2.8V6"/>'),
+  contrast:sv('<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>'),
   moon:sv('<path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/>'),
   textsize:sv('<path d="M3 7V5h11v2"/><path d="M8.5 5v14"/><path d="M14 12v-1.5h7V12"/><path d="M17.5 10.5V19"/>'),
   info:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 11v5.5"/><path d="M12 7.6v.1" stroke-width="2.6"/>'),
@@ -1135,9 +1171,21 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='36';
+var APP_VERSION='37';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
+var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
+function applyTheme(){
+  var t=state.settings.theme||'auto',root=document.documentElement;
+  if(t==='auto') root.removeAttribute('data-theme');else root.setAttribute('data-theme',t);
+  var metas=document.querySelectorAll('meta[name="theme-color"]');
+  if(!themeMeta) themeMeta=Array.prototype.map.call(metas,function(m){return m.getAttribute('content');});
+  var c={light:'#e8ecf0',dark:'#1a1f26',night:'#06080a',red:'#060101'}[t];
+  Array.prototype.forEach.call(metas,function(m,i){m.setAttribute('content',c||themeMeta[i]);});
+  try{localStorage.setItem('flightChecklist.theme',t);}catch(e){}
+}
+function themeHint(t){var x=THEMES.filter(function(y){return y[0]===t;})[0];return x?x[2]:'';}
 function applyTextScale(){
+  applyTheme();
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
   rs.setProperty('--ts',String(ts));
   rs.setProperty('--sp',String(Math.max(0.72,Math.min(1,ts)))); // smaller text also tightens the spacing
@@ -1161,7 +1209,7 @@ function normAltMin(o){
 function normSettings(st){
   st=st||{};
   var ts=+st.textScale;
-  return {fingerDraw:!!st.fingerDraw,sound:st.sound!==false,dest:normDest(st.dest),dep:normDest(st.dep),routes:normRoutes(st),alts:normIcaoList(st.alts,4),wxUrl:normWxUrl(st.wxUrl),wxWatch:normIcaoList(st.wxWatch,6),textScale:ts>0?TEXT_SIZES.reduce(function(a,x){return Math.abs(x[0]-ts)<Math.abs(a-ts)?x[0]:a;},1):1,
+  return {theme:['light','dark','night','red'].indexOf(st.theme)>=0?st.theme:'auto',fingerDraw:!!st.fingerDraw,sound:st.sound!==false,dest:normDest(st.dest),dep:normDest(st.dep),routes:normRoutes(st),alts:normIcaoList(st.alts,4),wxUrl:normWxUrl(st.wxUrl),wxWatch:normIcaoList(st.wxWatch,6),textScale:ts>0?TEXT_SIZES.reduce(function(a,x){return Math.abs(x[0]-ts)<Math.abs(a-ts)?x[0]:a;},1):1,
     recent:Array.isArray(st.recent)?st.recent.map(normDest).filter(Boolean).slice(0,6):[],
     etdT:numT(st.etdT),etaT:numT(st.etaT),altMin:normAltMin(st.altMin)};
 }
@@ -3310,6 +3358,8 @@ function openSettings(){
   openSheet('<div class="menu-head"><button type="button" class="back" data-sact="menu">'+I.left+'Menu</button><h3 style="text-align:center;margin-right:58px">Settings</h3></div><div class="menu">'+
     '<div class="menu-row">'+I.textsize+'<span class="mt">Text size</span><div class="seg ts" role="radiogroup" aria-label="Text size">'+
       TEXT_SIZES.map(function(t){var on=state.settings.textScale===t[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="ts" data-v="'+t[0]+'" aria-label="'+t[1]+'"><span style="font-size:'+t[2]+'px">A</span></button>';}).join('')+'</div></div>'+
+    '<div class="menu-row">'+I.contrast+'<span class="mt">Appearance<small id="fThemeHint">'+esc(themeHint(state.settings.theme))+'</small></span><div class="seg ts thm" role="radiogroup" aria-label="Appearance">'+
+      THEMES.map(function(t){var on=state.settings.theme===t[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="theme" data-v="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div></div>'+
     '<button type="button" data-sact="finger" role="switch" aria-checked="'+fd+'">'+I.hand+'<span class="mt">Draw with finger<small>'+(fd?'On: one finger draws in notepads':'Off: Apple Pencil draws, finger scrolls')+'</small></span><span class="tog'+(fd?' on':'')+'"></span></button>'+
     '<button type="button" data-sact="sound" role="switch" aria-checked="'+snd+'">'+I.bell+'<span class="mt">Alert sound<small>'+(snd?'On: alerts beep while the app is open':'Off: alerts are silent')+'</small></span><span class="tog'+(snd?' on':'')+'"></span></button>'+
     '</div><div class="set-h">Backup</div><div class="menu">'+
@@ -3322,6 +3372,11 @@ function openSettings(){
   function(act,btn){
     switch(act){
       case 'menu': openMenu();break;
+      case 'theme':
+        state.settings.theme=btn.getAttribute('data-v');applyTheme();save();
+        sheetEl.querySelectorAll('[data-sact="theme"]').forEach(function(b){b.classList.toggle('on',b===btn);b.setAttribute('aria-checked',String(b===btn));});
+        $('#fThemeHint').textContent=themeHint(state.settings.theme);
+        break;
       case 'ts':
         state.settings.textScale=+btn.getAttribute('data-v');applyTextScale();save();
         sheetEl.querySelectorAll('[data-sact="ts"]').forEach(function(b){b.classList.toggle('on',b===btn);b.setAttribute('aria-checked',String(b===btn));});
