@@ -548,6 +548,7 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .opt.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .opt small{font-weight:600;opacity:.6;margin-left:4px;font-size:12px}
 .taxi-row{display:grid;grid-template-columns:1fr 88px;gap:8px}
+.app-row{display:grid;grid-template-columns:1fr calc(84px*var(--ts));gap:8px}
 .tmin{display:flex;align-items:center;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:0 9px 0 0}
 .tmin:focus-within{border-color:var(--accent)}
 .tmin .fl-in,.tmin .fl-in:focus{border:0!important;background:none!important;box-shadow:none;text-align:right;padding-right:2px;min-width:0}
@@ -1155,12 +1156,12 @@ function normFlPart(p,arr){
   p=p&&typeof p==='object'?p:{};
   var t=parseInt(p.tmin,10);
   var o={icao:icaoClean(p.icao),stand:str(p.stand).slice(0,12),rwy:str(p.rwy).slice(0,8),taxi:str(p.taxi).slice(0,80),tmin:isFinite(t)&&t>=0?Math.min(t,240):null,notes:str(p.notes).slice(0,3000),nid:str(p.nid)};
-  if(arr) o.app=str(p.app).slice(0,24);
+  if(arr){o.app=str(p.app).slice(0,24);o.star=str(p.star).slice(0,24);}
   return o;
 }
 function newFlEntry(){return {id:uid(),date:todayZ(),fno:'',reg:'',dep:normFlPart({},false),arr:normFlPart({},true)};}
 function flEmpty(f){
-  function e(p){return !p.icao&&!p.stand&&!p.rwy&&!p.taxi&&p.tmin===null&&!p.notes&&!p.app;}
+  function e(p){return !p.icao&&!p.stand&&!p.rwy&&!p.taxi&&p.tmin===null&&!p.notes&&!p.app&&!p.star;}
   return !f.fno&&!f.reg&&e(f.dep)&&e(f.arr);
 }
 function normFlights(a){
@@ -1181,7 +1182,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='41';
+var APP_VERSION='42';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1819,7 +1820,18 @@ function flFormHTML(f,fid,part,ic,A){
   var h='';
   if(part==='arr'){
     var ap=S('app');FL_APP.forEach(function(d){if(ap.length<4&&!ap.some(function(x){return x.v.toUpperCase()===d.toUpperCase();})) ap.push({v:d,n:0});});
-    h=fld('Approach','app','e.g. ILS Z',ap)+fld('Runway','rwy','e.g. 01R',S('rwy'),'up')+taxi('Taxi in')+fld('Stand','stand','e.g. 77',S('stand'),'up');
+    var sr=S('star');if(sr.length<4&&!sr.some(function(x){return x.v.toUpperCase()==='VECTORS';})) sr.push({v:'Vectors',n:0});
+    var cm=new Map();
+    if(ic) state.flights.forEach(function(g){
+      if((f&&g.id===f.id)||g.arr.icao!==ic||!g.arr.app||!g.arr.rwy) return;
+      var key=(g.arr.app+' '+g.arr.rwy).toUpperCase(),e=cm.get(key)||{a:g.arr.app,r:g.arr.rwy,n:0};e.n++;cm.set(key,e);
+    });
+    var combos=Array.from(cm.values()).sort(function(x,y){return y.n-x.n;}).slice(0,3),ca=val('app').toUpperCase(),cr=val('rwy').toUpperCase();
+    var apc=combos.map(function(x){return '<button type="button" class="opt'+(ca===x.a.toUpperCase()&&cr===x.r.toUpperCase()?' on':'')+'" '+A+'="flChip" data-fid="'+fid+'" data-part="'+part+'" data-k="app" data-v="'+esc(x.a)+'" data-k2="rwy" data-v2="'+esc(x.r)+'">'+esc(x.a+' '+x.r)+'<small>'+x.n+'</small></button>';})
+      .concat(FL_APP.filter(function(d){return !combos.some(function(x){return x.a.toUpperCase()===d.toUpperCase();});}).map(function(d){
+        return '<button type="button" class="opt'+(ca===d.toUpperCase()?' on':'')+'" '+A+'="flChip" data-fid="'+fid+'" data-part="'+part+'" data-k="app" data-v="'+esc(d)+'">'+esc(d)+'</button>';}));
+    h=fld('Arrival route','star','STAR, e.g. RIVET 1A',sr,'up')+
+      '<div class="ff"><div class="ff-l">Approach and runway</div><div class="app-row">'+inp('app','e.g. ILS Z')+inp('rwy','RWY','up',' autocapitalize="characters"')+'</div><div class="opts">'+apc.join('')+'</div></div>'+taxi('Taxi in')+fld('Stand','stand','e.g. 77',S('stand'),'up');
   }else h=fld('Stand','stand','e.g. C42',S('stand'),'up')+taxi('Taxi out')+fld('Runway','rwy','e.g. 30R',S('rwy'),'up');
   h+='<div class="ff"><div class="ff-l">Notes</div><textarea class="fl-in" rows="2" data-fl="notes" data-part="'+part+'" data-fid="'+fid+'" placeholder="Optional">'+esc(val('notes'))+'</textarea>';
   if(ic){
@@ -1860,16 +1872,27 @@ function flInput(t){
   else f[k]=v;
   saveSoon();
   var ff=t.closest('.ff');
-  if(ff&&part) ff.querySelectorAll('.opt').forEach(function(b){b.classList.toggle('on',typeof v==='string'&&v!==''&&b.getAttribute('data-v').toUpperCase()===v.toUpperCase());});
+  if(ff&&part){
+    var P=f[part],same=function(x,y){return String(x||'').toUpperCase()===String(y||'').toUpperCase();};
+    ff.querySelectorAll('.opt').forEach(function(c){
+      var ck=c.getAttribute('data-k'),ck2=c.getAttribute('data-k2');
+      c.classList.toggle('on',!!P[ck]&&same(P[ck],c.getAttribute('data-v'))&&(!ck2||same(P[ck2],c.getAttribute('data-v2'))));
+    });
+  }
 }
 function flChip(el){
   var fid=el.getAttribute('data-fid'),part=el.getAttribute('data-part'),k=el.getAttribute('data-k'),v=el.getAttribute('data-v');
   var f=fid==='cur'?curFlight(true):flById(fid);if(!f) return;
-  var nv=String(f[part][k]||'').toUpperCase()===v.toUpperCase()?'':v;
-  f[part][k]=nv;save();refreshApst();
+  var k2=el.getAttribute('data-k2'),v2=el.getAttribute('data-v2')||'',P=f[part];
+  function same(a,b){return String(a||'').toUpperCase()===String(b||'').toUpperCase();}
+  var on=same(P[k],v)&&(!k2||same(P[k2],v2));
+  P[k]=on?'':v;if(k2) P[k2]=on?'':v2;save();refreshApst();
   var ff=el.closest('.ff');if(!ff) return;
-  var inp=ff.querySelector('[data-fl]');if(inp) inp.value=nv;
-  ff.querySelectorAll('.opt').forEach(function(b){b.classList.toggle('on',nv!==''&&b.getAttribute('data-v').toUpperCase()===nv.toUpperCase());});
+  [k,k2].forEach(function(x){if(!x) return;var i=ff.querySelector('[data-fl="'+x+'"]');if(i) i.value=P[x]||'';});
+  ff.querySelectorAll('.opt').forEach(function(b){
+    var bk2=b.getAttribute('data-k2');
+    b.classList.toggle('on',!!P[b.getAttribute('data-k')]&&same(P[b.getAttribute('data-k')],b.getAttribute('data-v'))&&(!bk2||same(P[bk2],b.getAttribute('data-v2'))));
+  });
 }
 function flToNote(el){
   var fid=el.getAttribute('data-fid'),part=el.getAttribute('data-part');
@@ -1910,7 +1933,7 @@ function openFlogBlockEditor(id,isNew){
   });
 }
 function flRouteSub(f){
-  var d=[f.dep.rwy,f.dep.stand].filter(Boolean).join(' · '),a=[(f.arr.app+' '+f.arr.rwy).trim(),f.arr.stand].filter(Boolean).join(' · ');
+  var d=[f.dep.rwy,f.dep.stand].filter(Boolean).join(' · '),a=[f.arr.star,(f.arr.app+' '+f.arr.rwy).trim(),f.arr.stand].filter(Boolean).join(' · ');
   if(d||a) return (d||'–')+' → '+(a||'–');
   return [f.fno,f.reg].filter(Boolean).join(' · ')||'No details yet';
 }
@@ -1953,6 +1976,7 @@ function flNew(){
 }
 function openFlEntry(id,isNew){
   var f=flById(id);if(!f) return;
+  loadAirports().catch(function(){});
   function ti(k,label,ph,extra){return '<label class="fld"><span class="fl">'+label+'</span><input type="text" data-fl="'+k+'" data-part="" data-fid="'+id+'" value="'+esc(k==='depicao'?f.dep.icao:k==='arricao'?f.arr.icao:f[k])+'" placeholder="'+ph+'" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false"'+(extra||'')+'></label>';}
   openSheet('<h3>'+(isNew?'Add a flight':'Flight')+'</h3>'+
     '<label class="fld"><span class="fl">Date (UTC)</span><input type="date" data-fl="date" data-part="" data-fid="'+id+'" value="'+f.date+'"></label>'+
@@ -1996,7 +2020,7 @@ function apStats(ic){
   D.forEach(function(f){if(f.dep.notes) notes.push({d:f.date,k:'departure',t:f.dep.notes});});
   notes.sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:0;});
   return {arr:A.length,dep:D.length,last:last,
-    arrRwy:cnt(A,function(f){return f.arr.rwy;}),app:cnt(A,function(f){return f.arr.app?(f.arr.app+' '+f.arr.rwy).trim():'';}),
+    arrRwy:cnt(A,function(f){return f.arr.rwy;}),star:cnt(A,function(f){return f.arr.star;}),app:cnt(A,function(f){return f.arr.app?(f.arr.app+' '+f.arr.rwy).trim():'';}),
     tin:tm(A,function(f){return f.arr.tmin;}),tout:tm(D,function(f){return f.dep.tmin;}),
     arrStand:cnt(A,function(f){return f.arr.stand;}),depStand:cnt(D,function(f){return f.dep.stand;}),
     stands:cnt(A.map(function(f){return {s:f.arr.stand};}).concat(D.map(function(f){return {s:f.dep.stand};})),function(x){return x.s;}),
@@ -2011,6 +2035,7 @@ function apStatsHTML(ic){
   if(!S.arr&&!S.dep) return '<p class="st-empty">No flights logged for '+esc(ic)+' yet. They come from your flight log: the Flight log blocks in your checklists, or Menu → Flight log.</p>';
   var h='<div class="tiles"><div class="tile"><b>'+S.arr+'</b><span>arrival'+(S.arr===1?'':'s')+'</span></div><div class="tile"><b>'+S.dep+'</b><span>departure'+(S.dep===1?'':'s')+'</span></div><div class="tile"><b>'+esc(fmtDay(S.last))+'</b><span>last visit</span></div></div>';
   if(S.arrRwy.length) h+='<div class="st-h">Arrival runway</div>'+barsHTML(S.arrRwy);
+  if(S.star.length) h+='<div class="st-h">Arrival route</div>'+barsHTML(S.star);
   if(S.app.length) h+='<div class="st-h">Approach</div>'+barsHTML(S.app);
   if(S.tin||S.tout) h+='<div class="st-h">Taxi time <em>average (range)</em></div><div class="pair">'+
     (S.tin?'<div class="tile"><b>'+S.tin.avg+' <small>min</small></b><span>in'+(S.tin.min!==S.tin.max?' · '+S.tin.min+'–'+S.tin.max:'')+'</span></div>':'<div class="tile"><b>–</b><span>in</span></div>')+
@@ -2035,6 +2060,7 @@ function renderApst(m){
     if(a0.n>=2&&(S.app.length===1||a0.n>S.app[1].n)) h+='<p>Usually <b>'+esc(a0.v)+'</b> ('+a0.n+' of '+n+')</p>';
     else h+='<p>Approaches <b>'+S.app.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
   }
+  if(arr&&S.star.length) h+='<p>Arrival <b>'+S.star.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
   if(t) h+='<p>Taxi '+(arr?'in':'out')+' about <b>'+t.avg+' min</b>'+(t.min!==t.max?' ('+t.min+'–'+t.max+')':'')+'</p>';
   if(st.length) h+='<p>Stands <b>'+st.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
   if(!rw.length&&!t&&!st.length) h+='<p>'+n+' '+(arr?'arrival':'departure')+(n===1?'':'s')+' logged, no details yet.</p>';
@@ -2384,7 +2410,7 @@ function wxPanelHTML(){
   if(wxSt.oldRelay&&aps.some(function(a){return wxUS(a.ic);})) h+='<div class="wxhint">For D-ATIS at US airports, update your relay: paste the new relay code from Claude into your Cloudflare Worker and deploy.</div>';
   if(!aps.length) h+='<p class="hint">Set the flight (tap the clock) or add an airport below.</p>';
   h+=aps.map(function(a){return wxCardHTML(a,a.role==='Watching');}).join('');
-  h+='<div class="wxadd"><input type="text" class="fl-in" id="wxAddIn" maxlength="4" placeholder="Add ICAO" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off"><button type="button" class="btn" data-act="wxWatch">'+I.plus+'Add</button></div>';
+  h+='<div class="wxadd"><input type="text" class="fl-in" id="wxAddIn" maxlength="4" placeholder="Add ICAO or IATA" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off"><button type="button" class="btn" data-act="wxWatch">'+I.plus+'Add</button></div>';
   h+='<p class="wxset">Relay: '+esc(st.wxUrl)+' · <button type="button" class="lnkbtn" data-act="wxChangeUrl">Change</button></p>';
   return h;
 }
@@ -3765,7 +3791,7 @@ function searchAll(q){
   });
   flSorted().forEach(function(f){
     var d=f.dep,a=f.arr;
-    if(hit(fmtDay(f.date),f.date,f.fno,f.reg,d.icao,d.stand,d.rwy,d.taxi,d.notes,a.icao,a.app,a.rwy,a.taxi,a.stand,a.notes))
+    if(hit(fmtDay(f.date),f.date,f.fno,f.reg,d.icao,d.stand,d.rwy,d.taxi,d.notes,a.icao,a.star,a.app,a.rwy,a.taxi,a.stand,a.notes))
       flights.push({id:f.id,t:fmtDay(f.date)+' · '+(d.icao||'—')+' → '+(a.icao||'—')+(f.fno?' · '+f.fno:''),p:flRouteSub(f),n:[d.notes,a.notes].filter(Boolean).join(' / ')});
   });
   return {words:words,items:items,notes:notes,flights:flights};
@@ -4154,7 +4180,7 @@ function apnPanelHTML(){
   var icao=apnPanelIcao();
   if(!icao){
     h+=all.length?'<div class="aplist">'+all.map(function(k){return '<button type="button" data-act="apnPick" data-v="'+k+'"><b>'+k+'</b><span>'+esc(apName(k))+'</span><small>'+(apNoteCount(k)||'')+'</small></button>';}).join('')+'</div>':'<p class="hint">No airport notes yet.</p>';
-    h+='<div class="apgo"><input type="text" id="apnIcao" class="icao-in" maxlength="4" placeholder="Other airport (ICAO)" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false"><button type="button" class="btn primary" data-act="apnGo">Open</button></div>';
+    h+='<div class="apgo"><input type="text" id="apnIcao" class="icao-in" maxlength="4" placeholder="Other airport (ICAO or IATA)" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false"><button type="button" class="btn primary" data-act="apnGo">Open</button></div>';
     return h;
   }
   if(toolApnSel==='all') h+='<button type="button" class="back-all" data-act="apnSel" data-v="all">'+I.left+'All airports</button>';
@@ -4185,8 +4211,8 @@ function apnAdd(sid){
   openItemEditor(n.id,true);
 }
 function apnGo(){
-  var ai=$('#apnIcao'),v=ai?ai.value.trim().toUpperCase():'';
-  if(!/^[A-Z0-9]{4}$/.test(v)){toast('Enter a 4-letter ICAO code');if(ai) ai.focus();return;}
+  var ai=$('#apnIcao'),v=apCode(ai?ai.value:'');
+  if(!/^[A-Z0-9]{4}$/.test(v)){toast('Enter an ICAO or IATA code');if(ai) ai.focus();return;}
   toolApnSel='all';toolApnIcao=v;toolApnOrd=false;refreshTool();
 }
 function apnSummary(){
@@ -4417,18 +4443,26 @@ function loadAirports(){
 }
 function apIndex(){
   if(apIdx) return apIdx;
-  var lines=window.AIRPORT_DATA.split('\n'),map=new Map();
-  lines.forEach(function(l){map.set(l.slice(0,4),l);});
-  return (apIdx={lines:lines,map:map});
+  var lines=window.AIRPORT_DATA.split('\n'),map=new Map(),iata=new Map();
+  lines.forEach(function(l){map.set(l.slice(0,4),l);var p=l.lastIndexOf('|');if(p>0&&!iata.has(l.slice(p+1))) iata.set(l.slice(p+1),l);});
+  return (apIdx={lines:lines,map:map,iata:iata});
 }
-function apRec(l){return {icao:l.slice(0,4),tz:window.AIRPORT_TZ[parseInt(l.slice(4,6),36)],cc:l.slice(6,8),name:l.slice(8)};}
+function apRec(l){var p=l.lastIndexOf('|');return {icao:l.slice(0,4),tz:window.AIRPORT_TZ[parseInt(l.slice(4,6),36)],cc:l.slice(6,8),name:p>0?l.slice(8,p):l.slice(8),iata:p>0?l.slice(p+1):''};}
+// an airport typed as IATA (JFK) becomes its ICAO code (KJFK) once the airport list is loaded
+function iataToIcao(v){
+  var c=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(c.length===3&&window.AIRPORT_DATA){var l=apIndex().iata.get(c);if(l) return l.slice(0,4);}
+  return c;
+}
+function apCode(v){return icaoClean(iataToIcao(v));}
 function apFind(q){
   q=q.trim().toUpperCase();
   var ix=apIndex(),out=[],seen={};
   function add(l){var c=l.slice(0,4);if(!seen[c]){seen[c]=1;out.push(apRec(l));}}
   if(/^[A-Z0-9]{4}$/.test(q)&&ix.map.has(q)) add(ix.map.get(q));
+  if(/^[A-Z]{3}$/.test(q)&&ix.iata.has(q)) add(ix.iata.get(q));
   if(/^[A-Z0-9]{2,3}$/.test(q)){for(var i=0;i<ix.lines.length&&out.length<8;i++){if(ix.lines[i].lastIndexOf(q,0)===0) add(ix.lines[i]);}}
-  if(q.length>=3&&out.length<8){for(var j=0;j<ix.lines.length&&out.length<8;j++){if(ix.lines[j].slice(8).toUpperCase().indexOf(q)>=0) add(ix.lines[j]);}}
+  if(q.length>=3&&out.length<8){for(var j=0;j<ix.lines.length&&out.length<8;j++){if(apRec(ix.lines[j]).name.toUpperCase().indexOf(q)>=0) add(ix.lines[j]);}}
   return out;
 }
 function zoneList(){
@@ -4535,7 +4569,7 @@ function openFlight(){
   function fltRow(r){var el=$('#fFlt');if(el) el.innerHTML=r.etdT&&r.etaT?'<b>'+durM(r.etaT-r.etdT,false)+'</b> flight':'';}
   function altKeys(){
     var d=picks.dest;if(!d) return [];
-    return normIcaoList($('#fAlts').value.split(/[^A-Za-z0-9]+/),4).filter(function(x){return x!==d.icao&&!(picks.dep&&x===picks.dep.icao);}).map(function(a){return {a:a,k:d.icao+'>'+a};});
+    return normIcaoList($('#fAlts').value.split(/[^A-Za-z0-9]+/).map(apCode),4).filter(function(x){return x!==d.icao&&!(picks.dep&&x===picks.dep.icao);}).map(function(a){return {a:a,k:d.icao+'>'+a};});
   }
   function altVal(k){return k in altVals?altVals[k]:(typeof st.altMin[k]==='number'?String(st.altMin[k]):'');}
   function altMeta(k,r){var n=parseInt(altVal(k),10);return 'min'+(r.etaT&&isFinite(n)&&n>=0?' · ETA ≈ '+hmOf(r.etaT+n*60000):'');}
@@ -4551,7 +4585,7 @@ function openFlight(){
   openSheet('<div class="fl-head"><h3>Flight</h3><label class="fno-in"><span>CALL SIGN</span><input id="fFno" type="text" maxlength="8" value="'+esc(st.csign)+'" placeholder="UAE6UL" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Call sign"></label></div>'+apRow('dep','From','etd','ETD')+
     '<div class="fmid"><button type="button" class="ib round" data-sact="swap" aria-label="Swap From and To">'+I.swap+'</button><span class="fflt" id="fFlt"></span></div>'+
     apRow('dest','To','eta','ETA')+
-    '<div class="fld" style="margin-top:14px"><span class="fl">Alternates <em>(optional, for weather)</em></span><input id="fAlts" class="icao-in" type="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="e.g. YBCG YSSY" value="'+esc(st.alts.join(' '))+'"></div><div id="fAltMin"></div>'+
+    '<div class="fld" style="margin-top:14px"><span class="fl">Alternates <em>(optional, for weather)</em></span><input id="fAlts" class="icao-in" type="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="e.g. YBCG SYD" value="'+esc(st.alts.join(' '))+'"></div><div id="fAltMin"></div>'+
     '<div class="sh-actions">'+((st.dep||st.dest||st.etdT||st.etaT)?'<button type="button" class="btn danger" data-sact="clear">Clear</button>':'')+
     '<button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Save</button></div>',
   function(act,btn){
@@ -4572,7 +4606,7 @@ function openFlight(){
       if(bad.length){toast('Choose an airport for '+(bad[0]==='dep'?'From':'To'));inp(bad[0]).focus();return;}
       ['dep','dest'].forEach(function(k){if(!inp(k).value.trim()) picks[k]=null;});
       st.dep=picks.dep;st.dest=picks.dest;
-      st.alts=normIcaoList($('#fAlts').value.split(/[^A-Za-z0-9]+/),4).filter(function(x){return !(st.dest&&x===st.dest.icao)&&!(st.dep&&x===st.dep.icao);});
+      st.alts=normIcaoList($('#fAlts').value.split(/[^A-Za-z0-9]+/).map(apCode),4).filter(function(x){return !(st.dest&&x===st.dest.icao)&&!(st.dep&&x===st.dep.icao);});
       if(st.dest){
         var key=(st.dep?st.dep.icao:'')+'>'+st.dest.icao;
         st.routes=[{dep:st.dep,dest:st.dest,alts:st.alts.slice()}].concat(st.routes.filter(function(x){return (x.dep?x.dep.icao:'')+'>'+x.dest.icao!==key;})).slice(0,6);
@@ -4592,9 +4626,9 @@ function openFlight(){
     setTimeout(refreshT,0);
     var p=picks[k],r=res(k),a=$('#fA_'+k);if(!r||!a) return;
     r.innerHTML='';
-    if(!p){a.innerHTML=inp(k).value.trim()?'':'ICAO or name';return;}
-    var info=tzInfo(p.tz,Date.now()),n=apNoteCount(p.icao);
-    a.innerHTML='<div class="apn1">'+esc(String(p.name||p.tz).replace(/_/g,' '))+'</div>'+
+    if(!p){a.innerHTML=inp(k).value.trim()?'':'ICAO, IATA or name';return;}
+    var info=tzInfo(p.tz,Date.now()),n=apNoteCount(p.icao),typed=inp(k).value.trim().toUpperCase();
+    a.innerHTML='<div class="apn1">'+(typed&&typed!==p.icao?esc(p.icao)+' · ':'')+esc(String(p.name||p.tz).replace(/_/g,' '))+'</div>'+
       '<div>'+(info?'<b>'+info.hm+'</b> '+info.wd+' · '+fmtOff(info.off):'')+(n?' · <span class="apcount">'+n+' note'+(n>1?'s':'')+'</span>':'')+'</div>';
   }
   function manual(k,code,msg){
@@ -4614,14 +4648,14 @@ function openFlight(){
     if(picks[k]&&picks[k].icao===q){show(k);return;}
     if(dbOK===false){
       if(/^[A-Z0-9]{4}$/.test(q)) manual(k,q,'The airport list isn’t available here. Choose the time zone for '+esc(q)+':');
-      else{picks[k]=null;r.innerHTML='<p class="ap-note">Enter the 4-letter ICAO code.</p>';}
+      else{picks[k]=null;r.innerHTML='<p class="ap-note">Enter the 4-letter ICAO code (IATA codes need the airport list).</p>';}
       return;
     }
     if(dbOK===null){r.innerHTML='<p class="ap-note">Loading airports…</p>';return;}
     var hits=apFind(q);
-    if(hits.length&&hits[0].icao===q){picks[k]={icao:hits[0].icao,tz:hits[0].tz,name:hits[0].name+(hits[0].cc&&hits[0].cc!=='--'?' ('+hits[0].cc+')':'')};show(k);return;}
+    if(hits.length&&(hits[0].icao===q||(q.length===3&&hits[0].iata===q))){picks[k]={icao:hits[0].icao,tz:hits[0].tz,name:hits[0].name+(hits[0].cc&&hits[0].cc!=='--'?' ('+hits[0].cc+')':'')};show(k);return;}
     picks[k]=null;
-    if(hits.length) r.innerHTML='<div class="ap-list">'+hits.map(function(x){return '<button type="button" data-sact="pick" data-k="'+k+'" data-icao="'+x.icao+'"><b>'+x.icao+'</b><span>'+esc(x.name)+'</span></button>';}).join('')+'</div>';
+    if(hits.length) r.innerHTML='<div class="ap-list">'+hits.map(function(x){return '<button type="button" data-sact="pick" data-k="'+k+'" data-icao="'+x.icao+'"><b>'+x.icao+'</b><span>'+(x.iata?x.iata+' · ':'')+esc(x.name)+'</span></button>';}).join('')+'</div>';
     else if(/^[A-Z0-9]{4}$/.test(q)) manual(k,q,esc(q)+' isn’t in the airport list. Choose its time zone:');
     else r.innerHTML='<p class="ap-note">No match yet.</p>';
   }
@@ -5210,8 +5244,8 @@ function onAct(e){
     case 'wxSetUrl': wxSetUrl();break;
     case 'wxChangeUrl': confirmSheet('Change the weather relay address?','Change',function(){state.settings.wxUrl='';save();openTool('wx');});break;
     case 'wxWatch':
-      var wi=$('#wxAddIn'),wv=icaoClean(wi?wi.value:'');
-      if(wv.length!==4){toast('Enter a 4-letter ICAO code');if(wi) wi.focus();break;}
+      var wi=$('#wxAddIn'),wv=apCode(wi?wi.value:'');
+      if(wv.length!==4){toast('Enter an ICAO or IATA code');if(wi) wi.focus();break;}
       if(state.settings.wxWatch.indexOf(wv)<0){if(state.settings.wxWatch.length>=6) state.settings.wxWatch.shift();state.settings.wxWatch.push(wv);save();}
       refreshTool();wxMaybe(true);break;
     case 'wxUnwatch':
@@ -5295,6 +5329,10 @@ function onInput(e){
 }
 app.addEventListener('input',onInput);
 sheetEl.addEventListener('input',function(e){if(e.target.matches&&e.target.matches('[data-fl]')) flInput(e.target);});
+sheetEl.addEventListener('change',function(e){
+  var t=e.target;if(!t.matches||!t.matches('[data-fl="depicao"],[data-fl="arricao"]')) return;
+  var v=apCode(t.value);if(v.length===4&&v!==t.value.trim().toUpperCase()){t.value=v;flInput(t);}
+});
 app.addEventListener('change',function(e){if(e.target.matches&&e.target.matches('[data-fl]')) refreshApst();});
 toolPanel.addEventListener('input',onInput);
 function onChange(e){
