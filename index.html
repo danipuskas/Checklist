@@ -82,14 +82,14 @@
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);-webkit-text-size-adjust:100%;touch-action:manipulation}
 body{margin:0;background:var(--bg);color:var(--text);font:calc(17px*var(--ts))/1.38 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 body.noscroll{overflow:hidden}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg-glass);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 button{font:inherit;touch-action:manipulation;cursor:pointer}
 button:focus-visible,a:focus-visible,[tabindex]:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 
 /* Top bar */
-.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:6px;min-height:58px;padding:4px 10px 7px;background:var(--bg-glass);-webkit-backdrop-filter:saturate(1.3) blur(14px);backdrop-filter:saturate(1.3) blur(14px)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:6px;min-height:58px;padding:4px 10px 7px;background:var(--bg)}
 .progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line-soft)}
 #barFill{height:100%;width:0;background:var(--accent);transition:width .25s ease}
 #barFill.complete{background:var(--done)}
@@ -1181,7 +1181,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='39';
+var APP_VERSION='40';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -3378,7 +3378,7 @@ function openSettings(){
     '<button type="button" data-sact="import">'+I.restore+'<span class="mt">Restore<small>Load a backup</small></span></button>'+
     '</div><div class="set-h">Storage</div><div class="menu"><div class="menu-row stor" id="storRow">'+storRowHTML(null)+'</div></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Done</button></div>'+
-    '<p class="ver">App version '+APP_VERSION+(updAvail?' · <button type="button" class="updl" data-sact="upd">New version ready, restart</button>':'')+'</p>',
+    '<p class="ver">App version '+APP_VERSION+(updAvail?' · <button type="button" class="updl" data-sact="upd">New version ready, restart</button>':'')+'</p>'+diagHTML(),
   function(act,btn){
     switch(act){
       case 'menu': openMenu();break;
@@ -5331,6 +5331,29 @@ render();
 try{var restY=+sessionStorage.getItem('flightChecklist.y');sessionStorage.removeItem('flightChecklist.y');
   if(!(restY>0)){var ui=JSON.parse(localStorage.getItem('flightChecklist.ui')||'null');if(ui&&ui.l===state.current&&Date.now()-ui.t<3*3600000) restY=+ui.y;}
   if(restY>0) window.scrollTo(0,restY);}catch(e){}
+/* Coming back to the app: was it kept by iPadOS or started again, and how long did the app take to show */
+var DIAGK='flightChecklist.diag';
+function diagGet(){var d=null;try{d=JSON.parse(localStorage.getItem(DIAGK)||'null');}catch(e){}return d&&Array.isArray(d.ev)?d:{h:0,ev:[]};}
+function diagPut(d){try{localStorage.setItem(DIAGK,JSON.stringify(d));}catch(e){}}
+function diagAdd(e){var d=diagGet();d.ev.unshift(e);d.ev=d.ev.slice(0,5);diagPut(d);}
+function diagAway(ms){var m=Math.round(ms/60000);return m<1?'under a minute':m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+m%60+' min':'');}
+function diagHTML(){
+  var ev=diagGet().ev.slice(0,3);if(!ev.length) return '';
+  return '<p class="ver" style="margin-top:4px;line-height:1.45">'+ev.map(function(e){
+    return hmOf(e.t)+' '+(e.k==='r'?'started again':'kept by iPadOS')+', showing in '+(e.ms/1000).toFixed(e.ms<1000?2:1)+' s, after '+diagAway(e.away)+' away';
+  }).join('<br>')+'</p>';
+}
+(function(){
+  var d=diagGet(),now=Date.now(),was=d.h;
+  if(was&&now-was<24*3600000) requestAnimationFrame(function(){requestAnimationFrame(function(){diagAdd({k:'r',t:now,away:now-was,ms:Math.round(performance.now())});});});
+  d.h=0;diagPut(d);
+})();
+document.addEventListener('visibilitychange',function(){
+  var d=diagGet();
+  if(document.visibilityState==='hidden'){d.h=Date.now();diagPut(d);return;}
+  var t0=performance.now(),away=d.h?Date.now()-d.h:0;d.h=0;diagPut(d);
+  if(away) requestAnimationFrame(function(){requestAnimationFrame(function(){diagAdd({k:'s',t:Date.now(),away:away,ms:Math.round(performance.now()-t0)});});});
+});
 function uiKeep(){try{localStorage.setItem('flightChecklist.ui',JSON.stringify({l:state.current,y:Math.round(window.scrollY),t:Date.now()}));}catch(e){}}
 window.addEventListener('pagehide',uiKeep);
 // while the app is hidden (e.g. in Slide Over), give back the notepads' drawing memory, so iPadOS is less likely to unload the app
