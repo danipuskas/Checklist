@@ -922,12 +922,6 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .pb-time .pb-sun{grid-column:1/-1;flex-direction:row;align-items:center;gap:8px;font-size:calc(13.5px*var(--ts));font-weight:650;color:var(--muted);border-top:1px solid var(--line-soft);padding-top:7px;margin-top:2px}
 .pb-time .pb-sun.dark{color:var(--warn)}
 .pb-time .pb-sun svg{width:16px;height:16px;flex:none}
-.pb-brief{background:var(--accent-weak);border-radius:12px;padding:10px 12px;font-size:calc(15px*var(--ts));line-height:1.45}
-.pb-brief b{font-weight:750}
-.pb-brief .nt{display:block;margin-top:6px;font-size:calc(13.5px*var(--ts));color:var(--muted)}
-.pb-brief .nt b{color:var(--text);font-weight:600}
-.pb-src{font-size:calc(12px*var(--ts));color:var(--muted);margin:5px 4px 0}
-.pb-src b{color:var(--text)}
 .pb-alts{margin-top:8px;padding:2px 4px 2px 12px}
 .pb-alt{appearance:none;border:0;background:none;color:var(--text);width:100%;display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line-soft);font:500 calc(14px*var(--ts)) -apple-system,system-ui,sans-serif;font-variant-numeric:tabular-nums;text-align:left}
 .pb-alt:first-child{border-top:0}
@@ -1230,7 +1224,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='45';
+var APP_VERSION='46';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -4327,37 +4321,6 @@ function briefTimeHTML(ic,tz,rec,w,now){
   }
   return h+'</div>';
 }
-function atisBrief(ic,dep){
-  var a=wx[ic]&&wx[ic].a;if(!a||!a.length) return '';
-  var x=a.filter(function(y){return y.type===(dep?'dep':'arr');})[0]||a.filter(function(y){return y.type==='combined';})[0]||a[0];
-  var t=String(x.text||'').toUpperCase().replace(/\s+/g,' '),RW='((?:\\d{1,2}[LRC]?)(?:\\s*(?:,|AND|&)\\s*\\d{1,2}[LRC]?)*)',out=[];
-  var ap=new RegExp('\\b(ILS|RNAV|RNP|GPS|VOR|LOC|VISUAL|VIS)\\b[^.]{0,30}?\\b(?:RWYS?|RUNWAYS?)\\s*'+RW).exec(t);
-  if(ap) out.push((ap[1]==='VIS'?'VISUAL':ap[1])+' '+ap[2].replace(/\s*(AND|&)\s*/g,', '));
-  var ld=new RegExp('\\b(?:'+(dep?'DEPARTING|DEPG|DEPS?|DEPARTURES?':'LANDING|LNDG|LDG|ARRIVING|ARRIVALS?')+')\\b[^.]{0,20}?\\b(?:RWYS?|RUNWAYS?)\\s*'+RW).exec(t);
-  if(ld) out.push((dep?'departing ':'landing ')+ld[1].replace(/\s*(AND|&)\s*/g,', '));
-  return (x.code?'ATIS '+esc(x.code):'ATIS')+(out.length?': '+esc(out.join(', ')):'');
-}
-function briefLineHTML(ic,dep){
-  var S=apStats(ic),n=dep?S.dep:S.arr,parts=[];
-  function first(l){return l&&l[0]?l[0].v:'';}
-  if(dep){
-    if(first(S.depStand)) parts.push('stand <b>'+esc(first(S.depStand))+'</b>');
-    if(first(S.depRwy)) parts.push('runway <b>'+esc(first(S.depRwy))+'</b>');
-    if(first(S.sid)) parts.push('<b>'+esc(first(S.sid))+'</b>');
-    if(S.tout) parts.push('taxi out about <b>'+S.tout.avg+' min</b>');
-  }else{
-    if(first(S.star)) parts.push('<b>'+esc(first(S.star))+'</b>');
-    if(first(S.app)) parts.push('<b>'+esc(first(S.app))+'</b>');
-    if(first(S.arrStand)) parts.push('stand <b>'+esc(first(S.arrStand))+'</b>');
-    if(S.tin) parts.push('taxi in about <b>'+S.tin.avg+' min</b>');
-  }
-  var note=S.notes.filter(function(x){return x.k===(dep?'departure':'arrival');})[0],atis=atisBrief(ic,dep);
-  if(!parts.length&&!note&&!atis) return '';
-  var h='<div class="pb-h"><span>Your brief</span></div><div class="pb-brief">'+
-    (parts.length?(n>1?'Usually ':'Last time: ')+parts.join(' · '):'No '+(dep?'departure':'arrival')+' details logged here yet.')+
-    (note?'<span class="nt">'+esc(fmtDay(note.d))+': <b>'+esc(note.t)+'</b></span>':'')+'</div>';
-  return h+'<p class="pb-src">'+(n?'From your '+n+' '+(dep?'departure':'arrival')+(n===1?'':'s')+' here.':'')+(atis?' Now: <b>'+atis+'</b>.':'')+'</p>';
-}
 function altSummary(ic,w){
   var d=wx[ic];if(!d) return 'No weather yet';
   if(d.t&&w){
@@ -4377,7 +4340,7 @@ function apBriefHTML(ic){
   var S=apStats(ic),w=role?wxWin({ic:ic,role:role}):null,dep=role==='From'||(!role&&!S.arr&&S.dep>0);
   // weather for an airport that isn't part of the flight is fetched when you open its brief
   if(st.wxUrl&&navigator.onLine!==false&&!wxSt.busy&&(!wx[ic]||now-wx[ic].f>WX_EVERY)&&(apbTried[ic]||0)<now){apbTried[ic]=now+120000;setTimeout(function(){wxFetch([ic]);},0);}
-  var h=briefTimeHTML(ic,tz,rec,w,now)+briefLineHTML(ic,dep);
+  var h=briefTimeHTML(ic,tz,rec,w,now);
   h+='<div class="pb-h"><span>Weather</span>'+(st.wxUrl?'<button type="button" class="lnkbtn" data-act="apbWx" data-v="'+ic+'">'+(wxSt.busy?'Updating…':'Update')+'</button>':'')+'</div>';
   h+=st.wxUrl?wxCardHTML({ic:ic,role:role},false):'<p class="pb-none">Set up the weather relay in Menu → Weather to see METAR and TAF here.</p>';
   if(role==='To'&&st.alts.length){
