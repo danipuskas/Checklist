@@ -834,7 +834,11 @@ textarea.fl-in{resize:vertical;min-height:58px}
 /* Airport sections: style picked per section */
 .esr{flex-wrap:wrap}
 .esr-lay{flex-basis:100%;display:flex;align-items:center;gap:8px;padding:6px 2px 2px;font-size:calc(13px*var(--ts));color:var(--muted)}
-.esr-lay .seg button{padding:5px 12px}
+.esr-lay .seg button{padding:5px 9px}
+.seg3{display:grid;grid-template-columns:1fr 1fr 1fr}
+.apl.notes .item > .row{padding-top:calc(8px*var(--sp));padding-bottom:calc(8px*var(--sp))}
+.apl.notes .kids .item > .row{padding-top:calc(6px*var(--sp));padding-bottom:calc(6px*var(--sp))}
+.apl.notes .note{margin-top:1px}
 .apl.rows .txt.stack .note{text-align:left;flex-basis:100%}
 /* Each note can be a row or text: notes next to each other with the same style share one box */
 .apl + .apl{border-top:1px solid var(--line-soft)}
@@ -1036,7 +1040,7 @@ function normItem(it){
     imgs:Array.isArray(it.imgs)?it.imgs.filter(function(x){return typeof x==='string'&&x;}):[],
     info:!!it.info,done:!it.info&&!!it.done,open:it.open!==false,rem:normRem(it.rem),
     children:Array.isArray(it.children)?it.children.map(normItem).filter(function(x){return x&&x.type==='check';}):[]};
-  if(it.lay==='rows'||it.lay==='text') o.lay=it.lay; // airport note shown as a row or as text, whatever its section's style
+  if(isLay(it.lay)) o.lay=it.lay; // airport note shown as a row or as text, whatever its section's style
   return normDec(o,it);
 }
 function normDec(o,it){
@@ -1062,7 +1066,7 @@ function normalize(o){
 }
 var AP_SECS_DEFAULT=['General','Arrival','Departure','On ground','Safety reports','Layover'];
 function normApSecs(a){
-  var out=Array.isArray(a)?a.filter(function(x){return x&&typeof x.name==='string';}).map(function(x){return {id:str(x.id)||uid(),name:x.name.slice(0,40)||'Section',lay:x.lay==='text'?'text':'rows'};}):[];
+  var out=Array.isArray(a)?a.filter(function(x){return x&&typeof x.name==='string';}).map(function(x){return {id:str(x.id)||uid(),name:x.name.slice(0,40)||'Section',lay:layOf(x.lay)};}):[];
   if(!out.length) out=AP_SECS_DEFAULT.map(function(n){return {id:'s_'+n.toLowerCase().replace(/[^a-z]+/g,'_'),name:n,lay:'rows'};});
   return out.slice(0,20);
 }
@@ -1131,7 +1135,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='35';
+var APP_VERSION='36';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -1622,7 +1626,10 @@ function apnHeadHTML(sec,arr,folded,act,id,addBtn){
     '<span class="chev">'+I.chev+'</span><span class="hd-title">'+esc(sec.name)+'</span><span class="hd-count">'+cnt+'</span></button>'+
     (addBtn?'<button type="button" class="hd-add" data-act="apnAdd" data-v="'+sec.id+'" aria-label="Add note to '+esc(sec.name)+'">'+I.plus+'</button>':'')+'</div></div>';
 }
-function apnLay(it,sec){return it.lay==='text'||it.lay==='rows'?it.lay:(sec.lay==='text'?'text':'rows');}
+// Airport note styles: rows (text on the right), text (briefing: bold title, text straight after), notes (text under the title)
+function isLay(v){return v==='rows'||v==='text'||v==='notes';}
+function layOf(v){return isLay(v)?v:'rows';}
+function apnLay(it,sec){return isLay(it.lay)?it.lay:layOf(sec.lay);}
 // A section's notes, each as a row or as text: neighbours with the same style share one box
 function apnListHTML(sec,arr,o){
   var h='',run='',buf='';
@@ -2738,8 +2745,8 @@ function openItemEditor(id,isNew){
   var kind=it.dq?'dec':it.end?'end':(info?'info':'check'),endTone=it.end||'go';
   var inKids=f.anc.length&&f.arr===f.anc[f.anc.length-1].children,allowDec=!f.apn&&!inKids;
   // an airport note can be a row or text on its own; until one is picked it follows its section's style
-  var topNote=!!(f.apn&&!f.anc.length),lay=it.lay==='text'||it.lay==='rows'?it.lay:'';
-  function secLayOf(sid){var x=state.apSections.filter(function(s){return s.id===sid;})[0];return x&&x.lay==='text'?'text':'rows';}
+  var topNote=!!(f.apn&&!f.anc.length),lay=isLay(it.lay)?it.lay:'';
+  function secLayOf(sid){var x=state.apSections.filter(function(s){return s.id===sid;})[0];return layOf(x&&x.lay);}
   var lay0=lay||(topNote?secLayOf(f.apn.sec):'rows');
   function layUI(){
     var ss=$('#fApSec'),v=lay||secLayOf(ss?ss.value:f.apn.sec);
@@ -2805,9 +2812,9 @@ function openItemEditor(id,isNew){
       }).join('')+'</div>'+
     '<p class="hint" id="fTypeHint" style="margin:8px 0 0">'+TYPE_HINT[kind]+'</p></div>'+
     (f.apn&&!f.anc.length?'<label class="fld"><span class="fl">Section</span><select id="fApSec" class="ap-tz">'+state.apSections.map(function(x){return '<option value="'+x.id+'"'+(x.id===f.apn.sec?' selected':'')+'>'+esc(x.name)+'</option>';}).join('')+'</select></label>':'')+
-    (topNote?'<div class="fld"><span class="fl">Style</span><div class="seg big seg2" id="fLay" role="radiogroup" aria-label="Style">'+[['rows','Row'],['text','Briefing']].map(function(x){
+    (topNote?'<div class="fld"><span class="fl">Style</span><div class="seg big seg3" id="fLay" role="radiogroup" aria-label="Style">'+[['rows','Row'],['text','Briefing'],['notes','Notes']].map(function(x){
         var on=x[0]===lay0;return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="lay" data-v="'+x[0]+'">'+x[1]+'</button>';
-      }).join('')+'</div><p class="hint" style="margin:8px 0 0">Row puts the text on the right of the line. Briefing shows the title in bold with the text straight after, for longer notes.</p></div>':'')+
+      }).join('')+'</div><p class="hint" style="margin:8px 0 0">Row puts the text on the right of the line. Briefing shows the title in bold with the text straight after. Notes puts the text under the title.</p></div>':'')+
     '<label class="fld"><span class="fl" id="fTextLab">'+(kind==='dec'?'Question':kind==='end'?'Text':'Item')+'</span><input id="fText" type="text" value="'+esc(it.text)+'" placeholder="'+(kind==='end'?'Optional':kind==='dec'?'e.g. Is dispatch allowed?':'e.g. TCAS BELOW')+'" autocomplete="off"></label>'+
     '<div class="fld" id="fAnsBlk"'+(kind==='dec'?'':' hidden')+'><span class="fl">Answers <em>(tap the colour to change it)</em></span><div class="ansl" id="fAns">'+ansRowsHTML()+'</div>'+
       '<button type="button" class="btn small ghost" data-sact="ansAdd">'+I.plus+'Add answer</button></div>'+
@@ -2871,7 +2878,7 @@ function openItemEditor(id,isNew){
         if(answers[ad].items.length){toast('That answer has steps. Remove them first.');break;}
         answers.splice(ad,1);$('#fAns').innerHTML=ansRowsHTML();break;
       case 'lay':
-        lay=btn.getAttribute('data-v')==='text'?'text':'rows';layUI();break;
+        lay=layOf(btn.getAttribute('data-v'));layUI();break;
       case 'endTone':
         endTone=btn.getAttribute('data-v');sheetEl.querySelectorAll('#fEndTone button').forEach(function(b){b.classList.toggle('on',b===btn);});break;
       case 'addLink':
@@ -4121,21 +4128,21 @@ function apnSummary(){
   return out.length?out.join(', '):'Your notes per airport, by section';
 }
 function openApSecs(){
-  var secs=state.apSections.map(function(x){return {id:x.id,name:x.name,lay:x.lay==='text'?'text':'rows'};});
+  var secs=state.apSections.map(function(x){return {id:x.id,name:x.name,lay:layOf(x.lay)};});
   function rowsHTML(){
     return secs.map(function(x,i){
       return '<div class="esr"><input type="text" data-si="'+i+'" value="'+esc(x.name)+'" placeholder="Section name" autocomplete="off">'+
         '<button type="button" class="ib" data-sact="sup" data-i="'+i+'"'+(i===0?' disabled':'')+' aria-label="Move up">'+I.up+'</button>'+
         '<button type="button" class="ib" data-sact="sdown" data-i="'+i+'"'+(i===secs.length-1?' disabled':'')+' aria-label="Move down">'+I.down+'</button>'+
         '<button type="button" class="ib danger" data-sact="sdel" data-i="'+i+'" aria-label="Delete section">'+I.trash+'</button>'+
-        '<div class="esr-lay"><span>Style</span><div class="seg" role="radiogroup" aria-label="Style for '+esc(x.name)+'">'+[['rows','Rows'],['text','Briefing']].map(function(o){
+        '<div class="esr-lay"><span>Style</span><div class="seg" role="radiogroup" aria-label="Style for '+esc(x.name)+'">'+[['rows','Rows'],['text','Briefing'],['notes','Notes']].map(function(o){
           var on=x.lay===o[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="lay" data-i="'+i+'" data-v="'+o[0]+'">'+o[1]+'</button>';
         }).join('')+'</div></div></div>';
     }).join('');
   }
   function sync(){sheetEl.querySelectorAll('[data-si]').forEach(function(inp){secs[+inp.getAttribute('data-si')].name=inp.value;});}
   function redraw(){$('#fSecRows').innerHTML=rowsHTML();}
-  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own. <b>Rows</b> puts each note on one line with its value on the right; <b>Briefing</b> shows the title in bold with the text straight after, for longer notes. A note can also pick its own style: tap it to edit.</p>'+
+  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own. <b>Rows</b> puts each note on one line with its value on the right; <b>Briefing</b> shows the title in bold with the text straight after, for longer notes. <b>Notes</b> puts the text under the title. A note can also pick its own style: tap it to edit.</p>'+
     '<div class="cbl" id="fSecRows">'+rowsHTML()+'</div>'+
     '<button type="button" class="btn small ghost tcd-add" data-sact="sadd">'+I.plus+'Add section</button>'+
     '<p class="hint" style="margin:12px 0 0">Deleting a section moves its notes to the first section.</p>'+
@@ -4144,7 +4151,7 @@ function openApSecs(){
     if(act!=='cancel') sync();
     var i=btn?+btn.getAttribute('data-i'):-1,t;
     switch(act){
-      case 'lay': secs[i].lay=btn.getAttribute('data-v')==='text'?'text':'rows';redraw();break;
+      case 'lay': secs[i].lay=layOf(btn.getAttribute('data-v'));redraw();break;
       case 'sup': if(i>0){t=secs[i];secs[i]=secs[i-1];secs[i-1]=t;redraw();}break;
       case 'sdown': if(i<secs.length-1){t=secs[i];secs[i]=secs[i+1];secs[i+1]=t;redraw();}break;
       case 'sdel': if(secs.length<2){toast('Keep at least one section');break;}secs.splice(i,1);redraw();break;
