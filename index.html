@@ -899,6 +899,52 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .sheet .fno-in input[type=text]{width:9ch;flex:none;font-variant-numeric:tabular-nums;border:0;background:none;padding:6px 2px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .tb-chips .updchip{margin:1px 0 3px;padding:3px 11px 3px 8px;font-size:13px}
 
+/* Airports: search any airport, and a Brief for preparation */
+.apfind{position:relative;margin:0 0 10px}
+.apfind input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font:600 max(16px,calc(16px*var(--ts))) -apple-system,system-ui,sans-serif;-webkit-appearance:none;appearance:none;outline:none}
+.apfind input:focus{border-color:var(--accent)}
+.apfind input::placeholder{font-weight:500;color:var(--muted)}
+.apfind .ap-list{margin-top:6px}
+.aphead.three{flex-wrap:wrap;row-gap:8px}
+.aphead.three .apname{flex:1 1 150px}
+.aphead.three .apview{flex:1 0 auto}
+.apview.three button{flex:1 1 auto;white-space:nowrap;padding-left:9px;padding-right:9px}
+.pb-h{font-size:12px;color:var(--muted);font-weight:700;margin:16px 4px 6px;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.pb-h span{flex:1}
+.pb-h .lnkbtn{text-transform:none;letter-spacing:0;font-weight:650;font-size:13px;text-decoration:none}
+.pb-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.pb-time{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-variant-numeric:tabular-nums}
+.pb-time.one{grid-template-columns:1fr}
+.pb-time > div{display:flex;flex-direction:column;min-width:0}
+.pb-time small{font-size:12px;color:var(--muted);font-weight:600}
+.pb-time b{font-size:calc(18px*var(--ts));font-weight:750}
+.pb-time i{font-style:normal;font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.pb-time .pb-sun{grid-column:1/-1;flex-direction:row;align-items:center;gap:8px;font-size:calc(13.5px*var(--ts));font-weight:650;color:var(--muted);border-top:1px solid var(--line-soft);padding-top:7px;margin-top:2px}
+.pb-time .pb-sun.dark{color:var(--warn)}
+.pb-time .pb-sun svg{width:16px;height:16px;flex:none}
+.pb-brief{background:var(--accent-weak);border-radius:12px;padding:10px 12px;font-size:calc(15px*var(--ts));line-height:1.45}
+.pb-brief b{font-weight:750}
+.pb-brief .nt{display:block;margin-top:6px;font-size:calc(13.5px*var(--ts));color:var(--muted)}
+.pb-brief .nt b{color:var(--text);font-weight:600}
+.pb-src{font-size:calc(12px*var(--ts));color:var(--muted);margin:5px 4px 0}
+.pb-src b{color:var(--text)}
+.pb-alts{margin-top:8px;padding:2px 4px 2px 12px}
+.pb-alt{appearance:none;border:0;background:none;color:var(--text);width:100%;display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line-soft);font:500 calc(14px*var(--ts)) -apple-system,system-ui,sans-serif;font-variant-numeric:tabular-nums;text-align:left}
+.pb-alt:first-child{border-top:0}
+.pb-alt b{font-size:calc(15px*var(--ts));font-weight:700;flex:none}
+.pb-alt .wxcat{flex:none}
+.pb-alt .q{flex:1;min-width:0;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb-alt svg{width:16px;height:16px;color:var(--muted);flex:none}
+.pb-vis{appearance:none;border:0;background:none;color:var(--text);width:100%;display:block;text-align:left;padding:9px 0;border-top:1px solid var(--line-soft);font:500 calc(14px*var(--ts))/1.35 -apple-system,system-ui,sans-serif}
+.pb-vis:first-child{border-top:0}
+.pb-vis .d{display:block;color:var(--muted);font-size:calc(12.5px*var(--ts));font-weight:650}
+.pb-vis b{font-weight:650}
+.pb-vis .nt{display:block;color:var(--muted);font-size:calc(13.5px*var(--ts));margin-top:2px}
+.pb-visits{padding:2px 12px}
+.pb-mini .mini{padding:0}
+.pb-none{color:var(--muted);font-size:calc(14px*var(--ts));margin:4px 4px 0}
+.pb-notes{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -1007,6 +1053,7 @@ var I={
   photo:sv('<rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="10" r="1.8"/><path d="M21 15.5l-5-5L7 19"/>'),
   timer:sv('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2"/><path d="M9.5 2.8h5"/><path d="M12 2.8V6"/>'),
   contrast:sv('<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>'),
+  sun:sv('<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>'),
   moon:sv('<path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/>'),
   textsize:sv('<path d="M3 7V5h11v2"/><path d="M8.5 5v14"/><path d="M14 12v-1.5h7V12"/><path d="M17.5 10.5V19"/>'),
   info:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 11v5.5"/><path d="M12 7.6v.1" stroke-width="2.6"/>'),
@@ -1183,7 +1230,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='44';
+var APP_VERSION='45';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2058,7 +2105,10 @@ function renderApst(m){
   if(!ap) return h+'Set the flight to see your '+tag.toLowerCase()+' stats. <button type="button" class="lnkbtn" data-act="openFlight">Set flight</button></div></div></div>';
   var S=apStats(ap.icao),arr=m.which==='dest',n=arr?S.arr:S.dep;
   if(!n) return h+'No '+(arr?'arrivals':'departures')+' logged for '+esc(ap.icao)+' yet.</div></div></div>';
-  var rw=arr?S.arrRwy:S.depRwy,st=arr?S.arrStand:S.depStand;
+  return h+apstMiniHTML(S,arr,n)+'</div></div></div>';
+}
+function apstMiniHTML(S,arr,n){
+  var h='',rw=arr?S.arrRwy:S.depRwy,st=arr?S.arrStand:S.depStand;
   h+=barsHTML(rw,3);
   if(arr&&S.app.length){
     var a0=S.app[0];
@@ -2069,7 +2119,7 @@ function renderApst(m){
   if(!rw.length&&!st.length&&!(arr&&S.app.length)) h+='<p>'+n+' '+(arr?'arrival':'departure')+(n===1?'':'s')+' logged, no details yet.</p>';
   var ln=S.notes.filter(function(x){return x.k===(arr?'arrival':'departure');})[0];
   if(ln) h+='<div class="last">'+esc(fmtDay(ln.d))+': <b>'+esc(ln.t)+'</b></div>';
-  return h+'</div></div></div>';
+  return h;
 }
 function openApstEditor(id){
   var f=find(id);if(!f) return;
@@ -2248,6 +2298,9 @@ function wxAtisHTML(ic,list){
 function wxRefreshViews(){
   app.querySelectorAll('.module.wx').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
   if(toolOpen&&toolKind==='wx') refreshTool();
+  if(toolOpen&&toolKind==='apn'&&toolApnView==='brief'){
+    var f=$('#apFind');if(!f||(!f.value.trim()&&document.activeElement!==f)) refreshTool(); // don't wipe a search you're typing
+  }
 }
 function wxPaint(){
   var now=Date.now();
@@ -2345,7 +2398,7 @@ function wxTafHTML(t,w){
 function wxCardHTML(a,removable){
   var d=wx[a.ic],now=Date.now(),nm=apName(a.ic).replace(/\s*\([A-Z-]{2}\)$/,'');
   var h='<div class="wxc"><div class="wxh"><b>'+esc(a.ic)+'</b><span class="wxn">'+esc(nm)+'</span>'+
-    (d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?'<span class="wxcat '+d.m.cat+'">'+d.m.cat+'</span>':'')+'<span class="wxrole">'+a.role+'</span>'+
+    (d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?'<span class="wxcat '+d.m.cat+'">'+d.m.cat+'</span>':'')+(a.role?'<span class="wxrole">'+a.role+'</span>':'')+
     (removable?'<button type="button" class="wxx" data-act="wxUnwatch" data-v="'+a.ic+'" aria-label="Stop watching '+a.ic+'">'+I.x+'</button>':'')+'</div>';
   if(!d) return h+'<div class="wxnone" style="margin-top:6px">'+(state.settings.wxUrl?'No weather yet. It loads when you’re online.':'Set up the weather relay in Menu → Weather.')+'</div></div>';
   var w=wxWin(a),tf=d.t?wxTafHTML(d.t,w):null;
@@ -3366,7 +3419,7 @@ function openMenu(){
     '<div class="menu">'+
     '<button type="button" data-sact="tcd">'+I.timer+'<span class="mt">Countdowns<small>'+esc(cdSummary(now))+'</small></span></button>'+
     '<button type="button" data-sact="trest">'+I.moon+'<span class="mt">Crew rest<small>'+esc(restSummary(now))+'</small></span></button>'+
-    '<button type="button" data-sact="tapn">'+I.pin+'<span class="mt">Airport notes<small>'+esc(apnSummary())+'</small></span></button>'+
+    '<button type="button" data-sact="tapn">'+I.pin+'<span class="mt">Airports<small>'+esc(apnSummary())+'</small></span></button>'+
     '<button type="button" data-sact="tflog">'+I.log+'<span class="mt">Flight log<small>'+esc(flogSummary())+'</small></span></button>'+
     '<button type="button" data-sact="twx">'+I.wx+'<span class="mt">Weather<small>'+esc(wxSummary())+'</small></span></button><hr>'+
     '<button type="button" data-sact="lists">'+I.list+'<span class="mt one">Checklists</span></button>'+
@@ -3380,7 +3433,7 @@ function openMenu(){
       case 'settings': openSettings();break;
       case 'tcd': openTool('cd');closeSheet();break;
       case 'trest': openTool('rest');closeSheet();break;
-      case 'tapn': toolApnSel=null;toolApnIcao=null;toolApnView='notes';openTool('apn');closeSheet();break;
+      case 'tapn': toolApnSel=null;toolApnIcao=null;toolApnView='brief';openTool('apn');closeSheet();break;
       case 'tflog': toolFlFilter='';openTool('flog');closeSheet();break;
       case 'twx': openTool('wx');closeSheet();wxMaybe();break;
       case 'lists': openLists();break;
@@ -4126,7 +4179,7 @@ function refreshTool(){
 }
 function openTool(kind){
   clearTimeout(toolHideT);if(kind!==toolKind) toolApnOrd=false;toolKind=kind;
-  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+'<h3>'+({cd:'Countdowns',rest:'Crew rest',apn:'Airport notes',flog:'Flight log',wx:'Weather',dec:'Answer steps'}[kind])+'</h3>'+
+  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+'<h3>'+({cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Weather',dec:'Answer steps'}[kind])+'</h3>'+
     (kind==='cd'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
     (kind==='apn'?(toolApnOrd&&apnCanOrder()?'<button type="button" class="pill" data-act="apnReorder">Done</button>':
       (apnCanOrder()?'<button type="button" class="ib round" data-act="apnReorder" aria-label="Change the order of the notes">'+I.swap+'</button>':'')+
@@ -4147,6 +4200,7 @@ function openTool(kind){
   else if(kind==='dec') h+=decPanelHTML();
   else h+=renderRest(T.rest);
   toolPanel.innerHTML=h;toolOpen=true;
+  if(kind==='apn') apFindWire();
   fillImages(toolPanel);
   if((kind==='apn'||kind==='wx')&&!window.AIRPORT_DATA&&!apnNamesTried){
     apnNamesTried=true;
@@ -4170,7 +4224,7 @@ function apnPanelIcao(){
   return toolApnIcao;
 }
 // The order can be changed when an airport's notes are on screen and there are at least two
-function apnCanOrder(){apnSelFix();var ic=apnPanelIcao();return !!ic&&toolApnView!=='stats'&&apNoteCount(ic)>1;}
+function apnCanOrder(){apnSelFix();var ic=apnPanelIcao();return !!ic&&toolApnView==='notes'&&apNoteCount(ic)>1;}
 function apnPanelHTML(){
   var st=state.settings;
   apnSelFix();
@@ -4179,19 +4233,20 @@ function apnPanelHTML(){
   state.flights.forEach(function(f){if(f.dep.icao) allm[f.dep.icao]=1;if(f.arr.icao) allm[f.arr.icao]=1;});
   var all=Object.keys(allm).sort();
   function sb(v,label,sub,dis){return '<button type="button" class="'+(toolApnSel===v?'on':'')+'" data-act="apnSel" data-v="'+v+'"'+(dis?' disabled':'')+'>'+esc(label)+'<small>'+sub+'</small></button>';}
-  var h='<div class="seg big segw">'+sb('dep',st.dep?st.dep.icao:'—','From',!st.dep)+sb('dest',st.dest?st.dest.icao:'—','To',!st.dest)+sb('all','All',all.length+' airport'+(all.length===1?'':'s'),false)+'</div>';
+  var h='<div class="apfind"><input type="text" id="apFind" placeholder="Find: ICAO, IATA or name" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Find an airport"><div id="apFindRes"></div></div>'+
+    '<div class="seg big segw">'+sb('dep',st.dep?st.dep.icao:'—','From',!st.dep)+sb('dest',st.dest?st.dest.icao:'—','To',!st.dest)+sb('all','All',all.length+' airport'+(all.length===1?'':'s'),false)+'</div>';
   var icao=apnPanelIcao();
   if(!icao){
     h+=all.length?'<div class="aplist">'+all.map(function(k){return '<button type="button" data-act="apnPick" data-v="'+k+'"><b>'+k+'</b><span>'+esc(apName(k))+'</span><small>'+(apNoteCount(k)||'')+'</small></button>';}).join('')+'</div>':'<p class="hint">No airport notes yet.</p>';
-    h+='<div class="apgo"><input type="text" id="apnIcao" class="icao-in" maxlength="4" placeholder="Other airport (ICAO or IATA)" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false"><button type="button" class="btn primary" data-act="apnGo">Open</button></div>';
     return h;
   }
   if(toolApnSel==='all') h+='<button type="button" class="back-all" data-act="apnSel" data-v="all">'+I.left+'All airports</button>';
   var nf=state.flights.filter(function(f){return f.dep.icao===icao||f.arr.icao===icao;}).length,nn=apNoteCount(icao);
   var apn=apName(icao).replace(/\s*\([A-Z-]{2}\)$/,'');
-  h+='<div class="aphead"><div class="apname">'+(toolApnSel==='all'||!apn?esc(icao)+' ':'')+esc(apn)+'</div><div class="seg apview"><button type="button" class="'+(toolApnView==='stats'?'':'on')+'" data-act="apnView" data-v="notes">Notes'+(nn?'<small>'+nn+'</small>':'')+'</button>'+
+  h+='<div class="aphead three"><div class="apname">'+(toolApnSel==='all'||!apn?esc(icao)+' ':'')+esc(apn)+'</div><div class="seg apview three"><button type="button" class="'+(toolApnView==='brief'?'on':'')+'" data-act="apnView" data-v="brief">Brief</button><button type="button" class="'+(toolApnView==='notes'?'on':'')+'" data-act="apnView" data-v="notes">Notes'+(nn?'<small>'+nn+'</small>':'')+'</button>'+
     '<button type="button" class="'+(toolApnView==='stats'?'on':'')+'" data-act="apnView" data-v="stats">My stats'+(nf?'<small>'+nf+'</small>':'')+'</button></div></div>';
   if(toolApnView==='stats') return h+apStatsHTML(icao);
+  if(toolApnView==='brief') return h+apBriefHTML(icao);
   var notes=state.apNotes[icao]||{},ord=toolApnOrd;
   var empty=[];
   if(ord) h+='<div class="apn-ord-tip">'+I.grip+'<span>Drag ≡ to change the order. Drop a note in another section to move it there.</span></div>';
@@ -4206,17 +4261,157 @@ function apnPanelHTML(){
     '<button type="button" class="btn small ghost tcd-add" data-act="apnSecs">'+I.list+'Edit sections</button></div>';
   return h;
 }
+function apnOpenAirport(ic){
+  var st=state.settings;ic=apCode(ic);if(!/^[A-Z0-9]{4}$/.test(ic)) return;
+  if(st.dest&&st.dest.icao===ic) toolApnSel='dest';
+  else if(st.dep&&st.dep.icao===ic) toolApnSel='dep';
+  else{toolApnSel='all';toolApnIcao=ic;}
+  toolApnOrd=false;refreshTool();toolWrap.scrollTop=0;
+}
+function apFindWire(){
+  var inp=$('#apFind'),res=$('#apFindRes');if(!inp||!res) return;
+  var hits=[];
+  function draw(){
+    var q=inp.value.trim();
+    if(q.length<2){res.innerHTML='';hits=[];return;}
+    loadAirports().then(function(){
+      if(inp.value.trim()!==q) return;
+      hits=apFind(q).slice(0,6);
+      res.innerHTML=hits.length?'<div class="ap-list">'+hits.map(function(x){return '<button type="button" data-act="apnPick" data-v="'+x.icao+'"><b>'+x.icao+'</b><span>'+(x.iata?x.iata+' · ':'')+esc(x.name)+'</span></button>';}).join('')+'</div>':
+        '<p class="pb-none">No airport found.</p>';
+    },function(){res.innerHTML=/^[A-Za-z0-9]{4}$/.test(q)?'':'<p class="pb-none">The airport list isn’t available. Enter the 4-letter ICAO code.</p>';});
+  }
+  inp.addEventListener('input',draw);
+  inp.addEventListener('keydown',function(e){
+    if(e.key!=='Enter') return;e.preventDefault();
+    var q=apCode(inp.value);
+    if(hits.length) apnOpenAirport(hits[0].icao);else if(/^[A-Z0-9]{4}$/.test(q)) apnOpenAirport(q);
+  });
+}
+/* ---------- Brief: what you want to know before flying to (or from) an airport ---------- */
+function sunRS(lat,lon,t){
+  // sunrise and sunset for the solar day nearest t (standard sunrise equation, about a minute accurate)
+  var r=Math.PI/180,J=t/86400000+2440587.5,best=null;
+  function toMs(j){return (j-2440587.5)*86400000;}
+  function day(n){
+    var Js=n-lon/360,M=((357.5291+0.98560028*Js)%360+360)%360,Mr=M*r;
+    var C=1.9148*Math.sin(Mr)+0.02*Math.sin(2*Mr)+0.0003*Math.sin(3*Mr);
+    var L=(M+C+180+102.9372)%360,Lr=L*r;
+    var Jt=2451545+Js+0.0053*Math.sin(Mr)-0.0069*Math.sin(2*Lr);
+    var sd=Math.sin(Lr)*Math.sin(23.4397*r),cd=Math.cos(Math.asin(sd));
+    var cw=(Math.sin(-0.833*r)-Math.sin(lat*r)*sd)/(Math.cos(lat*r)*cd);
+    if(cw>1) return {polar:'night',noon:toMs(Jt)};
+    if(cw<-1) return {polar:'day',noon:toMs(Jt)};
+    var w0=Math.acos(cw)/r;
+    return {rise:toMs(Jt-w0/360),set:toMs(Jt+w0/360),noon:toMs(Jt)};
+  }
+  var n0=Math.floor(J-2451545+0.0008);
+  [n0-1,n0,n0+1].forEach(function(n){var d=day(n);if(!best||Math.abs(d.noon-t)<Math.abs(best.noon-t)) best=d;});
+  return best;
+}
+function homeCity(){try{var z=Intl.DateTimeFormat().resolvedOptions().timeZone||'';return z.split('/').pop().replace(/_/g,' ')||'your iPad';}catch(e){return 'your iPad';}}
+function briefTimeHTML(ic,tz,rec,w,now){
+  var info=tz&&tzInfo(tz,now);if(!info) return '';
+  var diff=info.off-(-new Date(now).getTimezoneOffset()),home=homeCity(),ad=Math.abs(diff);
+  var rel=!diff?'same time as '+home:(ad%60?Math.floor(ad/60)+':'+pad2(ad%60):ad/60)+' h '+(diff<0?'behind ':'ahead of ')+home;
+  var h='<div class="pb-card pb-time'+(w?'':' one')+'"><div><small>Local now</small><b>'+info.hm+'</b><i>'+info.wd+' · '+fmtOff(info.off)+' · '+esc(rel)+'</i></div>';
+  if(w){var li=tzInfo(tz,w.t);h+='<div><small>At '+w.k+(w.approx?' ≈ ':' ')+hmOf(w.t)+'</small><b>'+(li?li.hm:'–')+'</b><i>'+relT(w.t,now)+'</i></div>';}
+  if(rec&&rec.lat!==null){
+    var t=w?w.t:now,S=sunRS(rec.lat,rec.lon,t),lt=function(x){var q=tzInfo(tz,x);return q?q.hm:hmOf(x);},txt,dark=false,what=w&&w.k==='ETD'?'Departing':'Landing';
+    if(S.polar) {dark=S.polar==='night';txt=dark?'Polar night, no sunrise today':'Midnight sun, no sunset today';}
+    else if(w){
+      dark=t<S.rise||t>S.set;
+      txt=what+(t>S.set?' after sunset':t<S.rise?' before sunrise':' in daylight')+' · '+(t<S.rise?'sunrise '+lt(S.rise):'sunset '+lt(S.set))+' LT';
+    }else txt='Sunrise '+lt(S.rise)+' · sunset '+lt(S.set)+' LT';
+    h+='<div class="pb-sun'+(dark?' dark':'')+'">'+(dark?I.moon:I.sun)+'<span>'+txt+'</span></div>';
+  }
+  return h+'</div>';
+}
+function atisBrief(ic,dep){
+  var a=wx[ic]&&wx[ic].a;if(!a||!a.length) return '';
+  var x=a.filter(function(y){return y.type===(dep?'dep':'arr');})[0]||a.filter(function(y){return y.type==='combined';})[0]||a[0];
+  var t=String(x.text||'').toUpperCase().replace(/\s+/g,' '),RW='((?:\\d{1,2}[LRC]?)(?:\\s*(?:,|AND|&)\\s*\\d{1,2}[LRC]?)*)',out=[];
+  var ap=new RegExp('\\b(ILS|RNAV|RNP|GPS|VOR|LOC|VISUAL|VIS)\\b[^.]{0,30}?\\b(?:RWYS?|RUNWAYS?)\\s*'+RW).exec(t);
+  if(ap) out.push((ap[1]==='VIS'?'VISUAL':ap[1])+' '+ap[2].replace(/\s*(AND|&)\s*/g,', '));
+  var ld=new RegExp('\\b(?:'+(dep?'DEPARTING|DEPG|DEPS?|DEPARTURES?':'LANDING|LNDG|LDG|ARRIVING|ARRIVALS?')+')\\b[^.]{0,20}?\\b(?:RWYS?|RUNWAYS?)\\s*'+RW).exec(t);
+  if(ld) out.push((dep?'departing ':'landing ')+ld[1].replace(/\s*(AND|&)\s*/g,', '));
+  return (x.code?'ATIS '+esc(x.code):'ATIS')+(out.length?': '+esc(out.join(', ')):'');
+}
+function briefLineHTML(ic,dep){
+  var S=apStats(ic),n=dep?S.dep:S.arr,parts=[];
+  function first(l){return l&&l[0]?l[0].v:'';}
+  if(dep){
+    if(first(S.depStand)) parts.push('stand <b>'+esc(first(S.depStand))+'</b>');
+    if(first(S.depRwy)) parts.push('runway <b>'+esc(first(S.depRwy))+'</b>');
+    if(first(S.sid)) parts.push('<b>'+esc(first(S.sid))+'</b>');
+    if(S.tout) parts.push('taxi out about <b>'+S.tout.avg+' min</b>');
+  }else{
+    if(first(S.star)) parts.push('<b>'+esc(first(S.star))+'</b>');
+    if(first(S.app)) parts.push('<b>'+esc(first(S.app))+'</b>');
+    if(first(S.arrStand)) parts.push('stand <b>'+esc(first(S.arrStand))+'</b>');
+    if(S.tin) parts.push('taxi in about <b>'+S.tin.avg+' min</b>');
+  }
+  var note=S.notes.filter(function(x){return x.k===(dep?'departure':'arrival');})[0],atis=atisBrief(ic,dep);
+  if(!parts.length&&!note&&!atis) return '';
+  var h='<div class="pb-h"><span>Your brief</span></div><div class="pb-brief">'+
+    (parts.length?(n>1?'Usually ':'Last time: ')+parts.join(' · '):'No '+(dep?'departure':'arrival')+' details logged here yet.')+
+    (note?'<span class="nt">'+esc(fmtDay(note.d))+': <b>'+esc(note.t)+'</b></span>':'')+'</div>';
+  return h+'<p class="pb-src">'+(n?'From your '+n+' '+(dep?'departure':'arrival')+(n===1?'':'s')+' here.':'')+(atis?' Now: <b>'+atis+'</b>.':'')+'</p>';
+}
+function altSummary(ic,w){
+  var d=wx[ic];if(!d) return 'No weather yet';
+  if(d.t&&w){
+    var pl=wxTafLines(d.t.raw).split('\n'),sp=tafSpans(pl,d.t.time||Date.now()),pick='',main='';
+    pl.forEach(function(l,i){var x=sp[i];if(!x||!(x.s<w.e&&x.e>w.s)) return;if(/^(TEMPO|PROB|BECMG)/.test(l)){if(!pick) pick=l;}else main=l;});
+    var l=pick||main;
+    if(l) return l.replace(/^TAF\s+(AMD\s+|COR\s+)?[A-Z0-9]{4}\s+\d{6}Z\s+\d{4}\/\d{4}\s*/,'').replace(/^(FM\d{6}|BECMG\s+\d{4}\/\d{4}|TEMPO\s+\d{4}\/\d{4}|PROB\d{2}\s+(TEMPO\s+)?\d{4}\/\d{4})\s*/,function(m){return /^FM/.test(m)?'':m.split(/\s+/)[0]+' ';});
+  }
+  if(d.m) return d.m.raw.replace(/^(METAR|SPECI)\s+/,'').replace(/^[A-Z0-9]{4}\s+\d{6}Z\s+/,'');
+  return '';
+}
+var apbTried={};
+function apBriefHTML(ic){
+  var st=state.settings,now=Date.now(),rec=apLookup(ic);
+  var role=st.dest&&st.dest.icao===ic?'To':st.dep&&st.dep.icao===ic?'From':(st.alts.indexOf(ic)>=0?'Alternate':'');
+  var tz=(role==='To'&&st.dest.tz)||(role==='From'&&st.dep.tz)||(rec&&rec.tz);
+  var S=apStats(ic),w=role?wxWin({ic:ic,role:role}):null,dep=role==='From'||(!role&&!S.arr&&S.dep>0);
+  // weather for an airport that isn't part of the flight is fetched when you open its brief
+  if(st.wxUrl&&navigator.onLine!==false&&!wxSt.busy&&(!wx[ic]||now-wx[ic].f>WX_EVERY)&&(apbTried[ic]||0)<now){apbTried[ic]=now+120000;setTimeout(function(){wxFetch([ic]);},0);}
+  var h=briefTimeHTML(ic,tz,rec,w,now)+briefLineHTML(ic,dep);
+  h+='<div class="pb-h"><span>Weather</span>'+(st.wxUrl?'<button type="button" class="lnkbtn" data-act="apbWx" data-v="'+ic+'">'+(wxSt.busy?'Updating…':'Update')+'</button>':'')+'</div>';
+  h+=st.wxUrl?wxCardHTML({ic:ic,role:role},false):'<p class="pb-none">Set up the weather relay in Menu → Weather to see METAR and TAF here.</p>';
+  if(role==='To'&&st.alts.length){
+    h+='<div class="pb-card pb-alts">'+st.alts.map(function(a){
+      var d=wx[a],w2=wxWin({ic:a,role:'Alternate'}),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';
+      return '<button type="button" class="pb-alt" data-act="apnPick" data-v="'+a+'" aria-label="Open '+a+'"><b>'+a+'</b>'+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+
+        '<span class="q">'+esc(altSummary(a,w2))+'</span>'+I.right+'</button>';
+    }).join('')+'</div>';
+  }
+  var notes=state.apNotes[ic]||{},ns=state.apSections.filter(function(x){return (notes[x.id]||[]).length;});
+  h+='<div class="pb-h"><span>Your notes</span><button type="button" class="lnkbtn" data-act="apnView" data-v="notes">'+(ns.length?'Edit':'Add')+'</button></div>';
+  h+=ns.length?'<div class="pn pb-notes">'+ns.map(function(x){var arr=notes[x.id],fo=!!toolApnFold[x.id];return apnHeadHTML(x,arr,fo,'apnPFold','',false)+(fo?'':apnListHTML(x,arr,{note:true}));}).join('')+'</div>':
+    '<p class="pb-none">No notes for '+esc(ic)+' yet.</p>';
+  var n=dep?S.dep:S.arr;
+  if(S.arr||S.dep){
+    h+='<div class="pb-h"><span>My stats</span><button type="button" class="lnkbtn" data-act="apnView" data-v="stats">All</button></div>';
+    h+=n?'<div class="pb-card pb-mini"><div class="mini">'+apstMiniHTML(S,!dep,n)+'</div></div>':'<p class="pb-none">No '+(dep?'departures':'arrivals')+' logged here yet.</p>';
+  }
+  var fl=flSorted().filter(function(f){return f.arr.icao===ic||f.dep.icao===ic;}).slice(0,3);
+  h+='<div class="pb-h"><span>Your last visits</span>'+(fl.length?'<button type="button" class="lnkbtn" data-act="apbFlights" data-v="'+ic+'">All</button>':'')+'</div>';
+  h+=fl.length?'<div class="pb-card pb-visits">'+fl.map(function(f){
+    var a=f.arr.icao===ic,p=a?f.arr:f.dep;
+    var line=(a?[p.star,(p.app+' '+p.rwy).trim(),p.stand]:[p.stand,p.rwy,p.sid]).filter(Boolean).join(' · ');
+    return '<button type="button" class="pb-vis" data-act="flOpen" data-id="'+f.id+'"><span class="d">'+esc(fmtDay(f.date))+' · '+(a?'arrival from '+esc(f.dep.icao||'—'):'departure to '+esc(f.arr.icao||'—'))+'</span>'+
+      (line?'<b>'+esc(line)+'</b>':'<span style="color:var(--muted)">No details</span>')+(typeof p.tmin==='number'?' · '+p.tmin+' min':'')+(p.notes?'<span class="nt">'+esc(p.notes)+'</span>':'')+'</button>';
+  }).join('')+'</div>':'<p class="pb-none">No flights logged here yet.</p>';
+  return h;
+}
 function apnAdd(sid){
   var icao=apnPanelIcao();
-  if(!icao){toast('Choose an airport first');var ai=$('#apnIcao');if(ai) ai.focus();return;}
+  if(!icao){toast('Choose an airport first');var ai=$('#apFind');if(ai) ai.focus();return;}
   sid=sid||state.apSections[0].id;
   var n=newNote();apArr(icao,sid).push(n);save();refreshTool();
   openItemEditor(n.id,true);
-}
-function apnGo(){
-  var ai=$('#apnIcao'),v=apCode(ai?ai.value:'');
-  if(!/^[A-Z0-9]{4}$/.test(v)){toast('Enter an ICAO or IATA code');if(ai) ai.focus();return;}
-  toolApnSel='all';toolApnIcao=v;toolApnOrd=false;refreshTool();
 }
 function apnSummary(){
   var st=state.settings,out=[];
@@ -4447,10 +4642,14 @@ function loadAirports(){
 function apIndex(){
   if(apIdx) return apIdx;
   var lines=window.AIRPORT_DATA.split('\n'),map=new Map(),iata=new Map();
-  lines.forEach(function(l){map.set(l.slice(0,4),l);var p=l.lastIndexOf('|');if(p>0&&!iata.has(l.slice(p+1))) iata.set(l.slice(p+1),l);});
+  lines.forEach(function(l){map.set(l.slice(0,4),l);var p=l.split('|');if(p[1]&&!iata.has(p[1])) iata.set(p[1],l);});
   return (apIdx={lines:lines,map:map,iata:iata});
 }
-function apRec(l){var p=l.lastIndexOf('|');return {icao:l.slice(0,4),tz:window.AIRPORT_TZ[parseInt(l.slice(4,6),36)],cc:l.slice(6,8),name:p>0?l.slice(8,p):l.slice(8),iata:p>0?l.slice(p+1):''};}
+function apRec(l){
+  var p=l.split('|'),ll=(p[2]||'').split(',');
+  return {icao:l.slice(0,4),tz:window.AIRPORT_TZ[parseInt(l.slice(4,6),36)],cc:l.slice(6,8),name:p[0].slice(8),iata:p[1]||'',lat:ll.length===2?+ll[0]:null,lon:ll.length===2?+ll[1]:null};
+}
+function apLookup(ic){if(!window.AIRPORT_DATA) return null;var l=apIndex().map.get(ic);return l?apRec(l):null;}
 // an airport typed as IATA (JFK) becomes its ICAO code (KJFK) once the airport list is loaded
 function iataToIcao(v){
   var c=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -5263,8 +5462,9 @@ function onAct(e){
     case 'openFlight': openFlight();break;
     case 'apnOpen': toolApnSel=el.getAttribute('data-v');toolApnIcao=null;toolApnOrd=false;openTool('apn');break;
     case 'apnSel': toolApnSel=el.getAttribute('data-v');if(toolApnSel==='all') toolApnIcao=null;toolApnOrd=false;refreshTool();break;
-    case 'apnPick': toolApnSel='all';toolApnIcao=el.getAttribute('data-v');toolApnOrd=false;refreshTool();break;
-    case 'apnGo': apnGo();break;
+    case 'apnPick': apnOpenAirport(el.getAttribute('data-v'));break;
+    case 'apbWx': if(!wxSt.busy) wxFetch([el.getAttribute('data-v')]);refreshTool();break;
+    case 'apbFlights': toolFlFilter=el.getAttribute('data-v');openTool('flog');break;
     case 'apnPFold': var ps=el.getAttribute('data-apsec');toolApnFold[ps]=!toolApnFold[ps];refreshTool();break;
     case 'apnAdd': apnAdd(el.getAttribute('data-v'));break;
     case 'apnSecs': openApSecs();break;
