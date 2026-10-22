@@ -1131,7 +1131,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='34';
+var APP_VERSION='35';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -2805,9 +2805,9 @@ function openItemEditor(id,isNew){
       }).join('')+'</div>'+
     '<p class="hint" id="fTypeHint" style="margin:8px 0 0">'+TYPE_HINT[kind]+'</p></div>'+
     (f.apn&&!f.anc.length?'<label class="fld"><span class="fl">Section</span><select id="fApSec" class="ap-tz">'+state.apSections.map(function(x){return '<option value="'+x.id+'"'+(x.id===f.apn.sec?' selected':'')+'>'+esc(x.name)+'</option>';}).join('')+'</select></label>':'')+
-    (topNote?'<div class="fld"><span class="fl">Style</span><div class="seg big seg2" id="fLay" role="radiogroup" aria-label="Style">'+[['rows','Row'],['text','Text']].map(function(x){
+    (topNote?'<div class="fld"><span class="fl">Style</span><div class="seg big seg2" id="fLay" role="radiogroup" aria-label="Style">'+[['rows','Row'],['text','Briefing']].map(function(x){
         var on=x[0]===lay0;return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="lay" data-v="'+x[0]+'">'+x[1]+'</button>';
-      }).join('')+'</div><p class="hint" style="margin:8px 0 0">Row puts the note on the right of the line. Text reads like a briefing, for longer notes.</p></div>':'')+
+      }).join('')+'</div><p class="hint" style="margin:8px 0 0">Row puts the text on the right of the line. Briefing shows the title in bold with the text straight after, for longer notes.</p></div>':'')+
     '<label class="fld"><span class="fl" id="fTextLab">'+(kind==='dec'?'Question':kind==='end'?'Text':'Item')+'</span><input id="fText" type="text" value="'+esc(it.text)+'" placeholder="'+(kind==='end'?'Optional':kind==='dec'?'e.g. Is dispatch allowed?':'e.g. TCAS BELOW')+'" autocomplete="off"></label>'+
     '<div class="fld" id="fAnsBlk"'+(kind==='dec'?'':' hidden')+'><span class="fl">Answers <em>(tap the colour to change it)</em></span><div class="ansl" id="fAns">'+ansRowsHTML()+'</div>'+
       '<button type="button" class="btn small ghost" data-sact="ansAdd">'+I.plus+'Add answer</button></div>'+
@@ -4128,14 +4128,14 @@ function openApSecs(){
         '<button type="button" class="ib" data-sact="sup" data-i="'+i+'"'+(i===0?' disabled':'')+' aria-label="Move up">'+I.up+'</button>'+
         '<button type="button" class="ib" data-sact="sdown" data-i="'+i+'"'+(i===secs.length-1?' disabled':'')+' aria-label="Move down">'+I.down+'</button>'+
         '<button type="button" class="ib danger" data-sact="sdel" data-i="'+i+'" aria-label="Delete section">'+I.trash+'</button>'+
-        '<div class="esr-lay"><span>Style</span><div class="seg" role="radiogroup" aria-label="Style for '+esc(x.name)+'">'+[['rows','Rows'],['text','Text']].map(function(o){
+        '<div class="esr-lay"><span>Style</span><div class="seg" role="radiogroup" aria-label="Style for '+esc(x.name)+'">'+[['rows','Rows'],['text','Briefing']].map(function(o){
           var on=x.lay===o[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="lay" data-i="'+i+'" data-v="'+o[0]+'">'+o[1]+'</button>';
         }).join('')+'</div></div></div>';
     }).join('');
   }
   function sync(){sheetEl.querySelectorAll('[data-si]').forEach(function(inp){secs[+inp.getAttribute('data-si')].name=inp.value;});}
   function redraw(){$('#fSecRows').innerHTML=rowsHTML();}
-  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own. <b>Rows</b> puts each note on one line with its value on the right; <b>Text</b> reads like a briefing, for longer notes. A note can also pick its own style: tap it to edit.</p>'+
+  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own. <b>Rows</b> puts each note on one line with its value on the right; <b>Briefing</b> shows the title in bold with the text straight after, for longer notes. A note can also pick its own style: tap it to edit.</p>'+
     '<div class="cbl" id="fSecRows">'+rowsHTML()+'</div>'+
     '<button type="button" class="btn small ghost tcd-add" data-sact="sadd">'+I.plus+'Add section</button>'+
     '<p class="hint" style="margin:12px 0 0">Deleting a section moves its notes to the first section.</p>'+
