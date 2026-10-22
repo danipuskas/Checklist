@@ -1181,7 +1181,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='40';
+var APP_VERSION='41';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1387,14 +1387,15 @@ function secCount(s){var d=0,t=0;s.items.forEach(function(it){if(isTask(it)){t++
 function listCount(L){var d=0,t=0;L.sections.forEach(function(s){var c=secCount(s);d+=c.d;t+=c.t;});return {d:d,t:t};}
 function untickItems(arr){arr.forEach(function(n){if(n.type==='check'){n.done=false;untickItems(n.children);if(n.dq){n.ans='';n.dq.forEach(function(x){untickItems(x.items);});}}});}
 function isTask(it){return it.type==='check'&&!it.info&&!it.dq&&!it.end;}
-function newFlight(L){
-  L.sections.forEach(function(s){
+function newFlight(){
+  // every checklist starts clean: ticks, answers, calculators and notepads
+  state.lists.forEach(function(L){L.sections.forEach(function(s){
     untickItems(s.items);
     s.items.forEach(function(n){
       if(n.type==='calc'){n.expr='';n.hist=[];fresh.delete(n.id);}
       if(n.type==='pad'){n.strokes=[];n.text='';}
     });
-  });
+  });});
   var T=state.tools;
   T.cds.forEach(function(c){c.target=null;c.aL=c.aZ=false;alerting.delete(c.id);});
   T.rest.start='';T.rest.end='';
@@ -3357,7 +3358,7 @@ function openMenu(){
       case 'untick':
         confirmSheet('Untick every item in “'+esc(L.title)+'”?','Untick all',function(){L.sections.forEach(function(s){untickItems(s.items);});save();render();toast('All items unticked');},openMenu);break;
       case 'flight':
-        confirmSheet('Start a new flight in “'+esc(L.title)+'”? This unticks every item, clears its calculators and notepads, clears all countdowns, the crew rest times, the call sign and the ETD and ETA, and unticks airport note checkboxes.','New flight',function(){newFlight(L);save();render();window.scrollTo(0,0);toast('Ready for a new flight');},openMenu);break;
+        confirmSheet('Start a new flight? This unticks every item in all checklists and clears their answers, calculators and notepads. It also clears all countdowns, the crew rest times, the call sign and the ETD and ETA, and unticks airport note checkboxes.','New flight',function(){newFlight();save();render();window.scrollTo(0,0);toast('Ready for a new flight');},openMenu);break;
       default: closeSheet();
     }
   });
@@ -3378,7 +3379,7 @@ function openSettings(){
     '<button type="button" data-sact="import">'+I.restore+'<span class="mt">Restore<small>Load a backup</small></span></button>'+
     '</div><div class="set-h">Storage</div><div class="menu"><div class="menu-row stor" id="storRow">'+storRowHTML(null)+'</div></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Done</button></div>'+
-    '<p class="ver">App version '+APP_VERSION+(updAvail?' · <button type="button" class="updl" data-sact="upd">New version ready, restart</button>':'')+'</p>'+diagHTML(),
+    '<p class="ver">App version '+APP_VERSION+(updAvail?' · <button type="button" class="updl" data-sact="upd">New version ready, restart</button>':'')+'</p>',
   function(act,btn){
     switch(act){
       case 'menu': openMenu();break;
@@ -5331,29 +5332,7 @@ render();
 try{var restY=+sessionStorage.getItem('flightChecklist.y');sessionStorage.removeItem('flightChecklist.y');
   if(!(restY>0)){var ui=JSON.parse(localStorage.getItem('flightChecklist.ui')||'null');if(ui&&ui.l===state.current&&Date.now()-ui.t<3*3600000) restY=+ui.y;}
   if(restY>0) window.scrollTo(0,restY);}catch(e){}
-/* Coming back to the app: was it kept by iPadOS or started again, and how long did the app take to show */
-var DIAGK='flightChecklist.diag';
-function diagGet(){var d=null;try{d=JSON.parse(localStorage.getItem(DIAGK)||'null');}catch(e){}return d&&Array.isArray(d.ev)?d:{h:0,ev:[]};}
-function diagPut(d){try{localStorage.setItem(DIAGK,JSON.stringify(d));}catch(e){}}
-function diagAdd(e){var d=diagGet();d.ev.unshift(e);d.ev=d.ev.slice(0,5);diagPut(d);}
-function diagAway(ms){var m=Math.round(ms/60000);return m<1?'under a minute':m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+m%60+' min':'');}
-function diagHTML(){
-  var ev=diagGet().ev.slice(0,3);if(!ev.length) return '';
-  return '<p class="ver" style="margin-top:4px;line-height:1.45">'+ev.map(function(e){
-    return hmOf(e.t)+' '+(e.k==='r'?'started again':'kept by iPadOS')+', showing in '+(e.ms/1000).toFixed(e.ms<1000?2:1)+' s, after '+diagAway(e.away)+' away';
-  }).join('<br>')+'</p>';
-}
-(function(){
-  var d=diagGet(),now=Date.now(),was=d.h;
-  if(was&&now-was<24*3600000) requestAnimationFrame(function(){requestAnimationFrame(function(){diagAdd({k:'r',t:now,away:now-was,ms:Math.round(performance.now())});});});
-  d.h=0;diagPut(d);
-})();
-document.addEventListener('visibilitychange',function(){
-  var d=diagGet();
-  if(document.visibilityState==='hidden'){d.h=Date.now();diagPut(d);return;}
-  var t0=performance.now(),away=d.h?Date.now()-d.h:0;d.h=0;diagPut(d);
-  if(away) requestAnimationFrame(function(){requestAnimationFrame(function(){diagAdd({k:'s',t:Date.now(),away:away,ms:Math.round(performance.now()-t0)});});});
-});
+try{localStorage.removeItem('flightChecklist.diag');}catch(e){} // the return record is no longer kept
 function uiKeep(){try{localStorage.setItem('flightChecklist.ui',JSON.stringify({l:state.current,y:Math.round(window.scrollY),t:Date.now()}));}catch(e){}}
 window.addEventListener('pagehide',uiKeep);
 // while the app is hidden (e.g. in Slide Over), give back the notepads' drawing memory, so iPadOS is less likely to unload the app
