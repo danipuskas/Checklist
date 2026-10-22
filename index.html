@@ -836,6 +836,19 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .esr-lay{flex-basis:100%;display:flex;align-items:center;gap:8px;padding:6px 2px 2px;font-size:calc(13px*var(--ts));color:var(--muted)}
 .esr-lay .seg button{padding:5px 12px}
 .apl.rows .txt.stack .note{text-align:left;flex-basis:100%}
+/* Each note can be a row or text: notes next to each other with the same style share one box */
+.apl + .apl{border-top:1px solid var(--line-soft)}
+
+/* Airport notes: change the order */
+.apn-ord-tip{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:10px 12px;border-radius:12px;background:var(--accent-weak);color:var(--accent);font-size:calc(14px*var(--ts));font-weight:600;line-height:1.3}
+.apn-ord-tip svg{width:20px;height:20px;flex:none}
+.pn.ord .apl .item > .row{align-items:center}
+.pn.ord .apl.text .item > .row{padding-top:calc(6px*var(--sp));padding-bottom:calc(6px*var(--sp))}
+.pn.ord .row .grip{margin:-6px -6px -6px 6px;color:var(--accent)}
+.pn.ord .kid-toggle{margin-right:2px}
+.apn-foot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.apn-foot .tcd-add{margin-top:0}
+.apn-foot.one{grid-template-columns:1fr}
 
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
@@ -1018,11 +1031,13 @@ function normItem(it){
   if(it.type==='pad') return {id:str(it.id)||uid(),type:'pad',title:str(it.title,'Notepad'),mode:it.mode==='type'?'type':'draw',text:str(it.text),
     strokes:Array.isArray(it.strokes)?it.strokes.filter(function(s){return s&&Array.isArray(s.pts)&&s.pts.length>=3;}):[],
     h:Math.min(2400,Math.max(160,+it.h||300)),collapsed:!!it.collapsed};
-  return normDec({id:str(it.id)||uid(),type:'check',text:str(it.text),note:str(it.note),
+  var o={id:str(it.id)||uid(),type:'check',text:str(it.text),note:str(it.note),
     links:Array.isArray(it.links)?it.links.filter(function(l){return l&&l.url;}).map(function(l){return {label:str(l.label),url:str(l.url)};}):[],
     imgs:Array.isArray(it.imgs)?it.imgs.filter(function(x){return typeof x==='string'&&x;}):[],
     info:!!it.info,done:!it.info&&!!it.done,open:it.open!==false,rem:normRem(it.rem),
-    children:Array.isArray(it.children)?it.children.map(normItem).filter(function(x){return x&&x.type==='check';}):[]},it);
+    children:Array.isArray(it.children)?it.children.map(normItem).filter(function(x){return x&&x.type==='check';}):[]};
+  if(it.lay==='rows'||it.lay==='text') o.lay=it.lay; // airport note shown as a row or as text, whatever its section's style
+  return normDec(o,it);
 }
 function normDec(o,it){
   // a Decision carries answers, each with its own steps; an End closes the procedure
@@ -1116,7 +1131,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='33';
+var APP_VERSION='34';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 function applyTextScale(){
   var ts=state.settings.textScale||1,rs=document.documentElement.style;
@@ -1487,12 +1502,13 @@ function renderEnd(it,o){
 function renderCheck(it,depth,o){
   if(it.dq) return renderDec(it,o);
   if(it.end) return renderEnd(it,o);
-  var nt=!!(o&&o.note),em=nt?!!o.edit:editMode;
+  var nt=!!(o&&o.note),em=nt?!!o.edit:editMode,ord=nt&&!!o.ord;
   var kids=it.children||[];
   var kt=kids.filter(function(k){return !k.info;}),kd=kt.filter(function(k){return k.done;}).length;
   var cls='item d'+Math.min(depth,3)+(it.info?' info':'')+(it.done?' done':'')+(kids.length&&it.open===false?' kclosed':'')+(o&&o.stripe?' stripe-'+o.stripe:'');
   var h='<div class="'+cls+'" data-item="'+it.id+'">';
-  if(em) h+='<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">';
+  if(ord) h+='<div class="row" data-id="'+it.id+'">'; // reordering airport notes: the row only moves
+  else if(em) h+='<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">';
   else if(it.info) h+='<div class="row" data-id="'+it.id+'">';
   else h+='<div class="row" data-act="tick" data-id="'+it.id+'" tabindex="0" role="checkbox" aria-checked="'+it.done+'">';
   h+=(it.info?'<span class="ibox" aria-hidden="true">'+I.info+'</span>':'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(esc(it.text)||'<span class="ph">Untitled item</span>')+'</div>';
@@ -1502,7 +1518,8 @@ function renderCheck(it,depth,o){
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
   h+='</div>';
   if(kids.length) h+='<button type="button" class="kid-toggle" data-act="toggleKids" data-id="'+it.id+'" aria-label="Show or hide sub-items">'+(kt.length?kd+'/'+kt.length:kids.length)+'<span class="chev">'+I.chev+'</span></button>';
-  if(em) h+='<span class="edit-hint">'+I.edit+'</span>'+(nt?'':'<span class="grip" data-drag="item" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>');
+  if(ord) h+='<span class="grip" data-pdrag="1" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>';
+  else if(em) h+='<span class="edit-hint">'+I.edit+'</span>'+(nt?'':'<span class="grip" data-drag="item" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>');
   h+='</div>';
   if(kids.length) h+='<div class="kids">'+kids.map(function(k){return renderCheck(k,depth+1,o);}).join('')+'</div>';
   return h+'</div>';
@@ -1605,6 +1622,18 @@ function apnHeadHTML(sec,arr,folded,act,id,addBtn){
     '<span class="chev">'+I.chev+'</span><span class="hd-title">'+esc(sec.name)+'</span><span class="hd-count">'+cnt+'</span></button>'+
     (addBtn?'<button type="button" class="hd-add" data-act="apnAdd" data-v="'+sec.id+'" aria-label="Add note to '+esc(sec.name)+'">'+I.plus+'</button>':'')+'</div></div>';
 }
+function apnLay(it,sec){return it.lay==='text'||it.lay==='rows'?it.lay:(sec.lay==='text'?'text':'rows');}
+// A section's notes, each as a row or as text: neighbours with the same style share one box
+function apnListHTML(sec,arr,o){
+  var h='',run='',buf='';
+  arr.forEach(function(it){
+    var l=apnLay(it,sec);
+    if(l!==run){if(buf) h+='<div class="apl '+run+'">'+buf+'</div>';run=l;buf='';}
+    buf+=renderCheck(it,0,o);
+  });
+  if(buf) h+='<div class="apl '+run+'">'+buf+'</div>';
+  return h;
+}
 function renderApn(m){
   var ap=flightAp(m.which),tag=m.which==='dep'?'Departure':'Destination';
   var h='<div class="module apn'+(m.collapsed?' collapsed':'')+'" data-mod="'+m.id+'"><div class="mod-head"><button type="button" class="mod-toggle" data-act="modToggle" data-id="'+m.id+'">'+I.pin+
@@ -1619,7 +1648,7 @@ function renderApn(m){
       var arr=notes[x.id]||[];if(!arr.length) return;
       var fo=!!m.fold[x.id];
       parts+=apnHeadHTML(x,arr,fo,'apnFold',m.id,false);
-      if(!fo) parts+='<div class="apl '+(x.lay==='text'?'text':'rows')+'">'+arr.map(function(it){return renderCheck(it,0,{note:true});}).join('')+'</div>';
+      if(!fo) parts+=apnListHTML(x,arr,{note:true});
     });
     h+=parts||'<div class="apn-empty">No notes for '+esc(ap.icao)+' yet. <button type="button" class="lnkbtn" data-act="apnOpen" data-v="'+m.which+'">Add a note</button></div>';
   }
@@ -2708,6 +2737,14 @@ function openItemEditor(id,isNew){
   var it=f.node,n=f.arr.length,imgs=(it.imgs||[]).slice(),busy=0,info=!!it.info;
   var kind=it.dq?'dec':it.end?'end':(info?'info':'check'),endTone=it.end||'go';
   var inKids=f.anc.length&&f.arr===f.anc[f.anc.length-1].children,allowDec=!f.apn&&!inKids;
+  // an airport note can be a row or text on its own; until one is picked it follows its section's style
+  var topNote=!!(f.apn&&!f.anc.length),lay=it.lay==='text'||it.lay==='rows'?it.lay:'';
+  function secLayOf(sid){var x=state.apSections.filter(function(s){return s.id===sid;})[0];return x&&x.lay==='text'?'text':'rows';}
+  var lay0=lay||(topNote?secLayOf(f.apn.sec):'rows');
+  function layUI(){
+    var ss=$('#fApSec'),v=lay||secLayOf(ss?ss.value:f.apn.sec);
+    sheetEl.querySelectorAll('#fLay button').forEach(function(b){var on=b.getAttribute('data-v')===v;b.classList.toggle('on',on);b.setAttribute('aria-checked',String(on));});
+  }
   var answers=(it.dq||[{id:uid(),label:'YES',tone:'y',items:[]},{id:uid(),label:'NO',tone:'n',items:[]}]).map(function(x){return {id:x.id,label:x.label,tone:x.tone,items:x.items};});
   var TYPE_HINT={check:'Tap the item in the checklist to tick it.',info:'Info items have no tick and aren’t counted in the progress.',
     dec:'Shows answer buttons. The steps for each answer are added in Edit mode: tap an answer under the question.',end:'Closes the procedure, e.g. Continue operation or Return to stand.'};
@@ -2768,6 +2805,9 @@ function openItemEditor(id,isNew){
       }).join('')+'</div>'+
     '<p class="hint" id="fTypeHint" style="margin:8px 0 0">'+TYPE_HINT[kind]+'</p></div>'+
     (f.apn&&!f.anc.length?'<label class="fld"><span class="fl">Section</span><select id="fApSec" class="ap-tz">'+state.apSections.map(function(x){return '<option value="'+x.id+'"'+(x.id===f.apn.sec?' selected':'')+'>'+esc(x.name)+'</option>';}).join('')+'</select></label>':'')+
+    (topNote?'<div class="fld"><span class="fl">Style</span><div class="seg big seg2" id="fLay" role="radiogroup" aria-label="Style">'+[['rows','Row'],['text','Text']].map(function(x){
+        var on=x[0]===lay0;return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="lay" data-v="'+x[0]+'">'+x[1]+'</button>';
+      }).join('')+'</div><p class="hint" style="margin:8px 0 0">Row puts the note on the right of the line. Text reads like a briefing, for longer notes.</p></div>':'')+
     '<label class="fld"><span class="fl" id="fTextLab">'+(kind==='dec'?'Question':kind==='end'?'Text':'Item')+'</span><input id="fText" type="text" value="'+esc(it.text)+'" placeholder="'+(kind==='end'?'Optional':kind==='dec'?'e.g. Is dispatch allowed?':'e.g. TCAS BELOW')+'" autocomplete="off"></label>'+
     '<div class="fld" id="fAnsBlk"'+(kind==='dec'?'':' hidden')+'><span class="fl">Answers <em>(tap the colour to change it)</em></span><div class="ansl" id="fAns">'+ansRowsHTML()+'</div>'+
       '<button type="button" class="btn small ghost" data-sact="ansAdd">'+I.plus+'Add answer</button></div>'+
@@ -2795,6 +2835,7 @@ function openItemEditor(id,isNew){
       it.links=Array.prototype.map.call(sheetEl.querySelectorAll('.link-row'),function(r){return {label:r.querySelector('.lLabel').value.trim(),url:r.querySelector('.lUrl').value.trim()};}).filter(function(l){return l.url;});
       it.imgs=imgs.slice();
       it.info=info;if(info) it.done=false;
+      if(topNote){if(lay) it.lay=lay;else delete it.lay;}
       var rb=remBuild(false);
       if(!remSame(rb.rem,it.rem)) it.rem=rb.rem?remMark(rb.rem):null;
       syncAns();
@@ -2829,6 +2870,8 @@ function openItemEditor(id,isNew){
         if(answers.length<=2){toast('A decision needs at least two answers');break;}
         if(answers[ad].items.length){toast('That answer has steps. Remove them first.');break;}
         answers.splice(ad,1);$('#fAns').innerHTML=ansRowsHTML();break;
+      case 'lay':
+        lay=btn.getAttribute('data-v')==='text'?'text':'rows';layUI();break;
       case 'endTone':
         endTone=btn.getAttribute('data-v');sheetEl.querySelectorAll('#fEndTone button').forEach(function(b){b.classList.toggle('on',b===btn);});break;
       case 'addLink':
@@ -2867,6 +2910,7 @@ function openItemEditor(id,isNew){
   });
   function refreshThumbs(){var box=$('#fImgs');if(box){box.innerHTML=edThumbsHTML(imgs);fillImages(box);}}
   var rbx=$('#fRemBody');if(rbx) rbx.innerHTML=remBodyHTML();
+  var fas=$('#fApSec');if(fas&&topNote) fas.addEventListener('change',function(){if(!lay) layUI();});
   fillImages(sheetEl);
   $('#fPhoto').addEventListener('change',function(e){
     var files=Array.from(e.target.files||[]);
@@ -3174,10 +3218,10 @@ function appIdle(){
   var ae=document.activeElement;
   return sheetWrap.hidden&&!toolOpen&&!editMode&&$('#lb').hidden&&!(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName));
 }
-function appRestart(){try{save();}catch(e){}location.reload();}
+function appRestart(){try{save();sessionStorage.setItem('flightChecklist.y',String(Math.round(window.scrollY)));}catch(e){}location.reload();}
 function updReady(){
-  // just opened and nothing in progress: take the new version straight away; otherwise wait for a tap
-  if(Date.now()-bootAt<10000&&appIdle()){appRestart();return;}
+  // A new version is on the iPad. The app never restarts by itself for it: that blanked the screen, and on slow
+  // hotel Wi-Fi it came several seconds after opening. It's used the next time the app starts; Update switches now.
   updAvail=true;var b=$('#updBtn');if(b) b.hidden=false;
 }
 
@@ -3978,10 +4022,12 @@ function refreshTool(){
   var y=toolWrap.scrollTop;openTool(toolKind);toolWrap.scrollTop=y;
 }
 function openTool(kind){
-  clearTimeout(toolHideT);toolKind=kind;
+  clearTimeout(toolHideT);if(kind!==toolKind) toolApnOrd=false;toolKind=kind;
   var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+'<h3>'+({cd:'Countdowns',rest:'Crew rest',apn:'Airport notes',flog:'Flight log',wx:'Weather',dec:'Answer steps'}[kind])+'</h3>'+
     (kind==='cd'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
-    (kind==='apn'?'<button type="button" class="ib round" data-act="apnAdd" aria-label="Add note">'+I.plus+'</button>':'')+
+    (kind==='apn'?(toolApnOrd&&apnCanOrder()?'<button type="button" class="pill" data-act="apnReorder">Done</button>':
+      (apnCanOrder()?'<button type="button" class="ib round" data-act="apnReorder" aria-label="Change the order of the notes">'+I.swap+'</button>':'')+
+      '<button type="button" class="ib round" data-act="apnAdd" aria-label="Add note">'+I.plus+'</button>'):'')+
     (kind==='flog'?'<button type="button" class="ib round" data-act="flNew" aria-label="Add a flight">'+I.plus+'</button>':'')+
     (kind==='wx'&&state.settings.wxUrl?'<button type="button" class="ib round" data-act="wxRefresh" aria-label="Update weather">'+I.reset+'</button>':'')+
     '<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button></div>';
@@ -4009,16 +4055,23 @@ function openTool(kind){
   toolWrap.classList.add('show');document.body.classList.add('noscroll');
   clockTick();
 }
-var toolApnView='notes',toolApnSel=null,toolApnIcao=null,toolApnFold={},apnNamesTried=false;
+var toolApnView='notes',toolApnSel=null,toolApnIcao=null,toolApnFold={},apnNamesTried=false,toolApnOrd=false;
+function apnSelFix(){
+  var st=state.settings;
+  if(!toolApnSel||(toolApnSel==='dest'&&!st.dest)||(toolApnSel==='dep'&&!st.dep)) toolApnSel=st.dest?'dest':(st.dep?'dep':'all');
+}
 function apnPanelIcao(){
   var st=state.settings;
   if(toolApnSel==='dep') return st.dep?st.dep.icao:null;
   if(toolApnSel==='dest') return st.dest?st.dest.icao:null;
   return toolApnIcao;
 }
+// The order can be changed when an airport's notes are on screen and there are at least two
+function apnCanOrder(){apnSelFix();var ic=apnPanelIcao();return !!ic&&toolApnView!=='stats'&&apNoteCount(ic)>1;}
 function apnPanelHTML(){
   var st=state.settings;
-  if(!toolApnSel||(toolApnSel==='dest'&&!st.dest)||(toolApnSel==='dep'&&!st.dep)) toolApnSel=st.dest?'dest':(st.dep?'dep':'all');
+  apnSelFix();
+  if(toolApnOrd&&!apnCanOrder()) toolApnOrd=false;
   var allm={};Object.keys(state.apNotes).forEach(function(k){if(apNoteCount(k)>0) allm[k]=1;});
   state.flights.forEach(function(f){if(f.dep.icao) allm[f.dep.icao]=1;if(f.arr.icao) allm[f.arr.icao]=1;});
   var all=Object.keys(allm).sort();
@@ -4036,15 +4089,18 @@ function apnPanelHTML(){
   h+='<div class="aphead"><div class="apname">'+(toolApnSel==='all'||!apn?esc(icao)+' ':'')+esc(apn)+'</div><div class="seg apview"><button type="button" class="'+(toolApnView==='stats'?'':'on')+'" data-act="apnView" data-v="notes">Notes'+(nn?'<small>'+nn+'</small>':'')+'</button>'+
     '<button type="button" class="'+(toolApnView==='stats'?'on':'')+'" data-act="apnView" data-v="stats">My stats'+(nf?'<small>'+nf+'</small>':'')+'</button></div></div>';
   if(toolApnView==='stats') return h+apStatsHTML(icao);
-  var notes=state.apNotes[icao]||{};
+  var notes=state.apNotes[icao]||{},ord=toolApnOrd;
   var empty=[];
-  h+='<div class="pn">'+state.apSections.map(function(x){
+  if(ord) h+='<div class="apn-ord-tip">'+I.grip+'<span>Drag ≡ to change the order. Drop a note in another section to move it there.</span></div>';
+  h+='<div class="pn'+(ord?' ord':'')+'">'+state.apSections.map(function(x){
     var arr=notes[x.id]||[],fo=!!toolApnFold[x.id];
     if(!arr.length){empty.push(x);return '';}
-    return apnHeadHTML(x,arr,fo,'apnPFold','',true)+(fo?'':'<div class="apl '+(x.lay==='text'?'text':'rows')+'">'+arr.map(function(it){return renderCheck(it,0,{note:true,edit:true});}).join('')+'</div>');
+    return apnHeadHTML(x,arr,fo,'apnPFold','',!ord)+(fo?'':apnListHTML(x,arr,{note:true,edit:true,ord:ord}));
   }).join('')+
-    (empty.length?'<div class="apn-addsec"><span>'+(empty.length===state.apSections.length?'No notes yet. Add to:':'Empty:')+'</span>'+empty.map(function(x){return '<button type="button" data-act="apnAdd" data-v="'+x.id+'" aria-label="Add note to '+esc(x.name)+'">+ '+esc(x.name)+'</button>';}).join('')+'</div>':'')+'</div>';
-  h+='<button type="button" class="btn small ghost tcd-add" data-act="apnSecs">'+I.list+'Edit sections</button>';
+    (empty.length&&!ord?'<div class="apn-addsec"><span>'+(empty.length===state.apSections.length?'No notes yet. Add to:':'Empty:')+'</span>'+empty.map(function(x){return '<button type="button" data-act="apnAdd" data-v="'+x.id+'" aria-label="Add note to '+esc(x.name)+'">+ '+esc(x.name)+'</button>';}).join('')+'</div>':'')+'</div>';
+  if(ord) h+='<div class="apn-foot one"><button type="button" class="btn small primary tcd-add" data-act="apnReorder">Done</button></div>';
+  else h+='<div class="apn-foot'+(apnCanOrder()?'':' one')+'">'+(apnCanOrder()?'<button type="button" class="btn small ghost tcd-add" data-act="apnReorder">'+I.swap+'Reorder</button>':'')+
+    '<button type="button" class="btn small ghost tcd-add" data-act="apnSecs">'+I.list+'Edit sections</button></div>';
   return h;
 }
 function apnAdd(sid){
@@ -4057,7 +4113,7 @@ function apnAdd(sid){
 function apnGo(){
   var ai=$('#apnIcao'),v=ai?ai.value.trim().toUpperCase():'';
   if(!/^[A-Z0-9]{4}$/.test(v)){toast('Enter a 4-letter ICAO code');if(ai) ai.focus();return;}
-  toolApnSel='all';toolApnIcao=v;refreshTool();
+  toolApnSel='all';toolApnIcao=v;toolApnOrd=false;refreshTool();
 }
 function apnSummary(){
   var st=state.settings,out=[];
@@ -4079,7 +4135,7 @@ function openApSecs(){
   }
   function sync(){sheetEl.querySelectorAll('[data-si]').forEach(function(inp){secs[+inp.getAttribute('data-si')].name=inp.value;});}
   function redraw(){$('#fSecRows').innerHTML=rowsHTML();}
-  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own. <b>Rows</b> puts each note on one line with its value on the right; <b>Text</b> reads like a briefing, for longer notes.</p>'+
+  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own. <b>Rows</b> puts each note on one line with its value on the right; <b>Text</b> reads like a briefing, for longer notes. A note can also pick its own style: tap it to edit.</p>'+
     '<div class="cbl" id="fSecRows">'+rowsHTML()+'</div>'+
     '<button type="button" class="btn small ghost tcd-add" data-sact="sadd">'+I.plus+'Add section</button>'+
     '<p class="hint" style="margin:12px 0 0">Deleting a section moves its notes to the first section.</p>'+
@@ -4125,7 +4181,7 @@ function toolCdDel(id){
 }
 function closeTool(){
   if(!toolOpen) return;
-  var wasDec=toolKind==='dec';toolKind=null;
+  var wasDec=toolKind==='dec';toolKind=null;toolApnOrd=false;
   refreshShared();
   if(wasDec){decPath=[];render();}
   if(document.activeElement&&toolPanel.contains(document.activeElement)) document.activeElement.blur();
@@ -4923,6 +4979,106 @@ app.addEventListener('pointerdown',function(e){
   dragStart(g,e);
 });
 
+/* ---------- Airport notes: drag to change the order (Reorder in the notes panel) ---------- */
+// A note moves among the notes on screen, also into another section; a sub-item moves among its siblings.
+var pdrag=null;
+function pdragNoScroll(e){if(pdrag) e.preventDefault();}
+function pdragStart(g,e){
+  pdrag={id:g.getAttribute('data-id'),g:g,pid:e.pointerId,x0:e.clientX,y0:e.clientY,y:e.clientY,started:false};
+  try{g.setPointerCapture(e.pointerId);}catch(_){}
+  window.addEventListener('pointermove',pdragMove,true);
+  window.addEventListener('pointerup',pdragUp,true);
+  window.addEventListener('pointercancel',pdragCancel,true);
+  document.addEventListener('touchmove',pdragNoScroll,{passive:false});
+}
+function pdragBegin(){
+  var d=pdrag,orig=d.g.closest('.item');
+  if(!orig){pdragFinish(false);return;}
+  d.sub=orig.parentNode.classList.contains('kids');
+  var r=orig.getBoundingClientRect(),ph=document.createElement('div');
+  ph.className='drag-ph';ph.style.height=Math.min(r.height,56)+'px';
+  orig.parentNode.insertBefore(ph,orig);
+  orig.classList.add('drag-hidden');
+  var lb=orig.querySelector(':scope > .row .label'),k=orig.querySelectorAll(':scope > .kids > .item').length,gh=document.createElement('div');
+  gh.className='drag-ghost';
+  gh.innerHTML=I.grip+'<span class="gh-t"><span>'+esc(lb&&lb.textContent.trim()?lb.textContent:'Note')+'</span></span>'+(k?'<small>'+k+' sub-item'+(k>1?'s':'')+'</small>':'');
+  gh.style.left=r.left+'px';gh.style.width=r.width+'px';
+  document.body.appendChild(gh);
+  d.orig=orig;d.ph=ph;d.gh=gh;d.off=Math.max(12,Math.min(d.y0-r.top,40));d.started=true;
+  document.body.classList.add('dragging');
+  d.raf=requestAnimationFrame(pdragAuto);
+}
+function pdragPlace(){
+  var d=pdrag;if(!d||!d.started) return;
+  d.gh.style.top=(d.y-d.off)+'px';
+  var c=d.sub?Array.prototype.filter.call(d.orig.parentNode.children,function(el){return el!==d.orig&&el.classList.contains('item');})
+    :Array.prototype.filter.call(toolPanel.querySelectorAll('.pn .apl > .item'),function(el){return el!==d.orig&&isVis(el);});
+  if(!c.length) return;
+  var best=null,bd=1e9,br=null;
+  c.forEach(function(el){var q=el.getBoundingClientRect(),dist=d.y<q.top?q.top-d.y:(d.y>q.bottom?d.y-q.bottom:0);if(dist<bd){bd=dist;best=el;br=q;}});
+  var ref=d.y<br.top+br.height/2?best:best.nextElementSibling,box=best.parentNode;
+  if(ref===d.ph||(d.ph.parentNode===box&&d.ph.nextElementSibling===ref)) return;
+  box.insertBefore(d.ph,ref);
+}
+function pdragAuto(){
+  var d=pdrag;if(!d||!d.started) return;
+  var top=90,bot=window.innerHeight-70,v=0;
+  if(d.y<top) v=-Math.min(20,2+(top-d.y)/3);
+  else if(d.y>bot) v=Math.min(20,2+(d.y-bot)/3);
+  if(v){var s=toolWrap.scrollTop;toolWrap.scrollTop=s+v;if(toolWrap.scrollTop!==s) pdragPlace();}
+  d.raf=requestAnimationFrame(pdragAuto);
+}
+function pdragMove(e){
+  if(!pdrag||e.pointerId!==pdrag.pid) return;
+  pdrag.y=e.clientY;
+  if(!pdrag.started){
+    if(Math.abs(e.clientX-pdrag.x0)+Math.abs(e.clientY-pdrag.y0)<5) return;
+    pdragBegin();if(!pdrag) return;
+  }
+  e.preventDefault();
+  pdragPlace();
+}
+function pdragUp(e){if(pdrag&&e.pointerId===pdrag.pid) pdragFinish(true);}
+function pdragCancel(e){if(pdrag&&e.pointerId===pdrag.pid) pdragFinish(false);}
+function pdragApply(d){
+  // the note lands right after the note above the gap, or right before the one below it
+  var f=find(d.id);if(!f||!f.apn||!d.ph.parentNode) return false;
+  function near(dir){for(var el=d.ph[dir];el;el=el[dir]){if(el!==d.orig&&el.classList.contains('item')) return el;}return null;}
+  var prev=near('previousElementSibling'),next=prev?null:near('nextElementSibling'),ref=prev||next;
+  if(!ref) return false;
+  var rf=find(ref.getAttribute('data-item'));if(!rf||!rf.apn||rf.node===f.node) return false;
+  var from=f.arr,i0=from.indexOf(f.node);
+  from.splice(i0,1);
+  var at=rf.arr.indexOf(rf.node)+(prev?1:0);
+  rf.arr.splice(at,0,f.node);
+  return !(rf.arr===from&&at===i0);
+}
+function pdragFinish(commit){
+  var d=pdrag;if(!d) return;
+  pdrag=null;
+  window.removeEventListener('pointermove',pdragMove,true);
+  window.removeEventListener('pointerup',pdragUp,true);
+  window.removeEventListener('pointercancel',pdragCancel,true);
+  document.removeEventListener('touchmove',pdragNoScroll,{passive:false});
+  try{d.g.releasePointerCapture(d.pid);}catch(_){}
+  if(!d.started) return;
+  cancelAnimationFrame(d.raf);
+  dragEndT=Date.now();dragSuppress=true;
+  var moved=commit&&pdragApply(d);
+  d.gh.remove();document.body.classList.remove('dragging');
+  if(!moved){d.ph.remove();d.orig.classList.remove('drag-hidden');return;}
+  save();render(); // redraws this panel (keeping its scroll) and the Airport notes blocks in the checklists
+  var el=toolPanel.querySelector('[data-item="'+d.id+'"]');
+  if(el){el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(function(){el.classList.remove('flash');},1400);}
+}
+toolPanel.addEventListener('pointerdown',function(e){
+  var g=e.target.closest('.grip[data-pdrag]');
+  if(!g||pdrag||drag) return;
+  if(e.pointerType==='mouse'&&e.button!==0) return;
+  e.preventDefault();
+  pdragStart(g,e);
+});
+
 /* ---------- Events ---------- */
 function onAct(e){
   if(e.target.closest('a')) return;
@@ -4989,12 +5145,13 @@ function onAct(e){
     case 'flToNote': flToNote(el);break;
     case 'flOpen': openFlEntry(id);break;
     case 'flNew': flNew();break;
-    case 'apnView': toolApnView=el.getAttribute('data-v');refreshTool();break;
+    case 'apnView': toolApnView=el.getAttribute('data-v');toolApnOrd=false;refreshTool();break;
+    case 'apnReorder': toolApnOrd=!toolApnOrd;refreshTool();break;
     case 'apnFold': apnFold(id,el.getAttribute('data-apsec'));break;
     case 'openFlight': openFlight();break;
-    case 'apnOpen': toolApnSel=el.getAttribute('data-v');toolApnIcao=null;openTool('apn');break;
-    case 'apnSel': toolApnSel=el.getAttribute('data-v');if(toolApnSel==='all') toolApnIcao=null;refreshTool();break;
-    case 'apnPick': toolApnSel='all';toolApnIcao=el.getAttribute('data-v');refreshTool();break;
+    case 'apnOpen': toolApnSel=el.getAttribute('data-v');toolApnIcao=null;toolApnOrd=false;openTool('apn');break;
+    case 'apnSel': toolApnSel=el.getAttribute('data-v');if(toolApnSel==='all') toolApnIcao=null;toolApnOrd=false;refreshTool();break;
+    case 'apnPick': toolApnSel='all';toolApnIcao=el.getAttribute('data-v');toolApnOrd=false;refreshTool();break;
     case 'apnGo': apnGo();break;
     case 'apnPFold': var ps=el.getAttribute('data-apsec');toolApnFold[ps]=!toolApnFold[ps];refreshTool();break;
     case 'apnAdd': apnAdd(el.getAttribute('data-v'));break;
@@ -5097,6 +5254,7 @@ if(window.matchMedia){
 }
 
 render();
+try{var restY=+sessionStorage.getItem('flightChecklist.y');sessionStorage.removeItem('flightChecklist.y');if(restY>0) window.scrollTo(0,restY);}catch(e){} // back where you were after Update
 tickLoop();
 if(loadedOK) setTimeout(gcImages,4000);
 setInterval(cloudMaybe,30000);

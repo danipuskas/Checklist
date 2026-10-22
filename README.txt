@@ -15,7 +15,8 @@ Your checklists are stored on the iPad, not on GitHub. The files on GitHub are o
 Deleting the Home Screen icon deletes its data, so use Menu > Back up now and then.
 
 UPDATING LATER: in the repository tap Add file > Upload files, upload the new files over the old ones and commit.
-The installed app updates after you open it twice while online.
+The installed app downloads the new version in the background while it's open and online, then shows
+an Update button at the top left. Tap it to switch now; otherwise the new version is used the next time the app starts.
 
 ONLINE BACKUP (optional): Menu > Settings > Online backup copies everything to a PRIVATE GitHub repository
 while the app is open and online. You need a private repository and a fine-grained access token
