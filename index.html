@@ -600,11 +600,11 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .rn{border-left:3px solid var(--accent);padding:1px 0 1px 10px;margin:9px 2px;font-size:calc(14px*var(--ts));line-height:1.35;white-space:pre-wrap}
 .rn small{display:block;color:var(--muted);font-size:12px;font-weight:650;white-space:normal}
 .st-empty{color:var(--muted);font-size:14.5px;margin:4px 2px}
-.mini{padding:2px 13px 12px;font-size:calc(14.5px*var(--ts));line-height:1.4}
-.mini .bar{grid-template-columns:minmax(0,60px) 1fr 30px;margin:5px 0;font-size:calc(14px*var(--ts))}
-.mini p{margin:6px 0 0}
+.mini{padding:0 13px 10px;font-size:calc(14.5px*var(--ts));line-height:1.35}
+.mini .bar{grid-template-columns:minmax(0,60px) 1fr 30px;margin:3px 0;font-size:calc(14px*var(--ts))}
+.mini p{margin:4px 0 0}
 .mini b{font-weight:650}
-.mini .last{margin-top:9px;border-top:1px solid var(--line);padding-top:8px;color:var(--muted);font-size:calc(13.5px*var(--ts))}
+.mini .last{margin-top:7px;border-top:1px solid var(--line);padding-top:6px;color:var(--muted);font-size:calc(13.5px*var(--ts))}
 .mini .last b{color:var(--text)}
 .apview{display:grid;grid-template-columns:1fr 1fr;margin:0 0 14px}
 .apview button small{opacity:.7;margin-left:4px;font-size:12px}
@@ -1183,7 +1183,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='43';
+var APP_VERSION='44';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2058,18 +2058,15 @@ function renderApst(m){
   if(!ap) return h+'Set the flight to see your '+tag.toLowerCase()+' stats. <button type="button" class="lnkbtn" data-act="openFlight">Set flight</button></div></div></div>';
   var S=apStats(ap.icao),arr=m.which==='dest',n=arr?S.arr:S.dep;
   if(!n) return h+'No '+(arr?'arrivals':'departures')+' logged for '+esc(ap.icao)+' yet.</div></div></div>';
-  var rw=arr?S.arrRwy:S.depRwy,t=arr?S.tin:S.tout,st=arr?S.arrStand:S.depStand;
+  var rw=arr?S.arrRwy:S.depRwy,st=arr?S.arrStand:S.depStand;
   h+=barsHTML(rw,3);
   if(arr&&S.app.length){
     var a0=S.app[0];
     if(a0.n>=2&&(S.app.length===1||a0.n>S.app[1].n)) h+='<p>Usually <b>'+esc(a0.v)+'</b> ('+a0.n+' of '+n+')</p>';
     else h+='<p>Approaches <b>'+S.app.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
   }
-  if(!arr&&S.sid.length) h+='<p>Departure <b>'+S.sid.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
-  if(arr&&S.star.length) h+='<p>Arrival <b>'+S.star.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
-  if(t) h+='<p>Taxi '+(arr?'in':'out')+' about <b>'+t.avg+' min</b>'+(t.min!==t.max?' ('+t.min+'–'+t.max+')':'')+'</p>';
   if(st.length) h+='<p>Stands <b>'+st.slice(0,3).map(function(x){return esc(x.v);}).join(', ')+'</b></p>';
-  if(!rw.length&&!t&&!st.length) h+='<p>'+n+' '+(arr?'arrival':'departure')+(n===1?'':'s')+' logged, no details yet.</p>';
+  if(!rw.length&&!st.length&&!(arr&&S.app.length)) h+='<p>'+n+' '+(arr?'arrival':'departure')+(n===1?'':'s')+' logged, no details yet.</p>';
   var ln=S.notes.filter(function(x){return x.k===(arr?'arrival':'departure');})[0];
   if(ln) h+='<div class="last">'+esc(fmtDay(ln.d))+': <b>'+esc(ln.t)+'</b></div>';
   return h+'</div></div></div>';
