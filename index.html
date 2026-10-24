@@ -1148,6 +1148,11 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .pkg-box.busy .pkg-lab b{color:var(--accent)}
 .pkg-box.busy .pkg-lab small{visibility:hidden}
 .pkg-files{width:100%;cursor:pointer}
+.pkg-how{display:block;margin:10px auto 0;font-size:calc(13.5px*var(--ts));font-weight:600;color:var(--muted)}
+.pkg-help{margin:0 0 12px;padding-left:22px;font-size:calc(14.5px*var(--ts));line-height:1.45}
+.pkg-help li{margin:0 0 10px}
+.pkg-help i{font-style:normal;font-weight:650}
+.pkg-dbg{font-size:12px;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1737,7 +1742,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='51';
+var APP_VERSION='52';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1957,6 +1962,7 @@ function newFlight(){
   T.rest.start='';T.rest.end='';T.rest.mine=-1;restEditing.clear();cdOpen.clear();
   state.flightCur=null;
   state.settings.etdT=0;state.settings.etaT=0;state.settings.csign='';
+  state.settings.dep=null;state.settings.dest=null;state.settings.alts=[];locEl.removeAttribute('data-k'); // the route goes too: pick it again from Recent
   Object.keys(state.apNotes).forEach(function(ic){var a=state.apNotes[ic];Object.keys(a).forEach(function(k){untickItems(a[k]);});});
 }
 function cloneList(L){
@@ -3368,11 +3374,12 @@ function pkgDropHTML(mode){
   var id='pkgIn'+(++pkgSeq);
   return '<div class="pkg-box"><div class="pkg-drop" contenteditable="true" inputmode="none" autocorrect="off" autocapitalize="off" spellcheck="false" role="textbox" aria-label="Paste the LIDO package here" data-mode="'+mode+'"></div>'+
     '<div class="pkg-lab" aria-hidden="true">'+I.paste+'<b>Touch and hold here, then Paste</b><small>Copy the PDF or its text first, or drop the PDF here.</small></div></div>'+
-    '<label class="btn pkg-files" for="'+id+'">'+I.folder+'Open from Files</label><input type="file" id="'+id+'" class="vh" accept="application/pdf,.pdf" data-pkg="'+mode+'">';
+    '<label class="btn pkg-files" for="'+id+'">'+I.folder+'Open from Files</label><input type="file" id="'+id+'" class="vh" accept="application/pdf,.pdf" data-pkg="'+mode+'">'+
+    '<button type="button" class="lnkbtn pkg-how" data-sact="pkghelp" data-act="pkgHelp">How to paste the PDF from Lido</button>';
 }
 function openPkgSheet(){
   openSheet('<h3>Load the LIDO package</h3><p class="hint">A newer copy of the same flight keeps what you’ve read. NOTAMs or weather on their own update the briefing.</p>'+pkgDropHTML('brief')+
-    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',function(){closeSheet();});
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',function(act){if(act==='pkghelp') pkgHelp(null,openPkgSheet);else closeSheet();});
 }
 function brStatus(msg){
   var boxes=Array.prototype.filter.call(document.querySelectorAll('.pkg-box'),function(b){return !!b.offsetParent;});
@@ -3421,13 +3428,34 @@ function pkgZone(t){return t&&t.closest?t.closest('.pkg-drop'):null;}
 document.addEventListener('paste',function(e){
   var z=pkgZone(e.target);if(!z) return;
   e.preventDefault();
-  var dt=e.clipboardData,m=z.getAttribute('data-mode')||'brief',f=dt&&pdfFromDT(dt);
+  var dt=e.clipboardData,m=z.getAttribute('data-mode')||'brief',f=dt&&pdfFromDT(dt),types=dt?Array.prototype.slice.call(dt.types||[]):[];
   z.innerHTML='';z.blur();
   if(f){brReadFile(f,m);return;}
   var t=dt?dt.getData('text/plain')||dt.getData('text'):'';
-  if(!t||!t.trim()){toast('Nothing to paste. Copy the LIDO package first.',3500);return;}
+  if(!t&&dt) types.forEach(function(x){if(!t&&!/^Files$|image\//i.test(x)){try{t=dt.getData(x)||'';}catch(er){}}});
+  var pdf=pdfB64(t);
+  if(pdf){brRead(loadPdfJs().then(function(lib){return pdfText(lib,pdf);}),m,'');return;}
+  if(!t||!t.trim()){pkgHelp(types,sheetEl.contains(z)?(m==='new'?openNewFlight:openPkgSheet):null);return;}
   brRead(Promise.resolve(t),m,'');
 });
+// the PDF copied as Base64 text (the "Copy for Checklists" shortcut), or as a data: URL
+function pdfB64(t){
+  var x=String(t||'').replace(/^\s+/,'').replace(/^data:application\/pdf;base64,/i,'');
+  if(!/^JVBER/.test(x)) return null;
+  try{var bin=atob(x.replace(/[^A-Za-z0-9+\/=]/g,'')),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);return u;}catch(er){return null;}
+}
+var pkgLastTypes='';
+function pkgHelp(types,back){
+  if(types) pkgLastTypes=types.length?types.join(', '):'nothing';
+  openSheet('<h3>Pasting the PDF</h3><p class="hint">iPadOS gives web apps copied text, but not a copied PDF file. These ways work:</p>'+
+    '<ol class="pkg-help">'+
+      '<li><b>A shortcut, once.</b> In the Shortcuts app tap +, name it <i>Copy for Checklists</i>. In its details (ⓘ) turn on <i>Show in Share Sheet</i> and let it receive <i>PDFs</i>. Add the action <i>Base64 Encode</i> (Line Breaks: None), then <i>Copy to Clipboard</i>.<br>From then on: in Lido tap Share → <i>Copy for Checklists</i>, come back here and paste.</li>'+
+      '<li><b>Drag it in.</b> With Lido and this app side by side or in Slide Over, drag the PDF onto the box. Not every app lets you drag its PDF.</li>'+
+      '<li><b>Copy the text.</b> If Lido lets you select the text, copy it and paste that.</li>'+
+      '<li><b>Files.</b> Share → Save to Files, then Open from Files.</li></ol>'+
+    (pkgLastTypes?'<p class="pkg-dbg">Last paste offered: '+esc(pkgLastTypes)+'</p>':'')+
+    '<div class="sh-actions"><button type="button" class="btn primary" data-sact="cancel">OK</button></div>',function(){if(back) back();else closeSheet();});
+}
 // the box only takes a paste: no typing into it
 document.addEventListener('beforeinput',function(e){if(pkgZone(e.target)&&e.inputType!=='insertFromPaste') e.preventDefault();});
 document.addEventListener('input',function(e){var z=pkgZone(e.target);if(z) z.innerHTML='';});
@@ -3445,12 +3473,13 @@ document.addEventListener('drop',function(e){
   var f=pdfFromDT(dt);if(!f){toast('Drop the LIDO package PDF');return;}
   brReadFile(f,!sheetWrap.hidden&&sheetEl.querySelector('.pkg-drop[data-mode="new"]')?'new':'brief');
 });
-function brSetFrom(P){
+function brSetFrom(P,keep){
   var old=brief,f=P.flight,read={},of=old&&old.flight,st=state.settings;
   if(of&&old.read&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon) read=old.read; // a newer copy of the same flight keeps what you've read
   if(!f.dep&&!f.dest){ // no OFP in it: the NOTAMs and weather go with the flight that's set
-    f.dep=st.dep?st.dep.icao:'';f.dest=st.dest?st.dest.icao:'';f.fromApp=true;
-    f.altns=st.alts.map(function(a){var m=st.dest&&st.altMin[st.dest.icao+'>'+a];return typeof m==='number'?{icao:a,min:m}:{icao:a};});
+    var k=keep||brHint();
+    f.dep=k.dep||'';f.dest=k.dest||'';f.fromApp=true;
+    f.altns=(k.alts||[]).map(function(a){var m=k.dest&&st.altMin[k.dest+'>'+a];return typeof m==='number'?{icao:a,min:m}:{icao:a};});
   }
   brief={v:1,at:Date.now(),file:P.file||'',flight:f,wx:brPkgWx(P),wxMade:P.wxMade||null,sigmets:P.sigmets||[],alerts:P.alerts||[],notams:P.notams,read:read};
   brRv=null;brFold.clear();brOpenSet.clear();brEnrOpen.clear();brSetup=false;brTab=f.dep?'dep':'dest';
@@ -3502,7 +3531,7 @@ function brConfirm(P,mode){
     var route=(f.dep||'?')+' → '+(f.dest||'?');
     if(act==='start'){
       var before=JSON.stringify(state),oldB=brief;
-      newFlight();brSetFrom(P);if(hasOfp) brApply(P);save();closeSheet();render();window.scrollTo(0,0);wxMaybe();clockTick();
+      var keep=brHint();newFlight();brSetFrom(P,keep);if(hasOfp) brApply(P);save();closeSheet();render();window.scrollTo(0,0);wxMaybe();clockTick();
       toast(hasOfp?'Flight ready: '+(f.fno?f.fno+' ':'')+route:'Ready for a new flight',6500,'Undo',function(){undoTo(before);brief=oldB;brRv=null;brSave();wxRefreshViews();});
     }else if(act==='fill'){
       brSetFrom(P);brApply(P);save();closeSheet();render();wxMaybe();clockTick();wxRefreshViews();toast('Briefing and flight filled in');
@@ -3514,14 +3543,15 @@ function brConfirm(P,mode){
   });
 }
 function openNewFlight(){
-  openSheet('<h3>New flight</h3><p class="hint">Every checklist starts clean: ticks, answers, calculators and notepads. Countdowns, crew rest, the call sign, ETD and ETA are cleared too.</p>'+
+  openSheet('<h3>New flight</h3><p class="hint">Every checklist starts clean: ticks, answers, calculators and notepads. Countdowns, crew rest and the flight (From, To, alternates, call sign, ETD and ETA) are cleared too.</p>'+
     '<div class="nf-opts"><div class="nf-opt pri"><div class="nf-h">'+I.brief+'<span><b>Load the OFP</b><small>The LIDO package fills in the flight and the briefing.</small></span></div>'+pkgDropHTML('new')+'</div>'+
       '<button type="button" class="nf-opt" data-sact="empty">'+I.plane+'<span><b>Empty flight</b><small>You fill in the flight yourself.</small></span></button></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',
   function(act){
+    if(act==='pkghelp'){pkgHelp(null,openNewFlight);return;}
     if(act==='empty'){
       var before=JSON.stringify(state),oldB=brief;
-      closeSheet();newFlight();brief=null;brRv=null;brSave();save();render();window.scrollTo(0,0);
+      closeSheet();newFlight();brief=null;brRv=null;brSave();save();render();clockTick();window.scrollTo(0,0);
       toast('Ready for a new flight',6500,'Undo',function(){undoTo(before);brief=oldB;brRv=null;brSave();wxRefreshViews();});
     }else{closeSheet();openMenu();}
   });
@@ -6640,6 +6670,7 @@ function onAct(e){
     case 'ntFold': var ntf=el.getAttribute('data-v');if(brFold.has(ntf)) brFold.delete(ntf);else brFold.add(ntf);refreshTool();break;
     case 'brEnr': var nte=el.getAttribute('data-v');if(brEnrOpen.has(nte)) brEnrOpen.delete(nte);else brEnrOpen.add(nte);refreshTool();break;
     case 'brLoad': openPkgSheet();break;
+    case 'pkgHelp': pkgHelp(null,null);break;
     case 'brSetup': brSetup=true;refreshTool();break;
     case 'brGo': brGo(el.getAttribute('data-v'));break;
     case 'brRemove': confirmSheet('Remove the LIDO package? Its NOTAMs and weather leave the briefing.','Remove',function(){brief=null;brRv=null;brSave();wxRefreshViews();toast('Package removed');});break;

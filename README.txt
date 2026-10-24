@@ -23,8 +23,10 @@ ONLINE BACKUP (optional): Menu > Settings > Online backup copies everything to a
 while the app is open and online. You need a private repository and a fine-grained access token
 limited to that repository with Contents: Read and write. The steps are shown in the app.
 
-BRIEFING: Menu > New flight > Load the OFP takes the LIDO package: copy the PDF (or its text) in your company app,
-then touch and hold the box and choose Paste. You can also drop the PDF in from another app, or open it from Files. It fills in the flight
+BRIEFING: Menu > New flight > Load the OFP takes the LIDO package. iPadOS doesn't hand a copied PDF to web apps, so
+either make a one-time Shortcut (Shortcuts > + > name it "Copy for Checklists" > details: Show in Share Sheet, receive PDFs >
+actions: Base64 Encode with Line Breaks None, then Copy to Clipboard) and use Share > Copy for Checklists in Lido, then touch
+and hold the box and Paste; or paste copied text; or drag the PDF in; or open it from Files. It fills in the flight
 (From, To, alternates and their diversion times, ETD, scheduled arrival as ETA, call sign, TOD countdown)
 and Menu > Briefing shows the NOTAMs for departure, destination, alternates and en-route airports, the
 SIGMETs on your route, company alerts and the package weather. The PDF is read on the iPad; nothing is sent anywhere.
