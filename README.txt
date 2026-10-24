@@ -4,7 +4,8 @@ FLIGHT CHECKLISTS – OFFLINE SETUP (about 10 minutes, once)
 2. Sign in or sign up at github.com in Safari.
 3. Tap + > New repository. Give it a name (e.g. checklists), set it to Public, create it.
 4. Tap "uploading an existing file" and add every file from the unzipped folder:
-   index.html, airports.js, sw.js, manifest.webmanifest, icon-180.png, icon-192.png, icon-512.png.
+   index.html, airports.js, sw.js, manifest.webmanifest, icon-180.png, icon-192.png, icon-512.png,
+   and the lib folder (pdf.js and pdf.worker.js, used to read the LIDO package).
    Tap Commit changes.
 5. In the repository: Settings > Pages > Source: Deploy from a branch > Branch: main, folder / (root) > Save.
 6. After a minute or two the page shows your address, e.g. https://yourname.github.io/checklists/
@@ -22,6 +23,12 @@ ONLINE BACKUP (optional): Menu > Settings > Online backup copies everything to a
 while the app is open and online. You need a private repository and a fine-grained access token
 limited to that repository with Contents: Read and write. The steps are shown in the app.
 
-WEATHER (optional): Menu > Weather shows METAR, TAF (aviationweather.gov) and US D-ATIS (atis.info) through a small
-free Cloudflare Worker you create once. Paste weather-relay-worker.js into a new "Hello World" Worker,
-deploy it, and enter its address (https://….workers.dev) in Menu > Weather.
+BRIEFING: Menu > New flight > Load the OFP opens the LIDO package PDF from Files. It fills in the flight
+(From, To, alternates and their diversion times, ETD, scheduled arrival as ETA, call sign, TOD countdown)
+and Menu > Briefing shows the NOTAMs for departure, destination, alternates and en-route airports, the
+SIGMETs on your route, company alerts and the package weather. The PDF is read on the iPad; nothing is sent anywhere.
+The NOTAMs that matter for your times and runways come first. The rest are folded, never hidden.
+
+LIVE WEATHER (optional): Menu > Briefing can also show live METAR, TAF (aviationweather.gov) and US D-ATIS (atis.info)
+through a small free Cloudflare Worker you create once. Paste weather-relay-worker.js into a new "Hello World" Worker,
+deploy it, and enter its address (https://….workers.dev) in Menu > Briefing.
