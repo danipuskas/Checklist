@@ -23,11 +23,13 @@ ONLINE BACKUP (optional): Menu > Settings > Online backup copies everything to a
 while the app is open and online. You need a private repository and a fine-grained access token
 limited to that repository with Contents: Read and write. The steps are shown in the app.
 
-BRIEFING: Menu > New flight > Load the OFP opens the LIDO package PDF from Files. It fills in the flight
+BRIEFING: Menu > New flight > Load the OFP takes the LIDO package: copy the PDF (or its text) in your company app,
+then touch and hold the box and choose Paste. You can also drop the PDF in from another app, or open it from Files. It fills in the flight
 (From, To, alternates and their diversion times, ETD, scheduled arrival as ETA, call sign, TOD countdown)
 and Menu > Briefing shows the NOTAMs for departure, destination, alternates and en-route airports, the
 SIGMETs on your route, company alerts and the package weather. The PDF is read on the iPad; nothing is sent anywhere.
 The NOTAMs that matter for your times and runways come first. The rest are folded, never hidden.
+Pasting only NOTAMs or weather later (the Briefing's load button) updates the briefing for those airports.
 
 LIVE WEATHER (optional): Menu > Briefing can also show live METAR, TAF (aviationweather.gov) and US D-ATIS (atis.info)
 through a small free Cloudflare Worker you create once. Paste weather-relay-worker.js into a new "Hello World" Worker,

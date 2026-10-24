@@ -1137,7 +1137,21 @@ a.rtag.rl svg{width:.95em;height:.95em;vertical-align:-.12em;margin-left:2px;str
 .br-load-t b{font-size:calc(16.5px*var(--ts))}
 .br-load-t p{margin:3px 0 0;color:var(--muted);font-size:calc(14px*var(--ts));line-height:1.4}
 .br-load .btn{width:100%;cursor:pointer}
-.br-paste{display:block;margin:12px auto 2px;font-size:calc(14px*var(--ts))}
+.pkg-box{position:relative;margin:12px 0 8px}
+.pkg-drop{position:absolute;inset:0;z-index:1;border:2px dashed var(--line-strong);border-radius:14px;background:var(--paper);outline:none;caret-color:transparent;color:transparent;overflow:hidden;cursor:text;-webkit-user-select:text;user-select:text}
+.pkg-drop:focus{border-style:solid;border-color:var(--accent)}
+body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);background:var(--accent-weak)}
+.pkg-lab{position:relative;z-index:2;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:14px 16px;text-align:center;pointer-events:none;color:var(--muted)}
+.pkg-lab svg{width:24px;height:24px;color:var(--accent);margin-bottom:3px}
+.pkg-lab b{color:var(--text);font-size:calc(15.5px*var(--ts))}
+.pkg-lab small{font-size:calc(13px*var(--ts));line-height:1.3}
+.pkg-box.busy .pkg-lab b{color:var(--accent)}
+.pkg-box.busy .pkg-lab small{visibility:hidden}
+.pkg-files{width:100%;cursor:pointer}
+.nf-opt.pri{display:block;cursor:default}
+.nf-h{display:flex;align-items:center;gap:13px}
+.nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
+.ofp-none{margin:0;font-weight:600;font-size:calc(15px*var(--ts))}
 label.ib{cursor:pointer}
 /* New flight: empty, or from the OFP */
 .nf-opts{display:grid;gap:10px;margin:12px 0 8px}
@@ -1216,7 +1230,8 @@ var SECTIONS=[['DEPARTURE AIRPORT','dep'],['DESTINATION AIRPORT','dest'],['DESTI
   ['EXTENDED AREA AROUND DEPARTURE','area'],['AREA ENROUTE DEPARTURE','area'],['EXTENDED AREA AROUND DESTINATION ALTERNATE','area'],['EXTENDED AREA AROUND DESTINATION','area'],['AREA ENROUTE DESTINATION','area'],
   ['TAKEOFF ALTERNATE','toalt'],['CREW BULLETIN','end']];
 var NOTAM_RE=/^\s*((?:\d[A-Z]|[A-Z]{2})\d{1,5}\/\d{2})(?:\s+-\s+CHART NOTAM)?\s+VALID:\s*(\d{10})\s*-\s*(\d{10}|UFN|PERM)(\s+EST)?\s*$/;
-function parse(text){
+function parse(text,hint){
+  hint=hint||{};
   var L=cleanLines(text),res={flight:{},groups:[],count:0};
   var all=L.join('\n');
   // flight details from the OFP and the bulletin heading
@@ -1232,7 +1247,9 @@ function parse(text){
   if(m&&res.flight.from){var a=new Date(res.flight.from),eta=Date.UTC(a.getUTCFullYear(),a.getUTCMonth(),a.getUTCDate(),+m[1].slice(0,2),+m[1].slice(2));if(eta<res.flight.from) eta+=86400000;res.flight.eta=eta;res.flight.etd=res.flight.from;}
   // the bulletin itself
   var start=-1;for(var i=0;i<L.length;i++){if(/LIDO-NOTAM-BULLETIN/.test(L[i])){start=i;break;}}
-  if(start<0) start=0;
+  var loose=start<0;if(loose) start=0; // pasted NOTAMs without the bulletin heading
+  res.full=!loose;
+  function guess(c){return c===hint.dep?'dep':c===hint.dest?'dest':(hint.alts||[]).indexOf(c)>=0?'altn':'enroute';}
   var sec=null,grp=null,cat='',cur=null;
   function flush(){if(cur){cur.text=cur.lines.join('\n').trim();grp.notams.push(cur);res.count++;cur=null;}}
   function nx(j){j++;while(j<L.length&&!L[j].trim()) j++;return j;} // next line with text (page breaks leave gaps)
@@ -1244,16 +1261,20 @@ function parse(text){
       for(var k=0;k<SECTIONS.length;k++){if(t.indexOf(SECTIONS[k][0])===0){s=SECTIONS[k];break;}}
       if(s){flush();sec={title:t,kind:s[1]};if(s[1]==='end') break;continue;}
     }
-    if(t&&L[j1]!==undefined&&/^-{5,}$/.test(L[j1].trim())&&sec&&!NOTAM_RE.test(l)){
-      flush();
+    if(t&&L[j1]!==undefined&&/^-{5,}$/.test(L[j1].trim())&&!NOTAM_RE.test(l)){
       var ap=/^([A-Z]{4})\s+\/([A-Z]{3})?\s+(.+?)(?:\s+-\s+DETAILED INFO)?$/.exec(t),ar=/^([A-Z0-9]{2,5})\s+(.+)$/.exec(t);
-      grp=ap?{section:sec.kind,sectionTitle:sec.title,code:ap[1],iata:ap[2]||'',name:ap[3],ad:true,notams:[]}:
-        {section:sec.kind,sectionTitle:sec.title,code:ar?ar[1]:t,iata:'',name:ar?ar[2]:t,ad:false,notams:[]};
-      res.groups.push(grp);cat='';i=j1;continue;
+      if(sec||(loose&&ap)){
+        flush();
+        var sk=sec?sec.kind:guess(ap[1]),stt=sec?sec.title:'';
+        grp=ap?{section:sk,sectionTitle:stt,code:ap[1],iata:ap[2]||'',name:ap[3],ad:true,notams:[]}:
+          {section:sk,sectionTitle:stt,code:ar?ar[1]:t,iata:'',name:ar?ar[2]:t,ad:false,notams:[]};
+        res.groups.push(grp);cat='';i=j1;continue;
+      }
     }
     var c=/^\++\s*([A-Z][A-Z \/&-]*?)\s*\++$/.exec(t);
     if(c){flush();cat=c[1];continue;}
     var n=NOTAM_RE.exec(l);
+    if(n&&!grp&&loose){grp={section:'enroute',sectionTitle:'',code:'NOTAMS',iata:'',name:'Pasted NOTAMs',ad:false,notams:[]};res.groups.push(grp);}
     if(n&&grp){flush();cur={id:n[1],cat:cat||'',from:t10(n[2]),to:n[3]==='UFN'||n[3]==='PERM'?null:t10(n[3]),toTxt:n[3],est:!!n[4],chart:/CHART NOTAM/.test(l),lines:[]};continue;}
     if(cur){if(t||cur.lines.length) cur.lines.push(t);}
   }
@@ -1335,7 +1356,7 @@ function rank(n,g,ctx){
 }
 function review(res,opt){
   opt=opt||{};
-  var f=res.flight,etd=opt.etd||f.etd||f.from,eta=opt.eta||f.eta||f.to,ctx={dep:f.dep,dest:f.dest,depRwy:opt.depRwy||f.depRwy,arrRwy:opt.arrRwy||f.arrRwy,now:opt.now||etd};
+  var f=res.flight,etd=opt.etd||f.etd||f.from,eta=opt.eta||f.eta||f.to,ctx={dep:opt.dep||f.dep,dest:opt.dest||f.dest,depRwy:opt.depRwy||f.depRwy,arrRwy:opt.arrRwy||f.arrRwy,now:opt.now||etd};
   var H=3600000,out=[];
   res.groups.forEach(function(g){
     var w=g.section==='dep'?[etd-H,etd+H]:g.section==='dest'?[eta-H,eta+H]:g.section==='altn'?[eta,eta+2*H]:[etd,eta+H];
@@ -1481,9 +1502,9 @@ function crewAlerts(L){
   out.forEach(function(c){c.body=c.lines.join('\n');delete c.lines;});
   return out;
 }
-function readPackage(text){
+function readPackage(text,hint){
   var L=lines(text),all=L.join('\n'),f=ofp(all);
-  var w=weather(L),nt=NR.parse(text);
+  var w=weather(L),nt=NR.parse(text,hint);
   // the bulletin knows the alternates even when the OFP table didn't come through
   if(!f.altns.length&&nt.flight.altns) f.altns=nt.flight.altns.map(function(x){return {icao:x};});
   if(!f.dep) {f.dep=nt.flight.dep;f.dest=nt.flight.dest;}
@@ -1510,6 +1531,8 @@ var I={
   check:sv('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
   edit:sv('<path d="M4 20h4L19.3 8.7a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 16v4z"/><path d="M13.5 6.5l4 4"/>'),
   brief:sv('<rect x="5" y="4.5" width="14" height="16.5" rx="2.2"/><path d="M9.5 3h5v3h-5z"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4"/>'),
+  paste:sv('<rect x="5" y="4.5" width="14" height="16.5" rx="2.2"/><path d="M9.5 3h5v3h-5z"/><path d="M12 10v6.5M9.2 13.8l2.8 2.8 2.8-2.8"/>'),
+  folder:sv('<path d="M3.5 7.5a2 2 0 0 1 2-2h3.8l2 2.2h7.2a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),
   ext:sv('<path d="M7 17L17 7M9 7h8v8"/>'),
   link:sv('<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
   more:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.9" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.9" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.9" fill="currentColor" stroke="none"/></svg>',
@@ -1714,7 +1737,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='50';
+var APP_VERSION='51';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2922,7 +2945,7 @@ function wxCardHTML(a,removable,bare){
   var h=bare?'<div class="wxc bare">':'<div class="wxc"><div class="wxh"><b>'+esc(a.ic)+'</b><span class="wxn">'+esc(nm)+'</span>'+
     (d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?'<span class="wxcat '+d.m.cat+'">'+d.m.cat+'</span>':'')+(a.role?'<span class="wxrole">'+a.role+'</span>':'')+
     (removable?'<button type="button" class="wxx" data-act="wxUnwatch" data-v="'+a.ic+'" aria-label="Stop watching '+a.ic+'">'+I.x+'</button>':'')+'</div>';
-  if(!d) return h+'<div class="wxnone"'+(bare?'':' style="margin-top:6px"')+'>'+(bare&&!state.settings.wxUrl?'No weather in the package.':state.settings.wxUrl?'No weather yet. It loads when you’re online.':'Load the LIDO package or set up the weather relay in Menu → Briefing.')+'</div></div>';
+  if(!d) return h+'<div class="wxnone"'+(bare?'':' style="margin-top:6px"')+'>'+(state.settings.wxUrl?'No weather yet. It loads when you’re online.':brief?'No weather for it in the package.':'Load the LIDO package or set up the weather relay in Menu → Briefing.')+'</div></div>';
   var w=wxWin(a),tf=d.t?wxTafHTML(d.t,w):null;
   if(w) h+=wxStripHTML(w,tf&&tf.outside);
   if(d.m){
@@ -3036,7 +3059,7 @@ function brReview(){
   if(!brief) return [];
   var t=brTimes(),k=brief.at+'|'+t.etd+'|'+t.eta;
   if(brRv&&brRv.k===k) return brRv.rv;
-  var G=brief.notams.groups,rv=NotamReader.review(brief.notams,{etd:t.etd,eta:t.eta,now:t.etd,depRwy:brief.flight.depRwy,arrRwy:brief.flight.arrRwy});
+  var G=brief.notams.groups,f=brief.flight,rv=NotamReader.review(brief.notams,{etd:t.etd,eta:t.eta,now:t.etd,dep:f.dep,dest:f.dest,depRwy:f.depRwy,arrRwy:f.arrRwy});
   rv.forEach(function(x){x.key=G.indexOf(x.g)+':'+x.n.id;});
   brRv={k:k,rv:rv};return rv;
 }
@@ -3133,13 +3156,6 @@ function sgCardHTML(x){
     '<div class="nt-body'+(open?'':' clamp')+'">'+wxSig(s.text)+'</div></div>'+ntTickHTML(x.key,read)+'</div>';
 }
 // ---- the panel ----
-function brEmptyHTML(){
-  return '<div class="br-load"><div class="br-load-t"><span class="ic">'+I.brief+'</span><div><b>Load the LIDO package</b>'+
-      '<p>Open the PDF from Files. The flight, NOTAMs for every airport on the way, weather and SIGMETs come from it, with what matters for your times and runways first.</p></div></div>'+
-    '<label class="btn primary" for="brFile">'+I.restore+'Open the PDF</label><input type="file" id="brFile" class="vh" accept="application/pdf,.pdf" data-pkg="brief">'+
-    '<button type="button" class="lnkbtn br-paste" data-act="brPaste">Paste the text instead</button></div>'+
-    '<div class="nt-sec"><b>Weather</b></div>';
-}
 function brFlightHTML(){
   var f=brief.flight,n=brief.notams,d=f.etd?new Date(f.etd):null,same=brSame();
   var t1=(f.fno||'LIDO package')+(f.dep||f.dest?' · '+(f.dep||'?')+' → '+(f.dest||'?'):'');
@@ -3311,23 +3327,6 @@ function pdfText(lib,buf){
   });
 }
 function toastOff(){clearTimeout(toastT);toastEl.classList.remove('show');toastFn=null;}
-function brStatus(msg){
-  var s=document.getElementById('nfStat');
-  if(s&&sheetEl.contains(s)){s.textContent=msg;s.hidden=!msg;return;}
-  if(msg) toast(msg,30000);else toastOff();
-}
-function brRead(textP,mode,name){
-  if(brBusy) return;brBusy=true;brStatus('Reading the package…');
-  Promise.all([textP,loadAirports().catch(function(){})]).then(function(r){
-    var P=LidoPackage.read(r[0]);
-    if(!P.flight.dep&&!P.flight.dest&&!P.notams.count) throw brErr('This doesn’t look like a LIDO package.');
-    P.file=name||'';
-    brBusy=false;brStatus('');brConfirm(P,mode);
-  }).catch(function(e){
-    brBusy=false;brStatus('');
-    toast(e&&e.mine?e.message:'Couldn’t read this file'+(e&&e.message?' ('+e.message+')':''),6000);
-  });
-}
 function brReadFile(file,mode){
   brRead(loadPdfJs().then(function(lib){return fileBuf(file).then(function(b){return pdfText(lib,b);});}),mode,file.name);
 }
@@ -3336,23 +3335,6 @@ document.addEventListener('change',function(e){
   if(!m||!t.files||!t.files[0]) return;
   var fl=t.files[0];t.value='';brReadFile(fl,m);
 });
-function brPaste(){
-  openSheet('<h3>Paste the package</h3><p class="hint">Copy the text of the LIDO package (the OFP, the NOTAMs or the weather) and paste it here.</p>'+
-    '<textarea id="fPkg" class="code" rows="8" placeholder="Paste here" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>'+
-    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="ok">Read</button></div>',
-  function(act){
-    if(act!=='ok'){closeSheet();return;}
-    var t=$('#fPkg').value;if(!t.trim()){toast('Paste the text first');return;}
-    closeSheet();brRead(Promise.resolve(t),'brief','');
-  });
-}
-function brSetFrom(P){
-  var old=brief,f=P.flight,read={},of=old&&old.flight;
-  if(of&&old.read&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon) read=old.read; // a newer copy of the same flight keeps what you've read
-  brief={v:1,at:Date.now(),file:P.file||'',flight:f,wx:brPkgWx(P),wxMade:P.wxMade||null,sigmets:P.sigmets||[],alerts:P.alerts||[],notams:P.notams,read:read};
-  brRv=null;brFold.clear();brOpenSet.clear();brEnrOpen.clear();brSetup=false;brTab=f.dep?'dep':'dest';
-  brSave();
-}
 // From, To, alternates with their diversion times, ETD, ETA, call sign and the TOD countdown
 function brApply(P){
   var st=state.settings,f=P.flight,now=Date.now();
@@ -3374,20 +3356,144 @@ function brApply(P){
   locEl.removeAttribute('data-k');
 }
 function brTodCd(){return state.tools.cds.filter(function(c){return /^TOD\b/i.test(c.title);})[0];}
+function brEmptyHTML(){
+  return '<div class="br-load"><div class="br-load-t"><span class="ic">'+I.brief+'</span><div><b>Load the LIDO package</b>'+
+      '<p>The flight, NOTAMs for every airport on the way, weather and SIGMETs, with what matters for your times and runways first.</p></div></div>'+
+    pkgDropHTML('brief')+'</div>'+
+    '<div class="nt-sec"><b>Weather</b></div>';
+}
+// Where the package goes in: paste it (the PDF or its text), drop the PDF, or open it from Files
+var pkgSeq=0;
+function pkgDropHTML(mode){
+  var id='pkgIn'+(++pkgSeq);
+  return '<div class="pkg-box"><div class="pkg-drop" contenteditable="true" inputmode="none" autocorrect="off" autocapitalize="off" spellcheck="false" role="textbox" aria-label="Paste the LIDO package here" data-mode="'+mode+'"></div>'+
+    '<div class="pkg-lab" aria-hidden="true">'+I.paste+'<b>Touch and hold here, then Paste</b><small>Copy the PDF or its text first, or drop the PDF here.</small></div></div>'+
+    '<label class="btn pkg-files" for="'+id+'">'+I.folder+'Open from Files</label><input type="file" id="'+id+'" class="vh" accept="application/pdf,.pdf" data-pkg="'+mode+'">';
+}
+function openPkgSheet(){
+  openSheet('<h3>Load the LIDO package</h3><p class="hint">A newer copy of the same flight keeps what you’ve read. NOTAMs or weather on their own update the briefing.</p>'+pkgDropHTML('brief')+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',function(){closeSheet();});
+}
+function brStatus(msg){
+  var boxes=Array.prototype.filter.call(document.querySelectorAll('.pkg-box'),function(b){return !!b.offsetParent;});
+  boxes.forEach(function(b){
+    b.classList.toggle('busy',!!msg);
+    var l=b.querySelector('.pkg-lab b');if(!l) return;
+    if(!l.hasAttribute('data-ph')) l.setAttribute('data-ph',l.textContent);
+    l.textContent=msg||l.getAttribute('data-ph');
+  });
+  if(boxes.length) return;
+  if(msg) toast(msg,30000);else toastOff();
+}
+// the airports the app already knows, so pasted NOTAMs without their section headings land on the right tab
+function brHint(){
+  var st=state.settings,f=brief&&brief.flight;
+  if(f&&(f.dep||f.dest)) return {dep:f.dep,dest:f.dest,alts:(f.altns||[]).map(function(a){return a.icao;})};
+  return {dep:st.dep&&st.dep.icao,dest:st.dest&&st.dest.icao,alts:st.alts.slice()};
+}
+function brRead(textP,mode,name){
+  if(brBusy) return;brBusy=true;brStatus('Reading the package…');
+  Promise.all([textP,loadAirports().catch(function(){})]).then(function(r){
+    var P=LidoPackage.read(r[0],brHint());
+    if(!P.flight.dep&&!P.flight.dest&&!P.notams.count&&!Object.keys(P.wx||{}).length&&!(P.sigmets||[]).length&&!(P.alerts||[]).length)
+      throw brErr('Couldn’t find an OFP, NOTAMs or weather in it. Copy the LIDO package and try again.');
+    P.file=name||'';
+    brBusy=false;brStatus('');brConfirm(P,mode);
+  }).catch(function(e){
+    brBusy=false;brStatus('');
+    toast(e&&e.mine?e.message:'Couldn’t read this file'+(e&&e.message?' ('+e.message+')':''),6000);
+  });
+}
+function pdfFromDT(dt){
+  var L=[],i;
+  if(dt.files) for(i=0;i<dt.files.length;i++) L.push(dt.files[i]);
+  if(!L.length&&dt.items) for(i=0;i<dt.items.length;i++){var it=dt.items[i];if(it.kind==='file'){var f=it.getAsFile&&it.getAsFile();if(f) L.push(f);}}
+  for(i=0;i<L.length;i++){if(/pdf/i.test(L[i].type||'')||/\.pdf$/i.test(L[i].name||'')) return L[i];}
+  for(i=0;i<L.length;i++){if(!L[i].type) return L[i];} // a pasted file without a type: worth a try
+  return null;
+}
+function dtHasFiles(dt){
+  var t=dt&&dt.types;if(!t) return false;
+  for(var i=0;i<t.length;i++){if(t[i]==='Files'||/pdf|file-url/i.test(t[i])) return true;}
+  return false;
+}
+function pkgZone(t){return t&&t.closest?t.closest('.pkg-drop'):null;}
+document.addEventListener('paste',function(e){
+  var z=pkgZone(e.target);if(!z) return;
+  e.preventDefault();
+  var dt=e.clipboardData,m=z.getAttribute('data-mode')||'brief',f=dt&&pdfFromDT(dt);
+  z.innerHTML='';z.blur();
+  if(f){brReadFile(f,m);return;}
+  var t=dt?dt.getData('text/plain')||dt.getData('text'):'';
+  if(!t||!t.trim()){toast('Nothing to paste. Copy the LIDO package first.',3500);return;}
+  brRead(Promise.resolve(t),m,'');
+});
+// the box only takes a paste: no typing into it
+document.addEventListener('beforeinput',function(e){if(pkgZone(e.target)&&e.inputType!=='insertFromPaste') e.preventDefault();});
+document.addEventListener('input',function(e){var z=pkgZone(e.target);if(z) z.innerHTML='';});
+// drop the PDF from another app (Split View or Slide Over)
+document.addEventListener('dragover',function(e){
+  if(!dtHasFiles(e.dataTransfer)) return;
+  e.preventDefault();try{e.dataTransfer.dropEffect='copy';}catch(x){}
+  document.body.classList.add('pkgdrag');
+});
+document.addEventListener('dragleave',function(e){if(!e.relatedTarget) document.body.classList.remove('pkgdrag');});
+document.addEventListener('drop',function(e){
+  document.body.classList.remove('pkgdrag');
+  var dt=e.dataTransfer;if(!dtHasFiles(dt)) return;
+  e.preventDefault();
+  var f=pdfFromDT(dt);if(!f){toast('Drop the LIDO package PDF');return;}
+  brReadFile(f,!sheetWrap.hidden&&sheetEl.querySelector('.pkg-drop[data-mode="new"]')?'new':'brief');
+});
+function brSetFrom(P){
+  var old=brief,f=P.flight,read={},of=old&&old.flight,st=state.settings;
+  if(of&&old.read&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon) read=old.read; // a newer copy of the same flight keeps what you've read
+  if(!f.dep&&!f.dest){ // no OFP in it: the NOTAMs and weather go with the flight that's set
+    f.dep=st.dep?st.dep.icao:'';f.dest=st.dest?st.dest.icao:'';f.fromApp=true;
+    f.altns=st.alts.map(function(a){var m=st.dest&&st.altMin[st.dest.icao+'>'+a];return typeof m==='number'?{icao:a,min:m}:{icao:a};});
+  }
+  brief={v:1,at:Date.now(),file:P.file||'',flight:f,wx:brPkgWx(P),wxMade:P.wxMade||null,sigmets:P.sigmets||[],alerts:P.alerts||[],notams:P.notams,read:read};
+  brRv=null;brFold.clear();brOpenSet.clear();brEnrOpen.clear();brSetup=false;brTab=f.dep?'dep':'dest';
+  brSave();
+}
+// NOTAMs or weather without an OFP update the briefing that's loaded: a whole bulletin replaces the NOTAMs, a part replaces just its airports
+function brMerge(P){
+  var b=brief,w=brPkgWx(P);
+  if(P.notams.count){
+    if(P.notams.full) b.notams=P.notams;
+    else{
+      P.notams.groups.forEach(function(g){
+        var i=-1;b.notams.groups.forEach(function(x,j){if(x.code===g.code&&x.ad===g.ad) i=j;});
+        if(i>=0){g.section=b.notams.groups[i].section;g.sectionTitle=b.notams.groups[i].sectionTitle;b.notams.groups[i]=g;}else b.notams.groups.push(g);
+      });
+      b.notams.count=b.notams.groups.reduce(function(s,g){return s+g.notams.length;},0);
+    }
+  }
+  Object.keys(w).forEach(function(k){b.wx[k]=w[k];});
+  if(P.wxMade) b.wxMade=P.wxMade;
+  if((P.sigmets||[]).length) b.sigmets=P.sigmets;
+  if((P.alerts||[]).length) b.alerts=P.alerts;
+  b.at=Date.now();brRv=null;brOpenSet.clear();brSave();
+}
 function brConfirm(P,mode){
-  var f=P.flight,d=f.etd?new Date(f.etd):null,canFill=!!(f.dep&&f.dest),now=Date.now();
+  var f=P.flight,d=f.etd?new Date(f.etd):null,hasOfp=!!(f.dep||f.dest),canFill=!!(f.dep&&f.dest),now=Date.now(),upd=!hasOfp&&!!brief&&mode!=='new';
   var alts=(f.altns||[]).map(function(a){return esc(a.icao)+(typeof a.min==='number'?' <small>'+durM(a.min*60000,false)+'</small>':'');}).join(' · ');
   var nsg=(P.sigmets||[]).filter(function(s){return s.kind==='SIGMET';}).length,nwx=Object.keys(P.wx||{}).length,nal=(P.alerts||[]).length;
   var pk=[P.notams.count+' NOTAM'+(P.notams.count===1?'':'s'),nwx?'weather for '+nwx+' airport'+(nwx===1?'':'s'):'',nsg?nsg+' SIGMET'+(nsg===1?'':'s'):'',nal?nal+' company alert'+(nal===1?'':'s'):''].filter(Boolean).join(' · ');
-  var h='<h3>'+(mode==='new'?'New flight from the OFP':'LIDO package')+'</h3><div class="ofp-sum">'+
-    '<div class="ofp-top"><b>'+esc(f.fno||'Flight')+'</b>'+(f.cs?'<span>'+esc(f.cs)+'</span>':'')+'<em>'+esc([d?d.getUTCDate()+' '+MON[d.getUTCMonth()]:'',f.type,f.reg].filter(Boolean).join(' · '))+'</em></div>'+
-    (f.dep||f.dest?'<div class="ofp-route"><b>'+esc(f.dep||'?')+'</b>'+(f.depRwy?'<small>'+esc(f.depRwy)+'</small>':'')+I.arrow+'<b>'+esc(f.dest||'?')+'</b>'+(f.arrRwy?'<small>'+esc(f.arrRwy)+'</small>':'')+'</div>':'')+
+  var h='<h3>'+(mode==='new'?(hasOfp?'New flight from the OFP':'New flight'):upd?'Update the briefing':'LIDO package')+'</h3><div class="ofp-sum">';
+  if(hasOfp) h+='<div class="ofp-top"><b>'+esc(f.fno||'Flight')+'</b>'+(f.cs?'<span>'+esc(f.cs)+'</span>':'')+'<em>'+esc([d?d.getUTCDate()+' '+MON[d.getUTCMonth()]:'',f.type,f.reg].filter(Boolean).join(' · '))+'</em></div>'+
+    '<div class="ofp-route"><b>'+esc(f.dep||'?')+'</b>'+(f.depRwy?'<small>'+esc(f.depRwy)+'</small>':'')+I.arrow+'<b>'+esc(f.dest||'?')+'</b>'+(f.arrRwy?'<small>'+esc(f.arrRwy)+'</small>':'')+'</div>'+
     '<dl>'+(f.etd?'<dt>ETD</dt><dd>'+hmOf(f.etd)+'</dd>':'')+(f.eta?'<dt>ETA</dt><dd>'+hmOf(f.eta)+' <small>scheduled arrival</small></dd>':'')+
       (alts?'<dt>Alternates</dt><dd>'+alts+'</dd>':'')+
-      (f.tod?'<dt>TOD</dt><dd>'+hmOf(f.tod)+(brTodCd()&&f.tod>now?' <small>countdown set</small>':'')+'</dd>':'')+'</dl>'+
-    '<p class="ofp-pk">'+esc(pk)+'</p></div>';
-  if(mode==='new') h+='<p class="hint">Every checklist starts clean. Countdowns, crew rest and the flight are replaced with the OFP’s.</p>'+
+      (f.tod?'<dt>TOD</dt><dd>'+hmOf(f.tod)+(brTodCd()&&f.tod>now?' <small>countdown set</small>':'')+'</dd>':'')+'</dl>';
+  else{
+    var bf=brief&&brief.flight,who=bf?(bf.fno||((bf.dep||'?')+' → '+(bf.dest||'?'))):'';
+    h+='<p class="ofp-none">'+(upd?'No OFP in it. It updates the briefing for '+esc(who)+'.':'No OFP in it. The flight stays as it is.')+'</p>';
+  }
+  h+='<p class="ofp-pk">'+esc(pk)+'</p></div>';
+  if(mode==='new') h+='<p class="hint">Every checklist starts clean. '+(hasOfp?'Countdowns, crew rest and the flight are replaced with the OFP’s.':'Countdowns, crew rest, ETD and ETA are cleared.')+'</p>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="start">Start flight</button></div>';
+  else if(upd) h+='<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="merge">Update</button></div>';
   else if(canFill) h+='<p class="hint">Fill the flight sets From, To, alternates, ETD, ETA and the call sign. Your checklists stay as they are.</p>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="only">Briefing only</button><button type="button" class="btn primary" data-sact="fill">Fill the flight too</button></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>';
@@ -3396,21 +3502,21 @@ function brConfirm(P,mode){
     var route=(f.dep||'?')+' → '+(f.dest||'?');
     if(act==='start'){
       var before=JSON.stringify(state),oldB=brief;
-      newFlight();brSetFrom(P);brApply(P);save();closeSheet();render();window.scrollTo(0,0);wxMaybe();clockTick();
-      toast('Flight ready: '+(f.fno?f.fno+' ':'')+route,6500,'Undo',function(){undoTo(before);brief=oldB;brRv=null;brSave();wxRefreshViews();});
+      newFlight();brSetFrom(P);if(hasOfp) brApply(P);save();closeSheet();render();window.scrollTo(0,0);wxMaybe();clockTick();
+      toast(hasOfp?'Flight ready: '+(f.fno?f.fno+' ':'')+route:'Ready for a new flight',6500,'Undo',function(){undoTo(before);brief=oldB;brRv=null;brSave();wxRefreshViews();});
     }else if(act==='fill'){
       brSetFrom(P);brApply(P);save();closeSheet();render();wxMaybe();clockTick();wxRefreshViews();toast('Briefing and flight filled in');
     }else if(act==='only'){
       brSetFrom(P);closeSheet();wxRefreshViews();toast('Briefing loaded');
+    }else if(act==='merge'){
+      brMerge(P);closeSheet();wxRefreshViews();toast('Briefing updated');
     }else{closeSheet();if(mode==='new') openNewFlight();}
   });
 }
 function openNewFlight(){
   openSheet('<h3>New flight</h3><p class="hint">Every checklist starts clean: ticks, answers, calculators and notepads. Countdowns, crew rest, the call sign, ETD and ETA are cleared too.</p>'+
-    '<div class="nf-opts"><label class="nf-opt pri" for="ofpIn">'+I.brief+'<span><b>Load the OFP</b><small>The LIDO package PDF. It fills in the flight and the briefing.</small></span></label>'+
-      '<input type="file" id="ofpIn" class="vh" accept="application/pdf,.pdf" data-pkg="new">'+
+    '<div class="nf-opts"><div class="nf-opt pri"><div class="nf-h">'+I.brief+'<span><b>Load the OFP</b><small>The LIDO package fills in the flight and the briefing.</small></span></div>'+pkgDropHTML('new')+'</div>'+
       '<button type="button" class="nf-opt" data-sact="empty">'+I.plane+'<span><b>Empty flight</b><small>You fill in the flight yourself.</small></span></button></div>'+
-    '<p class="nf-stat" id="nfStat" hidden></p>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',
   function(act){
     if(act==='empty'){
@@ -5295,7 +5401,7 @@ function openTool(kind){
     (kind==='flog'?'<button type="button" class="ib round" data-act="flNew" aria-label="Add a flight">'+I.plus+'</button>':'')+
     (kind==='rest'&&!editMode&&(restEditing.has(T.rest.id)||!restCalc(T.rest).err)?'<button type="button" class="pill" data-act="'+(restEditing.has(T.rest.id)?'restDone':'restEdit')+'" data-id="'+T.rest.id+'">'+(restEditing.has(T.rest.id)?'Done':'Edit')+'</button>':'')+
     (kind==='wx'&&state.settings.wxUrl?'<button type="button" class="ib round" data-act="wxRefresh" aria-label="Update weather">'+I.reset+'</button>':'')+
-    (kind==='wx'&&brief?'<label class="ib round" for="brFile" aria-label="Load another LIDO package">'+I.restore+'</label><input type="file" id="brFile" class="vh" accept="application/pdf,.pdf" data-pkg="brief">':'')+
+    (kind==='wx'&&brief?'<button type="button" class="ib round" data-act="brLoad" aria-label="Load or update the LIDO package">'+I.paste+'</button>':'')+
     '<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button></div>';
   if(kind==='cd'){
     if(!T.cds.length) h+='<p class="hint">No countdowns yet. Tap + to add one.</p>';
@@ -6533,7 +6639,7 @@ function onAct(e){
     case 'ntRead': var ntr=el.getAttribute('data-v');if(brief){if(brief.read[ntr]) delete brief.read[ntr];else brief.read[ntr]=1;brSave();refreshTool();}break;
     case 'ntFold': var ntf=el.getAttribute('data-v');if(brFold.has(ntf)) brFold.delete(ntf);else brFold.add(ntf);refreshTool();break;
     case 'brEnr': var nte=el.getAttribute('data-v');if(brEnrOpen.has(nte)) brEnrOpen.delete(nte);else brEnrOpen.add(nte);refreshTool();break;
-    case 'brPaste': brPaste();break;
+    case 'brLoad': openPkgSheet();break;
     case 'brSetup': brSetup=true;refreshTool();break;
     case 'brGo': brGo(el.getAttribute('data-v'));break;
     case 'brRemove': confirmSheet('Remove the LIDO package? Its NOTAMs and weather leave the briefing.','Remove',function(){brief=null;brRv=null;brSave();wxRefreshViews();toast('Package removed');});break;
