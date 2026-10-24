@@ -1018,6 +1018,17 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .module.collapsed .mod-toggle .apn-tag,.module.collapsed .mod-toggle .fl-tag{display:none}
 .msub .wxcat{display:inline-block;font-size:10px;padding:0 5px;line-height:1.5;vertical-align:1px}
 
+/* Links shown as a tag in the text, or as an icon at the right */
+a.rtag.rl{color:var(--accent);border-color:var(--accent);border-color:color-mix(in srgb,var(--accent) 55%,transparent);background:var(--accent-weak);text-decoration:none;font-size:.76em;padding:1px 5px 1px 6px}
+a.rtag.rl svg{width:.95em;height:.95em;vertical-align:-.12em;margin-left:2px;stroke-width:2.6}
+.rgo-w{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;align-self:center;margin-left:8px}
+.rgo{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:34px;height:34px;padding:0 9px;border-radius:999px;background:var(--accent-weak);color:var(--accent);font-size:calc(13px*var(--ts));font-weight:700;letter-spacing:.02em;text-decoration:none;white-space:nowrap}
+.rgo svg{width:17px;height:17px;stroke-width:2.4;flex:none}
+.rgo:active{filter:brightness(.92)}
+.ls-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
+.ls-row .fl{margin:0}
+.ls-hint{font-size:calc(13px*var(--ts));color:var(--muted);margin:6px 2px 0;line-height:1.35}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -1102,6 +1113,7 @@ var I={
   chev:sv('<path d="M6 9l6 6 6-6"/>'),
   check:sv('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
   edit:sv('<path d="M4 20h4L19.3 8.7a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 16v4z"/><path d="M13.5 6.5l4 4"/>'),
+  ext:sv('<path d="M7 17L17 7M9 7h8v8"/>'),
   link:sv('<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
   more:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.9" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.9" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.9" fill="currentColor" stroke="none"/></svg>',
   plus:sv('<path d="M12 5v14M5 12h14"/>'),
@@ -1209,6 +1221,7 @@ function normItem(it){
     info:!!it.info,done:!it.info&&!!it.done,open:it.open!==false,rem:normRem(it.rem),
     children:Array.isArray(it.children)?it.children.map(normItem).filter(function(x){return x&&x.type==='check';}):[]};
   if(isLay(it.lay)) o.lay=it.lay; // airport note shown as a row or as text, whatever its section's style
+  if(it.ls==='tag'||it.ls==='icon') o.ls=it.ls; // how its links show: a button (default), the tag in the text, or an icon
   return normDec(o,it);
 }
 function normDec(o,it){
@@ -1304,7 +1317,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='48';
+var APP_VERSION='49';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1544,6 +1557,24 @@ function linkHTML(l){
   var label=l.label||l.url.replace(/^[a-z][a-z0-9+.-]*:\/\//i,'');
   return '<a class="lnk" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener">'+I.link+'<span>'+esc(label)+'</span></a>';
 }
+function linkName(l){return l.label||l.url.replace(/^[a-z][a-z0-9+.-]*:\/\//i,'');}
+// Tag style: a [FCOM] tag whose text matches a link's name opens that link; links with no matching tag are added as tags at the end
+function tagLinks(h,links){
+  var used={};
+  function a(l,inner){return '<a class="rtag rl" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener" aria-label="Open '+esc(linkName(l))+'">'+inner+I.ext+'</a>';}
+  h=h.replace(/<span class="rtag">([^<]*)<\/span>/g,function(m,x){
+    for(var i=0;i<links.length;i++){if(!used[i]&&esc(linkName(links[i])).trim().toLowerCase()===x.trim().toLowerCase()){used[i]=1;return a(links[i],x);}}
+    return m;
+  });
+  var extra=links.filter(function(l,i){return !used[i];}).map(function(l){return a(l,esc(linkName(l)));}).join(' ');
+  return h+(extra?(h?' ':'')+extra:'');
+}
+// Icon style: a round ↗ at the right of the row (with the name when there is more than one link)
+function iconLinksHTML(links){
+  return '<span class="rgo-w">'+links.map(function(l){
+    return '<a class="rgo" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener" aria-label="Open '+esc(linkName(l))+'">'+(links.length>1?'<span>'+esc(linkName(l))+'</span>':'')+I.ext+'</a>';
+  }).join('')+'</span>';
+}
 // anything in square brackets in a check, like [FCOM] or [QRH 2.3], shows as a small tag
 function refTags(h){return h.replace(/\[([^\[\]<>\n]{1,30})\]/g,function(m,x){x=x.trim();return x?'<span class="rtag">'+x+'</span>':m;});}
 function linkify(escaped){
@@ -1699,12 +1730,15 @@ function renderCheck(it,depth,o){
   else if(em) h+='<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">';
   else if(it.info) h+='<div class="row" data-id="'+it.id+'">';
   else h+='<div class="row" data-act="tick" data-id="'+it.id+'" tabindex="0" role="checkbox" aria-checked="'+it.done+'">';
-  h+=(it.info?'<span class="ibox" aria-hidden="true">'+I.info+'</span>':'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(refTags(esc(it.text))||'<span class="ph">Untitled item</span>')+'</div>';
+  var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',lab=refTags(esc(it.text));
+  if(ls==='tag') lab=tagLinks(lab,it.links);
+  h+=(it.info?'<span class="ibox" aria-hidden="true">'+I.info+'</span>':'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(lab||'<span class="ph">Untitled item</span>')+'</div>';
   if(it.note) h+='<div class="note">'+refTags(linkify(esc(it.note)))+'</div>';
-  if(it.links.length) h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
+  if(it.links.length&&ls==='button') h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   if(it.rem&&!nt) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
   h+='</div>';
+  if(ls==='icon') h+=iconLinksHTML(it.links);
   if(kids.length) h+='<button type="button" class="kid-toggle" data-act="toggleKids" data-id="'+it.id+'" aria-label="Show or hide sub-items">'+(kt.length?kd+'/'+kt.length:kids.length)+'<span class="chev">'+I.chev+'</span></button>';
   if(ord) h+='<span class="grip" data-pdrag="1" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>';
   else if(em) h+='<span class="edit-hint">'+I.edit+'</span>'+(nt?'':'<span class="grip" data-drag="item" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>');
@@ -3041,7 +3075,10 @@ function edThumbsHTML(imgs){
 function openItemEditor(id,isNew){
   var f=find(id);if(!f) return;
   var it=f.node,n=f.arr.length,imgs=(it.imgs||[]).slice(),busy=0,info=!!it.info;
-  var kind=it.dq?'dec':it.end?'end':(info?'info':'check'),endTone=it.end||'go';
+  var kind=it.dq?'dec':it.end?'end':(info?'info':'check'),endTone=it.end||'go',ls=it.ls==='tag'||it.ls==='icon'?it.ls:'button';
+  var LS_HINT={button:'A button under the text, as before.',tag:'A tag in the text opens the link with the same name, e.g. [FCOM] opens the link named FCOM. A link with no matching tag is added as a tag at the end.',
+    icon:'A round ↗ button at the right of the row.'};
+  function lsVis(){var r=$('#fLsRow');if(r) r.hidden=!sheetEl.querySelector('.link-row');}
   var inKids=f.anc.length&&f.arr===f.anc[f.anc.length-1].children,allowDec=!f.apn&&!inKids;
   // an airport note can be a row or text on its own; until one is picked it follows its section's style
   var topNote=!!(f.apn&&!f.anc.length),lay=isLay(it.lay)?it.lay:'';
@@ -3121,7 +3158,10 @@ function openItemEditor(id,isNew){
       '<button type="button" data-sact="endTone" data-v="go" class="'+(endTone==='go'?'on':'')+'">Green · go</button><button type="button" data-sact="endTone" data-v="stop" class="'+(endTone==='stop'?'on':'')+'">Amber · stop</button></div></div>'+
     '<label class="fld"><span class="fl">Note <em>(shown under the item)</em></span><textarea id="fNote" rows="3" placeholder="Optional">'+esc(it.note)+'</textarea></label>'+
     '<div class="fld"><span class="fl">Links</span><div id="fLinks">'+it.links.map(linkRowHTML).join('')+'</div>'+
-    '<button type="button" class="btn small ghost" data-sact="addLink">'+I.plus+'Add link</button></div>'+
+    '<button type="button" class="btn small ghost" data-sact="addLink">'+I.plus+'Add link</button>'+
+    '<div id="fLsRow"'+(it.links.length?'':' hidden')+'><div class="ls-row"><span class="fl">Show links as</span><div class="seg" id="fLs" role="radiogroup" aria-label="Show links as">'+
+      [['button','Button'],['tag','Tag'],['icon','Icon']].map(function(x){var on=x[0]===ls;return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="ls" data-v="'+x[0]+'">'+x[1]+'</button>';}).join('')+
+    '</div></div><p class="ls-hint" id="fLsHint">'+LS_HINT[ls]+'</p></div></div>'+
     '<div class="fld"><span class="fl">Photos <em>(tap one in the checklist to enlarge it)</em></span><div class="ed-thumbs" id="fImgs">'+edThumbsHTML(imgs)+'</div>'+
     '<input type="file" id="fPhoto" class="vh" accept="image/*" multiple>'+
     '<label class="btn small ghost" for="fPhoto">'+I.photo+'Add photo</label></div>'+
@@ -3139,6 +3179,7 @@ function openItemEditor(id,isNew){
       it.text=$('#fText').value.trim();
       it.note=$('#fNote').value.replace(/\s+$/,'');
       it.links=Array.prototype.map.call(sheetEl.querySelectorAll('.link-row'),function(r){return {label:r.querySelector('.lLabel').value.trim(),url:r.querySelector('.lUrl').value.trim()};}).filter(function(l){return l.url;});
+      if(ls==='button') delete it.ls;else it.ls=ls;
       it.imgs=imgs.slice();
       it.info=info;if(info) it.done=false;
       if(topNote){if(lay) it.lay=lay;else delete it.lay;}
@@ -3182,8 +3223,12 @@ function openItemEditor(id,isNew){
         endTone=btn.getAttribute('data-v');sheetEl.querySelectorAll('#fEndTone button').forEach(function(b){b.classList.toggle('on',b===btn);});break;
       case 'addLink':
         var d=document.createElement('div');d.innerHTML=linkRowHTML({label:'',url:''});
-        var row=d.firstElementChild;$('#fLinks').appendChild(row);row.querySelector('.lLabel').focus();break;
-      case 'rmLink': btn.closest('.link-row').remove();break;
+        var row=d.firstElementChild;$('#fLinks').appendChild(row);row.querySelector('.lLabel').focus();lsVis();break;
+      case 'rmLink': btn.closest('.link-row').remove();lsVis();break;
+      case 'ls':
+        ls=btn.getAttribute('data-v');
+        sheetEl.querySelectorAll('#fLs button').forEach(function(b){var on=b===btn;b.classList.toggle('on',on);b.setAttribute('aria-checked',String(on));});
+        $('#fLsHint').textContent=LS_HINT[ls];break;
       case 'rmImg':
         k=imgs.indexOf(btn.getAttribute('data-v'));if(k>=0) imgs.splice(k,1);
         refreshThumbs();break;
