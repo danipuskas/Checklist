@@ -939,6 +939,59 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .pb-none{color:var(--muted);font-size:calc(14px*var(--ts));margin:4px 4px 0}
 .pb-notes{border:1px solid var(--line);border-radius:12px;overflow:hidden}
 
+/* Countdown and crew rest blocks: the result once set, controls on tap */
+.mod-head .mod-x{text-decoration:none;padding:8px 12px;font-size:calc(15px*var(--ts));flex:none}
+.cd.rd .cd-row{appearance:none;border:0;background:none;color:var(--text);width:100%;display:flex;align-items:center;gap:11px;padding:calc(11px*var(--sp)) 14px;text-align:left;font:inherit;border-radius:13px}
+.cd.rd .cd-row:active{background:var(--press)}
+.cd.rd .cd-row > svg{width:20px;height:20px;color:var(--accent);flex:none}
+.cd-rt{flex:1;min-width:0;display:flex;flex-direction:column}
+.cd-rt b{font-size:calc(16px*var(--ts));font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cd-rt small{font-size:calc(13px*var(--ts));color:var(--muted);font-variant-numeric:tabular-nums}
+.cd.rd .cd-rem{font-size:calc(28px*var(--ts))}
+.cd.rd.unset .cd-rem{display:none}
+.cd-setpill{background:var(--accent-weak);color:var(--accent);font-weight:650;font-size:calc(14px*var(--ts));padding:8px 13px;border-radius:10px;flex:none}
+.cd.rd .cd-alert{margin:0 10px 10px}
+.rest.rd .rest-out{margin-top:0}
+.rest-out.rd .rrow{appearance:none;border:0;border-top:1px solid var(--line-soft);background:none;color:var(--text);width:100%;text-align:left;font:inherit;padding:9px 12px}
+.rest-out.rd .rrow:active{background:var(--press)}
+.rname{display:flex;align-items:center;gap:7px;min-width:0;font-size:calc(16px*var(--ts));font-weight:600}
+.rname span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.you{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--accent);color:var(--on-accent);border-radius:5px;padding:2px 6px;flex:none}
+.rrow.mine{box-shadow:inset 4px 0 0 var(--accent)}
+.rrow.mine:not(.now){background:var(--accent-weak)}
+.rest-hint{color:var(--accent);font-weight:600}
+/* Straight on to the next checklist */
+.nextcl{appearance:none;border:0;width:100%;display:flex;align-items:center;gap:12px;margin:2px 0 calc(14px*var(--sp));padding:14px 14px 14px 16px;border-radius:16px;background:var(--accent);color:var(--on-accent);text-align:left;font:inherit}
+.nextcl[hidden]{display:none}
+.nextcl:active{filter:brightness(.92)}
+.nextcl .nc-t{flex:1;min-width:0;display:flex;flex-direction:column}
+.nextcl small{font-size:calc(13px*var(--ts));font-weight:650;opacity:.82}
+.nextcl b{font-size:calc(21px*var(--ts));font-weight:750;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nextcl i{font-style:normal;font-size:calc(13px*var(--ts));opacity:.82}
+.nextcl svg{width:26px;height:26px;flex:none;stroke-width:2.4}
+.tb-chips.pair{column-gap:4px}
+.tb-chips.pair .restchip{padding-right:9px}
+.tb-chips.pair .etachip{padding:3px 9px}
+.tb-chips.pair .etachip svg{display:none}
+.chip.next{color:var(--accent);font-weight:700;cursor:pointer;max-width:55%;overflow:hidden;text-overflow:ellipsis}
+/* Menu as live tiles */
+.mtiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 12px}
+.mtiles button{appearance:none;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:14px;padding:10px 12px 11px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:0;font:inherit}
+.mtiles button:active{background:var(--press)}
+.mtiles .wide{grid-column:1/-1}
+.mtiles .mi{display:flex;align-items:center;gap:7px;width:100%;font-size:calc(13px*var(--ts));color:var(--muted);font-weight:650;white-space:nowrap}
+.mtiles .mi svg{width:18px;height:18px;color:var(--accent);flex:none}
+.mtiles .mi .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);margin-left:auto}
+.mtiles b{font-size:calc(23px*var(--ts));font-weight:750;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:7px;margin-top:5px;line-height:1.15;max-width:100%;white-space:nowrap}
+.mtiles b.on{color:var(--done)}
+.mtiles i{font-style:normal;font-size:calc(12.5px*var(--ts));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-variant-numeric:tabular-nums}
+.mtiles .wxcat{font-size:11px}
+.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 -2px 2px}
+.mrow button{appearance:none;border:0;background:none;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:5px;font:600 calc(13px*var(--ts)) -apple-system,system-ui,sans-serif;padding:9px 2px 8px;border-radius:12px;text-align:center}
+.mrow button:active{background:var(--press)}
+.mrow svg{width:22px;height:22px;color:var(--accent)}
+.mrow .pri{background:var(--accent-weak);color:var(--accent)}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -1048,6 +1101,7 @@ var I={
   timer:sv('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2"/><path d="M9.5 2.8h5"/><path d="M12 2.8V6"/>'),
   contrast:sv('<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>'),
   sun:sv('<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>'),
+  arrow:sv('<path d="M5 12h14M13 6l6 6-6 6"/>'),
   moon:sv('<path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/>'),
   textsize:sv('<path d="M3 7V5h11v2"/><path d="M8.5 5v14"/><path d="M14 12v-1.5h7V12"/><path d="M17.5 10.5V19"/>'),
   info:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 11v5.5"/><path d="M12 7.6v.1" stroke-width="2.6"/>'),
@@ -1085,7 +1139,7 @@ function newCheck(text){return {id:uid(),type:'check',text:text||'',note:'',link
 function newCalc(){return {id:uid(),type:'calc',title:'Calculator',expr:'',hist:[],collapsed:false};}
 function newPad(){return {id:uid(),type:'pad',title:'Notepad',mode:'draw',text:'',strokes:[],h:300,collapsed:false};}
 function newCd(){return {id:uid(),type:'cd',title:'Countdown',target:null,lead:0,aL:false,aZ:false,collapsed:false};}
-function newRest(){return {id:uid(),type:'rest',title:'Crew rest',start:'',end:'',n:2,buffer:0,round:true,labels:[],collapsed:false};}
+function newRest(){return {id:uid(),type:'rest',title:'Crew rest',start:'',end:'',n:2,buffer:0,round:true,labels:[],mine:-1,collapsed:false};}
 
 function newApn(){return {id:uid(),type:'apn',title:'Airport notes',which:'dest',secs:null,fold:{},collapsed:false};}
 function newNote(){var n=newCheck('');n.info=true;return n;}
@@ -1117,7 +1171,7 @@ function normItem(it){
     lead:Math.max(0,Math.min(180,+it.lead||0)),aL:!!it.aL,aZ:!!it.aZ,collapsed:!!it.collapsed};
   if(it.type==='rest') return {id:str(it.id)||uid(),type:'rest',title:str(it.title,'Crew rest'),start:str(it.start),end:str(it.end),
     n:Math.max(1,Math.min(8,Math.round(+it.n)||2)),buffer:Math.max(0,Math.min(60,+it.buffer||0)),round:it.round!==false,
-    labels:Array.isArray(it.labels)?it.labels.map(function(x){return str(x);}).slice(0,8):[],collapsed:!!it.collapsed};
+    labels:Array.isArray(it.labels)?it.labels.map(function(x){return str(x);}).slice(0,8):[],mine:typeof it.mine==='number'&&it.mine>=0&&it.mine<8?Math.floor(it.mine):-1,collapsed:!!it.collapsed};
   if(it.type==='calc') return {id:str(it.id)||uid(),type:'calc',title:str(it.title,'Calculator'),expr:str(it.expr),
     hist:Array.isArray(it.hist)?it.hist.filter(function(h){return h&&typeof h.r==='string';}).slice(-8):[],collapsed:!!it.collapsed};
   if(it.type==='pad') return {id:str(it.id)||uid(),type:'pad',title:str(it.title,'Notepad'),mode:it.mode==='type'?'type':'draw',text:str(it.text),
@@ -1186,7 +1240,7 @@ function linkBlocks(lists,T){
       s.items[i]={id:n.id,type:'cd',link:true,ref:c?c.id:null,collapsed:n.collapsed};blocksMigrated=true;
     }else if(n.type==='rest'&&!n.link){
       var r=T.rest;
-      if(!restUsed(r)&&restUsed(n)){r.start=n.start;r.end=n.end;r.n=n.n;r.buffer=n.buffer;r.round=n.round;r.labels=n.labels.slice();}
+      if(!restUsed(r)&&restUsed(n)){r.start=n.start;r.end=n.end;r.n=n.n;r.buffer=n.buffer;r.round=n.round;r.labels=n.labels.slice();r.mine=n.mine;}
       s.items[i]={id:n.id,type:'rest',link:true,collapsed:n.collapsed};blocksMigrated=true;
     }else if(n.type==='cd'&&n.ref&&!T.cds.some(function(x){return x.id===n.ref;})) n.ref=null;
   });});});
@@ -1224,7 +1278,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='46';
+var APP_VERSION='47';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1441,7 +1495,7 @@ function newFlight(){
   });});
   var T=state.tools;
   T.cds.forEach(function(c){c.target=null;c.aL=c.aZ=false;alerting.delete(c.id);});
-  T.rest.start='';T.rest.end='';
+  T.rest.start='';T.rest.end='';T.rest.mine=-1;restEditing.clear();cdOpen.clear();
   state.flightCur=null;
   state.settings.etdT=0;state.settings.etaT=0;state.settings.csign='';
   Object.keys(state.apNotes).forEach(function(ic){var a=state.apNotes[ic];Object.keys(a).forEach(function(k){untickItems(a[k]);});});
@@ -1685,7 +1739,16 @@ function renderCdBlock(b){
 }
 function renderCd(m,blk){
   var b=blk||m;
-  return '<div class="module cd'+(b.collapsed?' collapsed':'')+'" data-mod="'+b.id+'"'+(blk?' data-ref="'+m.id+'"':'')+'>'+modHead({id:b.id,title:m.title},I.timer)+
+  if(blk&&!editMode&&!cdOpen.has(b.id)){
+    // in a checklist the countdown is one row; tap it for the controls (or to set a time)
+    var un=m.target===null;
+    return '<div class="module cd rd'+(un?' unset':'')+'" data-mod="'+b.id+'" data-ref="'+m.id+'">'+
+      '<button type="button" class="cd-row" data-act="'+(un?'cdSet':'cdOpen')+'" data-id="'+(un?m.id:b.id)+'" aria-label="'+esc(m.title)+(un?', not set. Tap to set a time':' countdown. Tap for the controls')+'">'+I.timer+
+      '<span class="cd-rt"><b>'+esc(m.title)+'</b><small data-sub></small></span><span class="cd-rem" data-rem></span>'+(un?'<span class="cd-setpill">Set time</span>':'')+'</button>'+
+      '<div class="cd-alert" role="alert"><span data-amsg></span><button type="button" data-act="cdAck" data-id="'+m.id+'">OK</button></div><span data-meta hidden></span></div>';
+  }
+  return '<div class="module cd'+(b.collapsed?' collapsed':'')+'" data-mod="'+b.id+'"'+(blk?' data-ref="'+m.id+'"':'')+'>'+
+    modHead({id:b.id,title:m.title},I.timer,blk&&!editMode?'<button type="button" class="lnkbtn mod-x" data-act="cdShut" data-id="'+b.id+'">Done</button>':'')+
     '<div class="mod-body"><button type="button" class="cd-time" data-act="cdSet" data-id="'+m.id+'" aria-label="Set countdown time">'+
     '<span class="cd-rem" data-rem></span><span class="cd-sub" data-sub></span></button>'+
     '<div class="cd-alert" role="alert"><span data-amsg></span><button type="button" data-act="cdAck" data-id="'+m.id+'">OK</button></div>'+
@@ -1696,9 +1759,13 @@ function renderCd(m,blk){
     '<div class="cd-meta" data-meta></div></div></div>';
 }
 function renderRest(m,blk){
-  var b=blk||m;
+  var b=blk||m,read=!restCalc(m).err&&!restEditing.has(b.id);
+  var x=editMode?'':read?'<button type="button" class="lnkbtn mod-x" data-act="restEdit" data-id="'+b.id+'">Edit</button>':
+    restEditing.has(b.id)?'<button type="button" class="lnkbtn mod-x" data-act="restDone" data-id="'+b.id+'">Done</button>':'';
+  if(read) return '<div class="module rest rd'+(b.collapsed?' collapsed':'')+'" data-mod="'+b.id+'"'+(blk?' data-ref="'+m.id+'"':'')+'>'+modHead({id:b.id,title:m.title},I.moon,x)+
+    '<div class="mod-body"><div class="rest-out rd" data-out>'+restReadHTML(m)+'</div></div></div>';
   var bufs=[0,5,10,15,20,30].map(function(v){return '<option value="'+v+'"'+(m.buffer===v?' selected':'')+'>'+(v?v+' min':'None')+'</option>';}).join('');
-  return '<div class="module rest'+(b.collapsed?' collapsed':'')+'" data-mod="'+b.id+'"'+(blk?' data-ref="'+m.id+'"':'')+'>'+modHead({id:b.id,title:m.title},I.moon)+
+  return '<div class="module rest'+(b.collapsed?' collapsed':'')+'" data-mod="'+b.id+'"'+(blk?' data-ref="'+m.id+'"':'')+'>'+modHead({id:b.id,title:m.title},I.moon,x)+
     '<div class="mod-body"><div class="rest-in">'+
     '<label class="tin"><span>Start</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="HHMM" data-rest="start" data-id="'+m.id+'" value="'+esc(m.start)+'"><i>Z</i></label>'+
     '<label class="tin"><span>End</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="HHMM" data-rest="end" data-id="'+m.id+'" value="'+esc(m.end)+'"><i>Z</i></label></div>'+
@@ -2551,6 +2618,12 @@ function render(){
   if(!L.sections.length&&!editMode) h+='<div class="sec"><div class="empty">This checklist is empty. Tap Edit to add a section.</div></div>';
   h+=L.sections.map(renderSection).join('');
   if(editMode) h+='<button type="button" class="add-sec" data-act="addSection">'+I.plus+'Add section</button>';
+  var nx=nextListOf(L);
+  if(nx&&!editMode){
+    var nc=listCount(nx).t;
+    h+='<button type="button" class="nextcl" data-act="nextList" data-id="'+nx.id+'" hidden><span class="nc-t"><small>'+esc(L.title)+' complete</small><b>Next: '+esc(nx.title)+'</b>'+
+      (nc?'<i>'+nc+' check'+(nc===1?'':'s')+'</i>':'')+'</span>'+I.arrow+'</button>';
+  }
   h+='<p class="foot">Saved on this device. Back up from the menu.</p>';
   app.innerHTML=h;
   apnFit(app);
@@ -2564,10 +2637,16 @@ function mountIfDraw(el){
   var f=find(el.getAttribute('data-mod'));
   if(f&&f.node.mode==='draw'&&el.querySelector('canvas')) ctl.set(f.node.id,mountPad(el,f.node));
 }
+function nextListOf(L){var i=state.lists.indexOf(L);return i>=0&&i<state.lists.length-1?state.lists[i+1]:null;}
 function updateProgress(){
-  var c=listCount(cur()),complete=c.t>0&&c.d===c.t,chip=$('#chip');
-  if(chip){chip.textContent=c.t?(complete?'All done':c.d+' of '+c.t):'';
-  chip.classList.toggle('complete',complete);}
+  var L=cur(),c=listCount(L),complete=c.t>0&&c.d===c.t,chip=$('#chip'),nx=complete&&!editMode?nextListOf(L):null;
+  if(chip){
+    chip.textContent=c.t?(nx?nx.title+' ›':complete?'All done':c.d+' of '+c.t):'';
+    chip.classList.toggle('complete',complete&&!nx);chip.classList.toggle('next',!!nx);
+    if(nx){chip.setAttribute('data-act','nextList');chip.setAttribute('data-id',nx.id);chip.setAttribute('role','button');chip.setAttribute('aria-label','Next checklist: '+nx.title);}
+    else{chip.removeAttribute('data-act');chip.removeAttribute('role');chip.removeAttribute('aria-label');}
+  }
+  var nb=app.querySelector('.nextcl');if(nb) nb.hidden=!complete;
   barFill.style.width=c.t?(c.d/c.t*100)+'%':'0';
   barFill.classList.toggle('complete',complete);
 }
@@ -3405,21 +3484,66 @@ function openSectionImport(){
     rd.readAsText(file);
   });
 }
+// Menu tiles: each tool with where it stands right now
+function tileTime(min){min=Math.max(0,Math.ceil(min));return Math.floor(min/60)+':'+pad2(min%60);}
+function menuTileVals(now){
+  var st=state.settings,o={};
+  var set=state.tools.cds.filter(function(c){return c.target!==null;});
+  if(!set.length) o.cd=['–',state.tools.cds.length>1?state.tools.cds.length+' countdowns, none set':'Not set'];
+  else{
+    var up=set.filter(function(c){return c.target>now;}).sort(function(a,b){return a.target-b.target;});
+    var m=up[0]||set.slice().sort(function(a,b){return b.target-a.target;})[0],diff=m.target-now,more=set.length>1?' · +'+(set.length-1)+' more':'';
+    var at=hmZ(new Date(m.target).getUTCHours()*60+new Date(m.target).getUTCMinutes());
+    o.cd=diff>0?[tileTime(Math.floor(diff/60000)),m.title+' at '+at+more]:['+'+tileTime(-diff/60000),m.title+' passed'+more];
+  }
+  var rm=restSource(),t=rm&&restTop(rm,now);
+  if(t) o.rest=[tileTime(t.min),t.mine?(t.mode==='on'?'left of your rest':'to your rest'):t.mode==='on'?(t.name+' left'):t.mode==='gap'?t.name:'to rest at '+rm.start+'Z',t.mode==='on'];
+  else if(rm){var rc=restCalc(rm);o.rest=[hmZ(rc.s).slice(0,4)+'Z',restInfo(rm,now).txt||'Crew rest set'];}
+  else o.rest=['–','Not set'];
+  var ap=st.dest||st.dep;
+  if(ap){var nn=apNoteCount(ap.icao);o.ap=[ap.icao,'Brief'+(nn?' · '+nn+' note'+(nn===1?'':'s'):', notes, stats')];}
+  else o.ap=['–','Brief and notes for any airport'];
+  var nf=state.flights.length,cf=curFlight(false),lf=flSorted()[0];
+  o.fl=[String(nf),cf?'logging '+(cf.dep.icao||'—')+' → '+(cf.arr.icao||'—'):nf?(nf===1?'flight':'flights')+(lf&&lf.arr.icao?' · last '+lf.arr.icao:''):'None logged yet'];
+  if(!st.wxUrl) o.wx=['–','METAR and TAF. Set up once'];
+  else{
+    var cat=function(ic){var d=wx[ic];return d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';};
+    var dst=st.dest&&st.dest.icao,f=wxLastFetch(wxAirports().map(function(x){return x.ic;})),age=f?ageText(now-f)+' ago':'Not updated yet';
+    if(dst){
+      var c0=cat(dst),alts=st.alts.filter(cat).map(function(a){return a+' '+cat(a);}).join(' · ');
+      o.wx=[esc(dst)+(c0?' <span class="wxcat '+c0+'">'+c0+'</span>':''),(alts?alts+' · ':'')+age,true];
+    }else o.wx=['–',wxSummary(),true];
+  }
+  return o;
+}
+function menuTilesHTML(now){
+  var v=menuTileVals(now);
+  function tile(k,act,icon,label,cls){
+    var x=v[k];
+    return '<button type="button" data-sact="'+act+'"'+(cls?' class="'+cls+'"':'')+'><span class="mi">'+icon+label+'</span><b data-mv="'+k+'"'+(x[2]===true&&k==='rest'?' class="on"':'')+'>'+(k==='wx'?x[0]:esc(x[0]))+'</b><i data-ms="'+k+'">'+esc(x[1])+'</i></button>';
+  }
+  return tile('cd','tcd',I.timer,'Countdowns')+tile('rest','trest',I.moon,'Crew rest')+tile('ap','tapn',I.pin,'Airports')+tile('fl','tflog',I.log,'Flight log')+tile('wx','twx',I.wx,'Weather','wide');
+}
+function paintMenuTiles(now){
+  var box=document.getElementById('mTiles');if(!box||!box.offsetParent) return;
+  var v=menuTileVals(now);
+  ['cd','rest'].forEach(function(k){
+    var b=box.querySelector('[data-mv="'+k+'"]'),i=box.querySelector('[data-ms="'+k+'"]');
+    if(b&&b.textContent!==v[k][0]) b.textContent=v[k][0];
+    if(b&&k==='rest') b.classList.toggle('on',v.rest[2]===true);
+    if(i&&i.textContent!==v[k][1]) i.textContent=v[k][1];
+  });
+}
 function openMenu(){
   var now=Date.now(),warn=cloud.on&&!!cloud.err;
   openSheet('<div class="menu-head"><h3>Menu</h3>'+
     '<button type="button" class="ib round" data-sact="search" aria-label="Search">'+I.search+'</button>'+
-    '<button type="button" class="ib round" data-sact="settings" aria-label="Settings'+(warn?', needs attention':'')+'">'+I.gear+(warn?'<span class="dot"></span>':'')+'</button></div>'+
-    '<div class="menu">'+
-    '<button type="button" data-sact="tcd">'+I.timer+'<span class="mt">Countdowns<small>'+esc(cdSummary(now))+'</small></span></button>'+
-    '<button type="button" data-sact="trest">'+I.moon+'<span class="mt">Crew rest<small>'+esc(restSummary(now))+'</small></span></button>'+
-    '<button type="button" data-sact="tapn">'+I.pin+'<span class="mt">Airports<small>'+esc(apnSummary())+'</small></span></button>'+
-    '<button type="button" data-sact="tflog">'+I.log+'<span class="mt">Flight log<small>'+esc(flogSummary())+'</small></span></button>'+
-    '<button type="button" data-sact="twx">'+I.wx+'<span class="mt">Weather<small>'+esc(wxSummary())+'</small></span></button><hr>'+
-    '<button type="button" data-sact="lists">'+I.list+'<span class="mt one">Checklists</span></button>'+
-    '<button type="button" data-sact="untick">'+I.reset+'<span class="mt one">Untick all</span></button>'+
-    '<button type="button" data-sact="flight">'+I.plane+'<span class="mt one">New flight</span></button>'+
-    '</div><div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button></div>',
+    '<button type="button" class="ib round" data-sact="settings" aria-label="Settings'+(warn?', needs attention':'')+'">'+I.gear+(warn?'<span class="dot"></span>':'')+'</button>'+
+    '<button type="button" class="ib round" data-sact="cancel" aria-label="Close menu">'+I.x+'</button></div>'+
+    '<div class="mtiles" id="mTiles">'+menuTilesHTML(now)+'</div>'+
+    '<div class="mrow"><button type="button" data-sact="lists">'+I.list+'Checklists</button>'+
+    '<button type="button" data-sact="untick">'+I.reset+'Untick all</button>'+
+    '<button type="button" data-sact="flight" class="pri">'+I.plane+'New flight</button></div>',
   function(act){
     var L=cur();
     switch(act){
@@ -3957,23 +4081,41 @@ function restOutHTML(m){
   }).join('');
   return '<div class="rest-now" data-status></div>'+h+'<div class="rest-sum">Total '+durHM(r.total)+(m.buffer?', with '+m.buffer+' min handover':'')+'</div>';
 }
+function restMineIdx(m,r){return typeof m.mine==='number'&&m.mine>=0&&m.mine<r.rows.length?m.mine:-1;}
 function restInfo(m,now){
   var r=restCalc(m);
   if(r.err) return null;
   var d=new Date(now),nowMin=d.getUTCHours()*60+d.getUTCMinutes()+d.getUTCSeconds()/60;
-  var rel=((nowMin-r.s)%1440+1440)%1440,abs=r.s+rel,txt='',on=false,idx=-1;
+  var rel=((nowMin-r.s)%1440+1440)%1440,abs=r.s+rel,txt='',on=false,idx=-1,me=restMineIdx(m,r);
   if(rel<r.total){
     for(var i=0;i<r.rows.length;i++){
       var x=r.rows[i];
-      if(abs>=x.s&&abs<x.e){idx=i;txt='Now: '+(m.labels[i]||'Break '+(i+1))+', '+durHM(Math.ceil(x.e-abs))+' left';on=true;break;}
-      if(abs<x.s){txt='Handover, next at '+hmZ(x.s);break;}
+      if(abs>=x.s&&abs<x.e){
+        idx=i;on=true;
+        txt=i===me?'Your rest: '+durHM(Math.ceil(x.e-abs))+' left':'Now: '+(m.labels[i]||'Break '+(i+1))+', '+durHM(Math.ceil(x.e-abs))+' left'+(me>i?' · yours in '+durHM(Math.ceil(r.rows[me].s-abs)):'');
+        break;
+      }
+      if(abs<x.s){txt='Handover, next at '+hmZ(x.s)+(i===me?' (yours)':'');break;}
     }
   }else{
     var wait=1440-rel;
-    txt=wait<=720?'Starts in '+durHM(Math.ceil(wait)):'Rest finished';
+    txt=wait>720?'Rest finished':me>=0?'Your rest in '+durHM(Math.ceil(wait+r.rows[me].s-r.s)):'Starts in '+durHM(Math.ceil(wait));
   }
   return {txt:txt,on:on,idx:idx};
 }
+// The block once the times are set: the breaks to read, tap one to mark it as yours
+function restReadHTML(m){
+  var r=restCalc(m),me=restMineIdx(m,r);
+  var rows=r.rows.map(function(x,i){
+    var nm=m.labels[i]||'Break '+(i+1),my=i===me;
+    return '<button type="button" class="rrow'+(my?' mine':'')+'" data-ri="'+i+'" data-act="restMine" data-id="'+m.id+'" data-i="'+i+'" aria-pressed="'+my+'" aria-label="'+esc(nm)+', '+hmZ(x.s)+' to '+hmZ(x.e)+(my?', your rest. Tap to unmark':'. Tap to mark it as your rest')+'">'+
+      '<span class="rname"><span>'+esc(nm)+'</span>'+(my?'<i class="you">You</i>':'')+'</span>'+
+      '<span class="rright"><span class="rtime">'+hmZ(x.s).slice(0,4)+'–'+hmZ(x.e)+'</span><span class="rdur">'+durHM(x.e-x.s)+'</span></span></button>';
+  }).join('');
+  return '<div class="rest-now" data-status></div>'+rows+'<div class="rest-sum">'+(me<0?'<span class="rest-hint">Tap your break to mark it as yours.</span> ':'')+
+    'Total '+durHM(r.total)+(m.buffer?', with '+m.buffer+' min handover':'')+'</div>';
+}
+var restEditing=new Set(),cdOpen=new Set();
 function restStatus(m,el,now){
   var st=el.querySelector('[data-status]'),info=restInfo(m,now);
   el.querySelectorAll('.rrow').forEach(function(x,i){x.classList.toggle('now',!!info&&info.idx===i);});
@@ -4047,7 +4189,7 @@ function cdPaint(m,el,now){
   el.classList.toggle('soon',!unset&&diff>0&&!!m.lead&&diff<=m.lead*60000);
   el.classList.toggle('alerting',alerting.has(m.id));
   if(alerting.has(m.id)){var am=el.querySelector('[data-amsg]');if(am&&am.textContent!==alerting.get(m.id)) am.textContent=alerting.get(m.id);}
-  if(unset){rem.textContent='-:--:--';sub.textContent='Tap to set a time';meta.textContent='';return;}
+  if(unset){rem.textContent='-:--:--';sub.textContent=el.classList.contains('rd')?'Not set':'Tap to set a time';meta.textContent='';return;}
   var tz=hmZ(new Date(m.target).getUTCHours()*60+new Date(m.target).getUTCMinutes());
   rem.textContent=(diff<=0?'+':'')+durClock(diff);
   sub.textContent=(diff<=0?'since ':'to ')+tz;
@@ -4091,7 +4233,18 @@ function restTop(m,now){
   // what the top bar shows for a rest plan: current break, next break, or time to rest start
   var r=restCalc(m);if(r.err) return null;
   var d=new Date(now),nowMin=d.getUTCHours()*60+d.getUTCMinutes()+d.getUTCSeconds()/60;
-  var rel=((nowMin-r.s)%1440+1440)%1440,abs=r.s+rel;
+  var rel=((nowMin-r.s)%1440+1440)%1440,abs=r.s+rel,me=restMineIdx(m,r);
+  if(me>=0){
+    // your own break: time until it starts, then what is left of it; nothing once it is over
+    var y=r.rows[me];
+    if(rel<r.total){
+      if(abs<y.s) return {mode:'wait',min:y.s-abs,name:'to your rest',mine:true};
+      if(abs<y.e) return {mode:'on',min:y.e-abs,name:'rest left',mine:true};
+      return null;
+    }
+    var w=1440-rel;
+    return w<=720?{mode:'wait',min:w+y.s-r.s,name:'to your rest',mine:true}:null;
+  }
   if(rel<r.total){
     for(var i=0;i<r.rows.length;i++){
       var x=r.rows[i];
@@ -4117,8 +4270,10 @@ function etaState(now){
 }
 function paintEtaChip(now){
   var s=etaState(now),el=etaChip;
-  if(!s){if(!el.hidden){el.hidden=true;el.removeAttribute('data-k');}return;}
-  var left=s.t-now,fut=left>0,txt=(fut?'':'+')+durM(Math.abs(left),fut),name=(fut?'to ':'past ')+s.k+' '+hmOf(s.t);
+  if(!s){if(!el.hidden){el.hidden=true;el.removeAttribute('data-k');el.parentNode.classList.remove('pair');}return;}
+  var left=s.t-now,fut=left>0,txt=(fut?'':'+')+durM(Math.abs(left),fut),short=!restChip.hidden;
+  el.parentNode.classList.toggle('pair',short);
+  var name=short?(fut?'':'past ')+s.k:(fut?'to ':'past ')+s.k+' '+hmOf(s.t);
   var cls='etachip'+(fut?(left<=10*60000?' soon':''):' late'),key=txt+name+cls;
   if(el.getAttribute('data-k')===key&&!el.hidden) return;
   el.setAttribute('data-k',key);$('#ecTime').textContent=txt;$('#ecName').textContent=name;el.className=cls;
@@ -4129,9 +4284,9 @@ function paintRestChip(now){
   var m=restSource(),t=m&&restTop(m,now);
   if(!t){restChip.hidden=true;return;}
   var mins=Math.ceil(t.min),txt=Math.floor(mins/60)+':'+pad2(mins%60);
-  $('#rcTime').textContent=txt;$('#rcName').textContent=t.name;
+  $('#rcTime').textContent=txt;$('#rcName').textContent=t.name;restChip._alt=t.mine?(t.mode==='on'?'left':'to rest'):null;
   restChip.className='restchip'+(t.mode==='on'?(t.min<=10?' soon':''):' wait');
-  restChip.setAttribute('aria-label',t.mode==='on'?t.name+' rest, '+txt+' left':'Next rest in '+txt);
+  restChip.setAttribute('aria-label',t.mine?(t.mode==='on'?'Your rest, '+txt+' left':txt+' to your rest'):t.mode==='on'?t.name+' rest, '+txt+' left':'Next rest in '+txt);
   restChip.hidden=false;
 }
 restChip.addEventListener('click',function(){openTool('rest');});
@@ -4150,22 +4305,11 @@ function clockTick(){
   paintAlert();
   paintRestChip(now);
   paintEtaChip(now);
+  // both timers on one line: if your rest's label doesn't fit, use the shorter one
+  if(!restChip.hidden&&!etaChip.hidden&&restChip._alt&&Math.abs(restChip.offsetTop-etaChip.offsetTop)>3) $('#rcName').textContent=restChip._alt;
+  paintMenuTiles(now);
 }
 
-/* Countdown and crew rest from the menu */
-function cdSummary(now){
-  var set=state.tools.cds.filter(function(c){return c.target!==null;});
-  if(!set.length) return state.tools.cds.length>1?state.tools.cds.length+' countdowns, none set':'Not set';
-  var up=set.filter(function(c){return c.target>now;}).sort(function(a,b){return a.target-b.target;});
-  var m=up[0]||set.sort(function(a,b){return b.target-a.target;})[0],diff=m.target-now;
-  var txt=diff>0?m.title+' in '+durClock(diff):m.title+' passed '+durClock(diff)+' ago';
-  return txt+(set.length>1?' (+'+(set.length-1)+' more)':'');
-}
-function restSummary(now){
-  var m=state.tools.rest,info=restInfo(m,now),r=restCalc(m);
-  if(!info) return 'Not set';
-  return info.txt||(hmZ(r.s).slice(0,4)+'–'+hmZ(r.e));
-}
 var toolKind=null;
 function refreshTool(){
   if(!toolOpen||!toolKind) return;
@@ -4179,6 +4323,7 @@ function openTool(kind){
       (apnCanOrder()?'<button type="button" class="ib round" data-act="apnReorder" aria-label="Change the order of the notes">'+I.swap+'</button>':'')+
       '<button type="button" class="ib round" data-act="apnAdd" aria-label="Add note">'+I.plus+'</button>'):'')+
     (kind==='flog'?'<button type="button" class="ib round" data-act="flNew" aria-label="Add a flight">'+I.plus+'</button>':'')+
+    (kind==='rest'&&!editMode&&(restEditing.has(T.rest.id)||!restCalc(T.rest).err)?'<button type="button" class="pill" data-act="'+(restEditing.has(T.rest.id)?'restDone':'restEdit')+'" data-id="'+T.rest.id+'">'+(restEditing.has(T.rest.id)?'Done':'Edit')+'</button>':'')+
     (kind==='wx'&&state.settings.wxUrl?'<button type="button" class="ib round" data-act="wxRefresh" aria-label="Update weather">'+I.reset+'</button>':'')+
     '<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button></div>';
   if(kind==='cd'){
@@ -4577,9 +4722,13 @@ function cdClear(id){
 function cdAck(id){alerting.delete(id);clockTick();}
 
 /* Crew rest actions */
+function restRerender(id){if(toolOpen&&toolKind==='rest'&&state.tools.rest.id===id) refreshTool();else refreshModule(id);}
 function restRefresh(m){
+  var bad=!!restCalc(m).err;
   document.querySelectorAll('[data-mod="'+m.id+'"],[data-ref="'+m.id+'"]').forEach(function(el){
-    var out=el.querySelector('[data-out]');if(out) out.innerHTML=restOutHTML(m);
+    var out=el.querySelector('[data-out]');
+    if(out&&out.classList.contains('rd')){if(bad){restRerender(el.getAttribute('data-mod'));return;}out.innerHTML=restReadHTML(m);}
+    else if(out) out.innerHTML=restOutHTML(m);
     var nb=el.querySelector('[data-n]');if(nb) nb.textContent=m.n;
     restStatus(m,el,Date.now());
   });
@@ -5458,6 +5607,15 @@ function onAct(e){
         restRefresh(rc.node);clockTick();
       }
       break;
+    case 'restEdit': restEditing.add(id);restRerender(id);break;
+    case 'restDone': restEditing.delete(id);restRerender(id);break;
+    case 'restMine':
+      var rmf=find(id),ri=+el.getAttribute('data-i');
+      if(rmf){rmf.node.mine=rmf.node.mine===ri?-1:ri;saveSoon();restRefresh(rmf.node);clockTick();}
+      break;
+    case 'cdOpen': cdOpen.add(id);refreshModule(id);break;
+    case 'cdShut': cdOpen.delete(id);refreshModule(id);break;
+    case 'nextList': state.current=id;save();render();window.scrollTo(0,0);break;
     case 'restRound':
       var rr=find(id);
       if(rr){rr.node.round=!rr.node.round;el.classList.toggle('on',rr.node.round);el.setAttribute('aria-pressed',String(rr.node.round));saveSoon();restRefresh(rr.node);}
@@ -5510,6 +5668,21 @@ function onChange(e){
   if(t.matches&&t.matches('[data-rlabel]')){var lf=find(t.getAttribute('data-id'));if(lf) restStatus(lf.node,t.closest('.module'),Date.now());}
 }
 app.addEventListener('change',onChange);
+function restFocus(e){
+  var t=e.target;if(!t.matches||!t.matches('[data-rest],[data-rlabel]')) return;
+  var md=t.closest('.module.rest'),id=md&&md.getAttribute('data-mod');if(!id||restEditing.has(id)) return;
+  restEditing.add(id);
+  if(editMode) return;
+  if(md.closest('#toolPanel')){
+    // in the Crew rest panel the Done button sits in the panel's own header
+    var th=toolPanel.querySelector('.tp-head'),cl=th&&th.querySelector('[data-act="toolClose"]');
+    if(cl&&!th.querySelector('[data-act="restDone"],[data-act="restEdit"]')) cl.insertAdjacentHTML('beforebegin','<button type="button" class="pill" data-act="restDone" data-id="'+id+'">Done</button>');
+    return;
+  }
+  var hd=md.querySelector('.mod-head'),tg=hd&&hd.querySelector('.mod-toggle');
+  if(tg&&!editMode&&!hd.querySelector('.mod-x')) tg.insertAdjacentHTML('afterend','<button type="button" class="lnkbtn mod-x" data-act="restDone" data-id="'+id+'">Done</button>');
+}
+app.addEventListener('focusin',restFocus);toolPanel.addEventListener('focusin',restFocus);
 toolPanel.addEventListener('change',onChange);
 editBtn.addEventListener('click',function(){editMode=!editMode;render();});
 menuBtn.addEventListener('click',openMenu);
