@@ -992,6 +992,32 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .mrow svg{width:22px;height:22px;color:var(--accent)}
 .mrow .pri{background:var(--accent-weak);color:var(--accent)}
 
+/* Reference tags: [FCOM] etc. in a check */
+.rtag{display:inline-block;font-size:.7em;font-weight:750;letter-spacing:.03em;line-height:1.35;color:var(--muted);border:1px solid var(--line-strong);border-radius:5px;padding:0 5px;margin:0 3px;vertical-align:.12em;white-space:nowrap}
+.label > .rtag:first-child{margin-left:0;margin-right:6px}
+/* Checklist picker */
+.lpks{display:flex;flex-direction:column;gap:6px;margin:0 0 6px}
+.lpk{appearance:none;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:13px;padding:11px 14px 12px;display:flex;flex-direction:column;gap:8px;text-align:left;font:inherit;width:100%}
+.lpk:active{background:var(--press)}
+.lpk.on{border-color:var(--accent);background:var(--accent-weak)}
+.lpk-t{display:flex;align-items:baseline;gap:10px;min-width:0}
+.lpk-t b{flex:1;min-width:0;font-size:calc(17px*var(--ts));font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lpk.on .lpk-t b{color:var(--accent)}
+.lpk-t small{flex:none;font-size:calc(13px*var(--ts));color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}
+.lpk-t small svg{width:14px;height:14px;stroke-width:3}
+.lpk.done .lpk-t small{color:var(--done)}
+.lpk-bar{display:block;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.lpk-bar i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+.lpk.done .lpk-bar i{background:var(--done)}
+/* Folded blocks say what is inside */
+.mod-title .msub{display:none}
+.module.collapsed .mod-title{display:flex;flex-direction:column;line-height:1.25}
+.module.collapsed .mod-title .mt1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.module.collapsed .mod-title .msub{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:calc(13px*var(--ts));font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.msub b{color:var(--text);font-weight:650}
+.module.collapsed .mod-toggle .apn-tag,.module.collapsed .mod-toggle .fl-tag{display:none}
+.msub .wxcat{display:inline-block;font-size:10px;padding:0 5px;line-height:1.5;vertical-align:1px}
+
 /* Photos */
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 .thumb{appearance:none;padding:0;border:1px solid var(--line);background:var(--surface2);border-radius:10px;overflow:hidden;height:calc(88px*var(--sp));min-width:calc(88px*var(--sp));max-width:176px;display:block;position:relative}
@@ -1278,7 +1304,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='47';
+var APP_VERSION='48';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1518,6 +1544,8 @@ function linkHTML(l){
   var label=l.label||l.url.replace(/^[a-z][a-z0-9+.-]*:\/\//i,'');
   return '<a class="lnk" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener">'+I.link+'<span>'+esc(label)+'</span></a>';
 }
+// anything in square brackets in a check, like [FCOM] or [QRH 2.3], shows as a small tag
+function refTags(h){return h.replace(/\[([^\[\]<>\n]{1,30})\]/g,function(m,x){x=x.trim();return x?'<span class="rtag">'+x+'</span>':m;});}
 function linkify(escaped){
   return escaped.replace(/\b([a-z][a-z0-9+.-]{1,24}:\/\/[^\s<]+)/gi,function(m){
     if(/^(javascript|data|vbscript):/i.test(m)) return m;
@@ -1634,8 +1662,8 @@ function renderDec(it,o){
   var nt=!!(o&&o.note),em=nt?!!o.edit:editMode,stripe=o&&o.stripe?' stripe-'+o.stripe:'',ch=null;
   it.dq.forEach(function(x){if(x.id===it.ans) ch=x;});
   var h='<div class="item d0 dq'+stripe+'" data-item="'+it.id+'">'+(em?'<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">':'<div class="row">')+
-    '<span class="dbox" aria-hidden="true">'+I.diamond+'</span><div class="txt"><div class="label">'+(esc(it.text)||'<span class="ph">Untitled question</span>')+'</div>';
-  if(it.note) h+='<div class="note">'+linkify(esc(it.note))+'</div>';
+    '<span class="dbox" aria-hidden="true">'+I.diamond+'</span><div class="txt"><div class="label">'+(refTags(esc(it.text))||'<span class="ph">Untitled question</span>')+'</div>';
+  if(it.note) h+='<div class="note">'+refTags(linkify(esc(it.note)))+'</div>';
   if(it.links.length) h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   h+=thumbsHTML(it);
   if(!em) h+='<div class="ans" role="group" aria-label="Answers">'+it.dq.map(function(x){
@@ -1671,8 +1699,8 @@ function renderCheck(it,depth,o){
   else if(em) h+='<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">';
   else if(it.info) h+='<div class="row" data-id="'+it.id+'">';
   else h+='<div class="row" data-act="tick" data-id="'+it.id+'" tabindex="0" role="checkbox" aria-checked="'+it.done+'">';
-  h+=(it.info?'<span class="ibox" aria-hidden="true">'+I.info+'</span>':'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(esc(it.text)||'<span class="ph">Untitled item</span>')+'</div>';
-  if(it.note) h+='<div class="note">'+linkify(esc(it.note))+'</div>';
+  h+=(it.info?'<span class="ibox" aria-hidden="true">'+I.info+'</span>':'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(refTags(esc(it.text))||'<span class="ph">Untitled item</span>')+'</div>';
+  if(it.note) h+='<div class="note">'+refTags(linkify(esc(it.note)))+'</div>';
   if(it.links.length) h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   if(it.rem&&!nt) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
@@ -2627,6 +2655,7 @@ function render(){
   h+='<p class="foot">Saved on this device. Back up from the menu.</p>';
   app.innerHTML=h;
   apnFit(app);
+  paintSubs(app);
   app.querySelectorAll('.module.pad').forEach(mountIfDraw);
   fillImages(app);
   updateProgress();
@@ -2676,7 +2705,7 @@ function refreshModule(id){
   if(!f||!el) return null;
   var c=ctl.get(id);if(c){c.dispose();ctl.delete(id);}
   var t=document.createElement('div');t.innerHTML=renderNode(f.node,0);
-  var nu=t.firstElementChild;el.replaceWith(nu);mountIfDraw(nu);clockTick();
+  var nu=t.firstElementChild;el.replaceWith(nu);mountIfDraw(nu);if(app.contains(nu)) paintSubs(nu.parentNode);clockTick();
   return nu;
 }
 function flash(id){
@@ -2725,10 +2754,66 @@ function toggleSec(id){
   if(el){el.classList.toggle('collapsed',r.section.collapsed);var b=el.querySelector('.sec-toggle');if(b) b.setAttribute('aria-expanded',String(!r.section.collapsed));apnFit(el);}
   save();
 }
+var WXRANK={LIFR:4,IFR:3,MVFR:2,VFR:1};
+function modSubHTML(n){
+  var t=n.type,now=Date.now();
+  if(t==='calc'){
+    var hl=n.hist[n.hist.length-1];
+    if(n.expr){var cr=hasOp(n.expr)&&/[\d.]$/.test(n.expr)?calcEval(n.expr):null;return esc(fmtExpr(n.expr))+(cr!==null&&cr!=='err'?' = <b>'+esc(fmtNumStr(cr))+'</b>':'');}
+    return hl?'Last: '+esc(hl.e)+' = <b>'+esc(fmtNumStr(hl.r))+'</b>':'Empty';
+  }
+  if(t==='pad'){
+    var tx=String(n.text||'').split('\n').map(function(x){return x.trim();}).filter(Boolean).slice(0,3).join(' · ');
+    return tx?esc(tx):n.strokes&&n.strokes.length?'Drawing':'Empty';
+  }
+  if(t==='rest'){var rm=n.link?state.tools.rest:n,ri=restInfo(rm,now);return ri?esc(ri.txt||'Set'):'Not set';}
+  if(t==='cd'){
+    var c=n.link?(n.ref&&cdById(n.ref)):n;if(!c) return 'No countdown chosen';
+    return c.target===null?'Not set':'at '+hmZ(new Date(c.target).getUTCHours()*60+new Date(c.target).getUTCMinutes());
+  }
+  if(t==='wx'){
+    if(!state.settings.wxUrl) return 'Not set up';
+    var aps=wxBlockAirports(n);if(!aps.length) return 'Set the flight';
+    var cat=function(ic){var d=wx[ic];return d&&d.m&&WXRANK[d.m.cat]?d.m.cat:'';};
+    var first=aps[0],rest=aps.slice(1).sort(function(a,b){return (WXRANK[cat(b.ic)]||0)-(WXRANK[cat(a.ic)]||0);});
+    return [first].concat(rest).map(function(a){var k=cat(a.ic);return esc(a.ic)+' '+(k?'<span class="wxcat '+k+'">'+k+'</span>':'–');}).join(' · ');
+  }
+  if(t==='apn'){
+    var ap=flightAp(n.which);if(!ap) return 'Set the flight';
+    var notes=state.apNotes[ap.icao]||{},k2=0;apnSecsFor(n).forEach(function(x){k2+=(notes[x.id]||[]).length;});
+    return (n.which==='dep'?'Departure':'Destination')+' · '+(k2?k2+' note'+(k2===1?'':'s'):'no notes yet');
+  }
+  if(t==='apst'){
+    var ap2=flightAp(n.which);if(!ap2) return 'Set the flight';
+    var S=apStats(ap2.icao),arr=n.which==='dest',cnt=arr?S.arr:S.dep,rw=(arr?S.arrRwy:S.depRwy)[0];
+    return (arr?'Destination':'Departure')+' · '+(cnt?cnt+' '+(arr?'arrival':'departure')+(cnt===1?'':'s')+(rw?', mostly '+esc(rw.v):''):'none logged yet');
+  }
+  if(t==='flog'){
+    var f=curFlight(false),parts=n.part==='dep'?['dep']:n.part==='arr'?['arr']:['dep','arr'],out=[];
+    parts.forEach(function(p){var x=f&&f[p];if(!x) return;var v=[x.rwy?'RWY '+x.rwy:'',x.stand?'stand '+x.stand:''].filter(Boolean).join(' ');if(v) out.push(v);});
+    return 'Flight log · '+(out.length?esc(out.join(' · ')):'nothing logged yet');
+  }
+  return '';
+}
+// put (or refresh) the summary line in each block's title; it only shows while the block is folded
+function paintSubs(root){
+  (root||app).querySelectorAll('.module[data-mod]').forEach(function(el){
+    var tt=el.querySelector(':scope > .mod-head .mod-title');if(!tt) return;
+    var f=find(el.getAttribute('data-mod'));if(!f) return;
+    var h=modSubHTML(f.node);
+    var ms=tt.querySelector('.msub');
+    if(!h){if(ms) ms.remove();return;}
+    if(!ms){
+      if(!tt.querySelector('.mt1')){var t1=document.createElement('span');t1.className='mt1';while(tt.firstChild) t1.appendChild(tt.firstChild);tt.appendChild(t1);}
+      ms=document.createElement('span');ms.className='msub';tt.appendChild(ms);
+    }
+    if(ms.innerHTML!==h) ms.innerHTML=h;
+  });
+}
 function modToggle(id){
   var f=find(id);if(!f) return;
   f.node.collapsed=!f.node.collapsed;
-  var el=app.querySelector('[data-mod="'+id+'"]');if(el){el.classList.toggle('collapsed',f.node.collapsed);apnFit(el);}
+  var el=app.querySelector('[data-mod="'+id+'"]');if(el){el.classList.toggle('collapsed',f.node.collapsed);apnFit(el);if(f.node.collapsed) paintSubs(el.parentNode);}
   save();
 }
 function addItem(sid){
@@ -3212,40 +3297,50 @@ function openSecEditor(sid){
     }else closeSheet();
   });
 }
-function openLists(){
+function openLists(manage){
+  manage=manage===true;
   var rows=state.lists.map(function(l){
     var c=listCount(l);
+    if(!manage){
+      var done=c.t>0&&c.d===c.t,on=l.id===state.current;
+      return '<button type="button" class="lpk'+(on?' on':'')+(done?' done':'')+'" data-sact="pick" data-id="'+l.id+'"'+(on?' aria-current="true"':'')+'><span class="lpk-t"><b>'+esc(l.title)+'</b><small>'+
+        (done?I.check+'Done':c.t?c.d+' of '+c.t:'No checks')+'</small></span><span class="lpk-bar"><i style="width:'+(c.t?Math.round(c.d/c.t*100):0)+'%"></i></span></button>';
+    }
     return '<div class="lrow'+(l.id===state.current?' on':'')+'"><button type="button" class="lpick" data-sact="pick" data-id="'+l.id+'"><span class="ltitle">'+esc(l.title)+'</span><span class="lcount">'+(c.t?c.d+'/'+c.t:'')+'</span></button>'+
       '<button type="button" class="ib" data-sact="rename" data-id="'+l.id+'" aria-label="Rename '+esc(l.title)+'">'+I.edit+'</button>'+
       '<button type="button" class="ib" data-sact="dupe" data-id="'+l.id+'" aria-label="Duplicate '+esc(l.title)+'">'+I.copy+'</button>'+
       '<button type="button" class="ib danger" data-sact="del" data-id="'+l.id+'" aria-label="Delete '+esc(l.title)+'"'+(state.lists.length<2?' disabled':'')+'>'+I.trash+'</button></div>';
   }).join('');
-  openSheet('<h3>Checklists</h3><div class="lrows">'+rows+'</div>'+
+  var head='<div class="menu-head"><h3>Checklists</h3><button type="button" class="pill" data-sact="'+(manage?'browse':'manage')+'">'+(manage?'Done':'Edit')+'</button>'+
+    '<button type="button" class="ib round" data-sact="cancel" aria-label="Close">'+I.x+'</button></div>';
+  openSheet(head+(manage?'<div class="lrows">'+rows+'</div>'+
     '<button type="button" class="btn small ghost tcd-add" data-sact="imp" style="margin:0 0 8px">'+I.restore+'Import a section or checklist</button>'+
     '<button type="button" class="btn small ghost tcd-add" data-sact="shr" style="margin:0 0 12px">'+I.share+'Share a section or checklist</button>'+
-    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button><button type="button" class="btn primary" data-sact="new">'+I.plus+'New checklist</button></div>',
+    '<div class="sh-actions"><button type="button" class="btn primary" data-sact="new">'+I.plus+'New checklist</button></div>':'<div class="lpks">'+rows+'</div>'),
   function(act,btn){
     var id=btn&&btn.getAttribute('data-id'),L=null;
     state.lists.forEach(function(x){if(x.id===id) L=x;});
     switch(act){
       case 'pick': state.current=id;save();closeSheet();render();window.scrollTo(0,0);break;
+      case 'manage': openLists(true);break;
+      case 'browse': openLists();break;
       case 'imp': openSectionImport();break;
       case 'shr': openSharePick();break;
-      case 'rename': promptSheet('Rename checklist',L.title,'Name',function(v){L.title=v;save();render();openLists();},openLists);break;
+      case 'rename': promptSheet('Rename checklist',L.title,'Name',function(v){L.title=v;save();render();openLists(true);},function(){openLists(true);});break;
       case 'dupe':
         var c=cloneList(L);c.title=L.title+' copy';
-        state.lists.splice(state.lists.indexOf(L)+1,0,c);save();openLists();break;
+        state.lists.splice(state.lists.indexOf(L)+1,0,c);save();openLists(true);break;
       case 'del':
         confirmSheet('Delete the checklist “'+esc(L.title)+'”?','Delete',function(){
           state.lists.splice(state.lists.indexOf(L),1);
           if(state.current===id) state.current=state.lists[0].id;
-          save();render();openLists();
-        },openLists);break;
+          save();render();openLists(true);
+        },function(){openLists(true);});break;
       case 'new':
         promptSheet('New checklist','','e.g. Descent',function(v){
           var l={id:uid(),title:v,sections:[{id:uid(),title:'Items',collapsed:false,items:[]}]};
           state.lists.push(l);state.current=l.id;editMode=true;save();render();window.scrollTo(0,0);
-        },openLists);break;
+        },function(){openLists(true);});break;
       default: closeSheet();
     }
   });
@@ -3293,7 +3388,7 @@ function openSharePick(){
   });
   openSheet(h+'</div><div class="sh-actions"><button type="button" class="btn" data-sact="back">Back</button></div>',function(act,btn){
     if(act==='pick') openShare(btn.getAttribute('data-k'),btn.getAttribute('data-id'),openSharePick);
-    else openLists();
+    else openLists(true);
   });
 }
 function openShare(kind,id,back){
@@ -4119,6 +4214,7 @@ var restEditing=new Set(),cdOpen=new Set();
 function restStatus(m,el,now){
   var st=el.querySelector('[data-status]'),info=restInfo(m,now);
   el.querySelectorAll('.rrow').forEach(function(x,i){x.classList.toggle('now',!!info&&info.idx===i);});
+  if(info&&el.classList.contains('collapsed')){var ms=el.querySelector('.mod-title .msub');if(ms&&ms.textContent!==(info.txt||'Set')) ms.textContent=info.txt||'Set';}
   if(!info||!st) return;
   if(st.textContent!==info.txt) st.textContent=info.txt;
   st.classList.toggle('on',info.on);
