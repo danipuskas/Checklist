@@ -1176,6 +1176,34 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .ntm:not(.open) .ntm-head{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ntm-when{font-size:calc(12.5px*var(--ts));color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
 .ntm .nt-body{margin-top:6px;padding-top:6px}
+.sec.ref .sec-body{padding:10px;background:var(--surface2)}
+.rf-card{background:var(--paper);border:1px solid var(--line);border-radius:13px;margin-bottom:10px;overflow:hidden}
+.rf-card:last-child{margin-bottom:0}
+.rf-h{appearance:none;border:0;background:none;width:100%;display:flex;align-items:center;gap:8px;padding:12px 12px 10px 14px;color:var(--accent);font:inherit;text-align:left}
+.rf-h b{flex:1;min-width:0;font-size:calc(16.5px*var(--ts));font-weight:700;overflow-wrap:anywhere}
+.rf-h em{font-style:normal;font-size:calc(13px*var(--ts));font-weight:700;color:var(--muted);background:var(--surface2);border-radius:999px;padding:1px 8px;display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}
+.rf-h em svg{width:13px;height:13px;stroke-width:3}
+.rf-card.complete .rf-h em{color:var(--done);background:var(--done-weak)}
+.rf-h .chev svg{width:17px;height:17px}
+.rf-card.shut .rf-h .chev{transform:rotate(-90deg)}
+.rf-b{padding:0 14px 4px}
+.rf-b>*{border-top:1px solid var(--line-soft)}
+.rf-card.nohead .rf-b>*:first-child{border-top:0}
+.rf-i{padding:10px 0 11px;font-size:calc(17px*var(--ts));line-height:1.42;overflow-wrap:anywhere}
+.rf-i.t>.rf-l,.rf-i.t>.rf-ir>.rf-tx>.rf-l{font-weight:700}
+.rf-n{color:var(--muted);font-size:calc(15.5px*var(--ts));margin-top:2px;white-space:pre-wrap}
+.rf-n a,.rf-sub a{color:var(--accent)}
+.rf-sub{margin:3px 0 0;padding-left:18px;color:var(--muted);font-size:calc(15px*var(--ts));list-style:circle}
+.rf-sub li{margin:2px 0}
+.rf-ul{margin:5px 0 0;padding-left:20px;font-size:calc(16px*var(--ts))}
+.rf-ul>li{margin:4px 0}
+.rf-ul .rf-ul{font-size:inherit}
+.rf-i .links,.rf-ul .links{margin-top:6px}
+.rf-ir{display:flex;gap:8px;align-items:flex-start}
+.rf-tx{flex:1;min-width:0}
+.rf-b>.item{margin:0 -14px}
+.rf-b>.module{margin:10px 0;border-top:1px solid var(--line)}
+.sty-hint{margin:8px 2px 0;font-size:calc(13.5px*var(--ts));color:var(--muted);line-height:1.35}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1687,7 +1715,7 @@ function normDec(o,it){
 function normalize(o){
   if(!o||!Array.isArray(o.lists)||!o.lists.length) return null;
   var lists=o.lists.map(function(l){return {id:str(l.id)||uid(),title:str(l.title,'Checklist'),
-    sections:Array.isArray(l.sections)?l.sections.map(function(s){return {id:str(s.id)||uid(),title:str(s.title,'Section'),collapsed:!!s.collapsed,
+    sections:Array.isArray(l.sections)?l.sections.map(function(s){return {id:str(s.id)||uid(),title:str(s.title,'Section'),collapsed:!!s.collapsed,style:s.style==='ref'?'ref':undefined,
       items:Array.isArray(s.items)?s.items.map(normItem).filter(Boolean):[]};}):[]};});
   var current=lists.some(function(l){return l.id===o.current;})?o.current:lists[0].id;
   var secs=normApSecs(o.apSections),tools=normTools(o.tools);
@@ -1767,7 +1795,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='54';
+var APP_VERSION='55';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2122,6 +2150,59 @@ function renderItems(s){
     if(it.type==='head'){fold=!!it.collapsed&&g[it.id].n>0;return renderHead(it,g[it.id]);}
     var x=renderNode(it,0);
     return fold?x.replace('class="','class="hfold '):x;
+  }).join('');
+}
+// ---------- Reference sections: each heading is a card, notes read as text, no boxes ----------
+function rfInfoTree(it){return it.type==='check'&&it.info&&!it.dq&&!it.end&&(it.children||[]).every(rfInfoTree);}
+// a note: lines starting with •, -, – or * become a bulleted list
+function rfNoteHTML(note,cls){
+  var out='',ul=[];
+  function flush(){if(ul.length){out+='<ul class="rf-sub">'+ul.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';ul=[];}}
+  String(note).split('\n').forEach(function(l){
+    var m=/^\s*[•\-–*·]\s*(.*)$/.exec(l),t=refTags(linkify(esc(m?m[1]:l)));
+    if(m){ul.push(t);return;}
+    flush();if(l.trim()) out+='<div class="'+(cls||'rf-n')+'">'+t+'</div>';
+  });
+  flush();return out;
+}
+function rfLabel(it){
+  var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',lab=refTags(esc(it.text));
+  if(ls==='tag') lab=tagLinks(lab,it.links);
+  return {ls:ls,lab:lab||'<span class="ph">Untitled item</span>'};
+}
+function rfExtras(it,ls){
+  var h='';
+  if(it.links.length&&ls==='button') h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
+  if(it.rem) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
+  if(it.imgs&&it.imgs.length) h+=thumbsHTML(it);
+  return h;
+}
+function rfKidHTML(k){
+  var L=rfLabel(k),kids=k.children||[];
+  var inner='<span class="rf-kl">'+L.lab+'</span>'+(k.note?rfNoteHTML(k.note):'')+rfExtras(k,L.ls)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
+  return '<li data-item="'+k.id+'">'+(L.ls==='icon'?'<div class="rf-ir"><div class="rf-tx">'+inner+'</div>'+iconLinksHTML(k.links)+'</div>':inner)+'</li>';
+}
+function rfItemHTML(it){
+  if(!rfInfoTree(it)) return renderCheck(it,0); // anything you tick keeps its box
+  var L=rfLabel(it),kids=it.children||[],big=!!(it.note||kids.length);
+  var inner='<div class="rf-l">'+L.lab+'</div>'+(it.note?rfNoteHTML(it.note):'')+rfExtras(it,L.ls)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
+  return '<div class="rf-i'+(big?' t':'')+'" data-item="'+it.id+'">'+(L.ls==='icon'?'<div class="rf-ir"><div class="rf-tx">'+inner+'</div>'+iconLinksHTML(it.links)+'</div>':inner)+'</div>';
+}
+function renderRefItems(s){
+  var g=headGroups(s),cards=[],cur=null;
+  s.items.forEach(function(it){
+    if(it.type==='head'){cur={hd:it,parts:[]};cards.push(cur);return;}
+    if(!cur){cur={hd:null,parts:[]};cards.push(cur);}
+    cur.parts.push(it.type==='check'?rfItemHTML(it):renderNode(it,0));
+  });
+  return cards.map(function(c){
+    if(!c.hd) return '<div class="rf-card nohead"><div class="rf-b">'+c.parts.join('')+'</div></div>';
+    var hd=c.hd,n=(g[hd.id]||{n:0}).n,gc=g[hd.id]||{d:0,t:0},shut=!!hd.collapsed&&n>0;
+    var cnt=gc.t?countHTML(gc.d,gc.t):n?String(n):'';
+    var head='<b>'+(esc(hd.title)||'<span class="ph">Heading</span>')+'</b>'+(cnt?'<em>'+cnt+'</em>':'')+(n?'<span class="chev">'+I.chev+'</span>':'');
+    return '<div class="rf-card'+(shut?' shut':'')+'" data-mod="'+hd.id+'">'+
+      (n?'<button type="button" class="rf-h" data-act="headFold" data-id="'+hd.id+'" aria-expanded="'+!shut+'">'+head+'</button>':'<div class="rf-h">'+head+'</div>')+
+      (shut||!n?'':'<div class="rf-b">'+c.parts.join('')+'</div>')+'</div>';
   }).join('');
 }
 function renderNode(it,depth){
@@ -3710,11 +3791,12 @@ function decAdd(kind){
 }
 function renderSection(s){
   var c=secCount(s),complete=c.t>0&&c.d===c.t;
-  var h='<section class="sec'+(s.collapsed?' collapsed':'')+(complete?' complete':'')+'" data-sec="'+s.id+'">';
+  var ref=s.style==='ref'&&!editMode;
+  var h='<section class="sec'+(s.collapsed?' collapsed':'')+(complete?' complete':'')+(ref?' ref':'')+'" data-sec="'+s.id+'">';
   h+='<div class="sec-head"><button type="button" class="sec-toggle" data-act="toggleSec" data-id="'+s.id+'" aria-expanded="'+!s.collapsed+'"><span class="sec-title">'+esc(s.title)+'</span><span class="sec-count">'+countHTML(c.d,c.t)+'</span><span class="chev">'+I.chev+'</span></button>';
   if(editMode) h+='<button type="button" class="ib" data-act="editSec" data-id="'+s.id+'" aria-label="Edit section">'+I.edit+'</button><span class="grip" data-drag="sec" data-id="'+s.id+'" aria-hidden="true">'+I.grip+'</span>';
   h+='</div><div class="sec-body">';
-  if(s.items.length) h+=renderItems(s);
+  if(s.items.length) h+=ref?renderRefItems(s):renderItems(s);
   else if(!editMode) h+='<div class="empty">No items yet. Tap Edit to add some.</div>';
   if(editMode) h+='<div class="add-row"><button type="button" data-act="addItem" data-id="'+s.id+'">'+I.plus+'Item</button><button type="button" data-act="addHead" data-id="'+s.id+'">'+I.heading+'Heading</button><button type="button" data-act="addCalc" data-id="'+s.id+'">'+I.calc+'Calculator</button><button type="button" data-act="addPad" data-id="'+s.id+'">'+I.pad+'Notepad</button>'+
     '<button type="button" data-act="addCd" data-id="'+s.id+'">'+I.timer+'Countdown</button><button type="button" data-act="addRest" data-id="'+s.id+'">'+I.moon+'Crew rest</button>'+
@@ -3783,6 +3865,10 @@ function updateSec(s){
     var hc=g[h.getAttribute('data-mod')];if(!hc) return;
     var hn=h.querySelector('.hd-count');if(hn) hn.innerHTML=countHTML(hc.d,hc.t);
     h.classList.toggle('complete',hc.t>0&&hc.d===hc.t);
+  });
+  el.querySelectorAll('.rf-card[data-mod]').forEach(function(h){ // reference cards count their ticks too
+    var hc=g[h.getAttribute('data-mod')],em=h.querySelector('.rf-h em');if(!hc||!hc.t||!em) return;
+    em.innerHTML=countHTML(hc.d,hc.t);h.classList.toggle('complete',hc.d===hc.t);
   });
 }
 function headFold(id){
@@ -4380,18 +4466,23 @@ function openModEditor(id,isNew){
   ti.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('save');}});
   if(isNew) ti.focus();
 }
+function secStyHint(v){return v==='ref'?'Each heading becomes a card you can fold. Notes read as text, without boxes or icons; anything you tick keeps its box. Edit mode still shows the list.':'Every item on its own row, with its box or info icon.';}
 function openSecEditor(sid){
   var r=findSec(sid);if(!r) return;
   var s=r.section,list=r.list,idx=r.idx;
+  var sty=s.style==='ref'?'ref':'list';
   openSheet('<h3>Section</h3><label class="fld"><span class="fl">Title</span><input id="fSec" type="text" value="'+esc(s.title)+'" autocomplete="off"></label>'+
+    '<div class="fld"><span class="fl">Show as</span><div class="seg big seg2" id="fSty">'+[['list','Checklist'],['ref','Reference']].map(function(o){return '<button type="button" data-sact="sty" data-v="'+o[0]+'" class="'+(sty===o[0]?'on':'')+'">'+o[1]+'</button>';}).join('')+'</div>'+
+    '<p class="sty-hint" id="fStyHint">'+secStyHint(sty)+'</p></div>'+
     '<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
     '<button type="button" class="btn small" data-sact="down"'+(idx===list.sections.length-1?' disabled':'')+'>'+I.down+'Down</button>'+
     '<button type="button" class="btn small" data-sact="share">'+I.share+'Share</button>'+
     '<button type="button" class="btn small danger" data-sact="del">'+I.trash+'Delete</button></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Save</button></div>',
-  function(act){
-    function commit(){var v=$('#fSec').value.trim();if(v) s.title=v;}
+  function(act,btn){
+    function commit(){var v=$('#fSec').value.trim();if(v) s.title=v;if(sty==='ref') s.style='ref';else delete s.style;}
     var i,j;
+    if(act==='sty'){sty=btn.getAttribute('data-v');sheetEl.querySelectorAll('#fSty button').forEach(function(b){b.classList.toggle('on',b===btn);});$('#fStyHint').textContent=secStyHint(sty);return;}
     if(act==='save'){commit();save();closeSheet();render();}
     else if(act==='share'){commit();save();openShare('sec',sid,function(){openSecEditor(sid);});}
     else if(act==='up'||act==='down'){
