@@ -1210,6 +1210,15 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .rf-wrap .rf-card{margin-bottom:8px}
 .module.apn .rf-card{margin:0 0 8px}
 .module.apn .rf-card:last-child{margin-bottom:0}
+.ckb{margin:6px 0 0;padding-left:18px;font-size:calc(15.5px*var(--ts));color:var(--muted);line-height:1.4;overflow-wrap:anywhere}
+.ckb li{margin:0 0 6px}
+.ckb li:last-child{margin-bottom:0}
+.ckb .ckb{margin-top:4px}
+.ckb .rf-n,.ckb .rf-sub{font-size:calc(14.5px*var(--ts))}
+.lnk.sm{padding:3px 9px;font-size:calc(13.5px*var(--ts));border-radius:8px;gap:5px;vertical-align:1px;max-width:100%}
+.lnk.sm svg{width:13px;height:13px}
+.rgo.sm{min-width:26px;height:26px;padding:0 6px;vertical-align:middle;margin-left:4px}
+.rgo.sm svg{width:14px;height:14px}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1801,7 +1810,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='56';
+var APP_VERSION='57';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2258,11 +2267,20 @@ function renderEnd(it,o){
     '<div class="endc '+(it.end==='stop'?'stop':'go')+'">'+I.flag+'<span>'+esc(it.text||'End')+(it.note?'<small>'+esc(it.note)+'</small>':'')+'</span></div>'+
     (em?'<span class="edit-hint">'+I.edit+'</span>'+(nt?'':'<span class="grip" data-drag="item" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>'):'')+'</div></div>';
 }
+// an info sub-item under a check: one bullet, its links small and inline
+function ckLiHTML(k){
+  var L=rfLabel(k),kids=k.children||[];
+  var links=L.ls==='button'?k.links.map(function(l){return linkHTML(l).replace('class="lnk"','class="lnk sm"');}).join(' '):
+    L.ls==='icon'?k.links.map(function(l){return '<a class="rgo sm" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener" aria-label="Open '+esc(linkName(l))+'">'+I.ext+'</a>';}).join(''):'';
+  return '<li data-item="'+k.id+'">'+L.lab+(links?' '+links:'')+(k.note?rfNoteHTML(k.note):'')+(k.imgs&&k.imgs.length?thumbsHTML(k):'')+
+    (kids.length?'<ul class="ckb">'+kids.map(ckLiHTML).join('')+'</ul>':'')+'</li>';
+}
 function renderCheck(it,depth,o){
   if(it.dq) return renderDec(it,o);
   if(it.end) return renderEnd(it,o);
   var nt=!!(o&&o.note),em=nt?!!o.edit:editMode,ord=nt&&!!o.ord;
-  var kids=it.children||[];
+  var kids0=it.children||[],bul=!em&&!ord&&!it.info&&!it.dq&&!it.end?kids0.filter(rfInfoTree):[];
+  var kids=bul.length?kids0.filter(function(k){return bul.indexOf(k)<0;}):kids0;
   var kt=kids.filter(function(k){return !k.info;}),kd=kt.filter(function(k){return k.done;}).length;
   var cls='item d'+Math.min(depth,3)+(it.info?' info':'')+(it.done?' done':'')+(kids.length&&it.open===false?' kclosed':'')+(o&&o.stripe?' stripe-'+o.stripe:'');
   var h='<div class="'+cls+'" data-item="'+it.id+'">';
@@ -2277,6 +2295,7 @@ function renderCheck(it,depth,o){
   if(it.links.length&&ls==='button') h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   if(it.rem&&!nt) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
+  if(bul.length) h+='<ul class="ckb">'+bul.map(ckLiHTML).join('')+'</ul>';
   h+='</div>';
   if(ls==='icon') h+=iconLinksHTML(it.links);
   if(kids.length) h+='<button type="button" class="kid-toggle" data-act="toggleKids" data-id="'+it.id+'" aria-label="Show or hide sub-items">'+(kt.length?kd+'/'+kt.length:kids.length)+'<span class="chev">'+I.chev+'</span></button>';
