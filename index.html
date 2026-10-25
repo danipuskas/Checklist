@@ -1153,6 +1153,26 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .pkg-help li{margin:0 0 10px}
 .pkg-help i{font-style:normal;font-weight:650}
 .pkg-dbg{font-size:12px;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.nt-keep{appearance:none;flex:none;width:38px;height:38px;margin:-7px -6px -4px 0;border:0;border-radius:10px;background:none;color:var(--box);display:grid;place-items:center;padding:0}
+.nt-keep svg{width:23px;height:23px}
+.nt-keep.on{color:var(--accent)}
+.nt-keep.on svg{fill:currentColor}
+.nt-keep:active{background:var(--press)}
+.nt-card.kept{border-left-color:var(--accent)}
+.nt-h{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:2px 3px 6px}
+.nt-badge.k{display:inline-flex;align-items:center;gap:1px;background:var(--accent);color:var(--on-accent)}
+.nt-badge.k svg{width:10px;height:10px;fill:currentColor;stroke-width:2.5}
+.nt-tip{display:flex;align-items:center;gap:9px;margin:0 3px 10px;font-size:calc(13.5px*var(--ts));color:var(--muted);line-height:1.35}
+.nt-tip svg{width:19px;height:19px;color:var(--accent);flex:none}
+.ntb .mod-body{padding:0 10px calc(10px*var(--sp))}
+.ntb-ap{display:flex;align-items:baseline;gap:8px;margin:6px 2px 5px}
+.ntb-ap b{font-size:calc(14.5px*var(--ts))}
+.ntb-ap span{font-size:calc(12.5px*var(--ts));color:var(--muted);font-weight:600}
+.ntm{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:8px 11px;margin:0 0 6px;cursor:pointer}
+.ntm-head{font-weight:650;font-size:calc(15px*var(--ts));line-height:1.35;overflow-wrap:anywhere}
+.ntm:not(.open) .ntm-head{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ntm-when{font-size:calc(12.5px*var(--ts));color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+.ntm .nt-body{margin-top:6px;padding-top:6px}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1538,6 +1558,7 @@ var I={
   brief:sv('<rect x="5" y="4.5" width="14" height="16.5" rx="2.2"/><path d="M9.5 3h5v3h-5z"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4"/>'),
   paste:sv('<rect x="5" y="4.5" width="14" height="16.5" rx="2.2"/><path d="M9.5 3h5v3h-5z"/><path d="M12 10v6.5M9.2 13.8l2.8 2.8 2.8-2.8"/>'),
   folder:sv('<path d="M3.5 7.5a2 2 0 0 1 2-2h3.8l2 2.2h7.2a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),
+  bm:sv('<path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-4.2L6 21V4.5a1 1 0 0 1 1-1z"/>'),
   ext:sv('<path d="M7 17L17 7M9 7h8v8"/>'),
   link:sv('<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
   more:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.9" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.9" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.9" fill="currentColor" stroke="none"/></svg>',
@@ -1628,6 +1649,7 @@ function normItem(it){
   if(it.type==='rest'&&it.link===true) return {id:str(it.id)||uid(),type:'rest',link:true,collapsed:!!it.collapsed};
   if(it.type==='flog') return {id:str(it.id)||uid(),type:'flog',part:['dep','arr'].indexOf(it.part)>=0?it.part:'both',collapsed:!!it.collapsed};
   if(it.type==='apst') return {id:str(it.id)||uid(),type:'apst',which:it.which==='dep'?'dep':'dest',collapsed:!!it.collapsed};
+  if(it.type==='nt') return {id:str(it.id)||uid(),type:'nt',show:Array.isArray(it.show)?it.show.filter(function(x){return ['dep','dest','alts','enr','co'].indexOf(x)>=0;}):['dest','alts'],collapsed:!!it.collapsed};
   if(it.type==='wx') return {id:str(it.id)||uid(),type:'wx',show:Array.isArray(it.show)?it.show.filter(function(x){return ['dep','dest','alts'].indexOf(x)>=0;}):['dest','alts'],collapsed:!!it.collapsed};
   if(it.type==='head') return {id:str(it.id)||uid(),type:'head',title:str(it.title,'Heading'),collapsed:!!it.collapsed};
   if(it.type==='cd') return {id:str(it.id)||uid(),type:'cd',title:str(it.title,'Countdown'),target:typeof it.target==='number'&&isFinite(it.target)?it.target:null,
@@ -1742,7 +1764,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='52';
+var APP_VERSION='53';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2109,6 +2131,7 @@ function renderNode(it,depth){
   if(it.type==='flog') return renderFlog(it);
   if(it.type==='apst') return renderApst(it);
   if(it.type==='wx') return renderWx(it);
+  if(it.type==='nt') return renderNtBlock(it);
   return renderCheck(it,depth);
 }
 function thumbsHTML(it){
@@ -2847,7 +2870,7 @@ function wxAtisHTML(ic,list){
   }).join('');
 }
 function wxRefreshViews(){
-  app.querySelectorAll('.module.wx').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
+  app.querySelectorAll('.module.wx,.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
   if(toolOpen&&toolKind==='wx') refreshTool();
   if(toolOpen&&toolKind==='apn'&&toolApnView==='brief'){
     var f=$('#apFind');if(!f||(!f.value.trim()&&document.activeElement!==f)) refreshTool(); // don't wipe a search you're typing
@@ -3025,7 +3048,7 @@ function wxPanelHTML(){
 // Kept on its own, outside the backup: it belongs to one flight and is easy to load again.
 var BRKEY='flightChecklist.brief';
 var brief=(function(){try{var o=JSON.parse(localStorage.getItem(BRKEY)||'null');return o&&o.v===1&&o.flight&&o.notams&&Array.isArray(o.notams.groups)?o:null;}catch(e){return null;}})();
-if(brief){if(!brief.read||typeof brief.read!=='object') brief.read={};if(!brief.notams.flight) brief.notams.flight={};brief.notams.count=brief.notams.count||0;}
+if(brief){if(!brief.keep||typeof brief.keep!=='object') brief.keep={};if(!brief.notams.flight) brief.notams.flight={};brief.notams.count=brief.notams.count||0;}
 var brTab='dep',brFold=new Set(),brOpenSet=new Set(),brEnrOpen=new Set(),brSetup=false,brRv=null,brBusy=false;
 function brSave(){
   try{if(brief) localStorage.setItem(BRKEY,JSON.stringify(brief));else localStorage.removeItem(BRKEY);}
@@ -3074,8 +3097,6 @@ function brBy(rv){
   rv.forEach(function(x){var s=x.g.section;(!x.g.ad?by.area:s==='dep'?by.dep:s==='dest'?by.dest:s==='altn'?by.altn:s==='toalt'?by.toalt:by.enr).push(x);});
   return by;
 }
-function brIsRead(id){return !!(brief&&brief.read&&brief.read[id]);}
-function brImp(L){return L.filter(function(x){return x.level==='high'&&!brIsRead(x.n.id);}).length;}
 function brByScore(a,b){return b.score-a.score;}
 function brCodes(L){var o=[],m={};L.forEach(function(x){var c=x.g.code;if(!m[c]){m[c]=[];o.push(c);}m[c].push(x);});return {order:o,map:m};}
 // SIGMETs for the FIRs you fly through, while you're in them (times from the OFP, moved with your ETD)
@@ -3089,12 +3110,6 @@ function brSigs(){
     }
     return {s:s,key:'SG:'+s.fir+':'+(s.from||i),on:on};
   });
-}
-function brUnread(){
-  if(!brief) return 0;
-  var n=brReview().filter(function(x){return x.level==='high'&&!brIsRead(x.n.id);}).length;
-  n+=brSigs().filter(function(x){return x.on&&!brIsRead(x.key);}).length;
-  return n+(brief.alerts||[]).filter(function(a){return !brIsRead(a.id);}).length;
 }
 // ---- cards ----
 function ntCat(n){
@@ -3133,34 +3148,12 @@ function ntHL(t,rw){
   if(r2) t=t.replace(new RegExp('\\bRWY\\s*(?:'+rw+'|'+r2+')(?:\\/(?:'+rw+'|'+r2+'))?\\b|\\b(?:'+rw+'\\/'+r2+'|'+r2+'\\/'+rw+')\\b','g'),function(m){return '<b class="hr">'+m+'</b>';});
   return t;
 }
-function ntTickHTML(id,read){
-  return '<button type="button" class="nt-tick" data-act="ntRead" data-v="'+esc(id)+'" aria-pressed="'+read+'" aria-label="'+(read?'Read. Tap to mark as not read':'Mark as read')+'">'+(read?I.check:'')+'</button>';
-}
-function ntCardHTML(x,rw){
-  var n=x.n,c=ntCat(n),read=brIsRead(n.id),open=brOpenSet.has(x.key);
-  var why=x.why.filter(function(w){return w.toLowerCase()!==c[0].toLowerCase();}),when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
-  return '<div class="nt-card lv-'+x.level+(read?' read':'')+(open?' open':'')+'">'+
-    '<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'"><div class="nt-top"><span class="nt-cat '+c[1]+'">'+c[0]+'</span>'+
-      why.slice(0,2).map(function(w){return '<span class="nt-why">'+esc(w)+'</span>';}).join('')+'</div>'+
-    '<div class="nt-head">'+ntHL(ntHead(n),rw)+'</div>'+
-    '<div class="nt-when">'+(when?esc(when)+' · ':'')+'<span class="nt-id">'+esc(n.id)+'</span></div>'+
-    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+ntHL(n.body||'',rw).replace(/\n/g,'<br>')+'</div>':'')+'</div>'+
-    ntTickHTML(n.id,read)+'</div>';
-}
 function ntFoldHTML(key,title,count,badge){
   var open=brFold.has(key);
   return '<button type="button" class="nt-fold'+(open?' open':'')+'" data-act="ntFold" data-v="'+esc(key)+'" aria-expanded="'+open+'"><span>'+esc(title)+'</span>'+
     (badge?'<small class="nt-badge">'+badge+'</small>':'<em>'+esc(count)+'</em>')+I.right+'</button>';
 }
 function ntCards(L,rw){return L.map(function(x){return ntCardHTML(x,rw);}).join('');}
-function sgCardHTML(x){
-  var s=x.s,read=brIsRead(x.key),open=brOpenSet.has(x.key),when=s.from&&s.to&&s.to>s.from?hmOf(s.from).slice(0,4)+'–'+hmOf(s.to):'';
-  return '<div class="nt-card sg lv-'+(x.on?'high':'low')+(read?' read':'')+(open?' open':'')+'">'+
-    '<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'"><div class="nt-top"><span class="nt-cat'+(x.on?' rw':'')+'">'+esc(s.kind)+'</span>'+(x.on?'<span class="nt-why">On your route</span>':'')+'</div>'+
-    '<div class="nt-head">'+esc((s.fir||'')+(s.name?' '+brCap(s.name).replace(/\bFir\b/,'FIR'):''))+(when?' · '+when:'')+'</div>'+
-    (x.on?'<div class="nt-when">You’re in '+esc(s.fir)+' '+hmOf(x.on.a).slice(0,4)+'–'+hmOf(x.on.b)+'</div>':'')+
-    '<div class="nt-body'+(open?'':' clamp')+'">'+wxSig(s.text)+'</div></div>'+ntTickHTML(x.key,read)+'</div>';
-}
 // ---- the panel ----
 function brFlightHTML(){
   var f=brief.flight,n=brief.notams,d=f.etd?new Date(f.etd):null,same=brSame();
@@ -3171,58 +3164,20 @@ function brFlightHTML(){
     '<small>'+esc(t3)+' · <button type="button" class="lnkbtn" data-act="brRemove">Remove</button></small>'+
     (!same&&f.dest?'<p class="nt-other">Your flight isn’t set to this route. <button type="button" class="lnkbtn" data-act="brFill">Fill the flight from it</button></p>':'')+'</div>';
 }
-function brAlertsHTML(){
-  var A=brief.alerts||[],un=A.filter(function(a){return !brIsRead(a.id);}).length,h=ntFoldHTML('co','Company alerts',un?'':'All read',un||'');
-  if(brFold.has('co')) h+='<div class="nt-in">'+A.map(function(a){
-    return ntCardHTML({n:{id:a.id,body:a.title+'\n'+a.body,cat:''},why:[],level:'high',key:'co:'+a.id,whenTxt:''},'');
-  }).join('')+'</div>';
-  return h;
-}
-function brListHTML(L,rw,pre,ctx){
-  var h='<div class="nt-sec"><b>NOTAMs</b><span>'+esc(ctx)+'</span></div>';
-  if(!L.length) return h+'<p class="nt-none">None in the package.</p>';
-  var G=L.slice().sort(brByScore),hi=G.filter(function(x){return x.level==='high';});
-  h+=hi.length?ntCards(hi,rw):'<p class="nt-none">Nothing important at your time.</p>';
-  [['mid','Also in force'],['low','Less important'],['off','Not at your time']].forEach(function(f){
-    var S=G.filter(function(x){return f[0]==='off'?(x.level==='later'||x.level==='none'):x.level===f[0];});
-    if(!S.length) return;var k=pre+':'+f[0];
-    h+=ntFoldHTML(k,f[1],S.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(S,rw)+'</div>';
-  });
-  return h;
-}
 // one airport (or FIR) with its important NOTAMs and the rest folded
-function brApBlockHTML(code,L,o){
-  var G=L.slice().sort(brByScore),top=G.filter(function(x){return x.level==='high'||(o.mid&&x.level==='mid');}),rest=G.filter(function(x){return top.indexOf(x)<0;}),k='ap:'+o.sec+':'+code;
-  var d=o.wx&&wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';
-  var h='<div class="nt-ap" data-ap="'+esc(code)+'"><b>'+esc(code)+'</b><span>'+esc(o.name||'')+'</span>'+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+'</div>'+(o.info?'<div class="nt-apinfo">'+esc(o.info)+'</div>':'');
-  if(o.wx) h+=wxCardHTML({ic:code,role:o.role||''},false,true);
-  h+=top.length?ntCards(top,''):'<p class="nt-none sm">'+(L.length?'Nothing important':'No NOTAMs in the package')+'</p>';
-  if(rest.length){h+=ntFoldHTML(k,top.length?'Others':'All NOTAMs',rest.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(rest,'')+'</div>';}
-  return h;
-}
-function brEnrRowHTML(code,L){
-  var g=L[0].g,open=brEnrOpen.has(code),d=wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'',imp=brImp(L);
-  var nm=apName(code).replace(/\s*\([A-Z-]{2}\)$/,'')||brCap(g.name);
-  var h='<button type="button" class="br-row'+(open?' open':'')+'" data-act="brEnr" data-v="'+esc(code)+'" data-ap="'+esc(code)+'" aria-expanded="'+open+'"><b>'+esc(code)+'</b><span class="n">'+esc(nm)+'</span>'+
-    (g.section==='enalt'?'<i class="br-era">ERA</i>':'')+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+(imp?'<small class="nt-badge">'+imp+'</small>':'')+'<em>'+L.length+'</em>'+I.right+'</button>';
-  if(!open) return h;
-  var G=L.slice().sort(brByScore),top=G.filter(function(x){return x.level==='high'||x.level==='mid';}),rest=G.filter(function(x){return top.indexOf(x)<0;}),k='ap:enr:'+code;
-  h+='<div class="br-rowin">'+wxCardHTML({ic:code,role:''},false,true)+(top.length?ntCards(top,''):'<p class="nt-none sm">Nothing important</p>');
-  if(rest.length){h+=ntFoldHTML(k,'Others',rest.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(rest,'')+'</div>';}
-  return h+'</div>';
-}
 function wxAddHTML(){return '<div class="wxadd"><input type="text" class="fl-in" id="wxAddIn" maxlength="4" placeholder="Add ICAO or IATA" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off"><button type="button" class="btn" data-act="wxWatch">'+I.plus+'Add</button></div>';}
 function brPanelHTML(){
   if(!brief) return brEmptyHTML()+wxPanelHTML();
   var st=state.settings,f=brief.flight,t=brTimes(),rv=brReview(),by=brBy(rv),sg=brSigs(),same=brSame(),h=brFlightHTML();
   if(st.wxUrl) h+=wxStatusHTML();
+  if(!brKeptCount()) h+='<p class="nt-tip">'+I.bm+'<span>Keep the NOTAMs that matter with the bookmark. They show in the NOTAMs block of your checklists (Edit → NOTAMs).</span></p>';
   if((brief.alerts||[]).length) h+=brAlertsHTML();
-  var tabs=[['dep',f.dep||'DEP',brImp(by.dep)+brImp(by.toalt)],['dest',f.dest||'DEST',brImp(by.dest)],['altn','ALTN',brImp(by.altn)],
-    ['enr','ENR',brImp(by.enr)+sg.filter(function(x){return x.on&&!brIsRead(x.key);}).length]];
+  var tabs=[['dep',f.dep||'DEP',brKeptIn(by.dep)+brKeptIn(by.toalt)],['dest',f.dest||'DEST',brKeptIn(by.dest)],['altn','ALTN',brKeptIn(by.altn)],
+    ['enr','ENR',brKeptIn(by.enr)+brKeptIn(by.area)]];
   if(!tabs.some(function(x){return x[0]===brTab;})) brTab='dep';
   h+='<div class="seg big nt-tabs" role="tablist">'+tabs.map(function(x){
     var on=x[0]===brTab;
-    return '<button type="button" role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-act="brTab" data-v="'+x[0]+'">'+esc(x[1])+(x[2]?'<small class="nt-badge" aria-label=", '+x[2]+' to read">'+x[2]+'</small>':'')+'</button>';
+    return '<button type="button" role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-act="brTab" data-v="'+x[0]+'">'+esc(x[1])+(x[2]?'<small class="nt-badge k" aria-label=", '+x[2]+' kept">'+I.bm+x[2]+'</small>':'')+'</button>';
   }).join('')+'</div>';
   if(brTab==='dep'||brTab==='dest'){
     var dep=brTab==='dep',ic=dep?f.dep:f.dest,rw=dep?f.depRwy:f.arrRwy;
@@ -3267,14 +3222,6 @@ function brPanelHTML(){
   return h;
 }
 // NOTAMs for one airport in Airports → Brief
-function brApSectionHTML(ic){
-  if(!brief) return '';
-  var rv=brReview().filter(function(x){return x.g.code===ic&&x.g.ad;});
-  if(!rv.length) return '';
-  var f=brief.flight,hi=rv.filter(function(x){return x.level==='high';}).sort(brByScore),rw=ic===f.dep?f.depRwy:ic===f.dest?f.arrRwy:'';
-  return '<div class="pb-h"><span>NOTAMs</span><button type="button" class="lnkbtn" data-act="brGo" data-v="'+esc(ic)+'">All '+rv.length+'</button></div>'+
-    (hi.length?'<div class="nt-brief">'+ntCards(hi,rw)+'</div>':'<p class="pb-none">Nothing important at your time.</p>');
-}
 function brGo(ic){
   var g=brief&&brief.notams.groups.filter(function(x){return x.code===ic&&x.ad;})[0];if(!g) return;
   var s=g.section;brTab=s==='dep'||s==='toalt'?'dep':s==='dest'?'dest':s==='altn'?'altn':'enr';
@@ -3378,7 +3325,7 @@ function pkgDropHTML(mode){
     '<button type="button" class="lnkbtn pkg-how" data-sact="pkghelp" data-act="pkgHelp">How to paste the PDF from Lido</button>';
 }
 function openPkgSheet(){
-  openSheet('<h3>Load the LIDO package</h3><p class="hint">A newer copy of the same flight keeps what you’ve read. NOTAMs or weather on their own update the briefing.</p>'+pkgDropHTML('brief')+
+  openSheet('<h3>Load the LIDO package</h3><p class="hint">A newer copy of the same flight keeps what you kept. NOTAMs or weather on their own update the briefing.</p>'+pkgDropHTML('brief')+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',function(act){if(act==='pkghelp') pkgHelp(null,openPkgSheet);else closeSheet();});
 }
 function brStatus(msg){
@@ -3474,14 +3421,14 @@ document.addEventListener('drop',function(e){
   brReadFile(f,!sheetWrap.hidden&&sheetEl.querySelector('.pkg-drop[data-mode="new"]')?'new':'brief');
 });
 function brSetFrom(P,keep){
-  var old=brief,f=P.flight,read={},of=old&&old.flight,st=state.settings;
-  if(of&&old.read&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon) read=old.read; // a newer copy of the same flight keeps what you've read
+  var old=brief,f=P.flight,keep={},of=old&&old.flight,st=state.settings;
+  if(of&&old.keep&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon) keep=old.keep; // a newer copy of the same flight keeps what you kept
   if(!f.dep&&!f.dest){ // no OFP in it: the NOTAMs and weather go with the flight that's set
     var k=keep||brHint();
     f.dep=k.dep||'';f.dest=k.dest||'';f.fromApp=true;
     f.altns=(k.alts||[]).map(function(a){var m=k.dest&&st.altMin[k.dest+'>'+a];return typeof m==='number'?{icao:a,min:m}:{icao:a};});
   }
-  brief={v:1,at:Date.now(),file:P.file||'',flight:f,wx:brPkgWx(P),wxMade:P.wxMade||null,sigmets:P.sigmets||[],alerts:P.alerts||[],notams:P.notams,read:read};
+  brief={v:1,at:Date.now(),file:P.file||'',flight:f,wx:brPkgWx(P),wxMade:P.wxMade||null,sigmets:P.sigmets||[],alerts:P.alerts||[],notams:P.notams,keep:keep};
   brRv=null;brFold.clear();brOpenSet.clear();brEnrOpen.clear();brSetup=false;brTab=f.dep?'dep':'dest';
   brSave();
 }
@@ -3556,6 +3503,174 @@ function openNewFlight(){
     }else{closeSheet();openMenu();}
   });
 }
+// ---- keeping NOTAMs: the ones you keep go with you into the checklists' NOTAMs blocks ----
+function ntKey(g,n){return (g&&g.code||'')+'|'+n.id;}
+function brIsKept(k){return !!(brief&&brief.keep&&brief.keep[k]);}
+function brKeptIn(L){return L.filter(function(x){return brIsKept(ntKey(x.g,x.n));}).length;}
+function brKeptCount(){
+  if(!brief||!brief.keep) return 0;
+  return brKeptList().length;
+}
+// kept NOTAMs and company alerts, as review entries, in briefing order
+function brKeptList(){
+  if(!brief||!brief.keep) return [];
+  var out=brReview().filter(function(x){return brIsKept(ntKey(x.g,x.n));});
+  (brief.alerts||[]).forEach(function(a){var x=brAlertEntry(a);if(brIsKept(ntKey(x.g,x.n))) out.push(x);});
+  return out;
+}
+function brAlertEntry(a){return {g:{code:'CO',section:'co',ad:false,name:'Company'},n:{id:a.id,body:a.title+'\n'+a.body,cat:''},why:[],level:'high',key:'co:'+a.id,whenTxt:'',score:9};}
+function ntKeepHTML(k,kept){
+  return '<button type="button" class="nt-keep'+(kept?' on':'')+'" data-act="ntKeep" data-v="'+esc(k)+'" aria-pressed="'+kept+'" aria-label="'+(kept?'Kept. Tap to remove':'Keep this NOTAM')+'">'+I.bm+'</button>';
+}
+function ntCardHTML(x,rw){
+  var n=x.n,c=ntCat(n),k=ntKey(x.g,n),kept=brIsKept(k),open=brOpenSet.has(x.key);
+  var why=x.why.filter(function(w){return w.toLowerCase()!==c[0].toLowerCase();}),when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
+  return '<div class="nt-card lv-'+x.level+(kept?' kept':'')+(open?' open':'')+'">'+
+    '<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'"><div class="nt-top"><span class="nt-cat '+c[1]+'">'+c[0]+'</span>'+
+      why.slice(0,2).map(function(w){return '<span class="nt-why">'+esc(w)+'</span>';}).join('')+'</div>'+
+    '<div class="nt-head">'+ntHL(ntHead(n),rw)+'</div>'+
+    '<div class="nt-when">'+(when?esc(when)+' · ':'')+'<span class="nt-id">'+esc(n.id)+'</span></div>'+
+    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+ntHL(n.body||'',rw).replace(/\n/g,'<br>')+'</div>':'')+'</div>'+
+    ntKeepHTML(k,kept)+'</div>';
+}
+function sgCardHTML(x){
+  var s=x.s,open=brOpenSet.has(x.key),when=s.from&&s.to&&s.to>s.from?hmOf(s.from).slice(0,4)+'–'+hmOf(s.to):'';
+  return '<div class="nt-card sg lv-'+(x.on?'high':'low')+(open?' open':'')+'">'+
+    '<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'"><div class="nt-top"><span class="nt-cat'+(x.on?' rw':'')+'">'+esc(s.kind)+'</span>'+(x.on?'<span class="nt-why">On your route</span>':'')+'</div>'+
+    '<div class="nt-head">'+esc((s.fir||'')+(s.name?' '+brCap(s.name).replace(/\bFir\b/,'FIR'):''))+(when?' · '+when:'')+'</div>'+
+    (x.on?'<div class="nt-when">You’re in '+esc(s.fir)+' '+hmOf(x.on.a).slice(0,4)+'–'+hmOf(x.on.b)+'</div>':'')+
+    '<div class="nt-body'+(open?'':' clamp')+'">'+wxSig(s.text)+'</div></div></div>';
+}
+function brAlertsHTML(){
+  var A=brief.alerts||[],E=A.map(brAlertEntry),kn=brKeptIn(E),h=ntFoldHTML('co','Company alerts',kn?kn+' kept · '+A.length:A.length);
+  if(brFold.has('co')) h+='<div class="nt-in">'+E.map(function(x){return ntCardHTML(x,'');}).join('')+'</div>';
+  return h;
+}
+function brListHTML(L,rw,pre,ctx){
+  var h='<div class="nt-sec"><b>NOTAMs</b><span>'+esc(ctx)+'</span></div>';
+  if(!L.length) return h+'<p class="nt-none">None in the package.</p>';
+  var G=L.slice().sort(brByScore),isK=function(x){return brIsKept(ntKey(x.g,x.n));};
+  var kept=G.filter(isK),hi=G.filter(function(x){return x.level==='high'&&!isK(x);});
+  if(kept.length) h+='<div class="nt-h">Kept</div>'+ntCards(kept,rw);
+  if(hi.length) h+=(kept.length?'<div class="nt-h">Important</div>':'')+ntCards(hi,rw);
+  else if(!kept.length) h+='<p class="nt-none">Nothing important at your time.</p>';
+  [['mid','Also in force'],['low','Less important'],['off','Not at your time']].forEach(function(f){
+    var S=G.filter(function(x){return !isK(x)&&(f[0]==='off'?(x.level==='later'||x.level==='none'):x.level===f[0]);});
+    if(!S.length) return;var k=pre+':'+f[0];
+    h+=ntFoldHTML(k,f[1],S.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(S,rw)+'</div>';
+  });
+  return h;
+}
+// one airport (or FIR): kept ones first, then the important ones, the rest folded
+function brApBlockHTML(code,L,o){
+  var isK=function(x){return brIsKept(ntKey(x.g,x.n));};
+  var G=L.slice().sort(function(a,b){return (isK(b)?1:0)-(isK(a)?1:0)||b.score-a.score;});
+  var top=G.filter(function(x){return isK(x)||x.level==='high'||(o.mid&&x.level==='mid');}),rest=G.filter(function(x){return top.indexOf(x)<0;}),k='ap:'+o.sec+':'+code;
+  var d=o.wx&&wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';
+  var h='<div class="nt-ap" data-ap="'+esc(code)+'"><b>'+esc(code)+'</b><span>'+esc(o.name||'')+'</span>'+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+'</div>'+(o.info?'<div class="nt-apinfo">'+esc(o.info)+'</div>':'');
+  if(o.wx) h+=wxCardHTML({ic:code,role:o.role||''},false,true);
+  h+=top.length?ntCards(top,''):'<p class="nt-none sm">'+(L.length?'Nothing important':'No NOTAMs in the package')+'</p>';
+  if(rest.length){h+=ntFoldHTML(k,top.length?'Others':'All NOTAMs',rest.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(rest,'')+'</div>';}
+  return h;
+}
+function brEnrRowHTML(code,L){
+  var isK=function(x){return brIsKept(ntKey(x.g,x.n));};
+  var g=L[0].g,open=brEnrOpen.has(code),d=wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'',kn=brKeptIn(L);
+  var nm=apName(code).replace(/\s*\([A-Z-]{2}\)$/,'')||brCap(g.name);
+  var h='<button type="button" class="br-row'+(open?' open':'')+'" data-act="brEnr" data-v="'+esc(code)+'" data-ap="'+esc(code)+'" aria-expanded="'+open+'"><b>'+esc(code)+'</b><span class="n">'+esc(nm)+'</span>'+
+    (g.section==='enalt'?'<i class="br-era">ERA</i>':'')+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+(kn?'<small class="nt-badge k" aria-label=", '+kn+' kept">'+I.bm+kn+'</small>':'')+'<em>'+L.length+'</em>'+I.right+'</button>';
+  if(!open) return h;
+  var G=L.slice().sort(function(a,b){return (isK(b)?1:0)-(isK(a)?1:0)||b.score-a.score;});
+  var top=G.filter(function(x){return isK(x)||x.level==='high'||x.level==='mid';}),rest=G.filter(function(x){return top.indexOf(x)<0;}),k='ap:enr:'+code;
+  h+='<div class="br-rowin">'+wxCardHTML({ic:code,role:''},false,true)+(top.length?ntCards(top,''):'<p class="nt-none sm">Nothing important</p>');
+  if(rest.length){h+=ntFoldHTML(k,'Others',rest.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(rest,'')+'</div>';}
+  return h+'</div>';
+}
+// Airports → Brief: what you kept for this airport, then the important ones
+function brApSectionHTML(ic){
+  if(!brief) return '';
+  var rv=brReview().filter(function(x){return x.g.code===ic&&x.g.ad;});
+  if(!rv.length) return '';
+  var f=brief.flight,isK=function(x){return brIsKept(ntKey(x.g,x.n));},rw=ic===f.dep?f.depRwy:ic===f.dest?f.arrRwy:'';
+  var top=rv.filter(function(x){return isK(x)||x.level==='high';}).sort(function(a,b){return (isK(b)?1:0)-(isK(a)?1:0)||b.score-a.score;});
+  return '<div class="pb-h"><span>NOTAMs</span><button type="button" class="lnkbtn" data-act="brGo" data-v="'+esc(ic)+'">All '+rv.length+'</button></div>'+
+    (top.length?'<div class="nt-brief">'+ntCards(top,rw)+'</div>':'<p class="pb-none">Nothing important at your time.</p>');
+}
+// ---- the NOTAMs block: only the NOTAMs you kept, for the airports you choose ----
+var NTB_SHOW=[['dep','Departure'],['dest','Destination'],['alts','Alternates'],['enr','En route'],['co','Company alerts']];
+function newNtBlock(){return {id:uid(),type:'nt',show:['dest','alts'],collapsed:false};}
+function ntScope(x){var s=x.g.section;return s==='co'?'co':s==='dep'||s==='toalt'?'dep':s==='dest'?'dest':s==='altn'?'alts':'enr';}
+function ntBlockList(m){
+  var order=['dep','dest','alts','enr','co'];
+  return brKeptList().filter(function(x){return m.show.indexOf(ntScope(x))>=0;})
+    .sort(function(a,b){return order.indexOf(ntScope(a))-order.indexOf(ntScope(b));});
+}
+function ntMiniHTML(x,mid){
+  var n=x.n,open=brOpenSet.has('b:'+x.key),f=brief.flight,c=x.g.code,rw=c===f.dep?f.depRwy:c===f.dest?f.arrRwy:'';
+  var when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
+  return '<div class="ntm'+(open?' open':'')+'" data-act="ntbOpen" data-v="'+esc('b:'+x.key)+'" data-id="'+mid+'" role="button" aria-expanded="'+open+'">'+
+    '<div class="ntm-head">'+ntHL(ntHead(n),rw)+'</div>'+
+    '<div class="ntm-when">'+(when?esc(when)+' · ':'')+'<span class="nt-id">'+esc(n.id)+'</span></div>'+
+    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+ntHL(n.body||'',rw).replace(/\n/g,'<br>')+'</div>':'')+'</div>';
+}
+function renderNtBlock(m){
+  var h='<div class="module ntb'+(m.collapsed?' collapsed':'')+'" data-mod="'+m.id+'"><div class="mod-head"><button type="button" class="mod-toggle" data-act="modToggle" data-id="'+m.id+'">'+I.bm+
+    '<span class="mod-title">NOTAMs</span><span class="chev">'+I.chev+'</span></button>'+
+    (editMode?'<button type="button" class="ib" data-act="editMod" data-id="'+m.id+'" aria-label="Edit NOTAMs block">'+I.edit+'</button><span class="grip" data-drag="item" data-id="'+m.id+'" aria-hidden="true">'+I.grip+'</span>':'')+'</div><div class="mod-body">';
+  if(!brief) return h+'<div class="apn-empty" style="padding:6px 2px 4px">Load the LIDO package, then keep the NOTAMs that matter. <button type="button" class="lnkbtn" data-act="wxOpen">Menu → Briefing</button></div></div></div>';
+  var L=ntBlockList(m);
+  if(!L.length) return h+'<div class="apn-empty" style="padding:6px 2px 4px">None kept for '+esc(ntShowText(m.show).toLowerCase())+'. <button type="button" class="lnkbtn" data-act="brTabOpen" data-v="'+(m.show.indexOf('dest')>=0?'dest':m.show.indexOf('dep')>=0?'dep':m.show.indexOf('alts')>=0?'altn':'enr')+'">Keep them in the Briefing</button></div></div></div>';
+  var last='';
+  L.forEach(function(x){
+    var c=x.g.code,sc=ntScope(x);
+    if(c!==last){last=c;h+='<div class="ntb-ap"><b>'+esc(sc==='co'?'Company':c)+'</b><span>'+({dep:'Departure',dest:'Destination',alts:'Alternate',enr:x.g.ad?'En route':'FIR / area',co:'Alerts'}[sc])+'</span></div>';}
+    h+=ntMiniHTML(x,m.id);
+  });
+  return h+'</div></div>';
+}
+function ntShowText(show){
+  var L=NTB_SHOW.filter(function(o){return show.indexOf(o[0])>=0;}).map(function(o){return o[1];});
+  return L.length>1?L.slice(0,-1).join(', ')+' and '+L[L.length-1]:L.length?L[0]:'nothing chosen';
+}
+function ntBlockSub(n){
+  if(!brief) return 'No package loaded';
+  var L=ntBlockList(n);if(!L.length) return 'None kept';
+  var by={},o=[];L.forEach(function(x){var c=ntScope(x)==='co'?'Company':x.g.code;if(!by[c]){by[c]=0;o.push(c);}by[c]++;});
+  return L.length+' kept · '+o.map(function(c){return esc(c)+' '+by[c];}).join(' · ');
+}
+function openNtBlockEditor(id){
+  var f=find(id);if(!f) return;
+  var m=f.node,show=m.show.slice(),idx=f.arr.indexOf(m);
+  openSheet('<h3>NOTAMs block</h3><p class="hint">Shows the NOTAMs you keep in the Briefing, for these:</p><div class="fld"><div class="cbl" id="fNtShow">'+NTB_SHOW.map(function(o){
+      var on=show.indexOf(o[0])>=0;
+      return '<button type="button" class="cbr'+(on?' on':'')+'" data-sact="tog" data-v="'+o[0]+'" role="checkbox" aria-checked="'+on+'"><span class="cbx">'+I.check+'</span><span>'+o[1]+'</span></button>';
+    }).join('')+'</div></div>'+
+    '<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
+    '<button type="button" class="btn small" data-sact="down"'+(idx===f.arr.length-1?' disabled':'')+'>'+I.down+'Down</button>'+
+    '<button type="button" class="btn small danger" data-sact="del">'+I.trash+'Delete</button></div>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Save</button></div>',
+  function(act,btn){
+    var i,j;
+    switch(act){
+      case 'tog':
+        var v=btn.getAttribute('data-v'),k=show.indexOf(v);if(k>=0) show.splice(k,1);else show.push(v);
+        btn.classList.toggle('on',k<0);btn.setAttribute('aria-checked',String(k<0));break;
+      case 'save': m.show=show;save();closeSheet();render();break;
+      case 'up': case 'down':
+        i=f.arr.indexOf(m);j=i+(act==='up'?-1:1);if(j<0||j>=f.arr.length) return;
+        f.arr.splice(i,1);f.arr.splice(j,0,m);save();closeSheet();render();flash(id);break;
+      case 'del': confirmSheet('Delete this NOTAMs block?','Delete',function(){removeNode(f);save();render();},function(){openNtBlockEditor(id);});break;
+      default: closeSheet();
+    }
+  });
+}
+function brKeepToggle(k){
+  if(!brief) return;
+  if(!brief.keep) brief.keep={};
+  if(brief.keep[k]) delete brief.keep[k];else brief.keep[k]=1;
+  brSave();refreshTool();
+  app.querySelectorAll('.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
+}
 function wxSetUrl(){
   var inp=$('#wxUrlIn'),u=normWxUrl(inp?inp.value:'');
   if(!u){toast('Paste the address starting with https://');if(inp) inp.focus();return;}
@@ -3625,7 +3740,8 @@ function renderSection(s){
     '<button type="button" data-act="addApn" data-id="'+s.id+'">'+I.pin+'Airport notes</button>'+
     '<button type="button" data-act="addFlog" data-id="'+s.id+'">'+I.log+'Flight log</button>'+
     '<button type="button" data-act="addApst" data-id="'+s.id+'">'+I.chart+'Airport stats</button>'+
-    '<button type="button" data-act="addWx" data-id="'+s.id+'">'+I.wx+'Weather</button></div>';
+    '<button type="button" data-act="addWx" data-id="'+s.id+'">'+I.wx+'Weather</button>'+
+    '<button type="button" data-act="addNt" data-id="'+s.id+'">'+I.bm+'NOTAMs</button></div>';
   h+='<div class="sec-done">'+I.check+'<span>'+esc(s.title)+' complete</span></div>';
   return h+'</div></section>';
 }
@@ -3768,6 +3884,7 @@ function modSubHTML(n){
     var c=n.link?(n.ref&&cdById(n.ref)):n;if(!c) return 'No countdown chosen';
     return c.target===null?'Not set':'at '+hmZ(new Date(c.target).getUTCHours()*60+new Date(c.target).getUTCMinutes());
   }
+  if(t==='nt') return ntBlockSub(n);
   if(t==='wx'){
     if(!state.settings.wxUrl&&!brHasWx()) return 'Not set up';
     var aps=wxBlockAirports(n);if(!aps.length) return 'Set the flight';
@@ -4610,8 +4727,8 @@ function menuTileVals(now){
   o.fl=[String(nf),cf?'logging '+(cf.dep.icao||'—')+' → '+(cf.arr.icao||'—'):nf?(nf===1?'flight':'flights')+(lf&&lf.arr.icao?' · last '+lf.arr.icao:''):'None logged yet'];
   var cat=function(ic){var d=wxData(ic);return d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';};
   if(brief){
-    var bd=brief.flight.dest||(st.dest&&st.dest.icao),c1=bd?cat(bd):'',un=brUnread(),wf=st.wxUrl&&wxLastFetch(wxAirports().map(function(x){return x.ic;}));
-    o.wx=[bd?esc(bd)+(c1?' <span class="wxcat '+c1+'">'+c1+'</span>':''):'–',(un?un+' important to read':'Everything important read')+' · '+(wf?'weather '+ageText(now-wf)+' ago':brief.wxMade?'weather '+hmOf(brief.wxMade):brief.notams.count+' NOTAMs'),true];
+    var bd=brief.flight.dest||(st.dest&&st.dest.icao),c1=bd?cat(bd):'',kn=brKeptCount(),wf=st.wxUrl&&wxLastFetch(wxAirports().map(function(x){return x.ic;}));
+    o.wx=[bd?esc(bd)+(c1?' <span class="wxcat '+c1+'">'+c1+'</span>':''):'–',(kn?kn+' NOTAM'+(kn===1?'':'s')+' kept':'No NOTAMs kept yet')+' · '+(wf?'weather '+ageText(now-wf)+' ago':brief.wxMade?'weather '+hmOf(brief.wxMade):brief.notams.count+' NOTAMs'),true];
   }else if(!st.wxUrl) o.wx=['–','NOTAMs and weather from the LIDO package'];
   else{
     var dst=st.dest&&st.dest.icao,f=wxLastFetch(wxAirports().map(function(x){return x.ic;})),age=f?ageText(now-f)+' ago':'Not updated yet';
@@ -6247,7 +6364,7 @@ function dragLabel(kind,id){
   var f=find(id);if(!f) return {t:'',s:''};
   var n=f.node,k=n.type==='check'?n.children.length:0;
   if(n.type==='head'){var g=headGroups(f.section)[n.id]||{n:0};return {t:n.title||'Heading',s:g.n?g.n+' item'+(g.n>1?'s':''):''};}
-  return {t:n.type==='check'?(n.text||'Untitled item'):n.title,s:k?k+' sub-item'+(k>1?'s':''):''};
+  return {t:n.type==='check'?(n.text||'Untitled item'):n.title||({calc:'Calculator',pad:'Notepad',cd:'Countdown',rest:'Crew rest',apn:'Airport notes',flog:'Flight log',apst:'Airport stats',wx:'Weather',nt:'NOTAMs'}[n.type])||'Block',s:k?k+' sub-item'+(k>1?'s':''):''};
 }
 function dragSibs(box,kind){
   return Array.prototype.filter.call(box.children,function(el){
@@ -6637,6 +6754,7 @@ function onAct(e){
       else if(mf&&mf.node.type==='flog') openFlogBlockEditor(id);
       else if(mf&&mf.node.type==='apst') openApstEditor(id);
       else if(mf&&mf.node.type==='wx') openWxBlockEditor(id);
+      else if(mf&&mf.node.type==='nt') openNtBlockEditor(id);
       else openModEditor(id);
       break;
     case 'cdPick': openCdBlockEditor(id);break;
@@ -6666,7 +6784,10 @@ function onAct(e){
     case 'wxSetUrl': wxSetUrl();break;
     case 'brTab': brTabTo(el.getAttribute('data-v'));break;
     case 'ntOpen': var ntk=el.getAttribute('data-v');if(brOpenSet.has(ntk)) brOpenSet.delete(ntk);else brOpenSet.add(ntk);refreshTool();break;
-    case 'ntRead': var ntr=el.getAttribute('data-v');if(brief){if(brief.read[ntr]) delete brief.read[ntr];else brief.read[ntr]=1;brSave();refreshTool();}break;
+    case 'ntKeep': brKeepToggle(el.getAttribute('data-v'));break;
+    case 'ntbOpen': var nbk=el.getAttribute('data-v');if(brOpenSet.has(nbk)) brOpenSet.delete(nbk);else brOpenSet.add(nbk);refreshModule(id);break;
+    case 'brTabOpen': brTab=el.getAttribute('data-v');openTool('wx');break;
+    case 'addNt': addModule(id,newNtBlock());break;
     case 'ntFold': var ntf=el.getAttribute('data-v');if(brFold.has(ntf)) brFold.delete(ntf);else brFold.add(ntf);refreshTool();break;
     case 'brEnr': var nte=el.getAttribute('data-v');if(brEnrOpen.has(nte)) brEnrOpen.delete(nte);else brEnrOpen.add(nte);refreshTool();break;
     case 'brLoad': openPkgSheet();break;

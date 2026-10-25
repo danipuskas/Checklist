@@ -32,6 +32,8 @@ and Menu > Briefing shows the NOTAMs for departure, destination, alternates and 
 SIGMETs on your route, company alerts and the package weather. The PDF is read on the iPad; nothing is sent anywhere.
 The NOTAMs that matter for your times and runways come first. The rest are folded, never hidden.
 Pasting only NOTAMs or weather later (the Briefing's load button) updates the briefing for those airports.
+Tap the bookmark on a NOTAM to keep it. Kept NOTAMs show in a NOTAMs block you add to any checklist section
+(Edit > NOTAMs), for the airports you choose: departure, destination, alternates, en route, company alerts.
 
 LIVE WEATHER (optional): Menu > Briefing can also show live METAR, TAF (aviationweather.gov) and US D-ATIS (atis.info)
 through a small free Cloudflare Worker you create once. Paste weather-relay-worker.js into a new "Hello World" Worker,
