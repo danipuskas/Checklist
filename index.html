@@ -1081,7 +1081,7 @@ a.rtag.rl svg{width:.95em;height:.95em;vertical-align:-.12em;margin-left:2px;str
 .nt-sec{display:flex;align-items:baseline;gap:4px 8px;flex-wrap:wrap;margin:16px 3px 7px}
 .nt-sec b{font-size:12px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .nt-sec span{font-size:calc(12.5px*var(--ts));color:var(--muted);font-weight:600}
-.nt-card{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:12px;padding:10px 10px 10px 12px;margin:0 0 8px}
+.nt-card{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--line-strong);border-radius:12px;padding:10px 10px 10px 12px;margin:0 0 8px}
 .nt-card.lv-mid,.nt-card.lv-low,.nt-card.lv-later,.nt-card.lv-none{border-left-color:var(--line-strong)}
 .nt-card.read{border-left-color:var(--line)}
 .nt-card.read .nt-main{opacity:.6}
@@ -1159,6 +1159,9 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .nt-keep.on svg{fill:currentColor}
 .nt-keep:active{background:var(--press)}
 .nt-card.kept{border-left-color:var(--accent)}
+.nt-card.sg.lv-high{border-left-color:var(--warn)}
+.nt-card.off .nt-main{opacity:.55}
+.nt-why.off{color:var(--muted);border-color:var(--line-strong)}
 .nt-h{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:2px 3px 6px}
 .nt-badge.k{display:inline-flex;align-items:center;gap:1px;background:var(--accent);color:var(--on-accent)}
 .nt-badge.k svg{width:10px;height:10px;fill:currentColor;stroke-width:2.5}
@@ -1764,7 +1767,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='53';
+var APP_VERSION='54';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -3112,20 +3115,6 @@ function brSigs(){
   });
 }
 // ---- cards ----
-function ntCat(n){
-  var f=(n.body||'').split('\n')[0];
-  if(/^CO/.test(n.id)) return ['Company','co'];
-  if(/^CC/.test(n.id)) return ['Chart','ch'];
-  if(/^CA/.test(n.id)) return ['Airport map','lo'];
-  if(/^RWY\b/.test(f)) return ['Runway','rw'];
-  if(/^(RAPID EXIT )?(TWY|TXL)\b|HLDG POINT|HOLDING POINT|^INTERMEDIATE/.test(f)) return ['Taxiway','tw'];
-  if(/\b(ILS|LOC|GBAS|GLS|RNP|VOR|DME|NDB|APCH|MINIMA|LNAV)\b/.test(f+' '+(n.cat||''))&&n.cat!=='AIRPORT') return ['Approach','ap'];
-  if(n.cat==='RUNWAY') return ['Runway','rw'];
-  if(n.cat==='APPROACH PROCEDURE') return ['Approach','ap'];
-  if(/FREQ|ATIS/.test(f)) return ['Radio','lo'];
-  if(/BIRD|WILDLIFE|FLYING FOX/.test(f)) return ['Wildlife','lo'];
-  return [n.cat?n.cat.charAt(0)+n.cat.slice(1).toLowerCase():'Other','lo'];
-}
 function ntHead(n){
   var L=(n.body||'').split('\n').filter(Boolean),h=L[0]||'';
   h=h.replace(/^CO\d+\/\d+\s+COMPANY NOTAM\s*-\s*/,'').replace(/^([A-Z]{3}\/[A-Z]{4}|[A-Z]{4}\/[A-Z]{3})\s*-\s*/,'');
@@ -3522,17 +3511,6 @@ function brAlertEntry(a){return {g:{code:'CO',section:'co',ad:false,name:'Compan
 function ntKeepHTML(k,kept){
   return '<button type="button" class="nt-keep'+(kept?' on':'')+'" data-act="ntKeep" data-v="'+esc(k)+'" aria-pressed="'+kept+'" aria-label="'+(kept?'Kept. Tap to remove':'Keep this NOTAM')+'">'+I.bm+'</button>';
 }
-function ntCardHTML(x,rw){
-  var n=x.n,c=ntCat(n),k=ntKey(x.g,n),kept=brIsKept(k),open=brOpenSet.has(x.key);
-  var why=x.why.filter(function(w){return w.toLowerCase()!==c[0].toLowerCase();}),when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
-  return '<div class="nt-card lv-'+x.level+(kept?' kept':'')+(open?' open':'')+'">'+
-    '<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'"><div class="nt-top"><span class="nt-cat '+c[1]+'">'+c[0]+'</span>'+
-      why.slice(0,2).map(function(w){return '<span class="nt-why">'+esc(w)+'</span>';}).join('')+'</div>'+
-    '<div class="nt-head">'+ntHL(ntHead(n),rw)+'</div>'+
-    '<div class="nt-when">'+(when?esc(when)+' · ':'')+'<span class="nt-id">'+esc(n.id)+'</span></div>'+
-    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+ntHL(n.body||'',rw).replace(/\n/g,'<br>')+'</div>':'')+'</div>'+
-    ntKeepHTML(k,kept)+'</div>';
-}
 function sgCardHTML(x){
   var s=x.s,open=brOpenSet.has(x.key),when=s.from&&s.to&&s.to>s.from?hmOf(s.from).slice(0,4)+'–'+hmOf(s.to):'';
   return '<div class="nt-card sg lv-'+(x.on?'high':'low')+(open?' open':'')+'">'+
@@ -3546,65 +3524,12 @@ function brAlertsHTML(){
   if(brFold.has('co')) h+='<div class="nt-in">'+E.map(function(x){return ntCardHTML(x,'');}).join('')+'</div>';
   return h;
 }
-function brListHTML(L,rw,pre,ctx){
-  var h='<div class="nt-sec"><b>NOTAMs</b><span>'+esc(ctx)+'</span></div>';
-  if(!L.length) return h+'<p class="nt-none">None in the package.</p>';
-  var G=L.slice().sort(brByScore),isK=function(x){return brIsKept(ntKey(x.g,x.n));};
-  var kept=G.filter(isK),hi=G.filter(function(x){return x.level==='high'&&!isK(x);});
-  if(kept.length) h+='<div class="nt-h">Kept</div>'+ntCards(kept,rw);
-  if(hi.length) h+=(kept.length?'<div class="nt-h">Important</div>':'')+ntCards(hi,rw);
-  else if(!kept.length) h+='<p class="nt-none">Nothing important at your time.</p>';
-  [['mid','Also in force'],['low','Less important'],['off','Not at your time']].forEach(function(f){
-    var S=G.filter(function(x){return !isK(x)&&(f[0]==='off'?(x.level==='later'||x.level==='none'):x.level===f[0]);});
-    if(!S.length) return;var k=pre+':'+f[0];
-    h+=ntFoldHTML(k,f[1],S.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(S,rw)+'</div>';
-  });
-  return h;
-}
 // one airport (or FIR): kept ones first, then the important ones, the rest folded
-function brApBlockHTML(code,L,o){
-  var isK=function(x){return brIsKept(ntKey(x.g,x.n));};
-  var G=L.slice().sort(function(a,b){return (isK(b)?1:0)-(isK(a)?1:0)||b.score-a.score;});
-  var top=G.filter(function(x){return isK(x)||x.level==='high'||(o.mid&&x.level==='mid');}),rest=G.filter(function(x){return top.indexOf(x)<0;}),k='ap:'+o.sec+':'+code;
-  var d=o.wx&&wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';
-  var h='<div class="nt-ap" data-ap="'+esc(code)+'"><b>'+esc(code)+'</b><span>'+esc(o.name||'')+'</span>'+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+'</div>'+(o.info?'<div class="nt-apinfo">'+esc(o.info)+'</div>':'');
-  if(o.wx) h+=wxCardHTML({ic:code,role:o.role||''},false,true);
-  h+=top.length?ntCards(top,''):'<p class="nt-none sm">'+(L.length?'Nothing important':'No NOTAMs in the package')+'</p>';
-  if(rest.length){h+=ntFoldHTML(k,top.length?'Others':'All NOTAMs',rest.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(rest,'')+'</div>';}
-  return h;
-}
-function brEnrRowHTML(code,L){
-  var isK=function(x){return brIsKept(ntKey(x.g,x.n));};
-  var g=L[0].g,open=brEnrOpen.has(code),d=wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'',kn=brKeptIn(L);
-  var nm=apName(code).replace(/\s*\([A-Z-]{2}\)$/,'')||brCap(g.name);
-  var h='<button type="button" class="br-row'+(open?' open':'')+'" data-act="brEnr" data-v="'+esc(code)+'" data-ap="'+esc(code)+'" aria-expanded="'+open+'"><b>'+esc(code)+'</b><span class="n">'+esc(nm)+'</span>'+
-    (g.section==='enalt'?'<i class="br-era">ERA</i>':'')+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+(kn?'<small class="nt-badge k" aria-label=", '+kn+' kept">'+I.bm+kn+'</small>':'')+'<em>'+L.length+'</em>'+I.right+'</button>';
-  if(!open) return h;
-  var G=L.slice().sort(function(a,b){return (isK(b)?1:0)-(isK(a)?1:0)||b.score-a.score;});
-  var top=G.filter(function(x){return isK(x)||x.level==='high'||x.level==='mid';}),rest=G.filter(function(x){return top.indexOf(x)<0;}),k='ap:enr:'+code;
-  h+='<div class="br-rowin">'+wxCardHTML({ic:code,role:''},false,true)+(top.length?ntCards(top,''):'<p class="nt-none sm">Nothing important</p>');
-  if(rest.length){h+=ntFoldHTML(k,'Others',rest.length);if(brFold.has(k)) h+='<div class="nt-in">'+ntCards(rest,'')+'</div>';}
-  return h+'</div>';
-}
 // Airports → Brief: what you kept for this airport, then the important ones
-function brApSectionHTML(ic){
-  if(!brief) return '';
-  var rv=brReview().filter(function(x){return x.g.code===ic&&x.g.ad;});
-  if(!rv.length) return '';
-  var f=brief.flight,isK=function(x){return brIsKept(ntKey(x.g,x.n));},rw=ic===f.dep?f.depRwy:ic===f.dest?f.arrRwy:'';
-  var top=rv.filter(function(x){return isK(x)||x.level==='high';}).sort(function(a,b){return (isK(b)?1:0)-(isK(a)?1:0)||b.score-a.score;});
-  return '<div class="pb-h"><span>NOTAMs</span><button type="button" class="lnkbtn" data-act="brGo" data-v="'+esc(ic)+'">All '+rv.length+'</button></div>'+
-    (top.length?'<div class="nt-brief">'+ntCards(top,rw)+'</div>':'<p class="pb-none">Nothing important at your time.</p>');
-}
 // ---- the NOTAMs block: only the NOTAMs you kept, for the airports you choose ----
 var NTB_SHOW=[['dep','Departure'],['dest','Destination'],['alts','Alternates'],['enr','En route'],['co','Company alerts']];
 function newNtBlock(){return {id:uid(),type:'nt',show:['dest','alts'],collapsed:false};}
 function ntScope(x){var s=x.g.section;return s==='co'?'co':s==='dep'||s==='toalt'?'dep':s==='dest'?'dest':s==='altn'?'alts':'enr';}
-function ntBlockList(m){
-  var order=['dep','dest','alts','enr','co'];
-  return brKeptList().filter(function(x){return m.show.indexOf(ntScope(x))>=0;})
-    .sort(function(a,b){return order.indexOf(ntScope(a))-order.indexOf(ntScope(b));});
-}
 function ntMiniHTML(x,mid){
   var n=x.n,open=brOpenSet.has('b:'+x.key),f=brief.flight,c=x.g.code,rw=c===f.dep?f.depRwy:c===f.dest?f.arrRwy:'';
   var when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
@@ -3670,6 +3595,62 @@ function brKeepToggle(k){
   if(brief.keep[k]) delete brief.keep[k];else brief.keep[k]=1;
   brSave();refreshTool();
   app.querySelectorAll('.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
+}
+// only one category: company NOTAMs; everything else is just a NOTAM
+function ntCat(n){return /^CO\d/.test(n.id)?['Company','co']:null;}
+function ntIsCo(x){return /^CO\d/.test(x.n.id);}
+// company NOTAMs first, the rest in the package's own order
+function brOrder(L){
+  return L.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){return (ntIsCo(b.x)?1:0)-(ntIsCo(a.x)?1:0)||a.i-b.i;}).map(function(o){return o.x;});
+}
+function ntCardHTML(x,rw){
+  var n=x.n,c=ntCat(n),k=ntKey(x.g,n),kept=brIsKept(k),open=brOpenSet.has(x.key),off=x.level==='later'||x.level==='none';
+  var why=x.why.filter(function(w){return w!=='Company';}),when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
+  if(off) why.unshift('Not at your time');
+  var top=(c?'<span class="nt-cat '+c[1]+'">'+c[0]+'</span>':'')+why.slice(0,3).map(function(w){return '<span class="nt-why'+(w==='Not at your time'?' off':'')+'">'+esc(w)+'</span>';}).join('');
+  return '<div class="nt-card'+(kept?' kept':'')+(off?' off':'')+(open?' open':'')+'">'+
+    '<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'">'+(top?'<div class="nt-top">'+top+'</div>':'')+
+    '<div class="nt-head">'+ntHL(ntHead(n),rw)+'</div>'+
+    '<div class="nt-when">'+(when?esc(when)+' · ':'')+'<span class="nt-id">'+esc(n.id)+'</span></div>'+
+    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+ntHL(n.body||'',rw).replace(/\n/g,'<br>')+'</div>':'')+'</div>'+
+    ntKeepHTML(k,kept)+'</div>';
+}
+function brListHTML(L,rw,pre,ctx){
+  var h='<div class="nt-sec"><b>NOTAMs</b><span>'+L.length+' · '+esc(ctx)+'</span></div>';
+  if(!L.length) return h+'<p class="nt-none">None in the package.</p>';
+  return h+ntCards(brOrder(L),rw);
+}
+// one airport (or FIR) with all its NOTAMs, company ones first
+function brApBlockHTML(code,L,o){
+  var d=o.wx&&wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';
+  var h='<div class="nt-ap" data-ap="'+esc(code)+'"><b>'+esc(code)+'</b><span>'+esc(o.name||'')+'</span>'+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+'</div>'+(o.info?'<div class="nt-apinfo">'+esc(o.info)+'</div>':'');
+  if(o.wx) h+=wxCardHTML({ic:code,role:o.role||''},false,true);
+  return h+(L.length?ntCards(brOrder(L),''):'<p class="nt-none sm">No NOTAMs in the package</p>');
+}
+function brEnrRowHTML(code,L){
+  var g=L[0].g,open=brEnrOpen.has(code),d=wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'',kn=brKeptIn(L);
+  var nm=apName(code).replace(/\s*\([A-Z-]{2}\)$/,'')||brCap(g.name);
+  var h='<button type="button" class="br-row'+(open?' open':'')+'" data-act="brEnr" data-v="'+esc(code)+'" data-ap="'+esc(code)+'" aria-expanded="'+open+'"><b>'+esc(code)+'</b><span class="n">'+esc(nm)+'</span>'+
+    (g.section==='enalt'?'<i class="br-era">ERA</i>':'')+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+(kn?'<small class="nt-badge k" aria-label=", '+kn+' kept">'+I.bm+kn+'</small>':'')+'<em>'+L.length+'</em>'+I.right+'</button>';
+  if(!open) return h;
+  return h+'<div class="br-rowin">'+wxCardHTML({ic:code,role:''},false,true)+ntCards(brOrder(L),'')+'</div>';
+}
+// Airports → Brief: the NOTAMs you kept for this airport
+function brApSectionHTML(ic){
+  if(!brief) return '';
+  var rv=brReview().filter(function(x){return x.g.code===ic&&x.g.ad;});
+  if(!rv.length) return '';
+  var f=brief.flight,rw=ic===f.dep?f.depRwy:ic===f.dest?f.arrRwy:'',kept=brOrder(rv.filter(function(x){return brIsKept(ntKey(x.g,x.n));}));
+  return '<div class="pb-h"><span>NOTAMs</span><button type="button" class="lnkbtn" data-act="brGo" data-v="'+esc(ic)+'">All '+rv.length+'</button></div>'+
+    (kept.length?'<div class="nt-brief">'+ntCards(kept,rw)+'</div>':'<p class="pb-none">None kept yet. Keep the ones that matter in the Briefing.</p>');
+}
+function ntBlockList(m){
+  var order=['dep','dest','alts','enr','co'],gi={};
+  var L=brKeptList().filter(function(x){return m.show.indexOf(ntScope(x))>=0;});
+  L.forEach(function(x,i){if(!(x.g.code in gi)) gi[x.g.code]=i;});
+  return L.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){
+    return order.indexOf(ntScope(a.x))-order.indexOf(ntScope(b.x))||gi[a.x.g.code]-gi[b.x.g.code]||(ntIsCo(b.x)?1:0)-(ntIsCo(a.x)?1:0)||a.i-b.i;
+  }).map(function(o){return o.x;});
 }
 function wxSetUrl(){
   var inp=$('#wxUrlIn'),u=normWxUrl(inp?inp.value:'');
