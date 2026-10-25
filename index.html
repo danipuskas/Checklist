@@ -1204,6 +1204,12 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .rf-b>.item{margin:0 -14px}
 .rf-b>.module{margin:10px 0;border-top:1px solid var(--line)}
 .sty-hint{margin:8px 2px 0;font-size:calc(13.5px*var(--ts));color:var(--muted);line-height:1.35}
+.sec-body>.rf-i{padding:calc(12px*var(--sp)) 16px}
+.sec-body>.rf-i+.rf-i,.sec-body>.rf-i+.item,.sec-body>.item+.rf-i,.sec-body>.module+.rf-i{border-top:1px solid var(--line)}
+.sec-body>.rf-i+.module{margin-top:calc(10px*var(--sp))}
+.rf-wrap .rf-card{margin-bottom:8px}
+.module.apn .rf-card{margin:0 0 8px}
+.module.apn .rf-card:last-child{margin-bottom:0}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1715,7 +1721,7 @@ function normDec(o,it){
 function normalize(o){
   if(!o||!Array.isArray(o.lists)||!o.lists.length) return null;
   var lists=o.lists.map(function(l){return {id:str(l.id)||uid(),title:str(l.title,'Checklist'),
-    sections:Array.isArray(l.sections)?l.sections.map(function(s){return {id:str(s.id)||uid(),title:str(s.title,'Section'),collapsed:!!s.collapsed,style:s.style==='ref'?'ref':undefined,
+    sections:Array.isArray(l.sections)?l.sections.map(function(s){return {id:str(s.id)||uid(),title:str(s.title,'Section'),collapsed:!!s.collapsed,
       items:Array.isArray(s.items)?s.items.map(normItem).filter(Boolean):[]};}):[]};});
   var current=lists.some(function(l){return l.id===o.current;})?o.current:lists[0].id;
   var secs=normApSecs(o.apSections),tools=normTools(o.tools);
@@ -1795,7 +1801,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='55';
+var APP_VERSION='56';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2189,6 +2195,7 @@ function rfItemHTML(it){
   return '<div class="rf-i'+(big?' t':'')+'" data-item="'+it.id+'">'+(L.ls==='icon'?'<div class="rf-ir"><div class="rf-tx">'+inner+'</div>'+iconLinksHTML(it.links)+'</div>':inner)+'</div>';
 }
 function renderRefItems(s){
+  if(!s.items.some(function(x){return x.type==='head';})) return s.items.map(function(it){return it.type==='check'?rfItemHTML(it):renderNode(it,0);}).join('');
   var g=headGroups(s),cards=[],cur=null;
   s.items.forEach(function(it){
     if(it.type==='head'){cur={hd:it,parts:[]};cards.push(cur);return;}
@@ -2393,7 +2400,7 @@ function apnHeadHTML(sec,arr,folded,act,id,addBtn){
 // Airport note styles: rows (text on the right), text (briefing: bold title, text straight after), notes (text under the title)
 function isLay(v){return v==='rows'||v==='text'||v==='notes';}
 function layOf(v){return isLay(v)?v:'rows';}
-function apnLay(it,sec){return isLay(it.lay)?it.lay:layOf(sec.lay);}
+function apnLay(){return 'notes';} // one style for every note; editing shows the plain list
 // A section's notes, each as a row or as text: neighbours with the same style share one box
 function apnListHTML(sec,arr,o){
   var h='',run='',buf='';
@@ -2404,6 +2411,14 @@ function apnListHTML(sec,arr,o){
   });
   if(buf) h+='<div class="apl '+run+'">'+buf+'</div>';
   return h;
+}
+// an airport section as a card, notes read like checklist notes
+function apnCardHTML(sec,arr,folded,act,id){
+  var d=0,t=0;arr.forEach(function(it){if(!it.info){t++;if(it.done)d++;}});
+  var cnt=t?countHTML(d,t):String(arr.length);
+  return '<div class="rf-card'+(folded?' shut':'')+(t&&d===t?' complete':'')+'"><button type="button" class="rf-h" data-act="'+act+'" data-id="'+id+'" data-apsec="'+sec.id+'" aria-expanded="'+!folded+'">'+
+    '<b>'+esc(sec.name)+'</b><em>'+cnt+'</em><span class="chev">'+I.chev+'</span></button>'+
+    (folded?'':'<div class="rf-b">'+arr.map(function(it){return rfInfoTree(it)?rfItemHTML(it):renderCheck(it,0,{note:true});}).join('')+'</div>')+'</div>';
 }
 function renderApn(m){
   var ap=flightAp(m.which),tag=m.which==='dep'?'Departure':'Destination';
@@ -2418,8 +2433,7 @@ function renderApn(m){
     secs.forEach(function(x){
       var arr=notes[x.id]||[];if(!arr.length) return;
       var fo=!!m.fold[x.id];
-      parts+=apnHeadHTML(x,arr,fo,'apnFold',m.id,false);
-      if(!fo) parts+=apnListHTML(x,arr,{note:true});
+      parts+=apnCardHTML(x,arr,fo,'apnFold',m.id);
     });
     h+=parts||'<div class="apn-empty">No notes for '+esc(ap.icao)+' yet. <button type="button" class="lnkbtn" data-act="apnOpen" data-v="'+m.which+'">Add a note</button></div>';
   }
@@ -3791,8 +3805,8 @@ function decAdd(kind){
 }
 function renderSection(s){
   var c=secCount(s),complete=c.t>0&&c.d===c.t;
-  var ref=s.style==='ref'&&!editMode;
-  var h='<section class="sec'+(s.collapsed?' collapsed':'')+(complete?' complete':'')+(ref?' ref':'')+'" data-sec="'+s.id+'">';
+  var ref=!editMode,cards=ref&&s.items.some(function(x){return x.type==='head';}); // headings become cards; Edit mode keeps the list
+  var h='<section class="sec'+(s.collapsed?' collapsed':'')+(complete?' complete':'')+(cards?' ref':'')+'" data-sec="'+s.id+'">';
   h+='<div class="sec-head"><button type="button" class="sec-toggle" data-act="toggleSec" data-id="'+s.id+'" aria-expanded="'+!s.collapsed+'"><span class="sec-title">'+esc(s.title)+'</span><span class="sec-count">'+countHTML(c.d,c.t)+'</span><span class="chev">'+I.chev+'</span></button>';
   if(editMode) h+='<button type="button" class="ib" data-act="editSec" data-id="'+s.id+'" aria-label="Edit section">'+I.edit+'</button><span class="grip" data-drag="sec" data-id="'+s.id+'" aria-hidden="true">'+I.grip+'</span>';
   h+='</div><div class="sec-body">';
@@ -4295,9 +4309,7 @@ function openItemEditor(id,isNew){
       }).join('')+'</div>'+
     '<p class="hint" id="fTypeHint" style="margin:8px 0 0">'+TYPE_HINT[kind]+'</p></div>'+
     (f.apn&&!f.anc.length?'<label class="fld"><span class="fl">Section</span><select id="fApSec" class="ap-tz">'+state.apSections.map(function(x){return '<option value="'+x.id+'"'+(x.id===f.apn.sec?' selected':'')+'>'+esc(x.name)+'</option>';}).join('')+'</select></label>':'')+
-    (topNote?'<div class="fld"><span class="fl">Style</span><div class="seg big seg3" id="fLay" role="radiogroup" aria-label="Style">'+[['rows','Row'],['text','Briefing'],['notes','Notes']].map(function(x){
-        var on=x[0]===lay0;return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="lay" data-v="'+x[0]+'">'+x[1]+'</button>';
-      }).join('')+'</div><p class="hint" style="margin:8px 0 0">Row puts the text on the right of the line. Briefing shows the title in bold with the text straight after. Notes puts the text under the title.</p></div>':'')+
+
     '<label class="fld"><span class="fl" id="fTextLab">'+(kind==='dec'?'Question':kind==='end'?'Text':'Item')+'</span><input id="fText" type="text" value="'+esc(it.text)+'" placeholder="'+(kind==='end'?'Optional':kind==='dec'?'e.g. Is dispatch allowed?':'e.g. TCAS BELOW')+'" autocomplete="off"></label>'+
     '<div class="fld" id="fAnsBlk"'+(kind==='dec'?'':' hidden')+'><span class="fl">Answers <em>(tap the colour to change it)</em></span><div class="ansl" id="fAns">'+ansRowsHTML()+'</div>'+
       '<button type="button" class="btn small ghost" data-sact="ansAdd">'+I.plus+'Add answer</button></div>'+
@@ -4329,7 +4341,7 @@ function openItemEditor(id,isNew){
       if(ls==='button') delete it.ls;else it.ls=ls;
       it.imgs=imgs.slice();
       it.info=info;if(info) it.done=false;
-      if(topNote){if(lay) it.lay=lay;else delete it.lay;}
+      if(topNote) delete it.lay;
       var rb=remBuild(false);
       if(!remSame(rb.rem,it.rem)) it.rem=rb.rem?remMark(rb.rem):null;
       syncAns();
@@ -4466,23 +4478,18 @@ function openModEditor(id,isNew){
   ti.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('save');}});
   if(isNew) ti.focus();
 }
-function secStyHint(v){return v==='ref'?'Each heading becomes a card you can fold. Notes read as text, without boxes or icons; anything you tick keeps its box. Edit mode still shows the list.':'Every item on its own row, with its box or info icon.';}
 function openSecEditor(sid){
   var r=findSec(sid);if(!r) return;
   var s=r.section,list=r.list,idx=r.idx;
-  var sty=s.style==='ref'?'ref':'list';
   openSheet('<h3>Section</h3><label class="fld"><span class="fl">Title</span><input id="fSec" type="text" value="'+esc(s.title)+'" autocomplete="off"></label>'+
-    '<div class="fld"><span class="fl">Show as</span><div class="seg big seg2" id="fSty">'+[['list','Checklist'],['ref','Reference']].map(function(o){return '<button type="button" data-sact="sty" data-v="'+o[0]+'" class="'+(sty===o[0]?'on':'')+'">'+o[1]+'</button>';}).join('')+'</div>'+
-    '<p class="sty-hint" id="fStyHint">'+secStyHint(sty)+'</p></div>'+
     '<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
     '<button type="button" class="btn small" data-sact="down"'+(idx===list.sections.length-1?' disabled':'')+'>'+I.down+'Down</button>'+
     '<button type="button" class="btn small" data-sact="share">'+I.share+'Share</button>'+
     '<button type="button" class="btn small danger" data-sact="del">'+I.trash+'Delete</button></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Save</button></div>',
-  function(act,btn){
-    function commit(){var v=$('#fSec').value.trim();if(v) s.title=v;if(sty==='ref') s.style='ref';else delete s.style;}
+  function(act){
+    function commit(){var v=$('#fSec').value.trim();if(v) s.title=v;delete s.style;}
     var i,j;
-    if(act==='sty'){sty=btn.getAttribute('data-v');sheetEl.querySelectorAll('#fSty button').forEach(function(b){b.classList.toggle('on',b===btn);});$('#fStyHint').textContent=secStyHint(sty);return;}
     if(act==='save'){commit();save();closeSheet();render();}
     else if(act==='share'){commit();save();openShare('sec',sid,function(){openSecEditor(sid);});}
     else if(act==='up'||act==='down'){
@@ -5794,7 +5801,7 @@ function apBriefHTML(ic){
   h+=brApSectionHTML(ic);
   var notes=state.apNotes[ic]||{},ns=state.apSections.filter(function(x){return (notes[x.id]||[]).length;});
   h+='<div class="pb-h"><span>Your notes</span><button type="button" class="lnkbtn" data-act="apnView" data-v="notes">'+(ns.length?'Edit':'Add')+'</button></div>';
-  h+=ns.length?'<div class="pn pb-notes">'+ns.map(function(x){var arr=notes[x.id],fo=!!toolApnFold[x.id];return apnHeadHTML(x,arr,fo,'apnPFold','',false)+(fo?'':apnListHTML(x,arr,{note:true}));}).join('')+'</div>':
+  h+=ns.length?'<div class="rf-wrap">'+ns.map(function(x){var arr=notes[x.id],fo=!!toolApnFold[x.id];return apnCardHTML(x,arr,fo,'apnPFold','');}).join('')+'</div>':
     '<p class="pb-none">No notes for '+esc(ic)+' yet.</p>';
   var n=dep?S.dep:S.arr;
   if(S.arr||S.dep){
@@ -5831,14 +5838,12 @@ function openApSecs(){
         '<button type="button" class="ib" data-sact="sup" data-i="'+i+'"'+(i===0?' disabled':'')+' aria-label="Move up">'+I.up+'</button>'+
         '<button type="button" class="ib" data-sact="sdown" data-i="'+i+'"'+(i===secs.length-1?' disabled':'')+' aria-label="Move down">'+I.down+'</button>'+
         '<button type="button" class="ib danger" data-sact="sdel" data-i="'+i+'" aria-label="Delete section">'+I.trash+'</button>'+
-        '<div class="esr-lay"><span>Style</span><div class="seg" role="radiogroup" aria-label="Style for '+esc(x.name)+'">'+[['rows','Rows'],['text','Briefing'],['notes','Notes']].map(function(o){
-          var on=x.lay===o[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="lay" data-i="'+i+'" data-v="'+o[0]+'">'+o[1]+'</button>';
-        }).join('')+'</div></div></div>';
+        '</div>';
     }).join('');
   }
   function sync(){sheetEl.querySelectorAll('[data-si]').forEach(function(inp){secs[+inp.getAttribute('data-si')].name=inp.value;});}
   function redraw(){$('#fSecRows').innerHTML=rowsHTML();}
-  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own. <b>Rows</b> puts each note on one line with its value on the right; <b>Briefing</b> shows the title in bold with the text straight after, for longer notes. <b>Notes</b> puts the text under the title. A note can also pick its own style: tap it to edit.</p>'+
+  openSheet('<h3>Airport sections</h3><p class="hint">Every airport uses these sections. Rename, reorder or add your own.</p>'+
     '<div class="cbl" id="fSecRows">'+rowsHTML()+'</div>'+
     '<button type="button" class="btn small ghost tcd-add" data-sact="sadd">'+I.plus+'Add section</button>'+
     '<p class="hint" style="margin:12px 0 0">Deleting a section moves its notes to the first section.</p>'+
