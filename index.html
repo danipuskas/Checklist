@@ -1256,6 +1256,13 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .item.info.tld > .row .label{font-weight:500}
 .rf-l .lnk.sm,.rf-kl .lnk.sm,.item .label .lnk.sm{margin-left:2px;font-weight:600}
 .note.nb .rf-nl{margin-top:4px}
+.blk-list{display:grid;gap:6px}
+.blk-list button{appearance:none;display:flex;align-items:center;gap:13px;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:12px;padding:10px 13px;font:inherit}
+.blk-list button:active{background:var(--press)}
+.blk-list svg{width:22px;height:22px;color:var(--accent);flex:none}
+.blk-list span{min-width:0}
+.blk-list b{display:block;font-size:calc(16px*var(--ts));font-weight:650}
+.blk-list small{display:block;color:var(--muted);font-size:calc(13.5px*var(--ts));margin-top:1px;line-height:1.3}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1673,6 +1680,7 @@ var I={
   textsize:sv('<path d="M3 7V5h11v2"/><path d="M8.5 5v14"/><path d="M14 12v-1.5h7V12"/><path d="M17.5 10.5V19"/>'),
   info:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 11v5.5"/><path d="M12 7.6v.1" stroke-width="2.6"/>'),
   tickbox:sv('<circle cx="12" cy="12" r="8"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/>'),
+  blocks:sv('<rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/>'),
   heading:sv('<path d="M6 5v14M17 5v14M6 12h11"/>'),
   cloud:sv('<path d="M7 18.5h10.5a4 4 0 0 0 .4-7.98A6 6 0 0 0 6.3 9.1 4.7 4.7 0 0 0 7 18.5z"/><path d="M12 15.5v-5M9.6 12.6 12 10.2l2.4 2.4"/>'),
   log:sv('<path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v15.5H7a2 2 0 0 1-2-2V5a1.5 1.5 0 0 1 1-1.5z"/><path d="M5 18.5a2 2 0 0 1 2-2h11"/><path d="M9 8h5M9 11.5h5"/>'),
@@ -1848,7 +1856,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='59';
+var APP_VERSION='60';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -3875,13 +3883,7 @@ function renderSection(s){
   h+='</div><div class="sec-body">';
   if(s.items.length) h+=ref?renderRefItems(s):renderItems(s);
   else if(!editMode) h+='<div class="empty">No items yet. Tap Edit to add some.</div>';
-  if(editMode) h+='<div class="add-row"><button type="button" data-act="addItem" data-id="'+s.id+'">'+I.plus+'Item</button><button type="button" data-act="addHead" data-id="'+s.id+'">'+I.heading+'Heading</button><button type="button" data-act="addCalc" data-id="'+s.id+'">'+I.calc+'Calculator</button><button type="button" data-act="addPad" data-id="'+s.id+'">'+I.pad+'Notepad</button>'+
-    '<button type="button" data-act="addCd" data-id="'+s.id+'">'+I.timer+'Countdown</button><button type="button" data-act="addRest" data-id="'+s.id+'">'+I.moon+'Crew rest</button>'+
-    '<button type="button" data-act="addApn" data-id="'+s.id+'">'+I.pin+'Airport notes</button>'+
-    '<button type="button" data-act="addFlog" data-id="'+s.id+'">'+I.log+'Flight log</button>'+
-    '<button type="button" data-act="addApst" data-id="'+s.id+'">'+I.chart+'Airport stats</button>'+
-    '<button type="button" data-act="addWx" data-id="'+s.id+'">'+I.wx+'Weather</button>'+
-    '<button type="button" data-act="addNt" data-id="'+s.id+'">'+I.bm+'NOTAMs</button></div>';
+  if(editMode) h+='<div class="add-row"><button type="button" data-act="addItem" data-id="'+s.id+'">'+I.plus+'Item</button><button type="button" data-act="addHead" data-id="'+s.id+'">'+I.heading+'Heading</button><button type="button" data-act="addBlock" data-id="'+s.id+'">'+I.blocks+'Block</button></div>';
   h+='<div class="sec-done">'+I.check+'<span>'+esc(s.title)+' complete</span></div>';
   return h+'</div></section>';
 }
@@ -4083,6 +4085,36 @@ function addModule(sid,m){
   var r=findSec(sid);if(!r) return;
   r.section.items.push(m);r.section.collapsed=false;
   save();render();flash(m.id);
+}
+// the blocks a section can hold, picked from one sheet
+var BLOCKS=[
+  {k:'cd',i:'timer',n:'Countdown',d:'Time to an event, with an alert'},
+  {k:'rest',i:'moon',n:'Crew rest',d:'The breaks, and when your rest starts'},
+  {k:'wx',i:'wx',n:'Weather',d:'METAR and TAF for the flight'},
+  {k:'nt',i:'bm',n:'NOTAMs',d:'The NOTAMs you kept from the briefing'},
+  {k:'apn',i:'pin',n:'Airport notes',d:'Your notes for the departure or destination'},
+  {k:'apst',i:'chart',n:'Airport stats',d:'What you logged there before'},
+  {k:'flog',i:'log',n:'Flight log',d:'Stand, runway and taxi for this flight'},
+  {k:'pad',i:'pad',n:'Notepad',d:'Type or draw'},
+  {k:'calc',i:'calc',n:'Calculator',d:'Quick sums'}];
+function openBlockPicker(sid){
+  openSheet('<div class="menu-head"><h3>Add a block</h3><button type="button" class="ib round" data-sact="cancel" aria-label="Close">'+I.x+'</button></div>'+
+    '<div class="blk-list">'+BLOCKS.map(function(b){return '<button type="button" data-sact="blk" data-k="'+b.k+'">'+I[b.i]+'<span><b>'+b.n+'</b><small>'+b.d+'</small></span></button>';}).join('')+'</div>',
+    function(act,el){
+      closeSheet();
+      if(act==='blk') addBlockKind(el.getAttribute('data-k'),sid);
+    });
+}
+function addBlockKind(k,id){
+  if(k==='calc') addModule(id,newCalc());
+  else if(k==='pad') addModule(id,newPad());
+  else if(k==='cd'){var nb=newCdBlock();addModule(id,nb);openCdBlockEditor(nb.id,true);}
+  else if(k==='rest') addModule(id,newRestBlock());
+  else if(k==='apn') addModule(id,newApn());
+  else if(k==='flog'){var fb=newFlogBlock();addModule(id,fb);openFlogBlockEditor(fb.id,true);}
+  else if(k==='apst') addModule(id,newApstBlock());
+  else if(k==='wx'){addModule(id,newWxBlock());wxMaybe();}
+  else if(k==='nt') addModule(id,newNtBlock());
 }
 function addSection(){
   promptSheet('New section','','e.g. Descent',function(v){
@@ -6897,6 +6929,7 @@ function onAct(e){
     case 'toggleSec': toggleSec(id);break;
     case 'editSec': openSecEditor(id);break;
     case 'addItem': addItem(id);break;
+    case 'addBlock': openBlockPicker(id);break;
     case 'addCalc': addModule(id,newCalc());break;
     case 'addPad': addModule(id,newPad());break;
     case 'addSection': addSection();break;
