@@ -1241,6 +1241,21 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .pn>.hd.aph:first-child{margin-top:0}
 .pn>.apl{background:var(--paper);border:1px solid var(--line);border-top:1px solid var(--line-soft);border-radius:0 0 13px 13px;overflow:hidden}
 .pn>.hd.aph:not(:has(+ .apl)){border-radius:13px}
+.rf-ul{list-style:disc;line-height:1.4}
+.rf-ul>li{margin:5px 0}
+.rf-ul>li::marker,.ckb>li::marker{color:var(--muted)}
+.rf-ul.rf-nl{font-size:calc(16px*var(--ts));color:var(--text)}
+.rf-ul.rf-nl.mu{font-size:calc(15.5px*var(--ts));color:var(--muted)}
+.note.nb .rf-ul.rf-nl.mu{font-size:inherit}
+.rf-sub,.note.nb .rf-sub,.ckb .rf-sub{list-style:none;padding-left:14px;margin:3px 0 0;color:var(--muted);font-size:calc(15px*var(--ts));line-height:1.4}
+.ckb .rf-sub{font-size:calc(14.5px*var(--ts))}
+.rf-sub>li{position:relative;margin:2px 0}
+.rf-sub>li::before{content:"\2013";position:absolute;left:-14px}
+.rf-ul+.rf-n,.rf-sub+.rf-n,.rf-ul+.nl,.rf-sub+.nl{margin-top:6px}
+.rf-i.rf-ld>.rf-l,.rf-i.rf-ld>.rf-ir>.rf-tx>.rf-l{font-weight:500}
+.item.info.tld > .row .label{font-weight:500}
+.rf-l .lnk.sm,.rf-kl .lnk.sm,.item .label .lnk.sm{margin-left:2px;font-weight:600}
+.note.nb .rf-nl{margin-top:4px}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1833,7 +1848,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='58';
+var APP_VERSION='59';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2193,9 +2208,10 @@ function renderItems(s){
 // ---------- Reference sections: each heading is a card, notes read as text, no boxes ----------
 function rfInfoTree(it){return it.type==='check'&&it.info&&!it.dq&&!it.end&&(it.children||[]).every(rfInfoTree);}
 // a note: lines starting with •, -, – or * become a bulleted list
-function rfNoteHTML(note,cls){
+function rfNoteHTML(note,cls,top){
+  // under a card item, bullets read as its items; after a line of text they stay in the note's grey
   var out='',ul=[];
-  function flush(){if(ul.length){out+='<ul class="rf-sub">'+ul.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';ul=[];}}
+  function flush(){if(ul.length){out+='<ul class="'+(top?'rf-ul rf-nl'+(out?' mu':''):'rf-sub')+'">'+ul.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';ul=[];}}
   String(note).split('\n').forEach(function(l){
     var m=/^\s*[•\-–*·]\s*(.*)$/.exec(l),t=refTags(linkify(esc(m?m[1]:l)));
     if(m){ul.push(t);return;}
@@ -2203,28 +2219,31 @@ function rfNoteHTML(note,cls){
   });
   flush();return out;
 }
+// a short name is a title (bold); a sentence or a lead-in ("...from the:") reads as text
+function rfIsTitle(t){t=String(t||'').trim();return t.length<=48&&!/[.:;,]$/.test(t);}
+// button-style links as small chips right after the text they belong to
+function smLinks(it,ls){return ls==='button'&&it.links.length?' '+it.links.map(function(l){return linkHTML(l).replace('class="lnk"','class="lnk sm"');}).join(' '):'';}
 function rfLabel(it){
   var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',lab=refTags(esc(it.text));
   if(ls==='tag') lab=tagLinks(lab,it.links);
   return {ls:ls,lab:lab||'<span class="ph">Untitled item</span>'};
 }
-function rfExtras(it,ls){
+function rfExtras(it){
   var h='';
-  if(it.links.length&&ls==='button') h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   if(it.rem) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
   if(it.imgs&&it.imgs.length) h+=thumbsHTML(it);
   return h;
 }
 function rfKidHTML(k){
   var L=rfLabel(k),kids=k.children||[];
-  var inner='<span class="rf-kl">'+L.lab+'</span>'+(k.note?rfNoteHTML(k.note):'')+rfExtras(k,L.ls)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
+  var inner='<span class="rf-kl">'+L.lab+smLinks(k,L.ls)+'</span>'+(k.note?rfNoteHTML(k.note):'')+rfExtras(k)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
   return '<li data-item="'+k.id+'">'+(L.ls==='icon'?'<div class="rf-ir"><div class="rf-tx">'+inner+'</div>'+iconLinksHTML(k.links)+'</div>':inner)+'</li>';
 }
 function rfItemHTML(it){
   if(!rfInfoTree(it)) return renderCheck(it,0); // anything you tick keeps its box
   var L=rfLabel(it),kids=it.children||[],big=!!(it.note||kids.length);
-  var inner='<div class="rf-l">'+L.lab+'</div>'+(it.note?rfNoteHTML(it.note):'')+rfExtras(it,L.ls)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
-  return '<div class="rf-i'+(big?' t':'')+'" data-item="'+it.id+'">'+(L.ls==='icon'?'<div class="rf-ir"><div class="rf-tx">'+inner+'</div>'+iconLinksHTML(it.links)+'</div>':inner)+'</div>';
+  var inner='<div class="rf-l">'+L.lab+smLinks(it,L.ls)+'</div>'+(it.note?rfNoteHTML(it.note,'',true):'')+rfExtras(it)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
+  return '<div class="rf-i'+(big?(rfIsTitle(it.text)?' t':' rf-ld'):'')+'" data-item="'+it.id+'">'+(L.ls==='icon'?'<div class="rf-ir"><div class="rf-tx">'+inner+'</div>'+iconLinksHTML(it.links)+'</div>':inner)+'</div>';
 }
 function renderRefItems(s){
   if(!s.items.some(function(x){return x.type==='head';})) return s.items.map(function(it){return it.type==='check'?rfItemHTML(it):renderNode(it,0);}).join('');
@@ -2261,7 +2280,7 @@ function thumbsHTML(it){
   return it.imgs&&it.imgs.length?'<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>':'';
 }
 // a note: as typed, or as a list when its lines start with a bullet
-function noteHTML(note){return /^\s*[•\-–*·]\s/m.test(note)?'<div class="note nb">'+rfNoteHTML(note,'nl')+'</div>':'<div class="note">'+refTags(linkify(esc(note)))+'</div>';}
+function noteHTML(note,top){return /^\s*[•\-–*·]\s/m.test(note)?'<div class="note nb">'+rfNoteHTML(note,'nl',top)+'</div>':'<div class="note">'+refTags(linkify(esc(note)))+'</div>';}
 function decTone(t){return t==='y'||t==='n'?t:'o';}
 function renderDec(it,o){
   var nt=!!(o&&o.note),em=nt?!!o.edit:editMode,stripe=o&&o.stripe?' stripe-'+o.stripe:'',ch=null;
@@ -2295,7 +2314,7 @@ function renderEnd(it,o){
 // an info sub-item under a check: one bullet, its links small and inline
 function ckLiHTML(k){
   var L=rfLabel(k),kids=k.children||[];
-  var links=L.ls==='button'?k.links.map(function(l){return linkHTML(l).replace('class="lnk"','class="lnk sm"');}).join(' '):
+  var links=L.ls==='button'?smLinks(k,'button').slice(1):
     L.ls==='icon'?k.links.map(function(l){return '<a class="rgo sm" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener" aria-label="Open '+esc(linkName(l))+'">'+I.ext+'</a>';}).join(''):'';
   return '<li data-item="'+k.id+'">'+L.lab+(links?' '+links:'')+(k.note?rfNoteHTML(k.note):'')+(k.imgs&&k.imgs.length?thumbsHTML(k):'')+
     (kids.length?'<ul class="ckb">'+kids.map(ckLiHTML).join('')+'</ul>':'')+'</li>';
@@ -2307,7 +2326,7 @@ function renderCheck(it,depth,o){
   var kids0=it.children||[],bul=!em&&!ord&&!it.info&&!it.dq&&!it.end?kids0.filter(rfInfoTree):[];
   var kids=bul.length?kids0.filter(function(k){return bul.indexOf(k)<0;}):kids0;
   var kt=kids.filter(function(k){return !k.info;}),kd=kt.filter(function(k){return k.done;}).length;
-  var cls='item d'+Math.min(depth,3)+(it.info?' info':'')+(it.info&&(it.note||kids0.length)?' t':'')+(it.done?' done':'')+(kids.length&&it.open===false?' kclosed':'')+(o&&o.stripe?' stripe-'+o.stripe:'');
+  var cls='item d'+Math.min(depth,3)+(it.info?' info':'')+(it.info&&!depth&&(it.note||kids0.length)?(rfIsTitle(it.text)?' t':' tld'):'')+(it.done?' done':'')+(kids.length&&it.open===false?' kclosed':'')+(o&&o.stripe?' stripe-'+o.stripe:'');
   var h='<div class="'+cls+'" data-item="'+it.id+'">';
   if(ord) h+='<div class="row" data-id="'+it.id+'">'; // reordering airport notes: the row only moves
   else if(em) h+='<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">';
@@ -2315,9 +2334,9 @@ function renderCheck(it,depth,o){
   else h+='<div class="row" data-act="tick" data-id="'+it.id+'" tabindex="0" role="checkbox" aria-checked="'+it.done+'">';
   var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',lab=refTags(esc(it.text));
   if(ls==='tag') lab=tagLinks(lab,it.links);
-  h+=(it.info?(depth?'<span class="ibox dot" aria-hidden="true"></span>':''):'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(lab||'<span class="ph">Untitled item</span>')+'</div>';
-  if(it.note) h+=noteHTML(it.note);
-  if(it.links.length&&ls==='button') h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
+  h+=(it.info?(depth?'<span class="ibox dot" aria-hidden="true"></span>':''):'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(lab||'<span class="ph">Untitled item</span>')+(it.info?smLinks(it,ls):'')+'</div>';
+  if(it.note) h+=noteHTML(it.note,it.info&&!depth);
+  if(it.links.length&&ls==='button'&&!it.info) h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   if(it.rem&&!nt) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
   if(bul.length) h+='<ul class="ckb">'+bul.map(ckLiHTML).join('')+'</ul>';
