@@ -1219,6 +1219,28 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .lnk.sm svg{width:13px;height:13px}
 .rgo.sm{min-width:26px;height:26px;padding:0 6px;vertical-align:middle;margin-left:4px}
 .rgo.sm svg{width:14px;height:14px}
+.ibox.dot{width:calc(14px*var(--sp))!important;height:calc(22px*var(--sp))!important}
+.ibox.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.item.info.t > .row .label{font-weight:700}
+.note.nb{white-space:normal}
+.note.nb .nl{white-space:pre-wrap}
+.note.nb .rf-sub{color:inherit;font-size:inherit;margin:2px 0 0}
+.sec.ecards .sec-body{background:var(--surface2);padding:10px}
+.sec.ecards .sec-body>.hd{background:var(--paper);border:1px solid var(--line);border-bottom:0;border-radius:13px 13px 0 0;margin-top:10px}
+.sec.ecards .sec-body>.hd:first-child{margin-top:0}
+.sec.ecards .sec-body>.hd .hd-row{padding-top:calc(12px*var(--sp));padding-bottom:calc(10px*var(--sp))}
+.sec.ecards .sec-body>.item,.sec.ecards .sec-body>.module{background:var(--paper);border-left:1px solid var(--line);border-right:1px solid var(--line);border-top:1px solid var(--line-soft);margin:0}
+.sec.ecards .sec-body>.module{padding:6px 10px}
+.sec.ecards .sec-body>.item:first-child,.sec.ecards .sec-body>.module:first-child{border-top:1px solid var(--line);border-radius:13px 13px 0 0}
+.sec.ecards .sec-body>:is(.item,.module):has(+ .hd),.sec.ecards .sec-body>:is(.item,.module):has(+ .add-row){border-bottom:1px solid var(--line);border-radius:0 0 13px 13px}
+.sec.ecards .sec-body>:is(.item,.module):first-child:has(+ .hd){border-radius:13px}
+.sec.ecards .sec-body>.hd:has(+ .hd),.sec.ecards .sec-body>.hd:has(+ .add-row){border-bottom:1px solid var(--line);border-radius:13px}
+.sec.ecards .sec-body>.add-row{border-top:0;padding:12px 0 0}
+.pn{border:0;border-radius:0;background:none;overflow:visible}
+.pn>.hd.aph{background:var(--paper);border:1px solid var(--line);border-radius:13px 13px 0 0;margin-top:10px}
+.pn>.hd.aph:first-child{margin-top:0}
+.pn>.apl{background:var(--paper);border:1px solid var(--line);border-top:1px solid var(--line-soft);border-radius:0 0 13px 13px;overflow:hidden}
+.pn>.hd.aph:not(:has(+ .apl)){border-radius:13px}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1702,7 +1724,8 @@ function normItem(it){
     lead:Math.max(0,Math.min(180,+it.lead||0)),aL:!!it.aL,aZ:!!it.aZ,collapsed:!!it.collapsed};
   if(it.type==='rest') return {id:str(it.id)||uid(),type:'rest',title:str(it.title,'Crew rest'),start:str(it.start),end:str(it.end),
     n:Math.max(1,Math.min(8,Math.round(+it.n)||2)),buffer:Math.max(0,Math.min(60,+it.buffer||0)),round:it.round!==false,
-    labels:Array.isArray(it.labels)?it.labels.map(function(x){return str(x);}).slice(0,8):[],mine:typeof it.mine==='number'&&it.mine>=0&&it.mine<8?Math.floor(it.mine):-1,collapsed:!!it.collapsed};
+    labels:Array.isArray(it.labels)?it.labels.map(function(x){return str(x);}).slice(0,8):[],mine:typeof it.mine==='number'&&it.mine>=0&&it.mine<8?Math.floor(it.mine):-1,collapsed:!!it.collapsed,
+    until:typeof it.until==='number'&&isFinite(it.until)?it.until:0,ukey:str(it.ukey)};
   if(it.type==='calc') return {id:str(it.id)||uid(),type:'calc',title:str(it.title,'Calculator'),expr:str(it.expr),
     hist:Array.isArray(it.hist)?it.hist.filter(function(h){return h&&typeof h.r==='string';}).slice(-8):[],collapsed:!!it.collapsed};
   if(it.type==='pad') return {id:str(it.id)||uid(),type:'pad',title:str(it.title,'Notepad'),mode:it.mode==='type'?'type':'draw',text:str(it.text),
@@ -1810,7 +1833,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='57';
+var APP_VERSION='58';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2237,13 +2260,15 @@ function renderNode(it,depth){
 function thumbsHTML(it){
   return it.imgs&&it.imgs.length?'<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>':'';
 }
+// a note: as typed, or as a list when its lines start with a bullet
+function noteHTML(note){return /^\s*[•\-–*·]\s/m.test(note)?'<div class="note nb">'+rfNoteHTML(note,'nl')+'</div>':'<div class="note">'+refTags(linkify(esc(note)))+'</div>';}
 function decTone(t){return t==='y'||t==='n'?t:'o';}
 function renderDec(it,o){
   var nt=!!(o&&o.note),em=nt?!!o.edit:editMode,stripe=o&&o.stripe?' stripe-'+o.stripe:'',ch=null;
   it.dq.forEach(function(x){if(x.id===it.ans) ch=x;});
   var h='<div class="item d0 dq'+stripe+'" data-item="'+it.id+'">'+(em?'<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">':'<div class="row">')+
     '<span class="dbox" aria-hidden="true">'+I.diamond+'</span><div class="txt"><div class="label">'+(refTags(esc(it.text))||'<span class="ph">Untitled question</span>')+'</div>';
-  if(it.note) h+='<div class="note">'+refTags(linkify(esc(it.note)))+'</div>';
+  if(it.note) h+=noteHTML(it.note);
   if(it.links.length) h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   h+=thumbsHTML(it);
   if(!em) h+='<div class="ans" role="group" aria-label="Answers">'+it.dq.map(function(x){
@@ -2282,7 +2307,7 @@ function renderCheck(it,depth,o){
   var kids0=it.children||[],bul=!em&&!ord&&!it.info&&!it.dq&&!it.end?kids0.filter(rfInfoTree):[];
   var kids=bul.length?kids0.filter(function(k){return bul.indexOf(k)<0;}):kids0;
   var kt=kids.filter(function(k){return !k.info;}),kd=kt.filter(function(k){return k.done;}).length;
-  var cls='item d'+Math.min(depth,3)+(it.info?' info':'')+(it.done?' done':'')+(kids.length&&it.open===false?' kclosed':'')+(o&&o.stripe?' stripe-'+o.stripe:'');
+  var cls='item d'+Math.min(depth,3)+(it.info?' info':'')+(it.info&&(it.note||kids0.length)?' t':'')+(it.done?' done':'')+(kids.length&&it.open===false?' kclosed':'')+(o&&o.stripe?' stripe-'+o.stripe:'');
   var h='<div class="'+cls+'" data-item="'+it.id+'">';
   if(ord) h+='<div class="row" data-id="'+it.id+'">'; // reordering airport notes: the row only moves
   else if(em) h+='<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">';
@@ -2290,8 +2315,8 @@ function renderCheck(it,depth,o){
   else h+='<div class="row" data-act="tick" data-id="'+it.id+'" tabindex="0" role="checkbox" aria-checked="'+it.done+'">';
   var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',lab=refTags(esc(it.text));
   if(ls==='tag') lab=tagLinks(lab,it.links);
-  h+=(it.info?'<span class="ibox" aria-hidden="true">'+I.info+'</span>':'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(lab||'<span class="ph">Untitled item</span>')+'</div>';
-  if(it.note) h+='<div class="note">'+refTags(linkify(esc(it.note)))+'</div>';
+  h+=(it.info?(depth?'<span class="ibox dot" aria-hidden="true"></span>':''):'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(lab||'<span class="ph">Untitled item</span>')+'</div>';
+  if(it.note) h+=noteHTML(it.note);
   if(it.links.length&&ls==='button') h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   if(it.rem&&!nt) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
@@ -3824,8 +3849,8 @@ function decAdd(kind){
 }
 function renderSection(s){
   var c=secCount(s),complete=c.t>0&&c.d===c.t;
-  var ref=!editMode,cards=ref&&s.items.some(function(x){return x.type==='head';}); // headings become cards; Edit mode keeps the list
-  var h='<section class="sec'+(s.collapsed?' collapsed':'')+(complete?' complete':'')+(cards?' ref':'')+'" data-sec="'+s.id+'">';
+  var hasHd=s.items.some(function(x){return x.type==='head';}),ref=!editMode,cards=ref&&hasHd; // headings become cards; Edit mode keeps the list, styled the same
+  var h='<section class="sec'+(s.collapsed?' collapsed':'')+(complete?' complete':'')+(cards?' ref':'')+(hasHd&&editMode?' ecards':'')+'" data-sec="'+s.id+'">';
   h+='<div class="sec-head"><button type="button" class="sec-toggle" data-act="toggleSec" data-id="'+s.id+'" aria-expanded="'+!s.collapsed+'"><span class="sec-title">'+esc(s.title)+'</span><span class="sec-count">'+countHTML(c.d,c.t)+'</span><span class="chev">'+I.chev+'</span></button>';
   if(editMode) h+='<button type="button" class="ib" data-act="editSec" data-id="'+s.id+'" aria-label="Edit section">'+I.edit+'</button><span class="grip" data-drag="sec" data-id="'+s.id+'" aria-hidden="true">'+I.grip+'</span>';
   h+='</div><div class="sec-body">';
@@ -5577,6 +5602,21 @@ function restTop(m,now){
   var wait=1440-rel;
   return wait<=720?{mode:'wait',min:wait,name:'to rest'}:null;
 }
+// The times repeat every day, so the plan remembers when this rest ends (the one under way, or the next one) and clears itself after
+var restChkT=0;
+function restAutoClear(now,force){
+  if(!force&&now-restChkT<10000) return;restChkT=now;
+  var m=state.tools.rest,r=restCalc(m),key=m.start+'|'+m.end+'|'+m.n+'|'+m.buffer;
+  if(r.err){if(m.until){m.until=0;m.ukey='';saveSoon();}return;}
+  if(!m.until||m.ukey!==key){
+    var d=new Date(now),nowMin=d.getUTCHours()*60+d.getUTCMinutes()+d.getUTCSeconds()/60,rel=((nowMin-r.s)%1440+1440)%1440;
+    m.until=Math.round(now+(rel<r.total?r.total-rel:1440-rel+r.total)*60000);m.ukey=key;saveSoon();return;
+  }
+  if(now<m.until||restEditing.has(m.id)) return;
+  m.start='';m.end='';m.mine=-1;m.until=0;m.ukey='';save();
+  render();if(toolOpen&&toolKind==='rest') refreshTool();
+  toast('Crew rest is over, so its times were cleared',4000);
+}
 function restSource(){return restCalc(state.tools.rest).err?null:state.tools.rest;}
 var restChip=$('#restChip');
 $('#rcIcon').outerHTML=I.moon;
@@ -5623,6 +5663,7 @@ function clockTick(){
     var diff=f.node.target-now;el.textContent=(diff<=0?'+':'')+durClock(diff);
     el.classList.toggle('warn',diff<=0||(!!f.node.lead&&diff<=f.node.lead*60000));
   });
+  restAutoClear(now,false);
   paintAlert();
   paintRestChip(now);
   paintEtaChip(now);
@@ -7078,7 +7119,7 @@ if(loadedOK&&blocksMigrated) save();
 if(!storageOK) toast('Storage is off here, so changes won’t be kept');
 (function(){var b=$('#updBtn');if(b){b.innerHTML=I.reset+'<span>Update</span>';b.addEventListener('click',appRestart);}})();
 storPersist();
-if('serviceWorker' in navigator&&location.protocol==='https:'){var hadCtl=!!navigator.serviceWorker.controller,swReloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(!hadCtl){hadCtl=true;return;}if(swReloaded) return;swReloaded=true;updReady();});navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible') navigator.serviceWorker.getRegistration().then(function(r){if(r) r.update();}).catch(function(){});});}
+if('serviceWorker' in navigator&&location.protocol==='https:'){var hadCtl=!!navigator.serviceWorker.controller,swReloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(!hadCtl){hadCtl=true;return;}if(swReloaded) return;swReloaded=true;updReady();});navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(function(){});var swChk=0;document.addEventListener('visibilitychange',function(){if(document.visibilityState!=='visible'||navigator.onLine===false||Date.now()-swChk<15*60000) return;swChk=Date.now();navigator.serviceWorker.getRegistration().then(function(r){if(r) r.update();}).catch(function(){});});}
 })();
 </script>
 </body>

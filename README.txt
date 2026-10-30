@@ -18,6 +18,8 @@ Deleting the Home Screen icon deletes its data, so use Menu > Back up now and th
 UPDATING LATER: in the repository tap Add file > Upload files, upload the new files over the old ones and commit.
 The installed app downloads the new version in the background while it's open and online, then shows
 an Update button at the top left. Tap it to switch now; otherwise the new version is used the next time the app starts.
+It looks for a new version at most every 10 to 15 minutes, and never while the iPad is offline, so airplane mode
+doesn't bring up the iPadOS "Turn Off Airplane Mode" alert.
 
 ONLINE BACKUP (optional): Menu > Settings > Online backup copies everything to a PRIVATE GitHub repository
 while the app is open and online. You need a private repository and a fine-grained access token
