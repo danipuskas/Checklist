@@ -1922,7 +1922,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='61';
+var APP_VERSION='62';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2134,12 +2134,20 @@ function tallyTask(it,c){
 }
 function secCount(s){var c={d:0,t:0};s.items.forEach(function(it){tallyTask(it,c);});return c;}
 function listCount(L){var d=0,t=0;L.sections.forEach(function(s){var c=secCount(s);d+=c.d;t+=c.t;});return {d:d,t:t};}
-function untickItems(arr){arr.forEach(function(n){if(n.type==='check'){n.done=false;if(n.fld) n.fld.val='';untickItems(n.children);if(n.dq){n.ans='';n.dq.forEach(function(x){untickItems(x.items);});}}});}
+function untickItems(arr,clr){arr.forEach(function(n){
+  if(n.type==='check'){n.done=false;if(clr&&n.fld) n.fld.val='';untickItems(n.children,clr);if(n.dq){n.ans='';n.dq.forEach(function(x){untickItems(x.items,clr);});}}
+  else if(clr&&n.type==='hot'){n.fluid='';n.t0=0;n.hm='';n.min='';n.max='';n.aMin=n.aMax=false;alerting.delete(n.id);}
+});}
+// anything filled in: a field's answer or a holdover time
+function hasAnswers(arr){return arr.some(function(n){
+  if(n.type==='hot') return !!(n.t0||n.min||n.max||n.fluid);
+  return n.type==='check'&&(!!(n.fld&&n.fld.val)||hasAnswers(n.children||[])||!!(n.dq&&n.dq.some(function(x){return hasAnswers(x.items);})));
+});}
 function isTask(it){return it.type==='check'&&!it.info&&!it.dq&&!it.end;}
 function newFlight(){
   // every checklist starts clean: ticks, answers, calculators and notepads
   state.lists.forEach(function(L){L.sections.forEach(function(s){
-    untickItems(s.items);
+    untickItems(s.items,true);
     s.items.forEach(function(n){
       if(n.type==='calc'){n.expr='';n.hist=[];fresh.delete(n.id);}
       if(n.type==='pad'){n.strokes=[];n.text='';}
@@ -4545,7 +4553,7 @@ function openItemEditor(id,isNew){
   }
   var answers=(it.dq||[{id:uid(),label:'YES',tone:'y',items:[]},{id:uid(),label:'NO',tone:'n',items:[]}]).map(function(x){return {id:x.id,label:x.label,tone:x.tone,items:x.items};});
   var TYPE_HINT={check:'Tap the item in the checklist to tick it.',info:'Info items have no tick and aren’t counted in the progress.',
-    fld:'A box to fill in for this flight. Its answer clears with Untick all and New flight.',
+    fld:'A box to fill in for this flight. The answer stays until New flight, or until you choose Untick and clear answers.',
     dec:'Shows answer buttons. The steps for each answer are added in Edit mode: tap an answer under the question.',end:'Closes the procedure, e.g. Continue operation or Return to stand.'};
   function ansRowsHTML(){
     return answers.map(function(a,i){
@@ -5171,7 +5179,21 @@ function openMenu(){
       case 'twx': openTool('wx');closeSheet();wxMaybe();break;
       case 'lists': openLists();break;
       case 'untick':
-        confirmSheet('Untick every item in “'+esc(L.title)+'”?','Untick all',function(){L.sections.forEach(function(s){untickItems(s.items);});save();render();toast('All items unticked');},openMenu);break;
+        if(!L.sections.some(function(s){return hasAnswers(s.items);})){
+          confirmSheet('Untick every item in “'+esc(L.title)+'”?','Untick all',function(){L.sections.forEach(function(s){untickItems(s.items);});save();render();toast('All items unticked');},openMenu);break;
+        }
+        // filled-in answers stay unless you clear them too
+        openSheet('<p class="confirm">Untick every item in “'+esc(L.title)+'”? Your filled-in answers stay.</p>'+
+          '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn danger-fill" data-sact="ok">Untick all</button></div>'+
+          '<div class="sh-actions"><button type="button" class="btn" data-sact="okc" style="flex:1">'+I.trash+'Untick and clear answers</button></div>',
+          function(a){
+            closeSheet();
+            if(a!=='ok'&&a!=='okc'){openMenu();return;}
+            var before=JSON.stringify(state);
+            L.sections.forEach(function(s){untickItems(s.items,a==='okc');});save();render();
+            offerUndo(before,a==='okc'?'Unticked, answers cleared':'All items unticked');
+          });
+        break;
       case 'flight': openNewFlight();break;
       default: closeSheet();
     }
