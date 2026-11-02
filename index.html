@@ -1922,7 +1922,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='62';
+var APP_VERSION='63';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2182,14 +2182,24 @@ function linkHTML(l){
 }
 function linkName(l){return l.label||l.url.replace(/^[a-z][a-z0-9+.-]*:\/\//i,'');}
 // Tag style: a [FCOM] tag whose text matches a link's name opens that link; links with no matching tag are added as tags at the end
-function tagLinks(h,links){
-  var used={};
-  function a(l,inner){return '<a class="rtag rl" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener" aria-label="Open '+esc(linkName(l))+'">'+inner+I.ext+'</a>';}
-  h=h.replace(/<span class="rtag">([^<]*)<\/span>/g,function(m,x){
-    for(var i=0;i<links.length;i++){if(!used[i]&&esc(linkName(links[i])).trim().toLowerCase()===x.trim().toLowerCase()){used[i]=1;return a(links[i],x);}}
+function lnKey(s){return String(s||'').replace(/^\s*\[/,'').replace(/\]\s*$/,'').trim().toLowerCase();}
+function tagA(l,inner){return '<a class="rtag rl" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener" aria-label="Open '+esc(linkName(l))+'">'+inner+I.ext+'</a>';}
+// every tag whose text is a link's name becomes that link
+function tagOnly(h,links,used){
+  if(!links||!links.length) return h;
+  return h.replace(/<span class="rtag">([^<]*)<\/span>/g,function(m,x){
+    var k=lnKey(x);
+    for(var i=0;i<links.length;i++){if(k&&lnKey(esc(linkName(links[i])))===k){if(used) used[i]=1;return tagA(links[i],x);}}
     return m;
   });
-  var extra=links.filter(function(l,i){return !used[i];}).map(function(l){return a(l,esc(linkName(l)));}).join(' ');
+}
+function tagLinks(h,links,note){
+  var used={};
+  h=tagOnly(h,links,used);
+  // a link whose tag is in the note opens from there
+  var nt=String(note||'').toLowerCase();
+  links.forEach(function(l,i){var k=lnKey(linkName(l));if(k&&nt.indexOf('['+k+']')>=0) used[i]=1;});
+  var extra=links.filter(function(l,i){return !used[i];}).map(function(l){return tagA(l,esc(linkName(l)));}).join(' ');
   return h+(extra?(h?' ':'')+extra:'');
 }
 // Icon style: a round ↗ at the right of the row (with the name when there is more than one link)
@@ -2299,12 +2309,12 @@ function renderItems(s){
 // ---------- Reference sections: each heading is a card, notes read as text, no boxes ----------
 function rfInfoTree(it){return it.type==='check'&&it.info&&!it.dq&&!it.end&&!it.fld&&(it.children||[]).every(rfInfoTree);}
 // a note: lines starting with •, -, – or * become a bulleted list
-function rfNoteHTML(note,cls,top){
+function rfNoteHTML(note,cls,top,links){
   // under a card item, bullets read as its items; after a line of text they stay in the note's grey
   var out='',ul=[];
   function flush(){if(ul.length){out+='<ul class="'+(top?'rf-ul rf-nl'+(out?' mu':''):'rf-sub')+'">'+ul.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';ul=[];}}
   String(note).split('\n').forEach(function(l){
-    var m=/^\s*[•\-–*·]\s*(.*)$/.exec(l),t=refTags(linkify(esc(m?m[1]:l)));
+    var m=/^\s*[•\-–*·]\s*(.*)$/.exec(l),t=tagOnly(refTags(linkify(esc(m?m[1]:l))),links);
     if(m){ul.push(t);return;}
     flush();if(l.trim()) out+='<div class="'+(cls||'rf-n')+'">'+t+'</div>';
   });
@@ -2316,7 +2326,7 @@ function rfIsTitle(t){t=String(t||'').trim();return t.length<=48&&!/[.:;,]$/.tes
 function smLinks(it,ls){return ls==='button'&&it.links.length?' '+it.links.map(function(l){return linkHTML(l).replace('class="lnk"','class="lnk sm"');}).join(' '):'';}
 function rfLabel(it){
   var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',lab=refTags(esc(it.text));
-  if(ls==='tag') lab=tagLinks(lab,it.links);
+  if(ls==='tag') lab=tagLinks(lab,it.links,it.note);
   return {ls:ls,lab:lab||'<span class="ph">Untitled item</span>'};
 }
 function rfExtras(it){
@@ -2327,13 +2337,13 @@ function rfExtras(it){
 }
 function rfKidHTML(k){
   var L=rfLabel(k),kids=k.children||[];
-  var inner='<span class="rf-kl">'+L.lab+smLinks(k,L.ls)+'</span>'+(k.note?rfNoteHTML(k.note):'')+rfExtras(k)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
+  var inner='<span class="rf-kl">'+L.lab+smLinks(k,L.ls)+'</span>'+(k.note?rfNoteHTML(k.note,'',false,L.ls==='tag'?k.links:null):'')+rfExtras(k)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
   return '<li data-item="'+k.id+'">'+(L.ls==='icon'?'<div class="rf-ir"><div class="rf-tx">'+inner+'</div>'+iconLinksHTML(k.links)+'</div>':inner)+'</li>';
 }
 function rfItemHTML(it){
   if(!rfInfoTree(it)) return renderCheck(it,0); // anything you tick keeps its box
   var L=rfLabel(it),kids=it.children||[],big=!!(it.note||kids.length);
-  var inner='<div class="rf-l">'+L.lab+smLinks(it,L.ls)+'</div>'+(it.note?rfNoteHTML(it.note,'',true):'')+rfExtras(it)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
+  var inner='<div class="rf-l">'+L.lab+smLinks(it,L.ls)+'</div>'+(it.note?rfNoteHTML(it.note,'',true,L.ls==='tag'?it.links:null):'')+rfExtras(it)+(kids.length?'<ul class="rf-ul">'+kids.map(rfKidHTML).join('')+'</ul>':'');
   return '<div class="rf-i'+(big?(rfIsTitle(it.text)?' t':' rf-ld'):'')+'" data-item="'+it.id+'">'+(L.ls==='icon'?'<div class="rf-ir"><div class="rf-tx">'+inner+'</div>'+iconLinksHTML(it.links)+'</div>':inner)+'</div>';
 }
 function renderRefItems(s){
@@ -2372,16 +2382,16 @@ function thumbsHTML(it){
   return it.imgs&&it.imgs.length?'<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>':'';
 }
 // a note: as typed, or as a list when its lines start with a bullet
-function noteHTML(note,top){return /^\s*[•\-–*·]\s/m.test(note)?'<div class="note nb">'+rfNoteHTML(note,'nl',top)+'</div>':'<div class="note">'+refTags(linkify(esc(note)))+'</div>';}
+function noteHTML(note,top,links){return /^\s*[•\-–*·]\s/m.test(note)?'<div class="note nb">'+rfNoteHTML(note,'nl',top,links)+'</div>':'<div class="note">'+tagOnly(refTags(linkify(esc(note))),links)+'</div>';}
 function decTone(t){return t==='y'||t==='n'?t:'o';}
 // a fill-in field: its label, and a box to type in, Yes/No, a list to choose from or a UTC time
 function renderField(it,depth,o){
   var nt=!!(o&&o.note),em=nt?!!o.edit:editMode,stripe=o&&o.stripe?' stripe-'+o.stripe:'';
   var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',lab=refTags(esc(it.text));
-  if(ls==='tag') lab=tagLinks(lab,it.links);
+  if(ls==='tag') lab=tagLinks(lab,it.links,it.note);
   var h='<div class="item d'+Math.min(depth,3)+' fx'+stripe+'" data-item="'+it.id+'">'+(em?'<div class="row" data-act="editItem" data-id="'+it.id+'" tabindex="0" role="button">':'<div class="row">')+
     (depth?'<span class="ibox dot" aria-hidden="true"></span>':'')+'<div class="txt"><div class="fx-l">'+(lab||'<span class="ph">Untitled field</span>')+smLinks(it,ls)+'</div>';
-  if(it.note) h+=noteHTML(it.note);
+  if(it.note) h+=noteHTML(it.note,false,ls==='tag'?it.links:null);
   h+='<div class="fx-c">'+fieldCtl(it)+'</div>'+thumbsHTML(it)+'</div>';
   if(ls==='icon') h+=iconLinksHTML(it.links);
   if(em) h+='<span class="edit-hint">'+I.edit+'</span>'+(nt?'':'<span class="grip" data-drag="item" data-id="'+it.id+'" aria-hidden="true">'+I.grip+'</span>');
@@ -2525,7 +2535,7 @@ function ckLiHTML(k){
   var L=rfLabel(k),kids=k.children||[];
   var links=L.ls==='button'?smLinks(k,'button').slice(1):
     L.ls==='icon'?k.links.map(function(l){return '<a class="rgo sm" href="'+esc(safeUrl(l.url))+'" target="_blank" rel="noopener" aria-label="Open '+esc(linkName(l))+'">'+I.ext+'</a>';}).join(''):'';
-  return '<li data-item="'+k.id+'">'+L.lab+(links?' '+links:'')+(k.note?rfNoteHTML(k.note):'')+(k.imgs&&k.imgs.length?thumbsHTML(k):'')+
+  return '<li data-item="'+k.id+'">'+L.lab+(links?' '+links:'')+(k.note?rfNoteHTML(k.note,'',false,L.ls==='tag'?k.links:null):'')+(k.imgs&&k.imgs.length?thumbsHTML(k):'')+
     (kids.length?'<ul class="ckb">'+kids.map(ckLiHTML).join('')+'</ul>':'')+'</li>';
 }
 function renderCheck(it,depth,o){
@@ -2543,9 +2553,9 @@ function renderCheck(it,depth,o){
   else if(it.info) h+='<div class="row" data-id="'+it.id+'">';
   else h+='<div class="row" data-act="tick" data-id="'+it.id+'" tabindex="0" role="checkbox" aria-checked="'+it.done+'">';
   var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',lab=refTags(esc(it.text));
-  if(ls==='tag') lab=tagLinks(lab,it.links);
+  if(ls==='tag') lab=tagLinks(lab,it.links,it.note);
   h+=(it.info?(depth?'<span class="ibox dot" aria-hidden="true"></span>':''):'<span class="box">'+I.check+'</span>')+'<div class="txt"><div class="label">'+(lab||'<span class="ph">Untitled item</span>')+(it.info?smLinks(it,ls):'')+'</div>';
-  if(it.note) h+=noteHTML(it.note,it.info&&!depth);
+  if(it.note) h+=noteHTML(it.note,it.info&&!depth,ls==='tag'?it.links:null);
   if(it.links.length&&ls==='button'&&!it.info) h+='<div class="links">'+it.links.map(linkHTML).join('')+'</div>';
   if(it.rem&&!nt) h+='<div class="remchip" data-remid="'+it.id+'">'+I.bell+'<span>'+esc(remText(it.rem,Date.now()))+'</span></div>';
   if(it.imgs&&it.imgs.length) h+='<div class="thumbs">'+it.imgs.map(function(im,i){return '<button type="button" class="thumb" data-act="viewImg" data-id="'+it.id+'" data-n="'+i+'" aria-label="Enlarge photo '+(i+1)+'"><img data-img="'+esc(im)+'" alt=""></button>';}).join('')+'</div>';
@@ -4539,7 +4549,7 @@ function openItemEditor(id,isNew){
   var f=find(id);if(!f) return;
   var it=f.node,n=f.arr.length,imgs=(it.imgs||[]).slice(),busy=0,info=!!it.info;
   var kind=it.dq?'dec':it.end?'end':it.fld?'fld':(info?'info':'check'),fk=it.fld?it.fld.k:'text',fopts=it.fld?it.fld.opts.join('\n'):'',endTone=it.end||'go',ls=it.ls==='tag'||it.ls==='icon'?it.ls:'button';
-  var LS_HINT={button:'A button under the text, as before.',tag:'A tag in the text opens the link with the same name, e.g. [FCOM] opens the link named FCOM. A link with no matching tag is added as a tag at the end.',
+  var LS_HINT={button:'A button under the text, as before.',tag:'A tag in the item or its note opens the link with the same name, e.g. [OM-C 10.3.12] opens the link named OM-C 10.3.12. A link with no matching tag is added as a tag at the end.',
     icon:'A round ↗ button at the right of the row.'};
   function lsVis(){var r=$('#fLsRow');if(r) r.hidden=!sheetEl.querySelector('.link-row');}
   var inKids=f.anc.length&&f.arr===f.anc[f.anc.length-1].children,allowDec=!f.apn&&!inKids;
