@@ -25,6 +25,15 @@ ONLINE BACKUP (optional): Menu > Settings > Online backup copies everything to a
 while the app is open and online. You need a private repository and a fine-grained access token
 limited to that repository with Contents: Read and write. The steps are shown in the app.
 
+SYNC BETWEEN iPAD AND iPHONE (optional, needs Online backup): on the iPad, Menu > Settings > Online backup and sync >
+turn on "Sync with your other devices". On the iPhone, open the same address in Safari > Share > Add to Home Screen,
+open it, then Menu > Settings > Online backup and sync, enter the same repository and token and choose
+"Use the synced checklists". From then on checklists, airport notes, the flight log, countdown and crew rest set-up
+and photos stay the same on both, while the app is open and online: a change is sent a few seconds after you make it,
+and the other device checks every 20 seconds and whenever it is opened. Changes made offline are sent when you are
+back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
+change wins. Ticks, answers, filled-in fields, times, reminders and folding always stay on each device.
+
 BRIEFING: Menu > New flight > Load the OFP takes the LIDO package. iPadOS doesn't hand a copied PDF to web apps, so
 either make a one-time Shortcut (Shortcuts > + > name it "Copy for Checklists" > details: Show in Share Sheet, receive PDFs >
 actions: Base64 Encode with Line Breaks None, then Copy to Clipboard) and use Share > Copy for Checklists in Lido, then touch

@@ -532,6 +532,7 @@ button.hd-row:active,.hd-row[role=button]:active{background:var(--press)}
 #cvList{margin-bottom:4px}
 #cvList button{align-items:center}
 #cvList span{color:var(--text)}
+#cvList .cv-dev{font-style:normal;font-size:12.5px;font-weight:700;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
 
 /* Flight log */
 .flb .mod-body{padding:0 12px 12px}
@@ -1922,7 +1923,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='63';
+var APP_VERSION='64';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2002,6 +2003,7 @@ function save(){
   clearTimeout(saveT);
   if(!storageOK) return;
   try{var js=JSON.stringify(state);localStorage.setItem(KEY,js);storCheck(js.length);}catch(e){toast('Could not save: storage is full. See Menu → Settings → Storage.',5000);}
+  synNudge();
 }
 function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,350);}
 
@@ -5353,7 +5355,7 @@ function cloudDataSha(){
   });
 }
 function cloudPutData(json){
-  var body={message:'Backup '+new Date().toISOString().slice(0,16).replace('T',' ')+'Z',content:b64utf8(json)};
+  var body={message:'Backup '+new Date().toISOString().slice(0,16).replace('T',' ')+'Z from '+devName(),content:b64utf8(json)};
   if(cloud.sha) body.sha=cloud.sha;
   return gh('PUT','/contents/data.json',body).then(function(r){
     if(r.status!==409&&r.status!==422) return r;
@@ -5392,7 +5394,7 @@ function cloudRun(withData,p){
     .then(function(ok){cloudBusy=false;cloudProg='';saveCloud();cloudPaint();return ok;});
 }
 function cloudMaybe(){
-  if(!cloud.on||cloudBusy||navigator.onLine===false||Date.now()<cloudRetryAt) return;
+  if(!cloud.on||cloudBusy||synBusy||navigator.onLine===false||Date.now()<cloudRetryAt) return;
   var p=cloudPending(),now=Date.now();
   if(p.h!==cloudTickHash){cloudTickHash=p.h;cloudChangedAt=now;}
   // a minute after the last change, and not more often than every few minutes
@@ -5413,21 +5415,22 @@ function cloudStatus(){
   return {txt:t,bad:false};
 }
 function cloudMenuText(){
-  if(!cloud.on) return 'Off: back up automatically to GitHub';
-  var s=cloudStatus();
-  return s.bad?'Needs attention':s.txt;
+  if(!cloud.on) return 'Off: back up and sync through GitHub';
+  var s=cloudStatus(),y=syn.on?synStatus():null;
+  if(s.bad||(y&&y.bad)) return 'Needs attention';
+  return syn.on?'Backup and sync on · '+y.txt:s.txt;
 }
 function cloudPaint(){
   var el=$('#cloudStat');if(!el) return;
   var s=cloudStatus();
   el.className='cl-stat'+(s.bad?' bad':'')+(s.busy?' busy':'');
-  el.innerHTML='<b>Status</b>'+esc(s.txt);
+  el.innerHTML='<b>'+(syn.on?'Backup':'Status')+'</b>'+esc(s.txt);
 }
 function ghOwnerGuess(){var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname);return m?m[1]+'/checklist-backup':'';}
 function openCloud(){
   if(!cloud.on){
     var photos=cloud.photos;
-    openSheet('<h3>Online backup</h3><p class="hint">While the app is open and online, it saves a copy of everything to a private GitHub repository about a minute after you change something. GitHub keeps every version, so you can go back to an earlier one.</p>'+
+    openSheet('<h3>Online backup and sync</h3><p class="hint">While the app is open and online, it saves a copy of everything to a private GitHub repository about a minute after you change something. GitHub keeps every version, so you can go back to an earlier one. The same repository can also keep your checklists the same on your iPhone and iPad.</p>'+
       '<details class="howto"><summary>How to set it up (once, about 5 minutes)</summary><ol>'+
       '<li>On github.com tap <b>+</b> → <b>New repository</b>. Name it, e.g. <b>checklist-backup</b>, choose <b>Private</b>, and create it.</li>'+
       '<li>Profile picture → <b>Settings</b> → <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>'+
@@ -5436,7 +5439,7 @@ function openCloud(){
       '<label class="fld"><span class="fl">Repository</span><input id="fRepo" type="text" value="'+esc(cloud.repo||ghOwnerGuess())+'" placeholder="yourname/checklist-backup" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label>'+
       '<label class="fld"><span class="fl">Access token</span><input id="fTok" type="password" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label>'+
       '<div class="menu cl-sw"><button type="button" data-sact="photos" role="switch" aria-checked="'+photos+'">'+I.photo+'<span class="mt">Include photos<small>Each photo is uploaded once</small></span><span class="tog'+(photos?' on':'')+'"></span></button></div>'+
-      '<p class="hint">The token stays on this iPad and isn’t part of manual backups.</p>'+
+      '<p class="hint">The token stays on this '+devName()+' and isn’t part of manual backups. To sync your iPhone and iPad, connect both to the same repository (the same token works).</p>'+
       '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="connect">Connect</button></div>',
     function(act,btn){
       if(act==='photos'){photos=!photos;btn.setAttribute('aria-checked',String(photos));btn.querySelector('.tog').classList.toggle('on',photos);return;}
@@ -5452,11 +5455,12 @@ function openCloud(){
     });
     return;
   }
-  openSheet('<h3>Online backup</h3><div class="cl-stat" id="cloudStat"></div><p class="cl-repo">To the private repository <b>'+esc(cloud.repo)+'</b> on GitHub.</p>'+
+  openSheet('<h3>Online backup and sync</h3><div class="cl-stat" id="cloudStat"></div><p class="cl-repo">To the private repository <b>'+esc(cloud.repo)+'</b> on GitHub.</p>'+
     '<div class="cl-row"><button type="button" class="btn" data-sact="now">'+I.cloud+'Back up now</button><button type="button" class="btn" data-sact="restore">'+I.restore+'Restore…</button></div>'+
     '<div class="menu cl-sw"><button type="button" data-sact="photos" role="switch" aria-checked="'+cloud.photos+'">'+I.photo+'<span class="mt">Include photos<small>Each photo is uploaded once</small></span><span class="tog'+(cloud.photos?' on':'')+'"></span></button>'+
+    '<button type="button" data-sact="sync" role="switch" aria-checked="'+syn.on+'">'+I.swap+'<span class="mt">Sync with your other devices<small id="synSub"></small></span><span class="tog'+(syn.on?' on':'')+'"></span></button>'+
     (cloud.kind==='auth'||cloud.kind==='access'?'<button type="button" data-sact="token">'+I.edit+'<span class="mt">Enter a new token</span></button>':'')+
-    '<button type="button" data-sact="off">'+I.x+'<span class="mt">Turn off<small>Removes the token from this iPad. Your backups stay on GitHub.</small></span></button></div>'+
+    '<button type="button" data-sact="off">'+I.x+'<span class="mt">Turn off<small>Removes the token from this '+devName()+'. Your backups stay on GitHub.</small></span></button></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button></div>',
   function(act,btn){
     switch(act){
@@ -5465,18 +5469,21 @@ function openCloud(){
         cloudRetryAt=0;
         cloudRun(true).then(function(ok){toast(ok?'Backed up':(cloud.kind==='net'?'No internet connection':'Backup didn’t work'));});break;
       case 'restore': openCloudRestore();break;
+      case 'sync':
+        if(!syn.on){if(navigator.onLine===false){toast('Sync needs the internet to start');break;}synEnable();break;}
+        confirmSheet('Stop syncing this '+devName()+'? Its checklists stay as they are. Your other devices keep syncing with each other.','Stop syncing',function(){synDisable();toast('Sync is off on this '+devName());},openCloud);break;
       case 'photos':
         cloud.photos=!cloud.photos;saveCloud();btn.setAttribute('aria-checked',String(cloud.photos));btn.querySelector('.tog').classList.toggle('on',cloud.photos);cloudPaint();
         if(cloud.photos) cloudMaybe();break;
       case 'token': cloud.on=false;cloud.token='';saveCloud();openCloud();break;
       case 'off':
-        confirmSheet('Turn off online backup? The token is removed from this iPad. The backups stay in your GitHub repository.','Turn off',function(){
-          cloud.on=false;cloud.token='';cloud.err='';cloud.kind='';saveCloud();toast('Online backup is off');
+        confirmSheet('Turn off online backup'+(syn.on?' and sync':'')+'? The token is removed from this '+devName()+'. The backups stay in your GitHub repository.','Turn off',function(){
+          cloud.on=false;cloud.token='';cloud.err='';cloud.kind='';saveCloud();if(syn.on) synDisable();toast('Online backup is off');
         },openCloud);break;
       default: closeSheet();
     }
   });
-  cloudPaint();
+  cloudPaint();synPaint();
 }
 function cloudConnect(repo,tok,photos){
   function msg(t){return new Error(t);}
@@ -5496,36 +5503,43 @@ function cloudConnect(repo,tok,photos){
     cloud={repo:repo,token:tok,on:true,photos:photos,sha:'',hash:'',last:0,err:'',kind:'',up:[]};
     if(!keepUp) cloudUp=new Set();
     cloudRetryAt=0;saveCloud();
+    if(syn.on){closeSheet();synRetryAt=0;synPollAt=0;toast('Online backup and sync are on',3000);cloudMaybe();return;} // a new token for the same set-up
+    return synMeta(false).then(function(m){
+      if(m.none) return backupFlow();
+      return synGet(m).then(function(R){openSyncFound(m,R,backupFlow);});
+    },function(){backupFlow();});
+    function backupFlow(){
     if(!list.length){closeSheet();cloudRun(true).then(function(ok){toast(ok?'Online backup is on':'Online backup is on, but the first backup didn’t work yet',3000);});return;}
     var when=list[0].commit&&list[0].commit.committer?Date.parse(list[0].commit.committer.date):0;
     openSheet('<h3>Backup found</h3><p class="hint">'+esc(repo)+' already has a backup'+(when?' from '+esc(whenZ(when)):'')+'. What would you like to do?</p>'+
-      '<div class="menu"><button type="button" data-sact="get">'+I.restore+'<span class="mt">Restore it to this iPad<small>Replaces what’s on this iPad</small></span></button>'+
-      '<button type="button" data-sact="put">'+I.cloud+'<span class="mt">Back up this iPad<small>The backup on GitHub becomes an older version</small></span></button></div>'+
+      '<div class="menu"><button type="button" data-sact="get">'+I.restore+'<span class="mt">Restore it to this '+devName()+'<small>Replaces what’s on this '+devName()+'</small></span></button>'+
+      '<button type="button" data-sact="put">'+I.cloud+'<span class="mt">Back up this '+devName()+'<small>The backup on GitHub becomes an older version</small></span></button></div>'+
       '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',
     function(act){
       if(act==='get'){closeSheet();cloudRestore(list[0].sha,true);}
       else if(act==='put'){closeSheet();cloudRun(true).then(function(ok){toast(ok?'Online backup is on':'Backup didn’t work yet',3000);});}
       else{cloud.on=false;cloud.token='';saveCloud();closeSheet();}
     });
+    }
   });
 }
 function openCloudRestore(){
-  openSheet('<h3>Restore from online backup</h3><p class="hint">Choose a version. It replaces everything on this iPad.</p>'+
+  openSheet('<h3>Restore from online backup</h3><p class="hint">Choose a version. It replaces everything on this '+devName()+(syn.on?'. Its checklists then sync to your other devices too':'')+'.</p>'+
     '<div class="aplist" id="cvList"><p class="hint" style="margin:12px 14px">Loading versions…</p></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Close</button></div>',
   function(act,btn){
     if(act==='ver'){
       var sha=btn.getAttribute('data-v'),label=btn.getAttribute('data-l'),latest=btn.hasAttribute('data-latest');
-      confirmSheet('Replace everything on this iPad with the online backup from '+esc(label)+'?','Restore',function(){cloudRestore(sha,latest);},openCloudRestore);
+      confirmSheet('Replace everything on this '+devName()+' with the online backup from '+esc(label)+'?','Restore',function(){cloudRestore(sha,latest);},openCloudRestore);
     }else closeSheet();
   });
   gh('GET','/commits?path=data.json&per_page=20').then(function(r){if(r.status===409) return [];return okJson(r);}).then(function(list){
     var box=$('#cvList');if(!box) return;
     if(!list.length){box.innerHTML='<p class="hint" style="margin:12px 14px">No online backups yet.</p>';return;}
     box.innerHTML=list.map(function(c,i){
-      var t=Date.parse(c.commit.committer.date),d=new Date(t),lab=whenZ(t);
+      var t=Date.parse(c.commit.committer.date),d=new Date(t),lab=whenZ(t),dv=/ from (iPhone|iPad|computer)$/.exec(c.commit.message||'');
       var day=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getUTCDay()]+' '+d.getUTCDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()];
-      return '<button type="button" data-sact="ver" data-v="'+esc(c.sha)+'" data-l="'+esc(lab)+'"'+(i===0?' data-latest':'')+'><b>'+day+'</b><span>'+hmZ(d.getUTCHours()*60+d.getUTCMinutes())+'</span>'+(i===0?'<small>Latest</small>':'')+'</button>';
+      return '<button type="button" data-sact="ver" data-v="'+esc(c.sha)+'" data-l="'+esc(lab)+'"'+(i===0?' data-latest':'')+'><b>'+day+'</b><span>'+hmZ(d.getUTCHours()*60+d.getUTCMinutes())+'</span>'+(dv?'<em class="cv-dev">'+dv[1]+'</em>':'')+(i===0?'<small>Latest</small>':'')+'</button>';
     }).join('');
   }).catch(function(e){
     var box=$('#cvList');if(box) box.innerHTML='<p class="hint" style="margin:12px 14px">'+(e&&e.status===401?'GitHub didn’t accept the token.':'Couldn’t load the versions. Check the internet and try again.')+'</p>';
@@ -5569,6 +5583,407 @@ function cloudRestore(sha,latest){
     });
   }).catch(function(e){toast(e&&e.status===401?'GitHub didn’t accept the token':'Couldn’t restore. Check the internet and try again.',3500);});
 }
+
+/* ---------- Sync: the same checklists on all your devices, through the online backup's repository ----------
+   sync.json holds the content only (checklists, airport notes, flight log, countdown and crew rest set-up, weather relay).
+   Ticks, answers, filled-in fields, times and folding stay on each device. Each device keeps the last synced copy (the base),
+   so a sync merges both sides' changes item by item: an edit on one device and another edit on the other both survive. */
+var SYKEY='flightChecklist.sync',SYNC_FILE='sync.json',SYNC_POLL=20000,SYNC_QUIET=2500,SYNC_GAP=8000;
+function loadSyn(){
+  var c=null;try{c=JSON.parse(localStorage.getItem(SYKEY)||'null');}catch(e){}
+  c=c&&typeof c==='object'?c:{};
+  return {on:!!c.on,sha:str(c.sha),etag:str(c.etag),at:+c.at||0,n:+c.n||0,last:+c.last||0,lastDev:str(c.lastDev)};
+}
+var syn=loadSyn(),synBase=null,synBaseHash='',synSeenHash='',synDirty=false,synBusy=false,synErr='',synKind='',synRetryAt=0,
+    synPollAt=0,synPushAt=0,synNudgeAt=0,synProg='',synPhotoTry={},synDl=false;
+function saveSyn(){try{localStorage.setItem(SYKEY,JSON.stringify(syn));}catch(e){}}
+function devName(){
+  var u=navigator.userAgent||'';
+  if(/iPhone/.test(u)) return 'iPhone';
+  if(/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1)) return 'iPad';
+  return 'computer';
+}
+// the last synced copy lives in its own small database, out of the way of the 5 MB app storage
+var synDbP=null;
+function synDb(){
+  if(synDbP) return synDbP;
+  synDbP=new Promise(function(res,rej){
+    if(!window.indexedDB){rej(new Error('IndexedDB unavailable'));return;}
+    var r=indexedDB.open('flightChecklistSync',1);
+    r.onupgradeneeded=function(){r.result.createObjectStore('kv');};
+    r.onsuccess=function(){res(r.result);};
+    r.onerror=function(){rej(r.error);};
+  });
+  synDbP.catch(function(){synDbP=null;});
+  return synDbP;
+}
+function synKv(mode,fn){
+  return synDb().then(function(d){return new Promise(function(res,rej){
+    var tx=d.transaction('kv',mode),out,q=fn(tx.objectStore('kv'));
+    if(q) q.onsuccess=function(){out=q.result;};
+    tx.oncomplete=function(){res(out);};
+    tx.onerror=tx.onabort=function(){rej(tx.error);};
+  });});
+}
+function synBaseLoad(){
+  if(synBase!==null) return Promise.resolve(synBase);
+  return synKv('readonly',function(s){return s.get('base');}).then(function(v){
+    synBase=typeof v==='string'?v:'';synBaseHash=synBase?strHash(synBase):'';return synBase;
+  },function(){synBase='';synBaseHash='';return '';});
+}
+function synBaseSave(s){
+  synBase=s;synBaseHash=s?strHash(s):'';
+  return synKv('readwrite',function(st){st.put(s,'base');}).catch(function(){});
+}
+// JSON with sorted keys, so the same content always reads the same
+function sj(v){
+  if(v===null||typeof v!=='object') return JSON.stringify(v===undefined?null:v);
+  if(Array.isArray(v)) return '['+v.map(sj).join(',')+']';
+  return '{'+Object.keys(v).sort().filter(function(k){return v[k]!==undefined;}).map(function(k){return JSON.stringify(k)+':'+sj(v[k]);}).join(',')+'}';
+}
+// what stays on this device, by kind of item
+var SYN_LOCAL={_:{id:1,collapsed:1,children:1,dq:1},check:{done:1,ans:1,open:1,rem:1},calc:{expr:1,hist:1},pad:{strokes:1,text:1,mode:1},
+  cd:{target:1,aL:1,aZ:1},rest:{start:1,end:1,mine:1,until:1,ukey:1},hot:{fluid:1,t0:1,hm:1,min:1,max:1,aMin:1,aMax:1},apn:{fold:1}};
+function synOwn(n){
+  var o={},L=SYN_LOCAL[n.type]||{};
+  Object.keys(n).forEach(function(k){if(!SYN_LOCAL._[k]&&!L[k]) o[k]=n[k];});
+  if(o.fld) o.fld={k:o.fld.k,opts:o.fld.opts};
+  if(n.dq) o.dq=true;
+  return JSON.parse(JSON.stringify(o));
+}
+// the content as a flat map: every list, section, item, answer… with the place it sits in, and each place's order
+function synFlat(st){
+  var e={},c={};
+  function put(key,p,o){if(e[key]) return false;e[key]={p:p,o:o};(c[p]=c[p]||[]).push(key);return true;}
+  function items(arr,p){arr.forEach(function(n){
+    var k='I:'+n.id;if(!put(k,p,synOwn(n))) return;
+    if(n.type!=='check') return;
+    items(n.children||[],k+'/c');
+    (n.dq||[]).forEach(function(a){var ak='A:'+a.id;if(put(ak,k+'/d',{label:a.label,tone:a.tone})) items(a.items||[],ak+'/i');});
+  });}
+  st.lists.forEach(function(L){
+    var lk='L:'+L.id;if(!put(lk,'lists',{title:L.title})) return;
+    L.sections.forEach(function(s){var sk='S:'+s.id;if(put(sk,lk+'/s',{title:s.title})) items(s.items,sk+'/i');});
+  });
+  st.apSections.forEach(function(x){put('P:'+x.id,'apsecs',{name:x.name,lay:x.lay});});
+  Object.keys(st.apNotes).sort().forEach(function(ic){Object.keys(st.apNotes[ic]).sort().forEach(function(sid){items(st.apNotes[ic][sid],'apn/'+ic+'/'+sid);});});
+  st.flights.forEach(function(f){if(flEmpty(f)) return;var o=JSON.parse(JSON.stringify(f));delete o.id;put('F:'+f.id,'flights',o);});
+  st.tools.cds.forEach(function(x){put('C:'+x.id,'cds',{title:x.title,lead:x.lead});});
+  var r=st.tools.rest;
+  e.R={p:'',o:{title:r.title,n:r.n,buffer:r.buffer,round:r.round,labels:r.labels.slice()}};
+  e.G={p:'',o:{wxUrl:st.settings.wxUrl||''}};
+  return {e:e,c:c};
+}
+// three-way merge: B is the last synced copy, L this device, R the one online
+function synMerge(B,L,R,preferL){
+  B=B||{e:{},c:{}};
+  var M={e:{},c:{}},keys={};
+  [B,L,R].forEach(function(F){Object.keys(F.e).forEach(function(k){keys[k]=1;});});
+  function pick(b,l,r,f){
+    var lv=sj(f(l)),rv=sj(f(r));
+    if(lv===rv) return f(l);
+    if(b){var bv=sj(f(b));if(lv===bv) return f(r);if(rv===bv) return f(l);}
+    return preferL?f(l):f(r); // changed on both: the more recent device wins
+  }
+  function same(x,b){return sj(x.o)===sj(b.o)&&x.p===b.p;}
+  Object.keys(keys).forEach(function(k){
+    var b=B.e[k],l=L.e[k],r=R.e[k],x=null;
+    if(l&&r) x={p:pick(b,l,r,function(z){return z.p;}),o:pick(b,l,r,function(z){return z.o;})};
+    else if(l) x=!b?l:(same(l,b)?null:l);   // deleted on the other device, unless changed here since
+    else if(r) x=!b?r:(same(r,b)?null:r);
+    if(x) M.e[k]={p:x.p,o:x.o};
+  });
+  // something kept needs the list, section, item or answer it sits in
+  function owner(p){var i=p.lastIndexOf('/');if(i<0) return null;var k=p.slice(0,i);return /^[LSIA]:/.test(k)?k:null;}
+  for(var again=true,guard=0;again&&guard<50;guard++){
+    again=false;
+    Object.keys(M.e).forEach(function(k){
+      if(!M.e[k]) return;
+      var ow=owner(M.e[k].p);if(!ow||M.e[ow]) return;
+      var s=L.e[ow]||R.e[ow]||B.e[ow];
+      if(s) M.e[ow]={p:s.p,o:s.o};else delete M.e[k];
+      again=true;
+    });
+  }
+  // the order in each place: from the device that reordered, with the other device's new things where it put them
+  var kids={};
+  Object.keys(M.e).forEach(function(k){var p=M.e[k].p;if(p) (kids[p]=kids[p]||{})[k]=1;});
+  Object.keys(kids).forEach(function(p){
+    var fin=kids[p],oB=B.c[p]||[],oL=L.c[p]||[],oR=R.c[p]||[],inB={};
+    oB.forEach(function(k){inB[k]=1;});
+    function rel(o){return sj(o.filter(function(k){return inB[k]&&fin[k];}));}
+    var rb=rel(oB),src,oth;
+    if(rel(oL)===rb){src=oR;oth=oL;}else if(rel(oR)===rb){src=oL;oth=oR;}else if(preferL){src=oL;oth=oR;}else{src=oR;oth=oL;}
+    var placed={},list=[],start=[],after={},prev=null,out=[];
+    src.forEach(function(k){if(fin[k]&&!placed[k]){placed[k]=1;list.push(k);}});
+    oth.forEach(function(k){
+      if(!fin[k]) return;
+      if(!placed[k]){placed[k]=1;(prev?(after[prev]=after[prev]||[]):start).push(k);}
+      prev=k;
+    });
+    function emit(k){var st=[k];while(st.length){var x=st.pop();out.push(x);var a=after[x];if(a) for(var i=a.length-1;i>=0;i--) st.push(a[i]);}}
+    start.forEach(emit);list.forEach(emit);
+    Object.keys(fin).forEach(function(k){if(!placed[k]) out.push(k);});
+    M.c[p]=out;
+  });
+  return M;
+}
+// a new app state from merged content, keeping this device's ticks, answers, times and folding
+function synBuild(M,st){
+  var loc={};
+  function li(arr){arr.forEach(function(n){loc['I:'+n.id]=n;if(n.type==='check'){li(n.children||[]);(n.dq||[]).forEach(function(a){loc['A:'+a.id]=a;li(a.items||[]);});}});}
+  st.lists.forEach(function(L){loc['L:'+L.id]=L;L.sections.forEach(function(s){loc['S:'+s.id]=s;li(s.items);});});
+  Object.keys(st.apNotes).forEach(function(ic){Object.keys(st.apNotes[ic]).forEach(function(sid){li(st.apNotes[ic][sid]);});});
+  st.tools.cds.forEach(function(x){loc['C:'+x.id]=x;});
+  function idOf(k){return k.slice(2);}
+  function kidsOf(p){return (M.c[p]||[]).filter(function(k){return M.e[k];});}
+  function item(k){
+    var o=JSON.parse(JSON.stringify(M.e[k].o)),old=loc[k],n=Object.assign({id:idOf(k)},o);
+    if(old&&old.type===n.type){var Lk=SYN_LOCAL[n.type]||{};Object.keys(old).forEach(function(x){if(Lk[x]||x==='collapsed') n[x]=old[x];});}
+    if(n.type==='check'){
+      n.children=kidsOf(k+'/c').map(item);
+      if(o.dq){
+        n.dq=kidsOf(k+'/d').map(function(ak){var a=M.e[ak].o;return {id:idOf(ak),label:a.label,tone:a.tone,items:kidsOf(ak+'/i').map(item)};});
+        if(!n.dq.some(function(a){return a.id===n.ans;})) n.ans='';
+      }else{delete n.dq;delete n.ans;}
+      if(o.fld) n.fld={k:o.fld.k,opts:o.fld.opts||[],val:old&&old.fld&&old.fld.k===o.fld.k?old.fld.val:''};
+    }
+    return n;
+  }
+  var out=JSON.parse(JSON.stringify({v:st.v,current:st.current,settings:st.settings,tools:st.tools,flightCur:st.flightCur}));
+  out.lists=kidsOf('lists').map(function(lk){
+    return {id:idOf(lk),title:M.e[lk].o.title,sections:kidsOf(lk+'/s').map(function(sk){var os=loc[sk];return {id:idOf(sk),title:M.e[sk].o.title,collapsed:!!(os&&os.collapsed),items:kidsOf(sk+'/i').map(item)};})};
+  });
+  out.apSections=kidsOf('apsecs').map(function(k){var o=M.e[k].o;return {id:idOf(k),name:o.name,lay:o.lay};});
+  out.apNotes={};
+  Object.keys(M.c).forEach(function(p){
+    if(p.indexOf('apn/')!==0) return;
+    var a=p.split('/'),arr=kidsOf(p).map(item);if(!arr.length) return;
+    (out.apNotes[a[1]]=out.apNotes[a[1]]||{})[a[2]]=arr;
+  });
+  out.flights=kidsOf('flights').map(function(k){return Object.assign({id:idOf(k)},JSON.parse(JSON.stringify(M.e[k].o)));});
+  out.tools.cds=kidsOf('cds').map(function(k){var o=M.e[k].o,old=loc[k];return {id:idOf(k),type:'cd',title:o.title,lead:o.lead,target:old?old.target:null,aL:old?old.aL:false,aZ:old?old.aZ:false,collapsed:old?!!old.collapsed:false};});
+  if(M.e.R){var r=M.e.R.o;out.tools.rest.title=r.title;out.tools.rest.n=r.n;out.tools.rest.buffer=r.buffer;out.tools.rest.round=r.round;out.tools.rest.labels=(r.labels||[]).slice();}
+  if(M.e.G) out.settings.wxUrl=M.e.G.o.wxUrl||'';
+  return normalize(out);
+}
+function synApply(M,Ms){
+  var o=synBuild(M,state);if(!o) return false;
+  state=o;fresh.clear();save();
+  // what arrived from the other device isn't an edit made here
+  synSeenHash=strHash(Ms||sj(synFlat(state)));synNudgeAt=0;
+  render();if(toolOpen) refreshTool();
+  return true;
+}
+// called after every save: the content may have changed
+function synNudge(){if(syn&&syn.on) synNudgeAt=Date.now();}
+function synCheckLocal(now){
+  var h=strHash(sj(synFlat(state)));
+  if(h!==synSeenHash){if(synSeenHash){syn.at=now;saveSyn();}synSeenHash=h;}
+  synDirty=h!==synBaseHash;
+}
+// nothing open that a re-drawn page would disturb
+function synIdle(){
+  var ae=document.activeElement;
+  if(sheetWrap.classList.contains('show')||drag||restEditing.size) return false;
+  if(ae&&ae!==document.body&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) return false;
+  return true;
+}
+function b64dec(s){var bin=atob(String(s).replace(/\s+/g,'')),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u);}
+// a cheap look at the online copy: GitHub answers 304 when it hasn't changed
+function synMeta(useTag){
+  var h={'Authorization':'Bearer '+cloud.token,'Accept':'application/vnd.github.object+json'};
+  if(useTag&&syn.etag) h['If-None-Match']=syn.etag;
+  return fetch('https://api.github.com/repos/'+cloud.repo+'/contents/'+SYNC_FILE,{cache:'no-store',headers:h}).then(function(r){
+    if(r.status===304) return {same:true};
+    if(r.status===404) return {none:true};
+    if(!r.ok) throw ghErr(r);
+    var et=r.headers.get('ETag')||'';
+    return r.json().then(function(j){return {sha:j.sha||'',etag:et,content:j.encoding==='base64'&&j.content?j.content:''};});
+  });
+}
+function synGet(m){
+  var p=m.content?Promise.resolve(b64dec(m.content)):gh('GET','/git/blobs/'+m.sha,null,'application/vnd.github.raw+json').then(function(r){if(!r.ok) throw ghErr(r);return r.text();});
+  return p.then(function(txt){
+    var d=null;try{d=JSON.parse(txt);}catch(e){}
+    if(!d||d.format!=='flight-checklists-sync'||!d.flat||!d.flat.e||!d.flat.c) throw new Error('The synced copy online can’t be read.');
+    return d;
+  });
+}
+function synImgIds(F){var s={};Object.keys(F.e).forEach(function(k){var o=F.e[k].o;if(k.charAt(0)==='I'&&Array.isArray(o.imgs)) o.imgs.forEach(function(i){s[i]=1;});});return Object.keys(s);}
+function synUpPhotos(F){
+  var ids=synImgIds(F).filter(function(id){return !cloudUp.has(id);}),chain=Promise.resolve();
+  ids.forEach(function(id,i){
+    chain=chain.then(function(){return i?new Promise(function(res){setTimeout(res,1200);}):null;})
+      .then(function(){synProg='Sending photo '+(i+1)+' of '+ids.length;synPaint();return cloudPutPhoto(id);});
+  });
+  return chain.then(function(){if(ids.length) saveCloud();});
+}
+function synPut(text,sha){
+  var body={message:'Sync from '+devName()+' '+new Date().toISOString().slice(0,16).replace('T',' ')+'Z',content:b64utf8(text)};
+  if(sha) body.sha=sha;
+  return gh('PUT','/contents/'+SYNC_FILE,body).then(function(r){
+    if(r.status===409||r.status===422){var e=new Error('conflict');e.conflict=true;throw e;}
+    return okJson(r);
+  }).then(function(j){return (j.content&&j.content.sha)||'';});
+}
+function synPush(F,Fs,sha,at,n){
+  return synUpPhotos(F).then(function(){
+    synProg='Syncing…';synPaint();
+    return synPut(JSON.stringify({format:'flight-checklists-sync',v:1,n:n,at:at,dev:devName(),flat:F}),sha);
+  }).then(function(nsha){
+    syn.sha=nsha;syn.n=n;syn.etag='';syn.last=Date.now();synPushAt=Date.now();
+    return synBaseSave(Fs);
+  });
+}
+function synFail(e){
+  var st=e&&e.status,now=Date.now();
+  synKind='';synErr='';
+  if(e&&e.busy){synRetryAt=now+3000;return;}
+  if(!st&&!(e&&e.message&&/can’t be read/.test(e.message))){synKind='net';synRetryAt=now+60000;return;}
+  if(st===429){synKind='wait';synRetryAt=now+900000;return;}
+  if(st===401){synKind='auth';synErr='GitHub no longer accepts the access token. Enter a new one in Online backup.';synRetryAt=now+1800000;return;}
+  if(st===403||st===404){synKind='access';synErr='The token can’t write to '+cloud.repo+'. It needs Contents: Read and write.';synRetryAt=now+1800000;return;}
+  synKind='other';synErr=st?'GitHub had a problem ('+st+'). Sync will try again.':(e&&e.message)||'Sync didn’t work. It will try again.';synRetryAt=now+300000;
+}
+function synRun(){
+  if(synBusy||!syn.on||!cloud.on) return Promise.resolve(false);
+  synBusy=true;synProg='Syncing…';synPaint();
+  var tries=0,news=false,from='';
+  function cycle(){
+    tries++;
+    return synBaseLoad().then(function(baseStr){
+      var B=null;if(baseStr){try{B=JSON.parse(baseStr);}catch(e){B=null;}}
+      return synMeta(!!B).then(function(m){
+        var Lf=synFlat(state),Ls=sj(Lf);
+        if(B&&(m.same||(m.sha&&m.sha===syn.sha))){
+          // nothing new online: send this device's changes, if any
+          if(m.etag) syn.etag=m.etag;
+          if(Ls===baseStr){syn.last=Date.now();return;}
+          return synPush(Lf,Ls,syn.sha,syn.at,syn.n+1);
+        }
+        if(m.none||m.same) return synPush(Lf,Ls,'',syn.at,syn.n+1); // the first device, or the online copy was removed
+        return synGet(m).then(function(R){
+          if(B&&syn.n>0&&typeof R.n==='number'&&R.n<=syn.n){
+            // an older copy than the one this device already has: GitHub hasn't caught up yet
+            if(Ls===baseStr) return;
+            return synPush(Lf,Ls,syn.sha,syn.at,syn.n+1);
+          }
+          var Rs=sj(R.flat),M=synMerge(B,Lf,R.flat,syn.at>=(+R.at||0)),Ms=sj(M);
+          if(Ms!==Ls){
+            if(!synIdle()){var be=new Error('busy');be.busy=true;throw be;}
+            if(!synApply(M,Ms)) throw new Error('The synced copy online can’t be read.');
+            news=true;from=R.dev||'';
+          }
+          syn.lastDev=R.dev||syn.lastDev;
+          if(Ms===Rs){syn.sha=m.sha;syn.n=+R.n||0;syn.etag=m.etag||'';syn.last=Date.now();return synBaseSave(Ms);}
+          return synPush(M,Ms,m.sha,Math.max(syn.at,+R.at||0),Math.max(syn.n,+R.n||0)+1);
+        });
+      });
+    }).catch(function(e){if(e&&e.conflict&&tries<4) return cycle();throw e;});
+  }
+  return cycle().then(function(){
+    synErr='';synKind='';synRetryAt=0;
+    synCheckLocal(Date.now());
+    if(news) toast('Updated from your '+(from&&from!==devName()?from:'other device'),2500);
+    synFetchPhotos();
+    return true;
+  },function(e){synFail(e);return false;}).then(function(ok){
+    synBusy=false;synProg='';synPollAt=Date.now();saveSyn();synPaint();return ok;
+  });
+}
+// photos that arrived with synced items
+function synFetchPhotos(){
+  if(synDl||!syn.on||!cloud.on||navigator.onLine===false) return;
+  var ids=Array.from(allImgIds()),now=Date.now();
+  synDl=true;
+  Promise.all(ids.map(function(id){return imgGet(id).then(function(v){return v?null:id;},function(){return null;});})).then(function(miss){
+    var chain=Promise.resolve();
+    miss.filter(function(id){return id&&!(synPhotoTry[id]>now-600000);}).forEach(function(id){
+      chain=chain.then(function(){
+        synPhotoTry[id]=Date.now();
+        return gh('GET','/contents/photos/'+id+'.jpg',null,'application/vnd.github.raw+json').then(function(r){if(!r.ok) throw ghErr(r);return r.blob();}).then(photoFromBlob).then(function(v){
+          return imgPut(id,v).then(function(){
+            thumbCache.set(id,v.t);cloudUp.add(id);
+            document.querySelectorAll('img[data-img="'+id+'"]').forEach(function(im){im.src=v.t;if(im.parentElement) im.parentElement.classList.remove('missing');});
+          });
+        }).catch(function(){});
+      });
+    });
+    return chain;
+  }).then(function(){synDl=false;saveCloud();},function(){synDl=false;});
+}
+function synTick(flush){
+  if(!syn||!syn.on) return;
+  var now=Date.now();
+  if(synNudgeAt&&(flush||now-synNudgeAt>=1500)){synNudgeAt=0;synCheckLocal(now);}
+  if(!cloud.on||synBusy||cloudBusy||navigator.onLine===false||now<synRetryAt) return;
+  if(!flush&&document.visibilityState==='hidden') return;
+  var due=now-synPollAt>=SYNC_POLL||(synDirty&&(flush||(now-syn.at>=SYNC_QUIET&&now-synPushAt>=SYNC_GAP)));
+  if(due&&synIdle()) synRun();
+}
+function synStatus(){
+  if(!syn.on) return {txt:'Checklists, airport notes and the flight log. Ticks and answers stay on each device.',bad:false};
+  if(synBusy) return {txt:synProg||'Syncing…',busy:true};
+  if(synErr) return {txt:synErr,bad:true};
+  if(navigator.onLine===false||synKind==='net') return {txt:'Waiting for internet'+(synDirty?' · changes to send':''),bad:false};
+  if(synKind==='wait') return {txt:'GitHub asked to slow down. Sync will try again later.',bad:false};
+  return {txt:syn.last?'Synced '+whenZ(syn.last)+(synDirty?' · sending changes':''):'Not synced yet',bad:false};
+}
+function synPaint(){
+  var el=$('#synSub');if(!el) return;
+  var s=synStatus();el.textContent=s.txt;el.classList.toggle('warn',!!s.bad);
+}
+// turning sync on: start the online copy, or take or combine with the one your other devices made
+function synStart(mode,m,R){
+  closeSheet();
+  syn.on=true;syn.sha='';syn.etag='';syn.at=0;syn.n=0;saveSyn();
+  synErr='';synKind='';synRetryAt=0;
+  if(mode==='use'){
+    var Rs=sj(R.flat);
+    synApply(R.flat,Rs);
+    syn.sha=m.sha;syn.n=+R.n||0;syn.etag=m.etag||'';syn.last=Date.now();syn.lastDev=R.dev||'';saveSyn();
+    synBaseSave(Rs).then(function(){synCheckLocal(Date.now());synPaint();synFetchPhotos();});
+    toast('Synced with your '+(R.dev&&R.dev!==devName()?R.dev:'other device'),3000);
+    return;
+  }
+  // 'merge' and 'new': no last synced copy yet, so nothing is treated as deleted
+  synBaseSave('').then(function(){synSeenHash='';synCheckLocal(Date.now());return synRun();}).then(function(ok){
+    toast(ok?(mode==='new'?'Sync is on. Turn it on on your other devices too.':'Synced and combined'):'Sync is on, but the first sync didn’t work yet',3500);
+  });
+}
+function openSyncFound(m,R,other){
+  var dn=devName(),when=R.at?' · last change '+whenZ(+R.at):'';
+  openSheet('<h3>Sync with your other devices</h3><p class="hint">Your '+esc(R.dev&&R.dev!==dn?R.dev:'other device')+' already syncs through '+esc(cloud.repo)+esc(when)+'. Ticks, answers and times always stay on each device.</p>'+
+    '<div class="menu"><button type="button" data-sact="use">'+I.restore+'<span class="mt">Use the synced checklists<small>Replaces the checklists, airport notes and flight log on this '+dn+'</small></span></button>'+
+    '<button type="button" data-sact="merge">'+I.swap+'<span class="mt">Combine with this '+dn+'’s<small>Keeps both. Nothing is deleted, so you may see some twice</small></span></button>'+
+    (other?'<button type="button" data-sact="bk">'+I.cloud+'<span class="mt">Only back up, don’t sync<small>You can turn sync on later</small></span></button>':'')+'</div>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button></div>',
+  function(act){
+    if(act==='use') synStart('use',m,R);
+    else if(act==='merge') synStart('merge',m,R);
+    else if(act==='bk'&&other) other();
+    else{closeSheet();if(other){cloud.on=false;cloud.token='';saveCloud();}}
+  });
+}
+function synEnable(){
+  toast('Looking for your other devices…',20000);
+  synMeta(false).then(function(m){
+    if(m.none){toastOff();synStart('new');return;}
+    return synGet(m).then(function(R){toastOff();openSyncFound(m,R,null);});
+  }).catch(function(e){toast(e&&e.status===401?'GitHub didn’t accept the token':'No connection to GitHub. Try again when online.',3500);});
+}
+function synDisable(){
+  syn.on=false;syn.sha='';syn.etag='';syn.at=0;syn.n=0;saveSyn();synBaseSave('');synDirty=false;synErr='';synKind='';
+}
+setInterval(function(){synTick(false);},4000);
+document.addEventListener('visibilitychange',function(){
+  if(!syn.on) return;
+  if(document.visibilityState==='visible'){synPollAt=0;setTimeout(function(){synTick(false);},600);}
+  else synTick(true); // send waiting changes before the app goes to the background
+});
+window.addEventListener('online',function(){if(syn.on){synRetryAt=0;synPollAt=0;setTimeout(function(){synTick(false);},800);}});
+if(syn.on) synBaseLoad().then(function(){synCheckLocal(Date.now());setTimeout(function(){synTick(false);},1500);});
 
 var toastT=0;
 /* ---------- Search: checklists, airport notes and the flight log ---------- */
