@@ -1319,6 +1319,12 @@ body.editing .fx-c{pointer-events:none;opacity:.7}
 .hot-r2 b{font-variant-numeric:tabular-nums}
 .hot-cl{margin-top:8px}
 .hot-cl .lnkbtn{font-size:calc(14px*var(--ts));font-weight:600;color:var(--muted);text-decoration:none;padding:4px 0}
+html.iphone{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 92px)}
+.iphone .topbar{padding-top:30px}
+.iphone .sheet-wrap{padding-top:calc(env(safe-area-inset-top,0px) + 40px)}
+.iphone .lb-close{top:calc(env(safe-area-inset-top,0px) + 34px)}
+.iphone .lb-count{top:calc(env(safe-area-inset-top,0px) + 46px)}
+.iphone .alert-bar{top:calc(env(safe-area-inset-top,0px) + 88px)}
 .nf-opt.pri{display:block;cursor:default}
 .nf-h{display:flex;align-items:center;gap:13px}
 .nf-h>svg{width:28px;height:28px;color:var(--accent);flex:none}
@@ -1346,7 +1352,7 @@ label.ib{cursor:pointer}
 .ofp-sum dd small{color:var(--muted);font-weight:500;font-size:.88em}
 .ofp-pk{margin:11px 0 0;padding-top:9px;border-top:1px solid var(--line-soft);font-size:calc(13.5px*var(--ts));color:var(--muted);line-height:1.35}
 </style>
-<script>/* night themes apply before the first paint, so there's no bright flash */try{var t0=localStorage.getItem('flightChecklist.theme');if(t0&&t0!=='auto')document.documentElement.setAttribute('data-theme',t0);}catch(e){}</script>
+<script>/* night themes apply before the first paint, so there's no bright flash */try{var t0=localStorage.getItem('flightChecklist.theme');if(t0&&t0!=='auto')document.documentElement.setAttribute('data-theme',t0);}catch(e){}if(/iPhone/.test(navigator.userAgent))document.documentElement.classList.add('iphone');</script>
 </head>
 <body>
 <header class="topbar">
@@ -1923,7 +1929,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='64';
+var APP_VERSION='65';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
