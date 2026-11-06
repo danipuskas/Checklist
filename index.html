@@ -1352,7 +1352,7 @@ label.ib{cursor:pointer}
 .ofp-sum dd small{color:var(--muted);font-weight:500;font-size:.88em}
 .ofp-pk{margin:11px 0 0;padding-top:9px;border-top:1px solid var(--line-soft);font-size:calc(13.5px*var(--ts));color:var(--muted);line-height:1.35}
 </style>
-<script>/* night themes apply before the first paint, so there's no bright flash */try{var t0=localStorage.getItem('flightChecklist.theme');if(t0&&t0!=='auto')document.documentElement.setAttribute('data-theme',t0);}catch(e){}if(/iPhone/.test(navigator.userAgent))document.documentElement.classList.add('iphone');</script>
+<script>/* night themes apply before the first paint, so there's no bright flash */try{var t0=localStorage.getItem('flightChecklist.theme');if(t0&&t0!=='auto')document.documentElement.setAttribute('data-theme',t0);}catch(e){}if(/iPhone/.test(navigator.userAgent)&&!window.NATIVE_APP)document.documentElement.classList.add('iphone');</script>
 </head>
 <body>
 <header class="topbar">
@@ -1929,7 +1929,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='65';
+var APP_VERSION='66';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -1940,6 +1940,7 @@ function applyTheme(){
   var c={light:'#e8ecf0',dark:'#1a1f26',night:'#06080a',red:'#060101'}[t];
   Array.prototype.forEach.call(metas,function(m,i){m.setAttribute('content',c||themeMeta[i]);});
   try{localStorage.setItem('flightChecklist.theme',t);}catch(e){}
+  natTheme();
 }
 function themeHint(t){var x=THEMES.filter(function(y){return y[0]===t;})[0];return x?x[2]:'';}
 function applyTextScale(){
@@ -5990,6 +5991,72 @@ document.addEventListener('visibilitychange',function(){
 });
 window.addEventListener('online',function(){if(syn.on){synRetryAt=0;synPollAt=0;setTimeout(function(){synTick(false);},800);}});
 if(syn.on) synBaseLoad().then(function(){synCheckLocal(Date.now());setTimeout(function(){synTick(false);},1500);});
+
+/* ---------- The iPhone and iPad app: this page inside a small native app ----------
+   The app delivers the alerts below as notifications when it's closed or the screen is locked,
+   opens a PDF shared from another app (e.g. Lido), and fetches new versions of this page from GitHub. */
+function natOn(){return !!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.native);}
+function natPost(o){if(!natOn()) return;try{window.webkit.messageHandlers.native.postMessage(o);}catch(e){}}
+// every alert still to come in the next two days: countdowns, holdover times and reminders
+function natAlerts(now){
+  var out=[],H=now+48*3600000;
+  function add(id,t,title,body){if(t>now+5000&&t<H) out.push({id:id,t:Math.round(t),title:title,body:body||''});}
+  state.tools.cds.forEach(function(c){
+    if(c.target===null) return;
+    var nm=cdName(c);
+    if(c.lead&&!c.aL) add(c.id+':lead',c.target-c.lead*60000,c.lead+' min to '+nm,'At '+hmOf(c.target));
+    if(!c.aZ) add(c.id+':zero',c.target,nm.charAt(0).toUpperCase()+nm.slice(1)+' now','');
+  });
+  state.lists.forEach(function(L){L.sections.forEach(function(s){s.items.forEach(function(n){
+    if(n.type!=='hot') return;
+    var T=hotTimes(n);if(!T) return;
+    if(!n.aMin) add(n.id+':min',T.min,'Minimum HOT expired','If precipitation has occurred since the start of the fluid: PCI within 5 min of take-off.');
+    if(T.max&&!n.aMax) add(n.id+':max',T.max,'Maximum HOT expired','External PCI (minimum HOT 20 min or more) or return for treatment.');
+  });});});
+  remWalk(function(it){
+    var r=it.rem,name=it.text||'Reminder';
+    if(r.mode==='cd'){
+      var c=cdById(r.cd);if(!c||c.target===null) return;
+      if(r.lastT!==null&&Math.abs(c.target-r.lastT)<20*60000) return;
+      add(it.id+':cd',c.target-r.min*60000,name,r.min+' min to '+c.title);return;
+    }
+    var day=Math.floor(now/86400000)*86400000;
+    r.times.forEach(function(x){
+      var m=(+x.slice(0,2))*60+(+x.slice(2));
+      [0,1,2].forEach(function(k){var t=day+k*86400000+(m-r.lead)*60000;if(t>r.last) add(it.id+':'+x+':'+k,t,name,(r.lead?'In '+r.lead+' min · ':'')+hmOf(t+r.lead*60000));});
+    });
+  });
+  out.sort(function(a,b){return a.t-b.t;});
+  return out.slice(0,60);
+}
+var natSig='';
+function natSync(force){
+  if(!natOn()) return;
+  var L=natAlerts(Date.now()),sig=JSON.stringify([state.settings.sound!==false,L.map(function(a){return [a.id,a.t,a.title];})]);
+  if(sig===natSig&&!force) return;
+  natSig=sig;natPost({type:'alerts',sound:state.settings.sound!==false,list:L});
+}
+function natTheme(){
+  if(!natOn()) return;
+  var t=(state&&state.settings&&state.settings.theme)||'auto',dark=t==='dark'||t==='night'||t==='red'||(t==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+  var bg='';try{bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();}catch(e){}
+  natPost({type:'theme',dark:dark,bg:bg});
+}
+// a PDF shared to the app, e.g. the LIDO package from Lido
+window.nativeOpenFile=function(url,name){
+  fetch(url).then(function(r){if(!r.ok) throw new Error(String(r.status));return r.blob();}).then(function(b){
+    if(sheetWrap.classList.contains('show')) closeSheet();
+    brReadFile(new File([b],name||'package.pdf',{type:'application/pdf'}),'brief');
+  }).catch(function(){toast('Couldn’t open that file',4000);});
+};
+// a new version of this page arrived: the Update button switches to it
+window.nativeUpdateReady=function(){updReady();};
+if(natOn()){
+  setInterval(function(){natSync(false);},5000);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden') natSync(true);});
+  setTimeout(function(){natSync(true);natTheme();},800);
+  if(window.matchMedia){var nmq=window.matchMedia('(prefers-color-scheme: dark)');if(nmq.addEventListener) nmq.addEventListener('change',natTheme);}
+}
 
 var toastT=0;
 /* ---------- Search: checklists, airport notes and the flight log ---------- */
