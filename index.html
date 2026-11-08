@@ -1999,7 +1999,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='67';
+var APP_VERSION='68';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -6585,7 +6585,7 @@ function openTool(kind){
     (kind==='rest'?restPillHTML(T):'')+
     (kind==='wx'&&state.settings.wxUrl?'<button type="button" class="ib round" data-act="wxRefresh" aria-label="Update weather">'+I.reset+'</button>':'')+
     (kind==='wx'&&brief?'<button type="button" class="ib round" data-act="brLoad" aria-label="Load or update the LIDO package">'+I.paste+'</button>':'')+
-    (tabPage?'':'<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button>')+'</div>';
+    (tabPage&&!editMode?'':'<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button>')+'</div>';
   if(kind==='cd'||kind==='tm'){
     if(!T.cds.length) h+='<p class="hint">No countdowns yet. Tap + to add one.</p>';
     h+=T.cds.map(function(c){
