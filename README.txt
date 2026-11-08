@@ -38,10 +38,14 @@ and the other device checks every 20 seconds and whenever it is opened. Changes 
 back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
 change wins. Ticks, answers, filled-in fields, times, reminders and folding always stay on each device.
 
-EDITING: tap the pencil at the top, then tap an item's text to change it right there. Return saves it and starts the next item
-below; Return on an empty item stops. The buttons under the item move it in or out a level, switch Checkbox/Info, open the full
-item sheet (More) or delete it. Select picks several items to move, indent, duplicate, change or delete at once. The round arrow
-next to Done undoes your edits one step at a time until you tap Done.
+EDITING: tap the pencil at the top. The checklist shows as an outline: one line per section, header and item, with small tags
+for notes, links and photos. Tap anything to open it as a page (text, note, type, sub-items, links, photos, reminder, in or out
+a level, duplicate, move, delete); Cancel and Done stay at the top. In a new item, Return keeps it and starts the next one. Drag ≡
+to move a line, or hold it over an item to put it inside. "+ Add item or header" ends each section. Select picks several items
+to move, indent, duplicate, change or delete at once. The round arrow next to Done undoes your edits one step at a time.
+On an iPad in full screen the outline stays on the left and the page opens on the right.
+QUICK CHANGES: without Edit, press and hold an item for Edit, add a note, a link, a sub-item or an item below, duplicate,
+move or delete.
 Write a check and its response with dots between them, like "Parking brake .... SET", and the response lines up on the right.
 
 BRIEFING: More > New flight > Load the OFP takes the LIDO package. iPadOS doesn't hand a copied PDF to web apps, so
