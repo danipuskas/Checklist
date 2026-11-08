@@ -34,6 +34,12 @@ and the other device checks every 20 seconds and whenever it is opened. Changes 
 back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
 change wins. Ticks, answers, filled-in fields, times, reminders and folding always stay on each device.
 
+EDITING: tap the pencil at the top, then tap an item's text to change it right there. Return saves it and starts the next item
+below; Return on an empty item stops. The buttons under the item move it in or out a level, switch Checkbox/Info, open the full
+item sheet (More) or delete it. Select picks several items to move, indent, duplicate, change or delete at once. The round arrow
+next to Done undoes your edits one step at a time until you tap Done.
+Write a check and its response with dots between them, like "Parking brake .... SET", and the response lines up on the right.
+
 BRIEFING: Menu > New flight > Load the OFP takes the LIDO package. iPadOS doesn't hand a copied PDF to web apps, so
 either make a one-time Shortcut (Shortcuts > + > name it "Copy for Checklists" > details: Show in Share Sheet, receive PDFs >
 actions: Base64 Encode with Line Breaks None, then Copy to Clipboard) and use Share > Copy for Checklists in Lido, then touch
