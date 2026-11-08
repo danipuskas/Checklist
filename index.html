@@ -1390,6 +1390,32 @@ label.ib{cursor:pointer}
 .ofp-sum dd{margin:0;font-weight:650;font-variant-numeric:tabular-nums}
 .ofp-sum dd small{color:var(--muted);font-weight:500;font-size:.88em}
 .ofp-pk{margin:11px 0 0;padding-top:9px;border-top:1px solid var(--line-soft);font-size:calc(13.5px*var(--ts));color:var(--muted);line-height:1.35}
+
+/* Bottom bar: Checklist, Timers, Briefing, Airports, More */
+main{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}
+#menuBtn{display:none}
+.tabbar{position:fixed;z-index:48;left:50%;transform:translateX(-50%);bottom:max(10px,calc(env(safe-area-inset-bottom,0px) - 10px));width:min(480px,calc(100% - 28px));height:64px;display:flex;padding:0 6px;border-radius:32px;background:color-mix(in srgb,var(--surface2) 93%,transparent);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border:1px solid color-mix(in srgb,var(--line-strong) 70%,transparent);box-shadow:var(--shadow)}
+.tabbar button{flex:1;min-width:0;appearance:none;-webkit-appearance:none;border:0;background:none;color:var(--muted);margin:6px 0;border-radius:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0 2px;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+.tabbar button.on{color:var(--accent);background:var(--accent-weak)}
+.tabbar .ti{position:relative;display:block;height:26px}
+.tabbar svg{width:26px;height:26px;stroke-width:1.8}
+.tabbar .tl{display:block;max-width:100%;font-size:11px;font-weight:650;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabbar .tl.tlv{color:var(--accent);font-weight:750;font-size:11.5px;font-variant-numeric:tabular-nums}
+.tabbar .tl.tlv.tlate{color:var(--warn)}
+.tabbar .dot{position:absolute;top:-1px;right:-5px;width:9px;height:9px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 2px var(--surface2)}
+body.editing .tabbar,html.kb .tabbar{display:none}
+html.more-open .tabbar{z-index:55}
+@media (max-width:340px){.tabbar{width:calc(100% - 16px);padding:0 3px}.tabbar .tl{font-size:10px}}
+/* More opens just above the bar */
+.sheet-wrap.at-bottom{align-items:flex-end;padding-bottom:calc(max(10px,calc(env(safe-area-inset-bottom,0px) - 10px)) + 76px)}
+.sheet-wrap.at-bottom .sheet{transform:translateY(8px)}
+.sheet-wrap.at-bottom.show .sheet{transform:none}
+/* the tools are pages between the top bar and the bottom bar */
+#toolWrap{top:calc(env(safe-area-inset-top,0px) + var(--tbh,64px));background:var(--bg);padding:12px 10px calc(env(safe-area-inset-bottom,0px) + 104px)}
+#toolWrap .tool-panel{max-width:760px;background:none;border:0;border-radius:0;box-shadow:none;padding:4px 6px 0;transform:none}
+.tm-rest{margin-top:28px}
+.toast{bottom:calc(max(10px,calc(env(safe-area-inset-bottom,0px) - 10px)) + 78px)}
+body.editing .toast,html.kb .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 22px)}
 </style>
 <script>/* night themes apply before the first paint, so there's no bright flash */try{var t0=localStorage.getItem('flightChecklist.theme');if(t0&&t0!=='auto')document.documentElement.setAttribute('data-theme',t0);}catch(e){}if(/iPhone/.test(navigator.userAgent)&&!window.NATIVE_APP)document.documentElement.classList.add('iphone');</script>
 </head>
@@ -1411,6 +1437,7 @@ label.ib{cursor:pointer}
   <div class="progress" aria-hidden="true"><div id="barFill"></div></div>
 </header>
 <main id="app"></main>
+<nav class="tabbar" id="tabBar" aria-label="Sections"></nav>
 <div class="sheet-wrap" id="sheetWrap" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="sheet-wrap" id="toolWrap" hidden><div class="sheet tool-panel" id="toolPanel" role="dialog" aria-modal="true"></div></div>
@@ -1740,7 +1767,7 @@ var LW=320; // logical drawing width; drawings scale with the window
 var $=function(s){return document.querySelector(s);};
 var app=$('#app'),editBtn=$('#editBtn'),undoBtn=$('#undoBtn'),menuBtn=$('#menuBtn'),barFill=$('#barFill'),clockBtn=$('#clockBtn'),utcEl=$('#utc'),locEl=$('#loc');
 var sheetWrap=$('#sheetWrap'),sheetEl=$('#sheet'),toastEl=$('#toast');
-var toolWrap=$('#toolWrap'),toolPanel=$('#toolPanel'),alertBar=$('#alertBar'),toolOpen=false,toolHideT=0;
+var toolWrap=$('#toolWrap'),toolPanel=$('#toolPanel'),alertBar=$('#alertBar'),toolOpen=false,toolHideT=0,tabBar=$('#tabBar');
 
 function sv(p){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>';}
 var I={
@@ -1805,6 +1832,9 @@ var I={
   back:sv('<path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/>')
 };
 menuBtn.innerHTML=I.more;
+tabBar.innerHTML=[['list','Checklist',I.list],['tm','Timers',I.timer],['wx','Briefing',I.brief],['apn','Airports',I.pin],['more','More',I.more]].map(function(t){
+  return '<button type="button" data-tab="'+t[0]+'" aria-label="'+t[1]+'"><span class="ti">'+t[2]+'</span><span class="tl">'+t[1]+'</span></button>';
+}).join('');
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
 function str(v,d){return typeof v==='string'?v:(d||'');}
@@ -1969,7 +1999,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='66';
+var APP_VERSION='67';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2050,7 +2080,7 @@ function save(){
   clearTimeout(saveT);
   var js0=editMode&&!undoBusy?undoNote():null;
   if(!storageOK) return;
-  try{var js=js0||JSON.stringify(state);localStorage.setItem(KEY,js);storCheck(js.length);}catch(e){toast('Could not save: storage is full. See Menu → Settings → Storage.',5000);}
+  try{var js=js0||JSON.stringify(state);localStorage.setItem(KEY,js);storCheck(js.length);}catch(e){toast('Could not save: storage is full. See More → Settings → Storage.',5000);}
   synNudge();
 }
 function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,350);}
@@ -2979,7 +3009,7 @@ function refreshFlogBlocks(){app.querySelectorAll('.module.flb,.module.apst').fo
 function openFlogBlockEditor(id,isNew){
   var f=find(id);if(!f) return;
   var m=f.node,part=m.part,idx=f.arr.indexOf(m);
-  openSheet('<h3>Flight log block</h3><p class="hint">Logs the current flight. The same entry is in Menu → Flight log.</p>'+
+  openSheet('<h3>Flight log block</h3><p class="hint">Logs the current flight. The same entry is in More → Flight log.</p>'+
     '<div class="fld"><span class="fl">Show</span><div class="seg big" id="fPart" style="display:grid;grid-template-columns:1fr 1fr 1fr">'+
     [['dep','Departure'],['arr','Arrival'],['both','Both']].map(function(x){return '<button type="button" data-sact="part" data-v="'+x[0]+'" class="'+(part===x[0]?'on':'')+'">'+x[1]+'</button>';}).join('')+'</div></div>'+
     (isNew?'':'<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
@@ -3099,7 +3129,7 @@ function barsHTML(list,max){
 }
 function apStatsHTML(ic){
   var S=apStats(ic);
-  if(!S.arr&&!S.dep) return '<p class="st-empty">No flights logged for '+esc(ic)+' yet. They come from your flight log: the Flight log blocks in your checklists, or Menu → Flight log.</p>';
+  if(!S.arr&&!S.dep) return '<p class="st-empty">No flights logged for '+esc(ic)+' yet. They come from your flight log: the Flight log blocks in your checklists, or More → Flight log.</p>';
   var h='<div class="tiles"><div class="tile"><b>'+S.arr+'</b><span>arrival'+(S.arr===1?'':'s')+'</span></div><div class="tile"><b>'+S.dep+'</b><span>departure'+(S.dep===1?'':'s')+'</span></div><div class="tile"><b>'+esc(fmtDay(S.last))+'</b><span>last visit</span></div></div>';
   if(S.arrRwy.length) h+='<div class="st-h">Arrival runway</div>'+barsHTML(S.arrRwy);
   if(S.star.length) h+='<div class="st-h">Arrival route</div>'+barsHTML(S.star);
@@ -3416,7 +3446,7 @@ function wxCardHTML(a,removable,bare){
   var h=bare?'<div class="wxc bare">':'<div class="wxc"><div class="wxh"><b>'+esc(a.ic)+'</b><span class="wxn">'+esc(nm)+'</span>'+
     (d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?'<span class="wxcat '+d.m.cat+'">'+d.m.cat+'</span>':'')+(a.role?'<span class="wxrole">'+a.role+'</span>':'')+
     (removable?'<button type="button" class="wxx" data-act="wxUnwatch" data-v="'+a.ic+'" aria-label="Stop watching '+a.ic+'">'+I.x+'</button>':'')+'</div>';
-  if(!d) return h+'<div class="wxnone"'+(bare?'':' style="margin-top:6px"')+'>'+(state.settings.wxUrl?'No weather yet. It loads when you’re online.':brief?'No weather for it in the package.':'Load the LIDO package or set up the weather relay in Menu → Briefing.')+'</div></div>';
+  if(!d) return h+'<div class="wxnone"'+(bare?'':' style="margin-top:6px"')+'>'+(state.settings.wxUrl?'No weather yet. It loads when you’re online.':brief?'No weather for it in the package.':'Load the LIDO package or set up the weather relay in Briefing.')+'</div></div>';
   var w=wxWin(a),tf=d.t?wxTafHTML(d.t,w):null;
   if(w) h+=wxStripHTML(w,tf&&tf.outside);
   if(d.m){
@@ -3438,7 +3468,7 @@ function renderWx(m){
     '<span class="mod-title">Weather</span><span class="chev">'+I.chev+'</span></button>'+
     (state.settings.wxUrl?'<button type="button" class="ib" data-act="wxRefresh" aria-label="Update weather">'+I.reset+'</button>':'')+
     (editMode?'<button type="button" class="ib" data-act="editMod" data-id="'+m.id+'" aria-label="Edit weather block">'+I.edit+'</button><span class="grip" data-drag="item" data-id="'+m.id+'" aria-hidden="true">'+I.grip+'</span>':'')+'</div><div class="mod-body">';
-  if(!state.settings.wxUrl&&!brHasWx()) return h+'<div class="apn-empty" style="padding:6px 2px 4px">Load the LIDO package or set up the weather relay. <button type="button" class="lnkbtn" data-act="wxOpen">Menu → Briefing</button></div></div></div>';
+  if(!state.settings.wxUrl&&!brHasWx()) return h+'<div class="apn-empty" style="padding:6px 2px 4px">Load the LIDO package or set up the weather relay. <button type="button" class="lnkbtn" data-act="wxOpen">Open Briefing</button></div></div></div>';
   var aps=wxBlockAirports(m);
   if(!aps.length) return h+'<div class="apn-empty" style="padding:6px 2px 4px">Set the flight to see its weather. <button type="button" class="lnkbtn" data-act="openFlight">Set flight</button></div></div></div>';
   return h+(state.settings.wxUrl?wxStatusHTML():'')+aps.map(function(a){return wxCardHTML(a,false);}).join('')+'</div></div>';
@@ -3981,7 +4011,7 @@ function renderNtBlock(m){
   var h='<div class="module ntb'+(m.collapsed?' collapsed':'')+'" data-mod="'+m.id+'"><div class="mod-head"><button type="button" class="mod-toggle" data-act="modToggle" data-id="'+m.id+'">'+I.bm+
     '<span class="mod-title">NOTAMs</span><span class="chev">'+I.chev+'</span></button>'+
     (editMode?'<button type="button" class="ib" data-act="editMod" data-id="'+m.id+'" aria-label="Edit NOTAMs block">'+I.edit+'</button><span class="grip" data-drag="item" data-id="'+m.id+'" aria-hidden="true">'+I.grip+'</span>':'')+'</div><div class="mod-body">';
-  if(!brief) return h+'<div class="apn-empty" style="padding:6px 2px 4px">Load the LIDO package, then keep the NOTAMs that matter. <button type="button" class="lnkbtn" data-act="wxOpen">Menu → Briefing</button></div></div></div>';
+  if(!brief) return h+'<div class="apn-empty" style="padding:6px 2px 4px">Load the LIDO package, then keep the NOTAMs that matter. <button type="button" class="lnkbtn" data-act="wxOpen">Open Briefing</button></div></div></div>';
   var L=ntBlockList(m);
   if(!L.length) return h+'<div class="apn-empty" style="padding:6px 2px 4px">None kept for '+esc(ntShowText(m.show).toLowerCase())+'. <button type="button" class="lnkbtn" data-act="brTabOpen" data-v="'+(m.show.indexOf('dest')>=0?'dest':m.show.indexOf('dep')>=0?'dep':m.show.indexOf('alts')>=0?'altn':'enr')+'">Keep them in the Briefing</button></div></div></div>';
   var last='';
@@ -4185,7 +4215,7 @@ function render(){
     h+='<button type="button" class="nextcl" data-act="nextList" data-id="'+nx.id+'" hidden><span class="nc-t"><small>'+esc(L.title)+' complete</small><b>Next: '+esc(nx.title)+'</b>'+
       (nc?'<i>'+nc+' check'+(nc===1?'':'s')+'</i>':'')+'</span>'+I.arrow+'</button>';
   }
-  h+='<p class="foot">Saved on this device. Back up from the menu.</p>';
+  h+='<p class="foot">Saved on this device. Back up in More → Settings.</p>';
   app.innerHTML=h;
   apnFit(app);
   paintSubs(app);
@@ -4571,6 +4601,8 @@ function padExtend(id){
 var sheetHandler=null,hideT=0;
 function openSheet(html,handler){
   clearTimeout(hideT);
+  sheetWrap.classList.remove('at-bottom');
+  if(document.documentElement.classList.contains('more-open')){document.documentElement.classList.remove('more-open');paintTabs();}
   sheetEl.innerHTML=html;sheetHandler=handler;
   sheetWrap.hidden=false;sheetWrap.scrollTop=0;void sheetWrap.offsetWidth;
   sheetWrap.classList.add('show');document.body.classList.add('noscroll');
@@ -4579,8 +4611,9 @@ function closeSheet(){
   if(document.activeElement&&sheetEl.contains(document.activeElement)) document.activeElement.blur();
   sheetHandler=null;
   sheetWrap.classList.remove('show');if(!toolOpen) document.body.classList.remove('noscroll');
+  if(document.documentElement.classList.contains('more-open')){document.documentElement.classList.remove('more-open');paintTabs();}
   clearTimeout(hideT);
-  hideT=setTimeout(function(){sheetWrap.hidden=true;sheetEl.innerHTML='';},200);
+  hideT=setTimeout(function(){sheetWrap.hidden=true;sheetEl.innerHTML='';sheetWrap.classList.remove('at-bottom');},200);
 }
 sheetWrap.addEventListener('click',function(e){
   if(e.target===sheetWrap){if(sheetHandler) sheetHandler('cancel',null);else closeSheet();return;}
@@ -4666,7 +4699,7 @@ function openItemEditor(id,isNew){
     if(remMode==='cd'){
       return '<div class="rem-body rem-cd"><select id="fRemCd" class="ap-tz">'+[{id:'@etd',title:'ETD'},{id:'@eta',title:'ETA'}].concat(state.tools.cds).map(function(c){return '<option value="'+c.id+'"'+(c.id===remCd?' selected':'')+'>'+esc(c.title)+'</option>';}).join('')+'</select>'+
         '<label class="rem-min"><input id="fRemMin" type="text" inputmode="numeric" maxlength="3" value="'+esc(remMin)+'" placeholder="40"><span>min before</span></label></div>'+
-        '<p class="hint" style="margin:6px 0 0">Goes off that long before the time, e.g. 40 min before ETA or TOD. ETD and ETA are set in the Flight sheet (tap the clock), countdowns in Menu → Countdowns.</p>';
+        '<p class="hint" style="margin:6px 0 0">Goes off that long before the time, e.g. 40 min before ETA or TOD. ETD and ETA are set in the Flight sheet (tap the clock), countdowns in Timers.</p>';
     }
     return '';
   }
@@ -5107,7 +5140,7 @@ function openMoveSheet(id){
 /* ---------- Storage on this iPad ---------- */
 var LS_LIMIT=5*1024*1024,storWarned=false,storP=null,updAvail=false,bootAt=Date.now();
 function storCheck(len){
-  if(!storWarned&&len*2>LS_LIMIT*0.8){storWarned=true;toast('Storage is 80% full. See Menu → Settings → Storage.',5000);}
+  if(!storWarned&&len*2>LS_LIMIT*0.8){storWarned=true;toast('Storage is 80% full. See More → Settings → Storage.',5000);}
 }
 function lsBytes(){var b=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);b+=(k.length+(localStorage.getItem(k)||'').length)*2;}}catch(e){}return b;}
 function fmtMB(b){var m=b/1048576;return m<0.1?'under 0.1 MB':m.toFixed(1)+' MB';}
@@ -5227,7 +5260,8 @@ function menuTilesHTML(now){
     var x=v[k];
     return '<button type="button" data-sact="'+act+'"'+(cls?' class="'+cls+'"':'')+'><span class="mi">'+icon+label+'</span><b data-mv="'+k+'"'+(x[2]===true&&k==='rest'?' class="on"':'')+'>'+(k==='wx'?x[0]:esc(x[0]))+'</b><i data-ms="'+k+'">'+esc(x[1])+'</i></button>';
   }
-  return tile('cd','tcd',I.timer,'Countdowns')+tile('rest','trest',I.moon,'Crew rest')+tile('ap','tapn',I.pin,'Airports')+tile('fl','tflog',I.log,'Flight log')+tile('wx','twx',I.brief,'Briefing','wide');
+  // countdowns, crew rest, airports and the briefing are in the bottom bar
+  return tile('fl','tflog',I.log,'Flight log','wide');
 }
 function paintMenuTiles(now){
   var box=document.getElementById('mTiles');if(!box||!box.offsetParent) return;
@@ -5241,7 +5275,7 @@ function paintMenuTiles(now){
 }
 function openMenu(){
   var now=Date.now(),warn=cloud.on&&!!cloud.err;
-  openSheet('<div class="menu-head"><h3>Menu</h3>'+
+  openSheet('<div class="menu-head"><h3>More</h3>'+
     '<button type="button" class="ib round" data-sact="search" aria-label="Search">'+I.search+'</button>'+
     '<button type="button" class="ib round" data-sact="settings" aria-label="Settings'+(warn?', needs attention':'')+'">'+I.gear+(warn?'<span class="dot"></span>':'')+'</button>'+
     '<button type="button" class="ib round" data-sact="cancel" aria-label="Close menu">'+I.x+'</button></div>'+
@@ -5280,11 +5314,12 @@ function openMenu(){
       default: closeSheet();
     }
   });
+  sheetWrap.classList.add('at-bottom');document.documentElement.classList.add('more-open');paintTabs();
 }
 function openSettings(){
   var fd=state.settings.fingerDraw,snd=state.settings.sound;
   setTimeout(storRefresh,0);
-  openSheet('<div class="menu-head"><button type="button" class="back" data-sact="menu">'+I.left+'Menu</button><h3 style="text-align:center;margin-right:58px">Settings</h3></div><div class="menu">'+
+  openSheet('<div class="menu-head"><button type="button" class="back" data-sact="menu">'+I.left+'More</button><h3 style="text-align:center;margin-right:58px">Settings</h3></div><div class="menu">'+
     '<div class="menu-row">'+I.textsize+'<span class="mt">Text size</span><div class="seg ts" role="radiogroup" aria-label="Text size">'+
       TEXT_SIZES.map(function(t){var on=state.settings.textScale===t[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="ts" data-v="'+t[0]+'" aria-label="'+t[1]+'"><span style="font-size:'+t[2]+'px">A</span></button>';}).join('')+'</div></div>'+
     '<div class="menu-row">'+I.contrast+'<span class="mt">Appearance<small id="fThemeHint">'+esc(themeHint(state.settings.theme))+'</small></span><div class="seg ts thm" role="radiogroup" aria-label="Appearance">'+
@@ -5330,7 +5365,7 @@ function openExport(){
 function showExport(json,nImgs,imgFail){
   var canShare=!!navigator.share,big=json.length>300000,mb=(json.length/1048576).toFixed(1);
   var hint=big?'This backup is '+mb+' MB because it includes '+nImgs+' photo'+(nImgs===1?'':'s')+'. Share it to Files to keep it safe.'
-              :'Keep a copy in Notes or Files. Restore it from the menu on this or another iPad.';
+              :'Keep a copy in Notes or Files. Restore it in More → Settings on this or another iPad.';
   if(imgFail) hint+=' Photos could not be included.';
   openSheet('<h3>Back up</h3><p class="hint">'+hint+'</p>'+
     (big?'':'<textarea id="fExport" class="code" rows="7" readonly>'+esc(json)+'</textarea>')+
@@ -6467,7 +6502,7 @@ function restAutoClear(now,force){
   }
   if(now<m.until||restEditing.has(m.id)) return;
   m.start='';m.end='';m.mine=-1;m.until=0;m.ukey='';save();
-  render();if(toolOpen&&toolKind==='rest') refreshTool();
+  render();if(toolOpen&&toolKind==='tm') refreshTool();
   toast('Crew rest is over, so its times were cleared',4000);
 }
 function restSource(){return restCalc(state.tools.rest).err?null:state.tools.rest;}
@@ -6525,6 +6560,7 @@ function clockTick(){
   // both timers on one line: if your rest's label doesn't fit, use the shorter one
   if(!restChip.hidden&&!etaChip.hidden&&restChip._alt&&Math.abs(restChip.offsetTop-etaChip.offsetTop)>3) $('#rcName').textContent=restChip._alt;
   paintMenuTiles(now);
+  paintTabs(now);
 }
 
 var toolKind=null;
@@ -6532,25 +6568,32 @@ function refreshTool(){
   if(!toolOpen||!toolKind) return;
   var y=toolWrap.scrollTop;openTool(toolKind);toolWrap.scrollTop=y;
 }
+function restPillHTML(T){
+  return !editMode&&(restEditing.has(T.rest.id)||!restCalc(T.rest).err)?'<button type="button" class="pill" data-act="'+(restEditing.has(T.rest.id)?'restDone':'restEdit')+'" data-id="'+T.rest.id+'">'+(restEditing.has(T.rest.id)?'Done':'Edit')+'</button>':'';
+}
 function openTool(kind){
+  // countdowns and crew rest share the Timers page
+  var toRest=kind==='rest';if(kind==='cd'||kind==='rest') kind='tm';
   clearTimeout(toolHideT);if(kind!==toolKind) toolApnOrd=false;toolKind=kind;
-  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+'<h3>'+({cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps'}[kind])+'</h3>'+
-    (kind==='cd'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
+  var tabPage=kind==='tm'||kind==='wx'||kind==='apn';
+  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+'<h3>'+({tm:'Countdowns',cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps'}[kind])+'</h3>'+
+    (kind==='cd'||kind==='tm'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
     (kind==='apn'?(toolApnOrd&&apnCanOrder()?'<button type="button" class="pill" data-act="apnReorder">Done</button>':
       (apnCanOrder()?'<button type="button" class="ib round" data-act="apnReorder" aria-label="Change the order of the notes">'+I.swap+'</button>':'')+
       '<button type="button" class="ib round" data-act="apnAdd" aria-label="Add note">'+I.plus+'</button>'):'')+
     (kind==='flog'?'<button type="button" class="ib round" data-act="flNew" aria-label="Add a flight">'+I.plus+'</button>':'')+
-    (kind==='rest'&&!editMode&&(restEditing.has(T.rest.id)||!restCalc(T.rest).err)?'<button type="button" class="pill" data-act="'+(restEditing.has(T.rest.id)?'restDone':'restEdit')+'" data-id="'+T.rest.id+'">'+(restEditing.has(T.rest.id)?'Done':'Edit')+'</button>':'')+
+    (kind==='rest'?restPillHTML(T):'')+
     (kind==='wx'&&state.settings.wxUrl?'<button type="button" class="ib round" data-act="wxRefresh" aria-label="Update weather">'+I.reset+'</button>':'')+
     (kind==='wx'&&brief?'<button type="button" class="ib round" data-act="brLoad" aria-label="Load or update the LIDO package">'+I.paste+'</button>':'')+
-    '<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button></div>';
-  if(kind==='cd'){
+    (tabPage?'':'<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button>')+'</div>';
+  if(kind==='cd'||kind==='tm'){
     if(!T.cds.length) h+='<p class="hint">No countdowns yet. Tap + to add one.</p>';
     h+=T.cds.map(function(c){
       return '<div class="tcd"><div class="tcd-head"><span class="tcd-title">'+esc(c.title)+'</span>'+
         '<button type="button" class="ib" data-act="toolCdDel" data-id="'+c.id+'" aria-label="Delete '+esc(c.title)+'">'+I.trash+'</button></div>'+renderCd(c)+'</div>';
     }).join('');
     h+='<button type="button" class="btn small ghost tcd-add" data-act="toolCdAdd">'+I.plus+'Add countdown</button>';
+    if(kind==='tm') h+='<div class="tp-head tm-rest" id="tmRest"><h3>Crew rest</h3>'+restPillHTML(T)+'</div>'+renderRest(T.rest);
   }else if(kind==='apn') h+=apnPanelHTML();
   else if(kind==='flog') h+=flogPanelHTML();
   else if(kind==='wx') h+=brPanelHTML();
@@ -6567,7 +6610,8 @@ function openTool(kind){
   toolWrap.hidden=false;toolWrap.scrollTop=0;void toolWrap.offsetWidth;
   apnFit(toolPanel);
   toolWrap.classList.add('show');document.body.classList.add('noscroll');
-  clockTick();
+  if(toRest){var rr=document.getElementById('tmRest');if(rr) toolWrap.scrollTop=Math.max(0,rr.getBoundingClientRect().top-toolWrap.getBoundingClientRect().top-8);}
+  clockTick();paintTabs();
 }
 var toolApnView='notes',toolApnSel=null,toolApnIcao=null,toolApnFold={},apnNamesTried=false,toolApnOrd=false;
 function apnSelFix(){
@@ -6705,7 +6749,7 @@ function apBriefHTML(ic){
   if(st.wxUrl&&navigator.onLine!==false&&!wxSt.busy&&(!wx[ic]||now-wx[ic].f>WX_EVERY)&&(apbTried[ic]||0)<now){apbTried[ic]=now+120000;setTimeout(function(){wxFetch([ic]);},0);}
   var h=briefTimeHTML(ic,tz,rec,w,now);
   h+='<div class="pb-h"><span>Weather</span>'+(st.wxUrl?'<button type="button" class="lnkbtn" data-act="apbWx" data-v="'+ic+'">'+(wxSt.busy?'Updating…':'Update')+'</button>':'')+'</div>';
-  h+=(st.wxUrl||wxData(ic))?wxCardHTML({ic:ic,role:role},false):'<p class="pb-none">Load the LIDO package or set up the weather relay in Menu → Briefing to see METAR and TAF here.</p>';
+  h+=(st.wxUrl||wxData(ic))?wxCardHTML({ic:ic,role:role},false):'<p class="pb-none">Load the LIDO package or set up the weather relay in Briefing to see METAR and TAF here.</p>';
   if(role==='To'&&st.alts.length){
     h+='<div class="pb-card pb-alts">'+st.alts.map(function(a){
       var d=wxData(a),w2=wxWin({ic:a,role:'Alternate'}),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';
@@ -6808,12 +6852,11 @@ function closeTool(){
   refreshShared();
   if(wasDec){decPath=[];render();}
   if(document.activeElement&&toolPanel.contains(document.activeElement)) document.activeElement.blur();
-  toolOpen=false;toolWrap.classList.remove('show');
+  toolOpen=false;toolWrap.classList.remove('show');paintTabs();
   if(sheetWrap.hidden||!sheetWrap.classList.contains('show')) document.body.classList.remove('noscroll');
   clearTimeout(toolHideT);
   toolHideT=setTimeout(function(){toolWrap.hidden=true;toolPanel.innerHTML='';},200);
 }
-toolWrap.addEventListener('click',function(e){if(e.target===toolWrap) closeTool();});
 function tickLoop(){clockTick();clearTimeout(tickT);tickT=setTimeout(tickLoop,1000-(Date.now()%1000)+15);}
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible') tickLoop();});
 
@@ -6873,7 +6916,7 @@ function openCdBlockEditor(id,isNew){
       return '<button type="button" class="cbr rad'+(on?' on':'')+'" data-sact="pick" data-v="'+c.id+'" role="radio" aria-checked="'+on+'"><span class="cbx">'+I.check+'</span><span>'+esc(c.title)+'</span><small>'+esc(cdShort(c,now))+'</small></button>';
     }).join('');
   }
-  openSheet('<h3>Countdown block</h3><p class="hint">Shows one of your countdowns from the menu. Setting it here or in the menu is the same thing.</p>'+
+  openSheet('<h3>Countdown block</h3><p class="hint">Shows one of your countdowns from Timers. Setting it here or in Timers is the same thing.</p>'+
     '<div class="fld"><span class="fl">Countdown</span>'+(T.cds.length?'<div class="cbl" id="fCdPick" role="radiogroup">'+rows()+'</div>':'<p class="hint">You have no countdowns yet.</p>')+
     '<button type="button" class="btn small ghost tcd-add" data-sact="new">'+I.plus+'New countdown</button></div>'+
     (isNew?'':'<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
@@ -6898,7 +6941,7 @@ function openCdBlockEditor(id,isNew){
         if(j<0||j>=f.arr.length) return;
         f.arr.splice(i,1);f.arr.splice(j,0,b);save();closeSheet();render();flash(id);break;
       case 'del':
-        confirmSheet('Delete this countdown block? The countdown stays in the menu.','Delete',function(){removeNode(f);save();render();},function(){openCdBlockEditor(id);});break;
+        confirmSheet('Delete this countdown block? The countdown stays in Timers.','Delete',function(){removeNode(f);save();render();},function(){openCdBlockEditor(id);});break;
       default:
         if(isNew){removeNode(f);save();render();}
         closeSheet();
@@ -6908,7 +6951,7 @@ function openCdBlockEditor(id,isNew){
 function openRestBlockEditor(id){
   var f=find(id);if(!f) return;
   var b=f.node,idx=f.arr.indexOf(b);
-  openSheet('<h3>Crew rest block</h3><p class="hint">Shows the crew rest from the menu, the same plan as under the clock. Change it here or in the menu.</p>'+
+  openSheet('<h3>Crew rest block</h3><p class="hint">Shows the crew rest from Timers, the same plan as under the clock. Change it here or in Timers.</p>'+
     '<div class="tools"><button type="button" class="btn small" data-sact="up"'+(idx===0?' disabled':'')+'>'+I.up+'Up</button>'+
     '<button type="button" class="btn small" data-sact="down"'+(idx===f.arr.length-1?' disabled':'')+'>'+I.down+'Down</button>'+
     '<button type="button" class="btn small danger" data-sact="del">'+I.trash+'Delete</button></div>'+
@@ -6921,7 +6964,7 @@ function openRestBlockEditor(id){
         if(j<0||j>=f.arr.length) return;
         f.arr.splice(i,1);f.arr.splice(j,0,b);save();closeSheet();render();flash(id);break;
       case 'del':
-        confirmSheet('Delete this crew rest block? The crew rest plan stays in the menu.','Delete',function(){removeNode(f);save();render();},function(){openRestBlockEditor(id);});break;
+        confirmSheet('Delete this crew rest block? The crew rest plan stays in Timers.','Delete',function(){removeNode(f);save();render();},function(){openRestBlockEditor(id);});break;
       default: closeSheet();
     }
   });
@@ -6939,7 +6982,7 @@ function cdClear(id){
 function cdAck(id){alerting.delete(id);clockTick();}
 
 /* Crew rest actions */
-function restRerender(id){if(toolOpen&&toolKind==='rest'&&state.tools.rest.id===id) refreshTool();else refreshModule(id);}
+function restRerender(id){if(toolOpen&&toolKind==='tm'&&state.tools.rest.id===id) refreshTool();else refreshModule(id);}
 function restRefresh(m){
   var bad=!!restCalc(m).err;
   document.querySelectorAll('[data-mod="'+m.id+'"],[data-ref="'+m.id+'"]').forEach(function(el){
@@ -8213,7 +8256,7 @@ function restFocus(e){
 }
 app.addEventListener('focusin',restFocus);toolPanel.addEventListener('focusin',restFocus);
 toolPanel.addEventListener('change',onChange);
-editBtn.addEventListener('click',function(){editMode=!editMode;if(editMode) undoBase=undoSnap();render();});
+editBtn.addEventListener('click',function(){if(!editMode&&toolOpen) closeTool();editMode=!editMode;if(editMode) undoBase=undoSnap();render();});
 undoBtn.innerHTML=I.undo;
 undoBtn.addEventListener('click',undoStep);
 document.addEventListener('keydown',function(e){
@@ -8223,6 +8266,68 @@ document.addEventListener('keydown',function(e){
   e.preventDefault();undoStep();
 });
 menuBtn.addEventListener('click',openMenu);
+
+// Bottom bar
+function tabNow(){
+  if(document.documentElement.classList.contains('more-open')) return 'more';
+  if(!toolOpen) return 'list';
+  return {tm:'tm',wx:'wx',apn:'apn',flog:'more'}[toolKind]||'list';
+}
+function paintTabs(now){
+  if(!tabBar||!tabBar.firstChild) return;
+  // a text box that went away without losing focus (re-drawn) doesn't keep the bar hidden
+  if(document.documentElement.classList.contains('kb')&&!kbUp()) document.documentElement.classList.remove('kb');
+  var on=tabNow();
+  tabBar.querySelectorAll('[data-tab]').forEach(function(b){
+    var a=b.getAttribute('data-tab')===on;
+    if(b.classList.contains('on')!==a){b.classList.toggle('on',a);if(a) b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}
+  });
+  // away from Timers, its tab shows the time to the next countdown, or to (or left of) your rest
+  var tl=tabBar.querySelector('[data-tab="tm"] .tl'),txt='Timers',live=false,warn=false;
+  if(on!=='tm'){
+    now=now||Date.now();
+    var up=state.tools.cds.filter(function(c){return c.target!==null&&c.target>now;}).sort(function(a,b){return a.target-b.target;})[0];
+    if(up){txt=tileTime(Math.floor((up.target-now)/60000));live=true;warn=!!up.lead&&up.target-now<=up.lead*60000;}
+    else{var rm=restSource(),t=rm&&restTop(rm,now);if(t){txt=tileTime(t.min);live=true;}}
+  }
+  if(tl.textContent!==txt) tl.textContent=txt;
+  tl.classList.toggle('tlv',live);tl.classList.toggle('tlate',warn);
+  // the online backup needs attention: a dot on More, as on Settings inside it
+  var mi=tabBar.querySelector('[data-tab="more"] .ti'),need=cloud.on&&!!cloud.err,d=mi.querySelector('.dot');
+  if(need&&!d) mi.insertAdjacentHTML('beforeend','<i class="dot"></i>');else if(!need&&d) d.parentNode.removeChild(d);
+}
+tabBar.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('[data-tab]');if(!b) return;
+  var k=b.getAttribute('data-tab'),more=document.documentElement.classList.contains('more-open');
+  if(k==='more'){if(more) closeSheet();else openMenu();return;}
+  if(more) closeSheet();
+  if(k==='list'){if(toolOpen) closeTool();return;}
+  var same=toolOpen&&toolKind===k;
+  if(k==='apn'){
+    // tapping Airports again goes back to its first view
+    if(same||(toolApnSel===null&&toolApnIcao===null)){toolApnSel=null;toolApnIcao=null;toolApnView='brief';toolApnOrd=false;}
+    openTool('apn');return;
+  }
+  if(same){toolWrap.scrollTop=0;return;}
+  openTool(k);
+  if(k==='wx') wxMaybe();
+});
+// typing: the bar steps aside while the on-screen keyboard is up (not for a hardware keyboard, which leaves the screen free)
+function kbField(t){return !!t&&(t.tagName==='TEXTAREA'||t.isContentEditable||(t.tagName==='INPUT'&&!/^(checkbox|radio|button|submit|reset|file|range|color)$/i.test(t.type)));}
+function kbUp(){
+  if(!kbField(document.activeElement)) return false;
+  var vv=window.visualViewport;
+  return !vv||document.documentElement.clientHeight-vv.height*(vv.scale||1)>150;
+}
+function kbSync(){document.documentElement.classList.toggle('kb',kbUp());}
+document.addEventListener('focusin',function(){kbSync();setTimeout(kbSync,450);});
+document.addEventListener('focusout',function(){setTimeout(kbSync,60);});
+if(window.visualViewport) window.visualViewport.addEventListener('resize',kbSync);
+// pages start just below the top bar, whatever its height
+function tbSync(){var tb=document.querySelector('.topbar');if(tb) document.documentElement.style.setProperty('--tbh',tb.offsetHeight+'px');}
+tbSync();window.addEventListener('resize',tbSync);
+if(window.ResizeObserver) new ResizeObserver(tbSync).observe(document.querySelector('.topbar'));
+paintTabs();
 document.addEventListener('keydown',function(e){if((e.metaKey||e.ctrlKey)&&(e.key==='f'||e.key==='F')){e.preventDefault();openSearch();}});
 document.addEventListener('keydown',function(e){
   if(!lb.hidden){
@@ -8266,7 +8371,7 @@ setTimeout(function(){
   // changes made last time but not yet backed up can go straight away
   if(!cloud.on||!cloudWasOn) return;
   var p=cloudPending();cloudTickHash=p.h;cloudChangedAt=Date.now()-CLOUD_QUIET;cloudMaybe();
-  if(cloud.kind==='auth'||cloud.kind==='access') toast('Online backup needs attention. Open Menu → Settings → Online backup.',4500);
+  if(cloud.kind==='auth'||cloud.kind==='access') toast('Online backup needs attention. Open More → Settings → Online backup.',4500);
 },5000);
 window.addEventListener('online',function(){cloudRetryAt=0;cloudMaybe();});
 document.addEventListener('visibilitychange',function(){
