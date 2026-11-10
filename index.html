@@ -1003,6 +1003,9 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .rrow.mine{box-shadow:inset 4px 0 0 var(--accent)}
 .rrow.mine:not(.now){background:var(--accent-weak)}
 .rest-hint{color:var(--accent);font-weight:600}
+.rpick{appearance:none;border:0;background:none;color:inherit;font:inherit;padding:4px 2px 4px 10px;margin:-4px 0;border-radius:8px;cursor:pointer;text-align:right;-webkit-tap-highlight-color:transparent}
+.rpick:active{background:var(--press)}
+.rpick .you{margin-bottom:3px}
 /* Straight on to the next checklist */
 .nextcl{appearance:none;border:0;width:100%;display:flex;align-items:center;gap:12px;margin:2px 0 calc(14px*var(--sp));padding:14px 14px 14px 16px;border-radius:16px;background:var(--accent);color:var(--on-accent);text-align:left;font:inherit}
 .nextcl[hidden]{display:none}
@@ -2127,7 +2130,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='76';
+var APP_VERSION='77';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -6482,11 +6485,14 @@ function restCalc(m){
 function restOutHTML(m){
   var r=restCalc(m);
   if(r.err) return '<div class="rest-msg">'+esc(r.err)+'</div>';
-  var h=r.rows.map(function(x,i){
-    return '<div class="rrow" data-ri="'+i+'"><input type="text" data-rlabel="'+i+'" data-id="'+m.id+'" value="'+esc(m.labels[i]||'')+'" placeholder="Break '+(i+1)+'" aria-label="Name for break '+(i+1)+'" autocomplete="off">'+
-      '<span class="rright"><span class="rtime">'+hmZ(x.s).slice(0,4)+'–'+hmZ(x.e)+'</span><span class="rdur">'+durHM(x.e-x.s)+'</span></span></div>';
+  // while setting up: names can be typed, and tapping a break's times marks it as yours
+  var me=restMineIdx(m,r),h=r.rows.map(function(x,i){
+    var my=i===me;
+    return '<div class="rrow'+(my?' mine':'')+'" data-ri="'+i+'"><input type="text" data-rlabel="'+i+'" data-id="'+m.id+'" value="'+esc(m.labels[i]||'')+'" placeholder="Break '+(i+1)+'" aria-label="Name for break '+(i+1)+'" autocomplete="off">'+
+      '<button type="button" class="rright rpick" data-act="restMine" data-id="'+m.id+'" data-i="'+i+'" aria-pressed="'+my+'" aria-label="'+(my?'Your break. Tap to unmark it':'Mark break '+(i+1)+' as yours')+'">'+(my?'<i class="you">You</i>':'')+
+      '<span class="rtime">'+hmZ(x.s).slice(0,4)+'–'+hmZ(x.e)+'</span><span class="rdur">'+durHM(x.e-x.s)+'</span></button></div>';
   }).join('');
-  return '<div class="rest-now" data-status></div>'+h+'<div class="rest-sum">Total '+durHM(r.total)+(m.buffer?', with '+m.buffer+' min handover':'')+'</div>';
+  return '<div class="rest-now" data-status></div>'+h+'<div class="rest-sum">'+(me<0?'<span class="rest-hint">Tap the times of your break to mark it as yours.</span> ':'')+'Total '+durHM(r.total)+(m.buffer?', with '+m.buffer+' min handover':'')+'</div>';
 }
 function restMineIdx(m,r){return typeof m.mine==='number'&&m.mine>=0&&m.mine<r.rows.length?m.mine:-1;}
 function restInfo(m,now){
@@ -8674,9 +8680,9 @@ function restFocus(e){
   restEditing.add(id);
   if(editMode) return;
   if(md.closest('#toolPanel')){
-    // in the Crew rest panel the Done button sits in the panel's own header
-    var th=toolPanel.querySelector('.tp-head'),cl=th&&th.querySelector('[data-act="toolClose"]');
-    if(cl&&!th.querySelector('[data-act="restDone"],[data-act="restEdit"]')) cl.insertAdjacentHTML('beforebegin','<button type="button" class="pill" data-act="restDone" data-id="'+id+'">Done</button>');
+    // on the Timers page the Done button sits next to the Crew rest heading (the page has no close button to put it by)
+    var th=document.getElementById('tmRest')||toolPanel.querySelector('.tp-head');
+    if(th&&!th.querySelector('[data-act="restDone"],[data-act="restEdit"]')) th.insertAdjacentHTML('beforeend','<button type="button" class="pill" data-act="restDone" data-id="'+id+'">Done</button>');
     return;
   }
   var hd=md.querySelector('.mod-head'),tg=hd&&hd.querySelector('.mod-toggle');
