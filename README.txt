@@ -17,10 +17,15 @@ THE BAR AT THE BOTTOM: Checklist, Timers (countdowns and crew rest on one page),
 next countdown, or to your rest. The bar steps aside while you edit or type.
 
 FLIGHT TOOLS in More: Position (next waypoint, off track, ground speed, ETA and the next FIRs, from the phone's GPS,
-which works in airplane mode on an iPhone, or from the flight plan without a fix), Nearest now (closest airports with
-distance, time, weather and NOTAMs from the package), Event log (one tap stamps the time and position; copy or share it)
-and Handover (filled in for the relief crew; add level, fuel and notes, then send). The route comes from the LIDO
-package: load it in Briefing. Packages loaded before version 78 need loading again for the route.
+which works in airplane mode on an iPhone, or from the flight plan without a fix), Nearest now (the airports in your LIDO
+package, nearest first, with distance, time, weather and NOTAMs) and Event log (one tap stamps the time and position;
+copy or share it). The route comes from the LIDO package: load it in Briefing.
+
+PREPARE in More: your next trips (added by hand, plus the flight that's set), each with tabs for the Place (local time,
+arrival, layover, sunrise and sunset, a forecast for your stay, last time there), your Notes for its airports, the Weather
+(METAR and TAF around your arrival, alternates you add) and the Layover (hotel, pick-up time with a countdown, places you
+saved, a Before you go list). On a wide iPad the trips sit on the left; in Slide Over and on the iPhone, one at a time.
+The forecast comes from Open-Meteo when you're online and stays on the device for the flight.
 
 THE FLIGHT STRIP under the clock appears once Set flight has an ETD and an ETA: a plane at the time now, the time
 flown, the time to go, and your break from Crew rest in purple with a countdown ("rest in 2:40", then "1:10 left").

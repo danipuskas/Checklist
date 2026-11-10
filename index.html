@@ -1514,16 +1514,73 @@ body.editing .toast,html.kb .toast{bottom:calc(env(safe-area-inset-bottom,0px) +
 .ev-k.sh{margin:8px 0 0}
 .lv-acts{display:flex;gap:10px;margin:0 0 12px}.lv-acts .btn{flex:1}
 .lv-more{appearance:none;border:0;background:none;color:var(--accent);font:600 calc(14.5px*var(--ts)) -apple-system,system-ui,sans-serif;padding:6px 2px 12px;cursor:pointer}
-.ho-r{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line-soft);font-size:calc(14.5px*var(--ts))}
-.ho-r:first-child{border-top:0}
-.ho-r span{color:var(--muted);flex:none}
-.ho-r b{text-align:right;font-weight:650;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.ho-r b.raw{font:600 12.5px/1.4 ui-monospace,Menlo,monospace}
-.ho-at{font-size:12px;color:var(--muted);text-align:right;padding-top:6px}
 .ho-in label{display:flex;align-items:center;gap:10px;padding:6px 0}
 .ho-in label span{width:52px;flex:none;color:var(--muted);font-weight:600}
 .ho-in input,.ho-in textarea{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--text);font:max(16px,calc(16px*var(--ts))) -apple-system,system-ui,sans-serif;padding:8px 10px}
 .ho-in .ho-n{align-items:flex-start}.ho-in .ho-n span{padding-top:8px}
+/* Prepare */
+#toolWrap[data-kind="prep"] .tool-panel{max-width:1180px}
+.prep-wide{display:grid;grid-template-columns:310px minmax(0,1fr);gap:18px;align-items:start}
+.prep-side{position:sticky;top:0}
+.prep-list{padding:4px 10px}
+.prep-trip{appearance:none;border:0;border-top:1px solid var(--line-soft);background:none;color:var(--text);font:inherit;width:100%;display:flex;align-items:center;gap:12px;padding:11px 4px;text-align:left;cursor:pointer;border-radius:12px}
+.prep-trip:first-child{border-top:0}
+.prep-trip.on{background:var(--accent-weak)}
+.prep-trip.on + .prep-trip{border-top-color:transparent}
+.pt-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.pt-t i{font-style:normal;font-size:calc(11.5px*var(--ts));font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.pt-t b{font-size:calc(16.5px*var(--ts))}.pt-t span{font-size:calc(13px*var(--ts));color:var(--muted)}
+.prep-ring{position:relative;width:40px;height:40px;flex:none}
+.prep-ring svg{width:40px;height:40px;fill:none;stroke-width:4.5;stroke-linecap:round}
+.prep-ring .rg-bg{stroke:var(--surface2)}.prep-ring .rg-on{stroke:var(--accent)}.prep-ring.all .rg-on{stroke:var(--done)}
+.prep-ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:11.5px;font-weight:800}
+.prep-hd{display:flex;align-items:center;gap:10px;margin:0 0 8px}
+.prep-ti{flex:1;min-width:0}.prep-ti b{display:block;font-size:calc(22px*var(--ts));font-weight:780;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prep-ti b span{font-size:calc(15px*var(--ts));font-weight:600;color:var(--muted)}
+.prep-ti i{font-style:normal;font-size:calc(13px*var(--ts));color:var(--muted)}
+.prep-ready{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.prep-ready span{display:inline-flex;align-items:center;gap:4px;font-size:calc(12.5px*var(--ts));font-weight:650;padding:3px 9px;border-radius:999px;background:var(--surface2);color:var(--muted)}
+.prep-ready span.on{background:var(--done-weak);color:var(--done)}.prep-ready svg{width:13px;height:13px;stroke-width:3}
+.seg.prep-tabs{display:flex;margin:0 0 12px;position:sticky;top:0;z-index:2}
+.seg.prep-tabs button{flex:1}
+.prep-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-radius:18px;padding:16px;margin:0 0 12px;color:#fff;background:linear-gradient(150deg,#1d4f7a,#2f72a0 55%,#c99a66)}
+.prep-hero b{display:block;font-size:calc(24px*var(--ts));font-weight:800}.prep-hero span{font-size:calc(13px*var(--ts));opacity:.92}
+.prep-hero .ph-r{text-align:right;flex:none}.prep-hero .ph-r b{font-variant-numeric:tabular-nums}
+.prep-sun{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:calc(14.5px*var(--ts))}
+.prep-sun b{font-variant-numeric:tabular-nums}
+.prep-sun em{font-style:normal;font-weight:700;font-size:calc(13px*var(--ts));padding:3px 9px;border-radius:999px}
+.prep-sun em.d{background:rgba(211,154,20,.16);color:#a46f00}.prep-sun em.n{background:var(--accent-weak);color:var(--accent)}
+.prep-fch{display:flex;justify-content:space-between}.prep-fch i{font-style:normal;text-transform:none;letter-spacing:0;font-weight:600}
+.pdays{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:6px;margin-top:8px;text-align:center}
+.pdays div{padding:6px 0;border-radius:12px}.pdays div.on{background:var(--accent-weak)}
+.pdays svg{display:block;width:26px;height:26px;margin:3px auto;color:var(--accent)}
+.pdays .sun svg,.pdays .part svg{color:#d39a14}.pdays .snow svg{color:#5b8fd6}
+.pdays b{display:block;font-size:calc(14.5px*var(--ts));font-variant-numeric:tabular-nums}.pdays span{display:block;font-size:12px;color:var(--muted)}
+.prep-facts{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.prep-facts div b{display:block}.prep-facts div span{font-size:calc(13px*var(--ts));color:var(--muted)}
+.lv-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-weight:650;text-decoration:none}
+.lv-link svg{width:17px;height:17px}
+.lvc small{font-size:11px;color:var(--muted);font-weight:600;margin-left:2px}
+.prep-alt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}
+.prep-alt .lvc svg{width:13px;height:13px;color:var(--muted)}
+.prep-alt input,.pi-add input,.ho-in input{min-width:0}
+.prep-alt input,.pi-add input{flex:1;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font:max(16px,calc(16px*var(--ts))) -apple-system,system-ui,sans-serif;padding:7px 10px}
+.prep-sh{margin:6px 4px 6px}
+.prep-items{padding:4px 12px}
+.pi-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line-soft);font-size:calc(15.5px*var(--ts))}
+.pi-row:first-child{border-top:0}.pi-row > span{flex:1;min-width:0}
+.pi-row i{display:block;font-style:normal;font-size:12px;color:var(--accent)}
+.pi-row.done > span{color:var(--muted);text-decoration:line-through}
+.pi-cb{appearance:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--box);background:none;display:grid;place-items:center;padding:0;color:#fff;flex:none;cursor:pointer}
+.pi-row.done .pi-cb{background:var(--done);border-color:var(--done)}.pi-cb svg{width:14px;height:14px;stroke-width:3}
+.pi-add{display:flex;gap:8px;padding:8px 0;border-top:1px solid var(--line-soft)}
+.pi-row:first-child + .pi-add,.prep-items > .pi-add:first-child{border-top:0}
+.pk-i{font-style:normal;font-size:calc(12.5px*var(--ts));color:var(--muted);flex:none;max-width:45%}
+.pa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.pa-grid label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:650;color:var(--muted)}
+.pa-grid input{border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font:max(16px,calc(16px*var(--ts))) -apple-system,system-ui,sans-serif;padding:9px 10px;min-width:0}
+.pa-err{color:var(--danger);font-size:14px;min-height:1em;margin:4px 0}
+
 
 /* Flight strip under the clock: departure to arrival, a plane at the time now, your rest in purple */
 :root{--rest:#7c5cd6}
@@ -2163,7 +2220,7 @@ function normalize(o){
   var secs=normApSecs(o.apSections),tools=normTools(o.tools);
   linkBlocks(lists,tools);
   var fl=normFlights(o.flights),fc=str(o.flightCur);if(!fl.some(function(x){return x.id===fc;})) fc=null;
-  return {v:1,current:current,settings:normSettings(o.settings),tools:tools,flights:fl,flightCur:fc,apSections:secs,apNotes:normApNotes(o.apNotes,secs),lists:lists,events:normEvents(o.events),handover:normHo(o.handover)};
+  return {v:1,current:current,settings:normSettings(o.settings),tools:tools,flights:fl,flightCur:fc,apSections:secs,apNotes:normApNotes(o.apNotes,secs),lists:lists,events:normEvents(o.events),evFrom:typeof o.evFrom==='number'&&isFinite(o.evFrom)?o.evFrom:(o.handover&&+o.handover.from)||0,trips:normTrips(o.trips),prep:normPrep(o.prep),places:normPlaces(o.places),prepTpl:Array.isArray(o.prepTpl)?o.prepTpl.map(function(x){return str(x).slice(0,80);}).filter(Boolean).slice(0,30):null};
 }
 function normEvents(a){
   return Array.isArray(a)?a.filter(function(e){return e&&typeof e.t==='number'&&isFinite(e.t);}).map(function(e){
@@ -2173,7 +2230,26 @@ function normEvents(a){
     return o;
   }).slice(-300):[];
 }
-function normHo(h){h=h&&typeof h==='object'?h:{};return {lvl:str(h.lvl).slice(0,40),fuel:str(h.fuel).slice(0,80),notes:str(h.notes).slice(0,2000),from:typeof h.from==='number'&&isFinite(h.from)?h.from:0};}
+function normTrips(a){
+  return Array.isArray(a)?a.filter(function(t){return t&&typeof t.std==='number'&&typeof t.sta==='number'&&isFinite(t.std)&&isFinite(t.sta)&&/^[A-Z0-9]{4}$/.test(t.dep)&&/^[A-Z0-9]{4}$/.test(t.dest);})
+    .map(function(t){return {id:str(t.id)||uid(),fno:str(t.fno).slice(0,10),dep:t.dep,dest:t.dest,std:t.std,sta:t.sta,src:t.src==='roster'?'roster':'me',alts:normIcaoList(t.alts,4)};}).slice(-200):[];
+}
+function normPrep(o){
+  var out={};if(!o||typeof o!=='object') return out;
+  Object.keys(o).slice(-300).forEach(function(k){var d=o[k];if(!d||typeof d!=='object') return;
+    out[k]={seen:{notes:!!(d.seen&&d.seen.notes),wx:!!(d.seen&&d.seen.wx)},pickup:typeof d.pickup==='number'&&isFinite(d.pickup)?d.pickup:0,
+      before:Array.isArray(d.before)?d.before.filter(function(x){return x&&x.t;}).map(function(x){return {id:str(x.id)||uid(),t:str(x.t).slice(0,80),done:!!x.done,auto:!!x.auto};}).slice(0,40):[]};
+    if(Array.isArray(d.alts)) out[k].alts=normIcaoList(d.alts,4);
+  });
+  return out;
+}
+function normPlaces(o){
+  var out={};if(!o||typeof o!=='object') return out;
+  Object.keys(o).forEach(function(k){var ic=icaoClean(k),d=o[k];if(!/^[A-Z0-9]{4}$/.test(ic)||!d||typeof d!=='object') return;
+    out[ic]={hotel:str(d.hotel).slice(0,2000),items:Array.isArray(d.items)?d.items.filter(function(x){return x&&x.t;}).map(function(x){return {id:str(x.id)||uid(),t:str(x.t).slice(0,200)};}).slice(0,40):[]};
+  });
+  return out;
+}
 var AP_SECS_DEFAULT=['General','Arrival','Departure','On ground','Safety reports','Layover'];
 function normApSecs(a){
   var out=Array.isArray(a)?a.filter(function(x){return x&&typeof x.name==='string';}).map(function(x){return {id:str(x.id)||uid(),name:x.name.slice(0,40)||'Section',lay:layOf(x.lay)};}):[];
@@ -2246,7 +2322,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='78';
+var APP_VERSION='79';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2487,7 +2563,7 @@ function newFlight(){
   var T=state.tools;
   T.cds.forEach(function(c){c.target=null;c.aL=c.aZ=false;alerting.delete(c.id);});
   T.rest.start='';T.rest.end='';T.rest.mine=-1;restEditing.clear();cdOpen.clear();
-  state.flightCur=null;state.handover={lvl:'',fuel:'',notes:'',from:Date.now()};
+  state.flightCur=null;state.evFrom=Date.now();
   state.settings.etdT=0;state.settings.etaT=0;state.settings.csign='';
   state.settings.dep=null;state.settings.dest=null;state.settings.alts=[];locEl.removeAttribute('data-k'); // the route goes too: pick it again from Recent
   Object.keys(state.apNotes).forEach(function(ic){var a=state.apNotes[ic];Object.keys(a).forEach(function(k){untickItems(a[k]);});});
@@ -3673,6 +3749,7 @@ function tafSpans(lines,ref){
 function durM(ms,up){var m=up?Math.ceil(ms/60000):Math.floor(ms/60000);return Math.floor(m/60)+':'+pad2(m%60);}
 function relT(t,now){return t>now?'in '+durM(t-now,true):durM(now-t,false)+' ago';}
 function wxWin(a){
+  if(a.win) return a.win; // Prepare gives its own arrival or departure time
   var st=state.settings,t=0,o={};
   if(a.role==='To'&&st.etaT){t=st.etaT;o={k:'ETA',tz:st.dest&&st.dest.tz};}
   else if(a.role==='From'&&st.etdT){t=st.etdT;o={k:'ETD',tz:st.dep&&st.dep.tz};}
@@ -5556,7 +5633,7 @@ function menuTilesHTML(now){
   // countdowns, crew rest, airports and the briefing are in the bottom bar; the flight tools sit above the flight log
   var nv=newTileVals(now);
   function tx(k,act,icon,label){var x=nv[k];return '<button type="button" data-sact="'+act+'"><span class="mi">'+icon+label+'</span><b data-mv="'+k+'">'+esc(x[0])+'</b><i data-ms="'+k+'">'+esc(x[1])+'</i></button>';}
-  return tx('pos','tpos',IX.gps,'Position')+tx('near','tnear',IX.near,'Nearest now')+tx('evt','tevt',IX.evt,'Event log')+tx('ho','tho',IX.ho,'Handover')+tile('fl','tflog',I.log,'Flight log','wide');
+  return tx('pos','tpos',IX.gps,'Position')+tx('near','tnear',IX.near,'Nearest now')+tx('evt','tevt',IX.evt,'Event log')+tx('prep','tprep',IX.prep,'Prepare')+tile('fl','tflog',I.log,'Flight log','wide');
 }
 function paintMenuTiles(now){
   var box=document.getElementById('mTiles');if(!box||!box.offsetParent) return;
@@ -5590,7 +5667,7 @@ function openMenu(){
       case 'tpos': openTool('pos');closeSheet();break;
       case 'tnear': openTool('near');closeSheet();break;
       case 'tevt': openTool('evt');closeSheet();break;
-      case 'tho': openTool('ho');closeSheet();break;
+      case 'tprep': openTool('prep');closeSheet();break;
       case 'twx': openTool('wx');closeSheet();wxMaybe();break;
       case 'lists': openLists();break;
       case 'untick':
@@ -6896,14 +6973,13 @@ fStrip.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e
 window.addEventListener('resize',function(){fsPlace();});
 /* ---------- More: Position, Nearest now, Event log, Handover ----------
    The phone's GPS (it works in airplane mode on an iPhone) against the route in the LIDO package; without a fix, the flight plan's position for the time now */
-var GPS_KINDS={pos:1,near:1,ho:1},gps={fix:null,err:'',watch:null},liveAt=0,livePend=0,nearAll=false,nearDB=null,evOld=false;
+var GPS_KINDS={pos:1,near:1},gps={fix:null,err:'',watch:null},liveAt=0,livePend=0,evOld=false;
 var EVK={med:'Medical',tech:'Technical',atc:'ATC',wx:'Weather',note:'Note'};
 var IX={
   gps:sv('<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'),
   near:sv('<path d="M12 21s-6.5-5.6-6.5-10.6a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><path d="M12 7.5v5M9.5 10h5"/>'),
   evt:sv('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
-  ho:sv('<path d="M5 4.5h10.5L19 8v11.5H5z"/><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4"/>'),
-  med:sv('<path d="M9.5 4h5v5.5H20v5h-5.5V20h-5v-5.5H4v-5h5.5z"/>'),
+    med:sv('<path d="M9.5 4h5v5.5H20v5h-5.5V20h-5v-5.5H4v-5h5.5z"/>'),
   tech:sv('<path d="M14.5 5.5a4 4 0 0 0-5 5L4 16v4h4l5.5-5.5a4 4 0 0 0 5-5L16 12l-4-4z"/>'),
   atc:sv('<path d="M6 18a8.5 8.5 0 0 1 0-12M18 6a8.5 8.5 0 0 1 0 12M9 15a4.2 4.2 0 0 1 0-6M15 9a4.2 4.2 0 0 1 0 6"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>'),
   wx:sv('<path d="M7 18h10a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 9.5 4.3 4.3 0 0 0 7 18z"/>'),
@@ -7036,23 +7112,12 @@ function posBodyHTML(now){
   }).join('')+'</div></div>';
   return h;
 }
-// Nearest airports to the position now, airline airports first
-function nearList(){
-  if(nearDB) return nearDB;if(!window.AIRPORT_DATA) return null;
-  nearDB=apIndex().lines.map(function(l){var p=l.split('|'),ll=(p[2]||'').split(',');return ll.length===2&&/^[A-Z]{4}$/.test(l.slice(0,4))?{ic:l.slice(0,4),iata:p[1]||'',name:p[0].slice(8),la:+ll[0],lo:+ll[1]}:null;})
-    .filter(function(x){return x&&isFinite(x.la)&&isFinite(x.lo);});
-  return nearDB;
-}
+// Nearest airports to the position now
 function nearFind(P,n){
-  var db=nearList();if(!db||P.la==null) return [];
-  var c=[],cl=Math.max(0.05,Math.cos(rad(P.la)));
-  db.forEach(function(a){
-    if(!nearAll&&!a.iata) return;
-    var dy=a.la-P.la;if(Math.abs(dy)>25) return;
-    var dx=((a.lo-P.lo+540)%360-180)*cl,d2=dx*dx+dy*dy;if(d2<900) c.push({a:a,d2:d2});
-  });
-  c.sort(function(x,y){return x.d2-y.d2;});
-  return c.slice(0,n).map(function(x){return {a:x.a,d:nmBetween(P,x.a),b:brgTo(P,x.a)};}).sort(function(x,y){return x.d-y.d;});
+  // the airports in the company documents: departure, destination, alternates and en-route airports in the LIDO package
+  if(P.la==null) return [];
+  var c=[];Object.keys(brCodes()).forEach(function(ic){var l=apLL(ic);if(l) c.push({a:{ic:ic,name:apName(ic),la:l.la,lo:l.lo},d:nmBetween(P,l),b:brgTo(P,l)});});
+  return c.sort(function(x,y){return x.d-y.d;}).slice(0,n);
 }
 function brCodes(){
   var o={};if(!brief) return o;var f=brief.flight||{};
@@ -7066,22 +7131,23 @@ function notesAt(ic){var a=state.apNotes&&state.apNotes[ic];return a?Object.keys
 function nearBodyHTML(now){
   if(!window.AIRPORT_DATA){loadAirports().then(function(){livePaint(true);},function(){});return '<p class="hint">Loading the airport list…</p>';}
   var P=posNow(now),h=posSrcHTML(P);
+  if(!brief) return h+'<p class="hint">Nearest now uses the airports in your LIDO package: departure, destination, alternates and en-route airports. Load the package in Briefing.</p>';
   if(P.la==null) return h+'<p class="hint">Nearest airports need a position: the GPS, or the flight plan once the package is loaded and you’re on your way.</p>';
   var A=posAlong(P),gs=posGS(P,A);if(gs<80) gs=0;
-  var pk=brCodes(),L=nearFind(P,12);
-  h+='<div class="nr-f"><button type="button" class="lvc'+(nearAll?'':' on')+'" data-act="nearAll" data-v="0">Airline airports</button><button type="button" class="lvc'+(nearAll?' on':'')+'" data-act="nearAll" data-v="1">All airports</button></div>';
-  h+='<div class="lv-card nr-list">'+L.map(function(x){
+  var f=brief.flight||{},role={},L=nearFind(P,20);
+  (f.altns||[]).forEach(function(x){if(x.icao) role[x.icao]='alternate';});if(f.dep) role[f.dep]='departure';if(f.dest) role[f.dest]='destination';
+  h+='<div class="lv-card nr-list">'+(L.length?L.map(function(x){
     var a=x.a,d=wxData(a.ic),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'',nn=ntCountAt(a.ic),no=notesAt(a.ic);
-    return '<button type="button" class="nr" data-act="nearOpen" data-v="'+a.ic+'"><span class="nr-l"><b>'+a.ic+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+(pk[a.ic]?'<span class="nr-pk">package</span>':'')+'</b>'+
+    return '<button type="button" class="nr" data-act="nearOpen" data-v="'+a.ic+'"><span class="nr-l"><b>'+a.ic+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+(role[a.ic]?'<span class="nr-pk">'+role[a.ic]+'</span>':'')+'</b>'+
       '<span>'+esc(a.name.replace(/\s*\([A-Z-]{2}\)$/,''))+(nn?' · '+nn+' NOTAM'+(nn>1?'s':''):'')+(no?' · your notes':'')+'</span></span>'+
       '<span class="nr-r"><b>'+Math.round(x.d)+' nm</b><span>'+(gs?fsDur(x.d/gs*60)+' · ':'')+pad3(x.b)+'°</span></span></button>';
-  }).join('')+'</div><p class="hint">Distances are straight lines from '+(P.gps?'the GPS position':'the flight plan’s position')+'. The airport list has no runway lengths, so check suitability as usual.</p>';
+  }).join(''):'<p class="hint" style="margin:8px 0">No airports with a known position in the package.</p>')+'</div><p class="hint">Only the airports in your LIDO package. Distances are straight lines from '+(P.gps?'the GPS position':'the flight plan’s position')+'.</p>';
   return h;
 }
 // Event log: one tap stamps the time and the position
 function evAll(){if(!Array.isArray(state.events)) state.events=[];return state.events;}
 function evFrom(now){
-  var e=state.settings.etdT,b=e&&e>now-36*3600000&&e<now+24*3600000?e-6*3600000:now-24*3600000,ho=state.handover&&state.handover.from||0;
+  var e=state.settings.etdT,b=e&&e>now-36*3600000&&e<now+24*3600000?e-6*3600000:now-24*3600000,ho=state.evFrom||0;
   return Math.max(b,ho);
 }
 function evCur(now){var s=evFrom(now);return evAll().filter(function(e){return e.t>=s;}).sort(function(a,b){return a.t-b.t;});}
@@ -7140,67 +7206,320 @@ function copyText(txt,host){
   if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){done(true);},fb);else fb();
 }
 function shareText(txt,title){if(navigator.share) navigator.share({title:title,text:txt}).catch(function(){});else copyText(txt);}
-// Handover: what the relief crew needs, filled in from the rest of the app
-function hoRows(now){
-  var st=state.settings,f=brief&&brief.flight||{},T=brief?brTimes():null,P=posNow(now),A=posAlong(P),gs=posGS(P,A),rows=[];
-  var dep=st.dep&&st.dep.icao||f.dep||'',dest=st.dest&&st.dest.icao||f.dest||'';
-  rows.push(['Flight',[st.csign||f.cs||f.fno,dep&&dest?dep+'–'+dest:dep||dest].filter(Boolean).join(' ')||'–']);
-  if(A){var tn=gs>30?A.dNext/gs*60:null;rows.push(['Position',A.prev.n+' – '+A.next.n+(tn!==null?', '+A.next.n+' '+fsHM(now+tn*60000):'')+(P.gps?'':' (plan)')]);}
-  else if(P.la!=null) rows.push(['Position',fmtLL(P.la,P.lo)+(P.gps?'':' (plan)')]);
-  var tq=A&&gs>30?A.dNext/gs*60:null,pe=T?T.eta:st.etaT||null,eta=tq!==null&&pe?pe+(now+tq*60000-A.next.t):null;
-  if(eta||pe) rows.push(['ETA',eta?fsHM(eta)+(P.gps?' by GPS':' by plan')+(pe?', plan '+fsHM(pe):''):fsHM(pe)]);
-  var F=firsAhead(now)[0];if(F) rows.push(['Next FIR',(F.name?brCap(F.name)+' ':'')+F.code+' '+fsHM(F.t)]);
-  if(dest){var d=wxData(dest);rows.push([dest,d&&d.m?d.m.raw.replace(/^(METAR|SPECI)\s+/,'').replace(new RegExp('^'+dest+'\\s+'),''):'No METAR',d&&d.m?'raw':'']);}
-  var K=brKeptList();if(K.length) rows.push(['NOTAMs kept',K.length+': '+K.slice(0,3).map(function(x){return (x.g.code&&x.g.code!=='CO'?x.g.code+' ':'')+ntHead(x.n);}).join('; ')+(K.length>3?'; …':'')]);
-  var m=restSource();
-  if(m){var r=restCalc(m),me=restMineIdx(m,r);rows.push(['Crew rest',r.rows.map(function(x,i){return (m.labels[i]||'Break '+(i+1))+' '+hmZ(x.s).slice(0,4)+'–'+hmZ(x.e);}).join(', ')+(me>=0?' · yours: '+(m.labels[me]||'Break '+(me+1)):'')]);}
-  var E=evCur(now).slice(-3);if(E.length) rows.push(['Events',E.map(function(e){return fsHM(e.t)+' '+EVK[e.k]+(e.x?': '+e.x:'');}).join('; ')]);
-  return rows;
-}
-function hoAutoHTML(now){
-  return hoRows(now).map(function(r){return '<div class="ho-r"><span>'+esc(r[0])+'</span><b'+(r[2]==='raw'?' class="raw"':'')+'>'+esc(r[1])+'</b></div>';}).join('')+'<div class="ho-at">Updated '+fsHM(now)+'</div>';
-}
-function hoState(){var H=state.handover;if(!H||typeof H!=='object') H=state.handover={lvl:'',fuel:'',notes:'',from:0};return H;}
-function hoPanelHTML(now){
-  var H=hoState();
-  return '<p class="hint">Filled in from the GPS, the package, Crew rest and the Event log. Check it, add yours, then send it.</p>'+
-    '<div class="lv-card ho" id="hoAuto">'+hoAutoHTML(now)+'</div>'+
-    '<div class="lv-card ho-in"><label><span>Level</span><input type="text" data-ho="lvl" maxlength="40" autocomplete="off" placeholder="FL350" value="'+esc(H.lvl)+'"></label>'+
-    '<label><span>Fuel</span><input type="text" data-ho="fuel" maxlength="80" autocomplete="off" placeholder="29.1 t, 0.7 above plan" value="'+esc(H.fuel)+'"></label>'+
-    '<label class="ho-n"><span>Notes</span><textarea data-ho="notes" rows="4" maxlength="2000" placeholder="Anything the next crew should know">'+esc(H.notes)+'</textarea></label></div>'+
-    '<div class="lv-acts"><button type="button" class="btn primary" data-act="hoShare">'+I.share+'Send</button><button type="button" class="btn" data-act="hoCopy">'+I.copy+'Copy text</button></div>';
-}
-function hoText(now){
-  var H=hoState(),R=hoRows(now),out=['Handover · '+fsHM(now)],ex=[],at=R.some(function(r){return r[0]==='Position';})?'Position':'Flight';
-  if(H.lvl) ex.push('Level: '+H.lvl);if(H.fuel) ex.push('Fuel: '+H.fuel);
-  R.forEach(function(r){out.push(r[0]+': '+r[1]);if(r[0]===at) out=out.concat(ex);});
-  if(H.notes) out.push('Notes: '+H.notes);
-  return out.join('\n');
-}
-function onHoInput(e){
-  var t=e.target;if(!t.getAttribute||!t.hasAttribute('data-ho')) return;
-  var H=hoState(),k=t.getAttribute('data-ho');H[k]=String(t.value||'').slice(0,k==='notes'?2000:80);saveSoon();
-}
-toolPanel.addEventListener('input',onHoInput);
 // the open page follows the GPS and the clock: Position and Nearest redraw, Handover refreshes what it filled in
 function livePaint(force){
   if(!toolOpen||!GPS_KINDS[toolKind]) return;
   var now=Date.now(),gap=force?1500:5000;
   if(now-liveAt<gap){if(force&&!livePend) livePend=setTimeout(function(){livePend=0;livePaint(true);},gap-(now-liveAt)+30);return;}
   liveAt=now;
-  if(toolKind==='ho'){var a=document.getElementById('hoAuto');if(a) a.innerHTML=hoAutoHTML(now);return;}
   var b=document.getElementById('liveBox');if(b) b.innerHTML=toolKind==='pos'?posBodyHTML(now):nearBodyHTML(now);
 }
 // the tiles in More
 function newTileVals(now){
   var P=posNow(now),A=posAlong(P),gs=posGS(P,A),v={};
   v.pos=A?[A.next.n,(gs>30?'in '+fsDur(A.dNext/gs*60)+' · ':'')+(P.gps?'GPS':'plan')]:P.la!=null?[fmtLL(P.la,P.lo).split(' ')[0],P.gps?'GPS':'plan']:['–','tap to start GPS'];
-  var N=P.la!=null&&window.AIRPORT_DATA?nearFind(P,1)[0]:null;
-  v.near=N?[N.a.ic,Math.round(N.d)+' nm · '+N.a.name.replace(/\s*\([A-Z-]{2}\)$/,'')]:['–','needs a position'];
+  var N=P.la!=null&&window.AIRPORT_DATA&&brief?nearFind(P,1)[0]:null;
+  v.near=N?[N.a.ic,Math.round(N.d)+' nm · '+N.a.name.replace(/\s*\([A-Z-]{2}\)$/,'')]:['–',brief?'needs a position':'load the package'];
   var E=evCur(now);v.evt=[String(E.length),E.length?'last '+fsHM(E[E.length-1].t):'tap to stamp the time'];
-  v.ho=['Send','to the relief crew'];
+  var TL=prepTrips(now),T0=TL[0];
+  if(T0){var rr=prepReady(T0,TL);v.prep=[window.AIRPORT_DATA?ap3(T0.dest):T0.dest,dayLbl(T0.std)+' · '+rr.filter(function(x){return x[1];}).length+' of '+rr.length+' ready'];}
+  else v.prep=['–','add your next trip'];
   return v;
 }
+/* ---------- Prepare: getting ready for the next trips on the ground, with tabs for the place, your notes, the weather and the layover ----------
+   Uses the internet when there is one (forecast from Open-Meteo, live METAR/TAF from your relay) and keeps it all for the flight */
+var prepSel=null,prepTab='place',prepAp=null,PREPKEY='flightChecklist.prep',prepBusy={},prepWide=null;
+var prepCache=(function(){try{var o=JSON.parse(localStorage.getItem(PREPKEY)||'{}');return o&&typeof o==='object'?o:{};}catch(_){return {};}})();
+function prepCacheSave(){try{localStorage.setItem(PREPKEY,JSON.stringify(prepCache));}catch(_){}}
+var PREP_TPL=['Passport and licence','Crew ID card','Uniform and spare shirt','Phone charger and adaptor'];
+var MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],WDS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+IX.prep=sv('<path d="M8 4.5h8M9 3h6v3H9z"/><rect x="5" y="4.5" width="14" height="16.5" rx="2.2"/><path d="M8.5 12l2.2 2.2 4.8-4.8"/>');
+var WXI={
+  sun:sv('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>'),
+  part:sv('<path d="M8 4v1.5M3.5 8.5H5M4.8 4.8l1 1"/><path d="M5.7 11a3.5 3.5 0 0 1 5.6-4"/><path d="M8.5 19h9a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.5 1.5A2.8 2.8 0 0 0 8.5 19z"/>'),
+  cloud:sv('<path d="M7 18h10a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 9.5 4.3 4.3 0 0 0 7 18z"/>'),
+  fog:sv('<path d="M4 9h16M3 13h18M5 17h14"/>'),
+  rain:sv('<path d="M7 14.5h10a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 6 4.3 4.3 0 0 0 7 14.5z"/><path d="M9 17l-1 3M13 17l-1 3M17 17l-1 3"/>'),
+  snow:sv('<path d="M7 14.5h10a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 6 4.3 4.3 0 0 0 7 14.5z"/><path d="M9 18v.1M12 20.5v.1M15 18v.1" stroke-width="2.8" stroke-linecap="round"/>'),
+  storm:sv('<path d="M7 14.5h10a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 6 4.3 4.3 0 0 0 7 14.5z"/><path d="M12.5 15l-2 3.5h3l-2 3.5"/>')
+};
+function wmoIcon(c){return c===0?'sun':c<=2?'part':c===3?'cloud':c===45||c===48?'fog':c>=95?'storm':(c>=71&&c<=77)||c===85||c===86?'snow':'rain';}
+function apRecOf(ic){if(!ic||!window.AIRPORT_DATA) return null;var l=apIndex().map.get(ic);return l?apRec(l):null;}
+function ap3(ic){var r=apRecOf(ic);return r&&r.iata?r.iata:ic;}
+function prepCity(ic){var n=apName(ic).replace(/\s*\([A-Z-]{2}\)$/,''),i=n.lastIndexOf(', ');return i>0?n.slice(i+2):n.replace(/\s+(Intl|International|Airport)\b.*$/,'');}
+function dayLbl(t,off){var d=new Date(t+(off||0)*60000);return WDS[d.getUTCDay()]+' '+d.getUTCDate()+' '+MONS[d.getUTCMonth()];}
+function ymdAt(t,off){return new Date(t+(off||0)*60000).toISOString().slice(0,10);}
+function durH(ms){var h=Math.round(ms/3600000);return h<=72?h+' h':Math.round(h/24*10)/10+' days';}
+function myTZ(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'';}catch(_){return '';}}
+function sunTimes(lat,lon,ymd){
+  // sunrise equation, good to a minute or two; times in UTC ms
+  var day=Date.UTC(+ymd.slice(0,4),+ymd.slice(5,7)-1,+ymd.slice(8,10),12)-lon/15*3600000;
+  var J=day/86400000+2440587.5,n=Math.round(J-2451545.0+0.0008),Js=n-lon/360,M=(357.5291+0.98560028*Js)%360,Mr=rad(M);
+  var C=1.9148*Math.sin(Mr)+0.02*Math.sin(2*Mr)+0.0003*Math.sin(3*Mr),Lr=rad((M+C+180+102.9372)%360);
+  var Jt=2451545.0+Js+0.0053*Math.sin(Mr)-0.0069*Math.sin(2*Lr),d=Math.asin(Math.sin(Lr)*Math.sin(rad(23.44)));
+  var cw=(Math.sin(rad(-0.833))-Math.sin(rad(lat))*Math.sin(d))/(Math.cos(rad(lat))*Math.cos(d));
+  if(cw>1) return {polar:'night'};if(cw<-1) return {polar:'day'};
+  var w=Math.acos(cw)*180/Math.PI;return {rise:(Jt-w/360-2440587.5)*86400000,set:(Jt+w/360-2440587.5)*86400000};
+}
+// the trips: added by hand, from the roster, and the flight that's set
+function prepTrips(now){
+  var L=(state.trips||[]).slice(),st=state.settings;
+  if(st.dep&&st.dest&&st.etdT&&!L.some(function(t){return t.dep===st.dep.icao&&t.dest===st.dest.icao&&Math.abs(t.std-st.etdT)<6*3600000;}))
+    L.push({id:'cur-'+st.dep.icao+'-'+st.dest.icao+'-'+new Date(st.etdT).toISOString().slice(0,10),fno:st.csign||'',dep:st.dep.icao,dest:st.dest.icao,std:st.etdT,sta:st.etaT||st.etdT+8*3600000,src:'flight',alts:(st.alts||[]).slice()});
+  return L.filter(function(t){return t.sta>now-12*3600000;}).sort(function(a,b){return a.std-b.std;});
+}
+function prepNext(t,L){return L.filter(function(x){return x.dep===t.dest&&x.std>t.sta;}).sort(function(a,b){return a.std-b.std;})[0]||null;}
+function prepData(id){
+  var P=state.prep||(state.prep={});
+  return P[id]||(P[id]={seen:{},pickup:0,before:(state.prepTpl||PREP_TPL).map(function(x){return {id:uid(),t:x,done:false};})});
+}
+function prepPlace(ic){var P=state.places||(state.places={});return P[ic]||(P[ic]={hotel:'',items:[]});}
+function prepAlts(t){var d=state.prep&&state.prep[t.id];return d&&d.alts?d.alts:(t.alts||[]);}
+function prepReady(t,L){
+  var d=(state.prep||{})[t.id]||{seen:{},before:[],pickup:0},pl=(state.places||{})[t.dest]||{},nx=prepNext(t,L);
+  // home base needs no layover, nor a quick turnaround; otherwise a hotel, a pick-up time or a saved place counts as planned
+  var home=t.dest===prepHome(),short=home||(nx&&nx.std-t.sta<10*3600000),lay=short||!!(pl.hotel||d.pickup||(pl.items&&pl.items.length));
+  var bl=d.before&&d.before.length?d.before:null;
+  return [['Notes read',!!(d.seen&&d.seen.notes)],['Weather checked',!!(d.seen&&d.seen.wx)],[home?'Home base':short?'No layover':'Layover planned',lay],['Before you go',!!bl&&bl.every(function(x){return x.done;})]];
+}
+// home base: the airport you leave from most often, in your flight log and your trips
+function prepHome(){var c={};state.flights.forEach(function(f){if(f.dep.icao) c[f.dep.icao]=(c[f.dep.icao]||0)+1;});(state.trips||[]).forEach(function(t){c[t.dep]=(c[t.dep]||0)+1;});
+  var st=state.settings;if(st.dep&&st.dep.icao) c[st.dep.icao]=(c[st.dep.icao]||0)+1;
+  return Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0]||'';}
+function prepRing(n,of){
+  var f=of?n/of:0,a=-Math.PI/2+2*Math.PI*f,x=(20+16*Math.cos(a)).toFixed(1),y=(20+16*Math.sin(a)).toFixed(1);
+  var arc=f>=1?'<circle cx="20" cy="20" r="16" class="rg-on"/>':f>0?'<path d="M20 4 A16 16 0 '+(f>.5?1:0)+' 1 '+x+' '+y+'" class="rg-on"/>':'';
+  return '<span class="prep-ring'+(f>=1?' all':'')+'"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" class="rg-bg"/>'+arc+'</svg><b>'+n+'/'+of+'</b></span>';
+}
+function prepPanelHTML(now){
+  var L=prepTrips(now),wide=window.innerWidth>=900;prepWide=wide;
+  if(!window.AIRPORT_DATA) return '<p class="hint">Loading the airport list…</p>';
+  if(prepSel&&!L.some(function(t){return t.id===prepSel;})) prepSel=null;
+  if(wide&&!prepSel&&L.length) prepSel=L[0].id;
+  var tr=prepSel?L.filter(function(t){return t.id===prepSel;})[0]:null;
+  if(tr) setTimeout(function(){prepFetch(tr.dest);},0);
+  if(wide) return '<div class="prep-wide"><div class="prep-side">'+prepListHTML(L,now)+'</div><div class="prep-main">'+(tr?prepTripHTML(tr,L,now,true):'<div class="lv-card"><p class="hint" style="margin:0">Add your next trip to start.</p></div>')+'</div></div>';
+  return tr?prepTripHTML(tr,L,now,false):prepListHTML(L,now);
+}
+function prepListHTML(L,now){
+  var h=L.length?'<div class="lv-card prep-list">'+L.map(function(t){
+    var r=prepReady(t,L),n=r.filter(function(x){return x[1];}).length,nx=prepNext(t,L);
+    var sub=t.src==='flight'?'The flight that’s set':nx?'Layover '+durH(nx.std-t.sta):t.src==='roster'?'From your roster':'';
+    return '<button type="button" class="prep-trip'+(t.id===prepSel?' on':'')+'" data-act="prepOpen" data-id="'+esc(t.id)+'">'+prepRing(n,r.length)+
+      '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+fsHM(t.std)+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></button>';
+  }).join('')+'</div>':'<div class="lv-card"><p class="hint" style="margin:0">No trips yet. Add one, or set your flight: it shows here by itself.</p></div>';
+  return h+'<button type="button" class="btn small ghost tcd-add" data-act="prepAdd">'+I.plus+'Add a trip</button>';
+}
+function prepTripHTML(t,L,now,wide){
+  var r=prepReady(t,L),n=r.filter(function(x){return x[1];}).length,nm=apName(t.dest).replace(/\s*\([A-Z-]{2}\)$/,'');
+  var h='<div class="prep-hd">'+(wide?'':'<button type="button" class="ib round" data-act="prepBack" aria-label="All trips">'+I.left+'</button>')+
+    '<div class="prep-ti"><b>'+esc(t.dest)+(nm?' <span>'+esc(nm)+'</span>':'')+'</b><i>'+esc((t.fno?t.fno+' · ':'')+ap3(t.dep)+' → '+ap3(t.dest)+' · '+dayLbl(t.std))+'</i></div>'+
+    (t.src==='flight'?'':'<button type="button" class="ib round" data-act="prepDel" data-id="'+esc(t.id)+'" aria-label="Remove this trip">'+I.trash+'</button>')+'</div>';
+  h+='<div class="prep-ready">'+r.map(function(x){return '<span class="'+(x[1]?'on':'')+'">'+(x[1]?I.check:'')+esc(x[0])+'</span>';}).join('')+'</div>';
+  h+='<div class="seg prep-tabs">'+[['place','Place'],['notes','Notes'],['wx','Weather'],['lay','Layover']].map(function(x){
+    return '<button type="button" class="'+(prepTab===x[0]?'on':'')+'" data-act="prepTab" data-v="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>';
+  if(prepTab==='notes') h+=prepNotesHTML(t);
+  else if(prepTab==='wx') h+=prepWxHTML(t,now);
+  else if(prepTab==='lay') h+=prepLayHTML(t,L,now);
+  else h+=prepPlaceHTML(t,L,now);
+  return h;
+}
+function prepPlaceHTML(t,L,now){
+  var rec=apRecOf(t.dest),tz=rec&&rec.tz,li=tz&&tzInfo(tz,now),ai=tz&&tzInfo(tz,t.sta),my=-new Date(now).getTimezoneOffset(),nx=prepNext(t,L),h='';
+  var home=myTZ().split('/').pop().replace(/_/g,' '),dh=li?(li.off-my)/60:0;
+  h+='<div class="prep-hero"><div class="ph-l"><b>'+esc(prepCity(t.dest)||t.dest)+'</b><span>'+esc(apName(t.dest).replace(/\s*\([A-Z-]{2}\)$/,'')||t.dest)+(rec&&rec.iata?' · '+rec.iata:'')+'</span></div>'+
+    (li?'<div class="ph-r"><b>'+li.hm+'</b><span>local now · '+(dh===0?'same as '+esc(home||'you'):Math.abs(dh)+' h '+(dh<0?'behind ':'ahead of ')+esc(home||'you'))+'</span></div>':'')+'</div>';
+  h+='<div class="lv-two"><div class="lv-card"><div class="lv-l">Arrive</div><b>'+(ai?ai.wd+' '+ai.hm:fsHM(t.sta))+'</b><span>'+fsHM(t.sta)+(ai?' · local time':'')+'</span></div>'+
+    '<div class="lv-card"><div class="lv-l">'+(nx?'Layover':'Stay')+'</div><b>'+(nx?durH(nx.std-t.sta):'–')+'</b><span>'+(nx?'out '+dayLbl(nx.std)+' '+fsHM(nx.std):'no flight out added')+'</span></div></div>';
+  if(rec&&rec.lat!=null&&ai){
+    var s=sunTimes(rec.lat,rec.lon,ymdAt(t.sta,ai.off)),day=s.rise?t.sta>s.rise&&t.sta<s.set:s.polar==='day';
+    h+='<div class="lv-card prep-sun"><span>'+(s.rise?'Sunrise <b>'+tzInfo(tz,s.rise).hm+'</b> · sunset <b>'+tzInfo(tz,s.set).hm+'</b>':s.polar==='day'?'Sun up all day':'No sunrise that day')+'</span><em class="'+(day?'d':'n')+'">'+(day?'You land in daylight':'You land in the dark')+'</em></div>';
+  }
+  h+=prepFcHTML(t,L,tz);
+  var fl=state.flights.filter(function(f){return f.arr.icao===t.dest||f.dep.icao===t.dest;}),last=fl.reduce(function(m,f){return f.date>m?f.date:m;},'');
+  h+='<div class="lv-card prep-facts">'+(fl.length?'<div><b>Last here '+esc(last.slice(8,10)+' '+MONS[+last.slice(5,7)-1]+' '+last.slice(0,4))+'</b><span>'+fl.length+' flight'+(fl.length>1?'s':'')+' in your log'+prepNn(t.dest)+'</span></div>':
+    '<div><b>First time here</b><span>Nothing in your flight log yet'+prepNn(t.dest)+'</span></div>')+
+    '<a class="lv-link" href="https://en.wikipedia.org/wiki/Special:Search?search='+encodeURIComponent(prepCity(t.dest)||t.dest)+'" target="_blank" rel="noopener">'+IX.globe+'About '+esc(prepCity(t.dest)||t.dest)+'</a></div>';
+  return h;
+}
+IX.globe=sv('<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5z"/>');
+function prepNn(ic){var n=apNoteCount(ic);return n?' · '+n+' note'+(n>1?'s':''):'';}
+function prepFcHTML(t,L,tz){
+  var c=prepCache[t.dest],nx=prepNext(t,L),ai=tz&&tzInfo(tz,t.sta),off=ai?ai.off:0;
+  var d0=ymdAt(t.sta,off),d1=nx?ymdAt(nx.std,off):ymdAt(t.sta+2*86400000,off);
+  var days=c&&c.days?c.days.filter(function(x){return x.d>=d0&&x.d<=d1;}).slice(0,7):[];
+  var h='<div class="lv-card"><div class="lv-l prep-fch">Weather for your stay'+(c&&c.at?'<i>updated '+fsHM(c.at)+'</i>':'')+'</div>';
+  if(days.length) h+='<div class="pdays">'+days.map(function(x,i){
+    var dd=new Date(x.d+'T12:00:00Z');
+    return '<div class="'+(i===0?'on ':'')+wmoIcon(x.c)+'"><span>'+WDS[dd.getUTCDay()]+'</span>'+WXI[wmoIcon(x.c)]+'<b>'+Math.round(x.hi)+'°/'+Math.round(x.lo)+'°</b>'+(x.p!=null&&x.p>=40?'<span>'+x.p+'%</span>':'')+'</div>';
+  }).join('')+'</div>';
+  else h+='<p class="hint" style="margin:6px 0 0">'+(prepBusy[t.dest]?'Getting the forecast…':c&&c.days?'The forecast doesn’t reach your stay yet: it goes 16 days ahead.':navigator.onLine===false?'No internet. The forecast comes when you’re online.':'No forecast yet.')+'</p>';
+  return h+'<button type="button" class="lv-more" data-act="prepFc" data-v="'+t.dest+'">'+(prepBusy[t.dest]?'Updating…':'Update the forecast')+'</button></div>';
+}
+function prepFetch(ic,force){
+  var rec=apRecOf(ic);if(!rec||rec.lat==null||prepBusy[ic]) return;
+  var c=prepCache[ic];if(!force&&c&&c.at&&Date.now()-c.at<3*3600000) return;
+  if(!force&&c&&c.err&&Date.now()-c.err<600000) return;
+  if(navigator.onLine===false) return;
+  prepBusy[ic]=1;
+  var u='https://api.open-meteo.com/v1/forecast?latitude='+rec.lat+'&longitude='+rec.lon+'&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone='+encodeURIComponent(rec.tz||'auto')+'&forecast_days=16';
+  fetch(u,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    var d=j&&j.daily;if(!d||!Array.isArray(d.time)) throw new Error('no forecast');
+    prepCache[ic]={at:Date.now(),days:d.time.map(function(x,i){return {d:x,c:+d.weather_code[i],hi:+d.temperature_2m_max[i],lo:+d.temperature_2m_min[i],p:d.precipitation_probability_max?d.precipitation_probability_max[i]:null};})};
+    prepCacheSave();prepAuto(ic);
+  }).catch(function(){prepCache[ic]=Object.assign({},prepCache[ic]||{},{err:Date.now()});}).then(function(){
+    delete prepBusy[ic];if(toolOpen&&toolKind==='prep') refreshTool();
+  });
+}
+// what the forecast adds to Before you go: a warm jacket below 5°, an umbrella when rain is likely
+function prepAuto(ic){
+  var c=prepCache[ic];if(!c||!c.days) return;
+  var now=Date.now(),L=prepTrips(now),ch=false;
+  L.filter(function(t){return t.dest===ic;}).forEach(function(t){
+    var rec=apRecOf(ic),ai=rec&&rec.tz&&tzInfo(rec.tz,t.sta),off=ai?ai.off:0,nx=prepNext(t,L);
+    var d0=ymdAt(t.sta,off),d1=nx?ymdAt(nx.std,off):ymdAt(t.sta+2*86400000,off),days=c.days.filter(function(x){return x.d>=d0&&x.d<=d1;});
+    if(!days.length) return;
+    var d=prepData(t.id),add=[];
+    if(days.some(function(x){return x.lo<=5;})) add.push('Warm jacket');
+    if(days.some(function(x){return (x.p!=null&&x.p>=60)||wmoIcon(x.c)==='rain'||wmoIcon(x.c)==='storm';})) add.push('Umbrella');
+    add.forEach(function(a){if(!d.before.some(function(x){return x.t.toLowerCase()===a.toLowerCase();})){d.before.push({id:uid(),t:a,done:false,auto:true});ch=true;}});
+  });
+  if(ch) save();
+}
+function prepNotesHTML(t){
+  var aps=[t.dest,t.dep].concat(prepAlts(t)).filter(function(x,i,a){return x&&a.indexOf(x)===i;});
+  if(!prepAp||aps.indexOf(prepAp)<0) prepAp=t.dest;
+  var d=prepData(t.id);if(!d.seen.notes){d.seen.notes=true;saveSoon();}
+  var h='<div class="nr-f">'+aps.map(function(ic){return '<button type="button" class="lvc'+(ic===prepAp?' on':'')+'" data-act="prepAp" data-v="'+ic+'">'+ic+'<small>'+(ic===t.dest?'arrival':ic===t.dep?'departure':'alternate')+'</small></button>';}).join('')+'</div>';
+  var notes=state.apNotes[prepAp]||{},body=state.apSections.map(function(x){
+    var arr=notes[x.id]||[];if(!arr.length) return '';var fo=!!toolApnFold[x.id];
+    return apnHeadHTML(x,arr,fo,'apnPFold','',false)+(fo?'':apnListHTML(x,arr,{note:true,edit:false}));
+  }).join('');
+  h+=body?'<div class="pn">'+body+'</div>':'<div class="lv-card"><p class="hint" style="margin:0">No notes for '+prepAp+' yet.</p></div>';
+  return h+'<button type="button" class="btn small ghost tcd-add" data-act="prepNotesEdit" data-v="'+prepAp+'">'+I.edit+'Add or change notes in Airports</button>';
+}
+function prepWxHTML(t,now){
+  var st=state.settings,alts=prepAlts(t),d=prepData(t.id);
+  var A=[{ic:t.dest,role:'To',win:{k:'ETA',t:t.sta,s:t.sta-3600000,e:t.sta+3600000}}]
+    .concat(alts.map(function(ic){return {ic:ic,role:'Alternate',win:{k:'ETA',approx:true,t:t.sta,s:t.sta-3600000,e:t.sta+7200000}};}))
+    .concat([{ic:t.dep,role:'From',win:{k:'ETD',t:t.std,s:t.std-3600000,e:t.std+3600000}}]);
+  if(!d.seen.wx&&wxData(t.dest)){d.seen.wx=true;saveSoon();}
+  var h=st.wxUrl?'<div class="lv-acts"><button type="button" class="btn" data-act="prepWx">'+I.reset+(wxSt.busy?'Updating…':'Update the weather')+'</button></div>':
+    '<p class="hint">For live weather, set up the weather relay in Briefing. Until then you see what the LIDO package has.</p>';
+  h+=A.map(function(a){return wxCardHTML(a,false);}).join('');
+  h+='<div class="prep-alt">'+alts.map(function(ic){return '<button type="button" class="lvc" data-act="prepAltDel" data-v="'+ic+'">'+ic+' '+I.x+'</button>';}).join('')+
+    '<input type="text" id="prepAltIn" maxlength="4" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="Add an alternate"><button type="button" class="btn small" data-act="prepAltAdd">Add</button></div>';
+  return h;
+}
+function prepLayHTML(t,L,now){
+  var d=prepData(t.id),pl=prepPlace(t.dest),nx=prepNext(t,L),rec=apRecOf(t.dest),tz=rec&&rec.tz;
+  var pk=d.pickup&&tz?tzInfo(tz,d.pickup):null;
+  var h='<div class="lv-card ho-in"><label class="ho-n"><span>Hotel</span><textarea data-pp="hotel" data-v="'+t.dest+'" rows="2" maxlength="2000" placeholder="Name, address, what to remember">'+esc(pl.hotel)+'</textarea></label>'+
+    '<label><span>Pick-up</span><input type="text" inputmode="numeric" data-pk="'+esc(t.id)+'" maxlength="4" placeholder="HHMM local" value="'+(pk?pk.hm.replace(':',''):'')+'"><em class="pk-i">'+(d.pickup?dayLbl(d.pickup,pk?pk.off:0)+' · '+fsHM(d.pickup)+(nx?' · '+fsDur((nx.std-d.pickup)/60000,true)+' before departure':''):nx?'local time, before '+(nx.fno||'your flight out'):'local time')+'</em></label>'+
+    (d.pickup?'<button type="button" class="lv-more" data-act="prepPkCd" data-id="'+esc(t.id)+'">'+IX.evt+'Add a countdown to Timers</button>':'')+'</div>';
+  h+='<div class="lv-l prep-sh">Places you saved in '+esc(prepCity(t.dest)||t.dest)+'</div><div class="lv-card prep-items">'+pl.items.map(function(x){
+    return '<div class="pi-row"><span>'+esc(x.t)+'</span><button type="button" class="ib" data-act="prepPlDel" data-v="'+t.dest+'" data-id="'+x.id+'" aria-label="Remove">'+I.x+'</button></div>';
+  }).join('')+'<div class="pi-add"><input type="text" id="prepPlIn" maxlength="200" placeholder="A restaurant, a run, a shop…"><button type="button" class="btn small" data-act="prepPlAdd" data-v="'+t.dest+'">Add</button></div></div>';
+  h+='<div class="lv-l prep-sh">Before you go</div><div class="lv-card prep-items">'+d.before.map(function(x){
+    return '<div class="pi-row bi'+(x.done?' done':'')+'"><button type="button" class="pi-cb" data-act="prepBi" data-id="'+esc(t.id)+'" data-v="'+x.id+'" aria-pressed="'+x.done+'">'+(x.done?I.check:'')+'</button><span>'+esc(x.t)+(x.auto?'<i>from the forecast</i>':'')+'</span>'+
+      '<button type="button" class="ib" data-act="prepBiDel" data-id="'+esc(t.id)+'" data-v="'+x.id+'" aria-label="Remove">'+I.x+'</button></div>';
+  }).join('')+'<div class="pi-add"><input type="text" id="prepBiIn" maxlength="80" placeholder="Add something to take"><button type="button" class="btn small" data-act="prepBiAdd" data-id="'+esc(t.id)+'">Add</button></div>'+
+    '<button type="button" class="lv-more" data-act="prepTpl" data-id="'+esc(t.id)+'">Use this list for new trips</button></div>';
+  return h;
+}
+function prepTripOf(id){return prepTrips(Date.now()).filter(function(t){return t.id===id;})[0]||null;}
+function prepAct(act,el){
+  var id=el.getAttribute('data-id'),v=el.getAttribute('data-v');
+  switch(act){
+    case 'prepAdd': prepAddSheet();return;
+    case 'prepDel':
+      confirmSheet('Remove this trip from Prepare?','Remove',function(){state.trips=(state.trips||[]).filter(function(t){return t.id!==id;});if(state.prep) delete state.prep[id];prepSel=null;save();refreshTool();});
+      return;
+    case 'prepNotesEdit': openTool('apn');apnOpenAirport(v);return;
+    case 'prepFc': prepFetch(v,true);refreshTool();return;
+    case 'prepWx':
+      var t=prepTripOf(prepSel);if(!t||wxSt.busy) return;
+      var ids=[t.dest,t.dep].concat(prepAlts(t)).filter(function(x,i,a){return x&&a.indexOf(x)===i;});
+      var p=wxFetch(ids);refreshTool();if(p&&p.then) p.then(function(){var d=prepData(t.id);if(wxData(t.dest)){d.seen.wx=true;save();}if(toolOpen&&toolKind==='prep') refreshTool();});
+      return;
+    case 'prepAltAdd': case 'prepAltDel':
+      var tr=prepTripOf(prepSel);if(!tr) return;
+      var d=prepData(tr.id),al=prepAlts(tr).slice();
+      if(act==='prepAltDel') al=al.filter(function(x){return x!==v;});
+      else{var inp=$('#prepAltIn'),ic=apCode(inp&&inp.value);if(!/^[A-Z]{4}$/.test(ic)||!apRecOf(ic)){toast('Type an ICAO or IATA code');return;}if(al.indexOf(ic)<0&&al.length<4) al.push(ic);}
+      d.alts=al;save();refreshTool();return;
+    case 'prepPkCd':
+      var dp=prepData(id),tp=prepTripOf(id);if(!dp.pickup||!tp) return;
+      var c=newCd();c.title='Pick-up '+ap3(tp.dest);c.target=dp.pickup;state.tools.cds.push(c);save();toast('Added to Timers');return;
+    case 'prepPlAdd': var pi=$('#prepPlIn'),pv=String(pi&&pi.value||'').trim();if(!pv) return;prepPlace(v).items.push({id:uid(),t:pv.slice(0,200)});save();refreshTool();return;
+    case 'prepPlDel': var pp=prepPlace(v);pp.items=pp.items.filter(function(x){return x.id!==id;});save();refreshTool();return;
+    case 'prepBi': var db=prepData(id);db.before.forEach(function(x){if(x.id===v) x.done=!x.done;});save();refreshTool();return;
+    case 'prepBiDel': var dd=prepData(id);dd.before=dd.before.filter(function(x){return x.id!==v;});save();refreshTool();return;
+    case 'prepBiAdd': var bi=$('#prepBiIn'),bv=String(bi&&bi.value||'').trim();if(!bv) return;prepData(id).before.push({id:uid(),t:bv.slice(0,80),done:false});save();refreshTool();var b2=$('#prepBiIn');if(b2) b2.focus();return;
+    case 'prepTpl': state.prepTpl=prepData(id).before.filter(function(x){return !x.auto;}).map(function(x){return x.t;});save();toast('New trips start with this list');return;
+  }
+}
+function prepAddSheet(){
+  var d=new Date();
+  openSheet('<h3>Add a trip</h3><div class="pa-grid">'+
+    '<label><span>Flight</span><input id="paF" maxlength="8" autocapitalize="characters" autocorrect="off" autocomplete="off" placeholder="EK201"></label>'+
+    '<label><span>Date (UTC)</span><input id="paD" type="date" value="'+d.toISOString().slice(0,10)+'"></label>'+
+    '<label><span>From</span><input id="paA" maxlength="4" autocapitalize="characters" autocorrect="off" autocomplete="off" placeholder="DXB"></label>'+
+    '<label><span>To</span><input id="paB" maxlength="4" autocapitalize="characters" autocorrect="off" autocomplete="off" placeholder="JFK"></label>'+
+    '<label><span>Departs UTC</span><input id="paT1" inputmode="numeric" maxlength="4" placeholder="HHMM"></label>'+
+    '<label><span>Arrives UTC</span><input id="paT2" inputmode="numeric" maxlength="4" placeholder="HHMM"></label></div><p class="pa-err" id="paErr"></p>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Add</button></div>',
+  function(act){
+    if(act!=='save'){closeSheet();return;}
+    function err(m){$('#paErr').textContent=m;}
+    var dep=apCode($('#paA').value),dest=apCode($('#paB').value),t1=parseHM($('#paT1').value),t2=parseHM($('#paT2').value),ds=$('#paD').value;
+    if(!apRecOf(dep)) return err('“From” isn’t an airport I know. Type its ICAO or IATA code.');
+    if(!apRecOf(dest)) return err('“To” isn’t an airport I know. Type its ICAO or IATA code.');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)) return err('Pick the date.');
+    if(t1===null||t2===null) return err('Type the times as HHMM in UTC.');
+    var base=Date.UTC(+ds.slice(0,4),+ds.slice(5,7)-1,+ds.slice(8,10)),std=base+t1*60000,sta=base+t2*60000;if(sta<=std) sta+=86400000;
+    var t={id:uid(),fno:String($('#paF').value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8),dep:dep,dest:dest,std:std,sta:sta,src:'me',alts:[]};
+    (state.trips||(state.trips=[])).push(t);prepSel=t.id;prepTab='place';save();closeSheet();refreshTool();prepFetch(dest);
+  });
+}
+function prepInput(e){
+  var t=e.target;if(!t.getAttribute) return;
+  if(t.hasAttribute('data-pp')){prepPlace(t.getAttribute('data-v')).hotel=String(t.value||'').slice(0,2000);saveSoon();}
+}
+function prepChange(e){
+  var t=e.target;if(!t.getAttribute||!t.hasAttribute('data-pk')) return;
+  var tr=prepTripOf(t.getAttribute('data-pk'));if(!tr) return;
+  var d=prepData(tr.id),v=parseHM(t.value),rec=apRecOf(tr.dest);
+  if(v===null||!rec||!rec.tz){d.pickup=0;save();refreshTool();return;}
+  // the local time on the day of the flight out (or of arrival): turn it into UTC with the airport's offset that day
+  var nx=prepNext(tr,prepTrips(Date.now())),ref=nx?nx.std:tr.sta,off=tzInfo(rec.tz,ref).off,day=ymdAt(ref,off);
+  var u=Date.UTC(+day.slice(0,4),+day.slice(5,7)-1,+day.slice(8,10))+v*60000-off*60000;
+  if(nx&&u>nx.std) u-=86400000;
+  d.pickup=u;save();refreshTool();
+}
+toolPanel.addEventListener('input',prepInput);toolPanel.addEventListener('change',prepChange);
+toolPanel.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'||!e.target.id) return;
+  var m={prepAltIn:'prepAltAdd',prepPlIn:'prepPlAdd',prepBiIn:'prepBiAdd'}[e.target.id];if(!m) return;
+  e.preventDefault();var b=e.target.parentNode.querySelector('[data-act="'+m+'"]');if(b) b.click();
+});
+window.addEventListener('resize',function(){if(toolOpen&&toolKind==='prep'&&prepWide!==(window.innerWidth>=900)) refreshTool();});
+// Roster in: the native app hands over calendar events; each becomes a trip (the flight number and the two airports read from the event)
+window.checklistsRoster=function(list){
+  if(!Array.isArray(list)) return 0;
+  var out=[];
+  list.forEach(function(ev){
+    var txt=[ev.title,ev.location,ev.notes].join(' ').toUpperCase(),f=/\b([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?(\d{1,4}[A-Z]?)\b/.exec(txt),r=/\b([A-Z]{3,4})\s*(?:-|–|→|>|\/|TO)\s*([A-Z]{3,4})\b/.exec(txt);
+    var s=+ev.start,e=+ev.end;if(!r||!isFinite(s)||!isFinite(e)||e<=s) return;
+    var dep=apCode(r[1]),dest=apCode(r[2]);if(!apRecOf(dep)||!apRecOf(dest)) return;
+    var fno=f?f[1]+f[2]:'';out.push({id:'r-'+fno+'-'+dep+'-'+new Date(s).toISOString().slice(0,13),fno:fno,dep:dep,dest:dest,std:s,sta:e,src:'roster',alts:[]});
+  });
+  if(!out.length) return 0;
+  var lo=Math.min.apply(null,out.map(function(t){return t.std;})),hi=Math.max.apply(null,out.map(function(t){return t.std;}));
+  state.trips=(state.trips||[]).filter(function(t){return t.src!=='roster'||t.std<lo||t.std>hi;}).concat(out);
+  save();if(toolOpen&&toolKind==='prep') refreshTool();
+  return out.length;
+};
 function clockTick(){
   var now=Date.now();
   paintClock(now);
@@ -7241,7 +7560,7 @@ function openTool(kind){
   var toRest=kind==='rest';if(kind==='cd'||kind==='rest') kind='tm';
   clearTimeout(toolHideT);if(kind!==toolKind) toolApnOrd=false;toolKind=kind;
   var tabPage=kind==='tm'||kind==='wx'||kind==='apn';
-  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+'<h3>'+({tm:'Countdowns',cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps',pos:'Position',near:'Nearest now',evt:'Event log',ho:'Handover'}[kind])+'</h3>'+
+  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+'<h3>'+({tm:'Countdowns',cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps',pos:'Position',near:'Nearest now',evt:'Event log',prep:'Prepare'}[kind])+'</h3>'+
     (kind==='cd'||kind==='tm'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
     (kind==='apn'?(toolApnOrd&&apnCanOrder()?'<button type="button" class="pill" data-act="apnReorder">Done</button>':
       (apnCanOrder()?'<button type="button" class="ib round" data-act="apnReorder" aria-label="Change the order of the notes">'+I.swap+'</button>':'')+
@@ -7266,11 +7585,11 @@ function openTool(kind){
   else if(kind==='pos') h+='<div id="liveBox">'+posBodyHTML(Date.now())+'</div>';
   else if(kind==='near') h+='<div id="liveBox">'+nearBodyHTML(Date.now())+'</div>';
   else if(kind==='evt') h+=evPanelHTML(Date.now());
-  else if(kind==='ho') h+=hoPanelHTML(Date.now());
+  else if(kind==='prep') h+=prepPanelHTML(Date.now());
   else h+=renderRest(T.rest);
   toolPanel.innerHTML=h;toolOpen=true;liveAt=Date.now();
   if(GPS_KINDS[kind]) gpsStart();else gpsStop();
-  if((GPS_KINDS[kind]||kind==='evt')&&!window.AIRPORT_DATA) loadAirports().then(function(){if(toolOpen&&GPS_KINDS[toolKind]){liveAt=0;livePaint(true);}},function(){});
+  if((GPS_KINDS[kind]||kind==='evt'||kind==='prep')&&!window.AIRPORT_DATA) loadAirports().then(function(){if(!toolOpen) return;if(GPS_KINDS[toolKind]){liveAt=0;livePaint(true);}else if(toolKind==='prep') refreshTool();},function(){});
   if(kind==='apn') apFindWire();
   fillImages(toolPanel);
   if((kind==='apn'||kind==='wx')&&!window.AIRPORT_DATA&&!apnNamesTried){
@@ -9011,15 +9330,17 @@ function onAct(e){
     case 'apnOpen': toolApnSel=el.getAttribute('data-v');toolApnIcao=null;toolApnOrd=false;openTool('apn');break;
     case 'apnSel': toolApnSel=el.getAttribute('data-v');if(toolApnSel==='all') toolApnIcao=null;toolApnOrd=false;refreshTool();break;
     case 'apnPick': apnOpenAirport(el.getAttribute('data-v'));break;
-    case 'nearAll': nearAll=el.getAttribute('data-v')==='1';liveAt=0;livePaint(true);break;
     case 'nearOpen': var nic=el.getAttribute('data-v');openTool('apn');apnOpenAirport(nic);break;
     case 'evAdd': evAdd(el.getAttribute('data-v'));break;
     case 'evEdit': evEdit(id);break;
     case 'evOld': evOld=!evOld;refreshTool();break;
     case 'evCopy': copyText(evText(evCur(Date.now())));break;
     case 'evShare': shareText(evText(evCur(Date.now())),'Event log');break;
-    case 'hoCopy': copyText(hoText(Date.now()));break;
-    case 'hoShare': shareText(hoText(Date.now()),'Handover');break;
+    case 'prepOpen': prepSel=id;refreshTool();toolWrap.scrollTop=0;break;
+    case 'prepBack': prepSel=null;refreshTool();toolWrap.scrollTop=0;break;
+    case 'prepTab': prepTab=el.getAttribute('data-v');refreshTool();break;
+    case 'prepAp': prepAp=el.getAttribute('data-v');refreshTool();break;
+    default: if(act0.indexOf('prep')===0) prepAct(act0,el);
     case 'apbWx': if(!wxSt.busy) wxFetch([el.getAttribute('data-v')]);refreshTool();break;
     case 'apbFlights': toolFlFilter=el.getAttribute('data-v');openTool('flog');break;
     case 'apnPFold': var ps=el.getAttribute('data-apsec');toolApnFold[ps]=!toolApnFold[ps];refreshTool();break;
@@ -9152,7 +9473,7 @@ menuBtn.addEventListener('click',openMenu);
 function tabNow(){
   if(document.documentElement.classList.contains('more-open')) return 'more';
   if(!toolOpen) return 'list';
-  return {tm:'tm',wx:'wx',apn:'apn',flog:'more',pos:'more',near:'more',evt:'more',ho:'more'}[toolKind]||'list';
+  return {tm:'tm',wx:'wx',apn:'apn',flog:'more',pos:'more',near:'more',evt:'more',prep:'more'}[toolKind]||'list';
 }
 function paintTabs(now){
   if(!tabBar||!tabBar.firstChild) return;
