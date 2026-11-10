@@ -1445,6 +1445,10 @@ body.editing .toast,html.kb .toast{bottom:calc(env(safe-area-inset-bottom,0px) +
 .lp-menu svg{width:19px;height:19px;flex:none}
 .lp-menu .dg{color:var(--danger)}
 .lp-on{background:var(--accent-weak)!important}
+#app{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#app a{-webkit-touch-callout:default}
+#app input,#app textarea,#app select,#app [contenteditable],#app .ie-in,#app .item.ie > .row{-webkit-user-select:text;user-select:text}
+.lp-wrap,.lp-wrap *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 /* ---------- Edit mode: the outline ---------- */
 .sec.ol .sec-toggle{gap:8px;padding-left:10px}
 .sec.ol .sec-toggle .chev{order:-1;width:22px;display:inline-grid;place-items:center;color:var(--muted)}
@@ -2102,7 +2106,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='71';
+var APP_VERSION='72';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -8173,11 +8177,13 @@ var lp=null,lpSwallow=0,lpEl=null;
 function lpTarget(e){
   if(editMode||selMode||drag) return null;
   var t=e.target;if(!t||!t.closest) return null;
-  if(t.closest('a,input,select,textarea,label,.thumb,.kid-toggle,.fx-c,.ans,.ab,.lnk,.grip,.mod-body,.ie-bar')) return null;
+  if(t.closest('a,input,select,textarea,label,.thumb,.kid-toggle,.fx-c,.ans,.ab,.lnk,.grip,.ie-bar')) return null;
   var row=t.closest('.item > .row');
   if(row&&!row.closest('.mod-body')){var it=row.parentNode;return {id:it.getAttribute('data-item'),el:row};}
   var hd=t.closest('.sec-body > .hd');if(hd) return {id:hd.getAttribute('data-mod'),el:hd};
   var mh=t.closest('.sec-body > .module > .mod-head');if(mh) return {id:mh.parentNode.getAttribute('data-mod'),el:mh};
+  var mb=t.closest('.sec-body > .module > .mod-body');
+  if(mb&&!t.closest('button,canvas,[contenteditable],.pkg-drop,.canvas-wrap,.item')) return {id:mb.parentNode.getAttribute('data-mod'),el:mb.parentNode};
   return null;
 }
 function lpCancel(){if(lp){clearTimeout(lp.t);lp=null;}}
@@ -8191,7 +8197,10 @@ window.addEventListener('pointermove',function(e){if(lp&&e.pointerId===lp.pid&&M
 window.addEventListener('pointerup',function(){lpCancel();if(lpSwallow) setTimeout(function(){lpSwallow=0;},400);},true);
 window.addEventListener('pointercancel',function(){lpCancel();},true);
 window.addEventListener('scroll',function(){lpCancel();},true);
-app.addEventListener('contextmenu',function(e){if(!editMode&&e.target.closest&&e.target.closest('.item > .row,.sec-body > .hd,.sec-body > .module > .mod-head')&&!e.target.closest('a')) e.preventDefault();});
+app.addEventListener('contextmenu',function(e){if(!editMode&&e.target.closest&&e.target.closest('.item > .row,.sec-body > .hd,.sec-body > .module')&&!e.target.closest('a,input,textarea,[contenteditable]')) e.preventDefault();});
+// iPhone: a hold also asks to select the word under the finger; no selection while a press is pending or its menu is open
+function lpNoSel(){try{var g=window.getSelection();if(g&&g.rangeCount&&!(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName))) g.removeAllRanges();}catch(_){}}
+document.addEventListener('selectstart',function(e){var t=e.target&&e.target.nodeType===1?e.target:e.target&&e.target.parentNode;if((lp||lpEl||lpSwallow)&&!(t&&t.closest&&t.closest('input,textarea,[contenteditable]'))) e.preventDefault();},true);
 function lpClose(){if(lpEl){lpEl.remove();lpEl=null;}app.querySelectorAll('.lp-on').forEach(function(x){x.classList.remove('lp-on');});}
 function lpMenu(id,anchor,px,py){
   var f=find(id);if(!f) return;
@@ -8214,6 +8223,7 @@ function lpMenu(id,anchor,px,py){
     lpAct(b.getAttribute('data-lp'),id);
   });
   try{if(navigator.vibrate) navigator.vibrate(8);}catch(_){}
+  lpNoSel();setTimeout(lpNoSel,120);setTimeout(lpNoSel,600);
 }
 // Keep the menu inside what can be seen: below the status bar and above the home bar. Next to the item when there is room,
 // otherwise (a tall item) next to the finger; scrolls when even the whole screen is too short.
