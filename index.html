@@ -2102,7 +2102,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='70';
+var APP_VERSION='71';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -8185,7 +8185,7 @@ app.addEventListener('pointerdown',function(e){
   if(e.pointerType==='mouse'&&e.button!==0) return;
   var T=lpTarget(e);if(!T||!T.id) return;
   lpCancel();
-  lp={id:T.id,el:T.el,x:e.clientX,y:e.clientY,pid:e.pointerId,t:setTimeout(function(){var p=lp;lp=null;if(p){lpSwallow=Date.now();lpMenu(p.id,p.el);}},480)};
+  lp={id:T.id,el:T.el,x:e.clientX,y:e.clientY,pid:e.pointerId,t:setTimeout(function(){var p=lp;lp=null;if(p){lpSwallow=Date.now();lpMenu(p.id,p.el,p.x,p.y);}},480)};
 });
 window.addEventListener('pointermove',function(e){if(lp&&e.pointerId===lp.pid&&Math.abs(e.clientX-lp.x)+Math.abs(e.clientY-lp.y)>10) lpCancel();},true);
 window.addEventListener('pointerup',function(){lpCancel();if(lpSwallow) setTimeout(function(){lpSwallow=0;},400);},true);
@@ -8193,7 +8193,7 @@ window.addEventListener('pointercancel',function(){lpCancel();},true);
 window.addEventListener('scroll',function(){lpCancel();},true);
 app.addEventListener('contextmenu',function(e){if(!editMode&&e.target.closest&&e.target.closest('.item > .row,.sec-body > .hd,.sec-body > .module > .mod-head')&&!e.target.closest('a')) e.preventDefault();});
 function lpClose(){if(lpEl){lpEl.remove();lpEl=null;}app.querySelectorAll('.lp-on').forEach(function(x){x.classList.remove('lp-on');});}
-function lpMenu(id,anchor){
+function lpMenu(id,anchor,px,py){
   var f=find(id);if(!f) return;
   lpClose();
   var n=f.node,isItem=n.type==='check',plain=isItem&&plainItem(n),isHead=n.type==='head',rows=[];
@@ -8207,17 +8207,28 @@ function lpMenu(id,anchor){
   lpEl=document.createElement('div');lpEl.className='lp-wrap';
   lpEl.innerHTML='<div class="lp-menu" role="menu">'+rows.join('')+'</div>';
   document.body.appendChild(lpEl);
-  var m=lpEl.firstChild,ar=anchor.getBoundingClientRect(),mh=m.offsetHeight,W=window.innerWidth,H=window.innerHeight;
-  var left=Math.max(10,Math.min(ar.left+16,W-m.offsetWidth-10)),top=ar.bottom+6;
-  if(top+mh>H-12) top=ar.top-mh-6;
-  top=Math.max(12,Math.min(top,H-mh-12));
-  m.style.left=left+'px';m.style.top=top+'px';
+  lpPlace(lpEl.firstChild,anchor.getBoundingClientRect(),px,py);
   lpEl.addEventListener('click',function(e){
     var b=e.target.closest('[data-lp]');
     if(!b){lpClose();return;}
     lpAct(b.getAttribute('data-lp'),id);
   });
   try{if(navigator.vibrate) navigator.vibrate(8);}catch(_){}
+}
+// Keep the menu inside what can be seen: below the status bar and above the home bar. Next to the item when there is room,
+// otherwise (a tall item) next to the finger; scrolls when even the whole screen is too short.
+function lpPlace(m,ar,px,py){
+  var cs=getComputedStyle(document.documentElement),W=window.innerWidth,H=window.innerHeight;
+  var vv=window.visualViewport;if(vv&&vv.height) H=Math.min(H,vv.height);
+  var T=(parseFloat(cs.paddingTop)||0)+8,B=H-(parseFloat(cs.paddingBottom)||0)-8,mw=m.offsetWidth,mh=m.offsetHeight;
+  if(mh>B-T){m.style.maxHeight=(B-T)+'px';m.style.overflowY='auto';mh=B-T;}
+  if(px==null){px=ar.left+ar.width/2;py=ar.top+ar.height/2;}
+  var top,left=ar.left+16;
+  if(ar.bottom+6+mh<=B&&ar.bottom>=T&&ar.bottom-py<160) top=ar.bottom+6;           // under the item, close to the finger
+  else if(ar.top-6-mh>=T&&ar.top<=B&&py-ar.top<160) top=ar.top-6-mh;              // over the item
+  else{left=px-mw/2;top=py+18+mh<=B?py+18:py-18-mh>=T?py-18-mh:py-mh/2;}       // tall item: by the finger
+  m.style.left=Math.max(10,Math.min(left,W-mw-10))+'px';
+  m.style.top=Math.max(T,Math.min(top,B-mh))+'px';
 }
 function lpAct(a,id){
   lpClose();
