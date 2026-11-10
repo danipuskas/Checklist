@@ -1448,6 +1448,23 @@ body.editing .toast,html.kb .toast{bottom:calc(env(safe-area-inset-bottom,0px) +
 .lp-menu svg{width:19px;height:19px;flex:none}
 .lp-menu .dg{color:var(--danger)}
 .lp-on{background:var(--accent-weak)!important}
+/* Flight strip under the clock: departure to arrival, a plane at the time now, your rest in purple */
+:root{--rest:#7c5cd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--rest:#a58cf0}}
+:root[data-theme="dark"]{--rest:#a58cf0}:root[data-theme="night"]{--rest:#6c5fa0}:root[data-theme="red"]{--rest:#a3402f}
+.fstrip{grid-column:1/-1;justify-self:center;width:100%;max-width:560px;position:relative;padding:21px 8px 1px;font-variant-numeric:tabular-nums;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;outline:none}
+.fstrip[hidden]{display:none}
+.fs-bar{position:relative;height:8px;border-radius:4px;background:var(--surface2);box-shadow:inset 0 0 0 1px var(--line-soft)}
+.fs-dn{position:absolute;left:0;top:0;bottom:0;border-radius:4px 0 0 4px;background:var(--accent)}
+.fs-rs{position:absolute;top:-3px;bottom:-3px;border-radius:5px;background:color-mix(in srgb,var(--rest) 30%,transparent);border:1.5px solid var(--rest)}
+.fs-rs.past{opacity:.4}
+.fs-pl{position:absolute;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;pointer-events:none}
+.fs-pl svg{display:block;width:28px;height:28px;transform:rotate(90deg);fill:var(--accent);stroke:var(--bg);stroke-width:1.6;paint-order:stroke}
+.fs-tag{position:absolute;top:2px;left:0;display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:750;line-height:16px;white-space:nowrap}
+.fs-tag svg{width:12px;height:12px;flex:none}
+.fs-fl{color:var(--accent)}.fs-rt{color:var(--rest)}
+.fs-lab{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:12.5px;font-weight:650;color:var(--muted);white-space:nowrap}
+.fs-lab b{color:var(--text);font-weight:750}
 #app{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #app a{-webkit-touch-callout:default}
 #app input,#app textarea,#app select,#app [contenteditable],#app .ie-in,#app .item.ie > .row{-webkit-user-select:text;user-select:text}
@@ -1544,6 +1561,7 @@ html.split.pg-open .split-hint{display:none}
     <button class="ib round" id="editBtn" type="button" aria-label="Edit"></button>
     <button class="ib round" id="menuBtn" type="button" aria-label="Menu"></button>
   </span>
+  <div class="fstrip" id="fStrip" role="button" tabindex="0" hidden></div>
   <div class="progress" aria-hidden="true"><div id="barFill"></div></div>
 </header>
 <main id="app"></main>
@@ -2109,7 +2127,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='74';
+var APP_VERSION='75';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -6695,6 +6713,59 @@ function paintRestChip(now){
   restChip.hidden=false;
 }
 restChip.addEventListener('click',function(){openTool('rest');});
+// Flight strip: ETD to ETA from Set flight, a plane at the time now, your break from Crew rest (or the whole rest if none is yours)
+var fStrip=$('#fStrip');
+function fsCode(a){return a&&a.icao||'';}
+function fsHM(t){var d=new Date(t);return pad2(d.getUTCHours())+':'+pad2(d.getUTCMinutes())+'z';}
+function fsDur(min,down){min=Math.max(0,down?Math.floor(min):Math.ceil(min-1e-9));return Math.floor(min/60)+':'+pad2(min%60);}
+function fsRest(now){
+  // the plan's times repeat daily: take the run under way, otherwise the nearer of the last one and the next
+  var m=restSource();if(!m) return null;
+  var r=restCalc(m);if(r.err) return null;
+  var d=new Date(now),nowMin=d.getUTCHours()*60+d.getUTCMinutes()+d.getUTCSeconds()/60,rel=((nowMin-r.s)%1440+1440)%1440;
+  var st=rel<r.total||1440-rel>rel-r.total?now-rel*60000:now+(1440-rel)*60000;
+  return {rows:r.rows.map(function(x){return {s:st+(x.s-r.s)*60000,e:st+(x.e-r.s)*60000};}),me:restMineIdx(m,r),top:restTop(m,now)};
+}
+function fsPlace(){
+  // tags sit over what they name, kept inside the strip; if the time flown would run into the rest label, the rest label wins
+  if(fStrip.hidden) return;
+  var bar=fStrip.querySelector('.fs-bar');if(!bar) return;
+  var W=bar.offsetWidth,x0=bar.offsetLeft,max=fStrip.clientWidth,tags=fStrip.querySelectorAll('.fs-tag'),box=[];
+  tags.forEach(function(t){t.style.display='';var w=t.offsetWidth,c=x0+W*parseFloat(t.getAttribute('data-c'))/100,l=Math.max(0,Math.min(c-w/2,max-w));t.style.left=l+'px';box.push({t:t,l:l,r:l+w});});
+  var fl=box.filter(function(b){return b.t.classList.contains('fs-fl');})[0],rt=box.filter(function(b){return b.t.classList.contains('fs-rt');})[0];
+  if(fl&&rt&&fl.r+8>rt.l&&fl.l<rt.r+8) fl.t.style.display='none';
+}
+function paintStrip(now){
+  var st=state.settings,a=st.etdT,b=st.etaT,res={on:false,rest:false};
+  if(!(a&&b&&b>a&&b-a<=24*3600000&&now>=a-12*3600000&&now<=b+3*3600000)){if(!fStrip.hidden){fStrip.hidden=true;fStrip._h='';}return res;}
+  res.on=true;
+  var span=b-a,P=function(t){return Math.max(0,Math.min(100,(t-a)/span*100));},p=P(now),R=fsRest(now),blk=null,tag='',past=false;
+  if(R){
+    var x=R.me>=0?R.rows[R.me]:{s:R.rows[0].s,e:R.rows[R.rows.length-1].e};
+    if(x.e>a&&x.s<b){
+      res.rest=true;past=now>=x.e;blk={l:P(x.s),w:Math.max(1.5,P(x.e)-P(x.s))};
+      if(R.me>=0) tag=now<x.s?'rest in '+fsDur((x.s-now)/60000):now<x.e?fsDur((x.e-now)/60000)+' left':'';
+      else{var t=R.top;tag=!t?'':t.mode==='on'?t.name+' · '+fsDur(t.min)+' left':t.mode==='gap'?t.name.replace(/^to /,'')+' in '+fsDur(t.min):'rest in '+fsDur(t.min);}
+    }
+  }
+  var mid=now<a?'departs in '+fsDur((a-now)/60000):now<b?fsDur((b-now)/60000)+' to go':'ETA +'+fsDur((now-b)/60000,true);
+  var flown=now>a&&now<b?fsDur((now-a)/60000,true):'';
+  var h='<div class="fs-bar"><div class="fs-dn" style="width:'+p.toFixed(2)+'%"></div>'+
+    (blk?'<div class="fs-rs'+(past?' past':'')+'" style="left:'+blk.l.toFixed(2)+'%;width:'+blk.w.toFixed(2)+'%"></div>':'')+
+    '<div class="fs-pl" style="left:'+p.toFixed(2)+'%">'+I.plane+'</div></div>'+
+    (flown?'<span class="fs-tag fs-fl" data-c="'+(p/2).toFixed(2)+'">'+flown+'</span>':'')+
+    (blk&&tag?'<span class="fs-tag fs-rt" data-c="'+(blk.l+blk.w/2).toFixed(2)+'">'+I.moon+esc(tag)+'</span>':'')+
+    '<div class="fs-lab"><span><b>'+esc(fsCode(st.dep))+'</b> '+fsHM(a)+'</span><span class="fs-mid">'+mid+'</span><span><b>'+esc(fsCode(st.dest))+'</b> '+fsHM(b)+'</span></div>';
+  if(fStrip._h!==h){
+    var was=fStrip.hidden;fStrip._h=h;fStrip.innerHTML=h;fStrip.hidden=false;fsPlace();
+    fStrip.setAttribute('aria-label',(flown?flown+' flown, ':'')+mid+(tag?', '+tag:'')+'. Tap to change the flight times');
+    if(was) tbSync();
+  }
+  return res;
+}
+fStrip.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.fs-rs,.fs-rt')) openTool('rest');else openFlight();});
+fStrip.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openFlight();}});
+window.addEventListener('resize',function(){fsPlace();});
 function clockTick(){
   var now=Date.now();
   paintClock(now);
@@ -6711,8 +6782,10 @@ function clockTick(){
   document.querySelectorAll('[data-hotlive]').forEach(function(el){var f=find(el.getAttribute('data-hotlive'));if(!f) return;var h=hotLiveHTML(f.node,now);if(el._h!==h){el._h=h;el.innerHTML=h;}});
   restAutoClear(now,false);
   paintAlert();
-  paintRestChip(now);
-  paintEtaChip(now);
+  // the strip carries the ETD/ETA and, when it is on it, the rest: then those chips stay hidden
+  var fs=paintStrip(now);
+  if(fs.rest) restChip.hidden=true;else paintRestChip(now);
+  if(fs.on){if(!etaChip.hidden){etaChip.hidden=true;etaChip.removeAttribute('data-k');etaChip.parentNode.classList.remove('pair');}}else paintEtaChip(now);
   // both timers on one line: if your rest's label doesn't fit, use the shorter one
   if(!restChip.hidden&&!etaChip.hidden&&restChip._alt&&Math.abs(restChip.offsetTop-etaChip.offsetTop)>3) $('#rcName').textContent=restChip._alt;
   paintMenuTiles(now);

@@ -16,6 +16,10 @@ THE BAR AT THE BOTTOM: Checklist, Timers (countdowns and crew rest on one page),
 (flight log, checklists, untick all, new flight, search, settings). Away from Timers, its tab shows the time left to the
 next countdown, or to your rest. The bar steps aside while you edit or type.
 
+THE FLIGHT STRIP under the clock appears once Set flight has an ETD and an ETA: a plane at the time now, the time
+flown, the time to go, and your break from Crew rest in purple with a countdown ("rest in 2:40", then "1:10 left").
+Tap the strip to change the flight times, or the rest label to open Crew rest. It goes 3 hours after the ETA.
+
 Your checklists are stored on the iPad, not on GitHub. The files on GitHub are only the empty app.
 Deleting the Home Screen icon deletes its data, so use More > Settings > Back up now and then.
 
