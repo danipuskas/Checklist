@@ -46,7 +46,7 @@ to move, indent, duplicate, change or delete at once. The round arrow next to Do
 On an iPad in full screen the outline stays on the left and the page opens on the right.
 QUICK CHANGES: without Edit, press and hold an item for Edit, add a note, a link, a sub-item or an item below, duplicate,
 move or delete.
-Write a check and its response with dots between them, like "Parking brake .... SET", and the response lines up on the right.
+Write a check and its response with dots between them, like "Parking brake .... SET", and the response lines up on the right. Three spaces instead of the dots, like "Fuel   12.4 t", put the rest on the right without dots.
 
 BRIEFING: More > New flight > Load the OFP takes the LIDO package. iPadOS doesn't hand a copied PDF to web apps, so
 either make a one-time Shortcut (Shortcuts > + > name it "Copy for Checklists" > details: Show in Share Sheet, receive PDFs >

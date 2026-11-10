@@ -456,6 +456,9 @@ body.selecting [data-act="editMod"],body.selecting [data-act="editSec"]{visibili
 .cr-l{flex:1 1 1.5em;min-width:1.5em;overflow:hidden;overflow:clip;white-space:nowrap;color:var(--box);font-weight:400;letter-spacing:.2em}
 .cr-l::before{content:"................................................................................................................................................................................................................................................................................................"}
 .cr-r{flex:0 1 auto;max-width:60%;font-weight:700;text-align:right;overflow-wrap:anywhere}
+/* Three spaces instead of dots: the text just sits on the right, no dots, same weight */
+.cr.rt .cr-l{color:transparent}.cr.rt .cr-l::before{content:none}
+.cr.rt .cr-r{font-weight:inherit}
 .drag-hidden{display:none!important}
 .drag-ph{margin:6px 10px;border:2px dashed var(--accent);border-radius:12px;background:var(--accent-weak)}
 .kids > .drag-ph{margin-left:44px}
@@ -2106,7 +2109,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='72';
+var APP_VERSION='73';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2516,12 +2519,16 @@ function rfIsTitle(t){t=String(t||'').trim();return t.length<=48&&!/[.:;,]$/.tes
 function smLinks(it,ls){return ls==='button'&&it.links.length?' '+it.links.map(function(l){return linkHTML(l).replace('class="lnk"','class="lnk sm"');}).join(' '):'';}
 // "Parking brake .... SET": two or more dots, or …, between a check and its response
 var CR_RE=/^(.*?\S)\s*(?:\.{2,}|\u2026+)\s*(\S.*)$/;
+// "Fuel   12.4 t": three or more spaces put the rest on the right, without dots. On an iPhone two quick spaces become ". ", so a full stop and two spaces count too
+var RT_RE=/^(.*?\S)[ \u00a0\t]{3,}(\S.*)$/,RT_IOS=/^(.*?[^\s.])\.[ \u00a0\t]{2}(\S.*)$/;
+function crSplit(t){t=String(t||'');var m=CR_RE.exec(t);if(m) return {c:m[1],r:m[2],rt:false};t=t.trim();m=RT_RE.exec(t)||RT_IOS.exec(t);return m?{c:m[1],r:m[2],rt:true}:null;}
+function crWrap(c,r,rt){return '<span class="cr'+(rt?' rt':'')+'"><span class="cr-c">'+c+'</span><span class="cr-l" aria-hidden="true"></span><span class="cr-r">'+r+'</span></span>';}
 function rfLabel(it){
-  var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',m=CR_RE.exec(String(it.text||'')),lab;
+  var ls=it.links.length&&(it.ls==='tag'||it.ls==='icon')?it.ls:'button',m=crSplit(it.text),lab;
   if(m){
-    var c=refTags(esc(m[1])),r=refTags(esc(m[2]));
+    var c=refTags(esc(m.c)),r=refTags(esc(m.r));
     if(ls==='tag'){var used={};c=tagOnly(c,it.links,used);r=tagLinks(r,it.links,it.note,used);}
-    lab='<span class="cr"><span class="cr-c">'+c+'</span><span class="cr-l" aria-hidden="true"></span><span class="cr-r">'+r+'</span></span>';
+    lab=crWrap(c,r,m.rt);
   }else{
     lab=refTags(esc(it.text));
     if(ls==='tag') lab=tagLinks(lab,it.links,it.note);
@@ -2739,8 +2746,8 @@ function ckLiHTML(k){
 }
 // the item's text; "Parking brake .... SET" lines the response up on the right
 function ckLabel(it,ph){
-  var m=CR_RE.exec(String(it.text||'')),lab;
-  if(m) lab='<span class="cr"><span class="cr-c">'+refTags(esc(m[1]))+'</span><span class="cr-l" aria-hidden="true"></span><span class="cr-r">'+refTags(esc(m[2]))+'</span></span>';
+  var m=crSplit(it.text),lab;
+  if(m) lab=crWrap(refTags(esc(m.c)),refTags(esc(m.r)),m.rt);
   else lab=refTags(esc(String(it.text||'').trim()));
   return lab||(ph||!it.note?'<span class="ph">Untitled item</span>':'');
 }
@@ -4803,7 +4810,7 @@ function openItemEditor(id,isNew,backTo){
     sheetEl.querySelectorAll('#fLay button').forEach(function(b){var on=b.getAttribute('data-v')===v;b.classList.toggle('on',on);b.setAttribute('aria-checked',String(on));});
   }
   var answers=(it.dq||[{id:uid(),label:'YES',tone:'y',items:[]},{id:uid(),label:'NO',tone:'n',items:[]}]).map(function(x){return {id:x.id,label:x.label,tone:x.tone,items:x.items};});
-  var TYPE_HINT={check:'Tap the item in the checklist to tick it. Dots between a check and its response, like “Parking brake .... SET”, line the response up on the right.',info:'Info items have no tick and aren’t counted in the progress.',
+  var TYPE_HINT={check:'Tap the item in the checklist to tick it. Dots between a check and its response, like “Parking brake .... SET”, line the response up on the right. Three spaces put the rest on the right without dots.',info:'Info items have no tick and aren’t counted in the progress.',
     fld:'A box to fill in for this flight. The answer stays until New flight, or until you choose Untick and clear answers.',
     dec:'Shows answer buttons. The steps for each answer are added in Edit mode: tap an answer under the question.',end:'Closes the procedure, e.g. Continue operation or Return to stand.'};
   function ansRowsHTML(){
