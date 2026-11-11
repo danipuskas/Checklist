@@ -1581,6 +1581,11 @@ body.editing .toast,html.kb .toast{bottom:calc(env(safe-area-inset-bottom,0px) +
 .pa-grid input{border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font:max(16px,calc(16px*var(--ts))) -apple-system,system-ui,sans-serif;padding:9px 10px;min-width:0}
 .pa-err{color:var(--danger);font-size:14px;min-height:1em;margin:4px 0}
 .prep-addrow{display:flex;gap:8px}.prep-addrow .btn{flex:1}
+.prep-lh{display:flex;justify-content:space-between;align-items:center;margin:0 4px 4px}.prep-lh .lv-more{padding:4px 2px}
+.prep-list.ed .prep-trip{cursor:default}
+.pt-rm{appearance:none;border:0;background:none;padding:6px;margin:-6px 0 -6px -4px;cursor:pointer;flex:none}
+.pt-rm i{display:block;width:24px;height:24px;border-radius:50%;background:var(--danger);position:relative}
+.pt-rm i::after{content:"";position:absolute;left:6px;right:6px;top:11px;height:2.5px;border-radius:2px;background:#fff}
 
 
 /* Flight strip under the clock: departure to arrival, a plane at the time now, your rest in purple */
@@ -2221,7 +2226,7 @@ function normalize(o){
   var secs=normApSecs(o.apSections),tools=normTools(o.tools);
   linkBlocks(lists,tools);
   var fl=normFlights(o.flights),fc=str(o.flightCur);if(!fl.some(function(x){return x.id===fc;})) fc=null;
-  return {v:1,current:current,settings:normSettings(o.settings),tools:tools,flights:fl,flightCur:fc,apSections:secs,apNotes:normApNotes(o.apNotes,secs),lists:lists,events:normEvents(o.events),evFrom:typeof o.evFrom==='number'&&isFinite(o.evFrom)?o.evFrom:(o.handover&&+o.handover.from)||0,trips:normTrips(o.trips),prep:normPrep(o.prep),places:normPlaces(o.places),prepTpl:Array.isArray(o.prepTpl)?o.prepTpl.map(function(x){return str(x).slice(0,80);}).filter(Boolean).slice(0,30):null};
+  return {v:1,current:current,settings:normSettings(o.settings),tools:tools,flights:fl,flightCur:fc,apSections:secs,apNotes:normApNotes(o.apNotes,secs),lists:lists,events:normEvents(o.events),evFrom:typeof o.evFrom==='number'&&isFinite(o.evFrom)?o.evFrom:(o.handover&&+o.handover.from)||0,trips:normTrips(o.trips),prep:normPrep(o.prep),places:normPlaces(o.places),prepHidden:Array.isArray(o.prepHidden)?o.prepHidden.map(str).filter(Boolean).slice(-300):[],prepTpl:Array.isArray(o.prepTpl)?o.prepTpl.map(function(x){return str(x).slice(0,80);}).filter(Boolean).slice(0,30):null};
 }
 function normEvents(a){
   return Array.isArray(a)?a.filter(function(e){return e&&typeof e.t==='number'&&isFinite(e.t);}).map(function(e){
@@ -2323,7 +2328,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='80';
+var APP_VERSION='81';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -7229,7 +7234,7 @@ function newTileVals(now){
 }
 /* ---------- Prepare: getting ready for the next trips on the ground, with tabs for the place, your notes, the weather and the layover ----------
    Uses the internet when there is one (forecast from Open-Meteo, live METAR/TAF from your relay) and keeps it all for the flight */
-var prepSel=null,prepTab='place',prepAp=null,PREPKEY='flightChecklist.prep',prepBusy={},prepWide=null;
+var prepSel=null,prepEdit=false,prepTab='place',prepAp=null,PREPKEY='flightChecklist.prep',prepBusy={},prepWide=null;
 var prepCache=(function(){try{var o=JSON.parse(localStorage.getItem(PREPKEY)||'{}');return o&&typeof o==='object'?o:{};}catch(_){return {};}})();
 function prepCacheSave(){try{localStorage.setItem(PREPKEY,JSON.stringify(prepCache));}catch(_){}}
 var PREP_TPL=['Passport and licence','Crew ID card','Uniform and spare shirt','Phone charger and adaptor'];
@@ -7267,7 +7272,8 @@ function prepTrips(now){
   var L=(state.trips||[]).slice(),st=state.settings;
   if(st.dep&&st.dest&&st.etdT&&!L.some(function(t){return t.dep===st.dep.icao&&t.dest===st.dest.icao&&Math.abs(t.std-st.etdT)<6*3600000;}))
     L.push({id:'cur-'+st.dep.icao+'-'+st.dest.icao+'-'+new Date(st.etdT).toISOString().slice(0,10),fno:st.csign||'',dep:st.dep.icao,dest:st.dest.icao,std:st.etdT,sta:st.etaT||st.etdT+8*3600000,src:'flight',alts:(st.alts||[]).slice()});
-  return L.filter(function(t){return t.sta>now-12*3600000;}).sort(function(a,b){return a.std-b.std;});
+  var hid=state.prepHidden||[];
+  return L.filter(function(t){return t.sta>now-12*3600000&&hid.indexOf(t.id)<0;}).sort(function(a,b){return a.std-b.std;});
 }
 function prepNext(t,L){return L.filter(function(x){return x.dep===t.dest&&x.std>t.sta;}).sort(function(a,b){return a.std-b.std;})[0]||null;}
 function prepData(id){
@@ -7303,19 +7309,24 @@ function prepPanelHTML(now){
   return tr?prepTripHTML(tr,L,now,false):prepListHTML(L,now);
 }
 function prepListHTML(L,now){
-  var h=L.length?'<div class="lv-card prep-list">'+L.map(function(t){
+  var home=prepHome(),ed=prepEdit&&L.length;
+  var h=L.length?'<div class="prep-lh"><span class="lv-l">Your trips</span><button type="button" class="lv-more" data-act="prepEditL">'+(ed?'Done':'Edit')+'</button></div>':'';
+  h+=L.length?'<div class="lv-card prep-list'+(ed?' ed':'')+'">'+L.map(function(t){
     var r=prepReady(t,L),n=r.filter(function(x){return x[1];}).length,nx=prepNext(t,L);
-    var sub=t.src==='flight'?'The flight that’s set':nx?'Layover '+durH(nx.std-t.sta):t.src==='roster'?'From your roster':'';
+    var sub=t.src==='flight'?'The flight that’s set':t.dest===home?'Back home':nx?'Layover '+durH(nx.std-t.sta):t.src==='roster'?'From your roster':'';
+    if(ed) return '<div class="prep-trip"><button type="button" class="pt-rm" data-act="prepRm" data-id="'+esc(t.id)+'" aria-label="Remove '+esc(t.fno||'this flight')+'"><i></i></button>'+
+      '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+(t.rep?'report '+fsHM(t.rep):fsHM(t.std))+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></div>';
     return '<button type="button" class="prep-trip'+(t.id===prepSel?' on':'')+'" data-act="prepOpen" data-id="'+esc(t.id)+'">'+prepRing(n,r.length)+
       '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+(t.rep?'report '+fsHM(t.rep):fsHM(t.std))+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></button>';
   }).join('')+'</div>':'<div class="lv-card"><p class="hint" style="margin:0">No trips yet. Add one, or set your flight: it shows here by itself.</p></div>';
+  if(ed) return h+'<p class="hint">Removing a duty from the roster keeps it away when you paste the roster again.</p>';
   return h+'<div class="prep-addrow"><button type="button" class="btn small ghost tcd-add" data-act="prepAdd">'+I.plus+'Add a trip</button><button type="button" class="btn small ghost tcd-add" data-act="prepPaste">'+I.copy+'Paste roster</button></div>';
 }
 function prepTripHTML(t,L,now,wide){
   var r=prepReady(t,L),n=r.filter(function(x){return x[1];}).length,nm=apName(t.dest).replace(/\s*\([A-Z-]{2}\)$/,'');
   var h='<div class="prep-hd">'+(wide?'':'<button type="button" class="ib round" data-act="prepBack" aria-label="All trips">'+I.left+'</button>')+
     '<div class="prep-ti"><b>'+esc(t.dest)+(nm?' <span>'+esc(nm)+'</span>':'')+'</b><i>'+esc((t.fno?t.fno+' · ':'')+ap3(t.dep)+' → '+ap3(t.dest)+' · '+dayLbl(t.std)+(t.rep?' · report '+fsHM(t.rep):' · off '+fsHM(t.std)))+'</i></div>'+
-    (t.src==='flight'?'':'<button type="button" class="ib round" data-act="prepDel" data-id="'+esc(t.id)+'" aria-label="Remove this trip">'+I.trash+'</button>')+'</div>';
+    '<button type="button" class="ib round" data-act="prepRm" data-id="'+esc(t.id)+'" aria-label="Remove this trip">'+I.trash+'</button></div>';
   h+='<div class="prep-ready">'+r.map(function(x){return '<span class="'+(x[1]?'on':'')+'">'+(x[1]?I.check:'')+esc(x[0])+'</span>';}).join('')+'</div>';
   h+='<div class="seg prep-tabs">'+[['place','Place'],['notes','Notes'],['wx','Weather'],['lay','Layover']].map(function(x){
     return '<button type="button" class="'+(prepTab===x[0]?'on':'')+'" data-act="prepTab" data-v="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>';
@@ -7331,7 +7342,8 @@ function prepPlaceHTML(t,L,now){
   h+='<div class="prep-hero"><div class="ph-l"><b>'+esc(prepCity(t.dest)||t.dest)+'</b><span>'+esc(apName(t.dest).replace(/\s*\([A-Z-]{2}\)$/,'')||t.dest)+(rec&&rec.iata?' · '+rec.iata:'')+'</span></div>'+
     (li?'<div class="ph-r"><b>'+li.hm+'</b><span>local now · '+(dh===0?'same as '+esc(home||'you'):Math.abs(dh)+' h '+(dh<0?'behind ':'ahead of ')+esc(home||'you'))+'</span></div>':'')+'</div>';
   h+='<div class="lv-two"><div class="lv-card"><div class="lv-l">Arrive</div><b>'+(ai?ai.wd+' '+ai.hm:fsHM(t.sta))+'</b><span>'+fsHM(t.sta)+(ai?' · local time':'')+'</span></div>'+
-    '<div class="lv-card"><div class="lv-l">'+(nx?'Layover':'Stay')+'</div><b>'+(nx?durH(nx.std-t.sta):'–')+'</b><span>'+(nx?'out '+dayLbl(nx.std)+' '+fsHM(nx.std):'no flight out added')+'</span></div></div>';
+    (t.dest===prepHome()?'<div class="lv-card"><div class="lv-l">Back home</div><b>'+(nx?durH(nx.std-t.sta):'–')+'</b><span>'+(nx?'until '+(nx.fno||'the next duty')+' '+dayLbl(nx.std):'no next duty added')+'</span></div></div>':
+    '<div class="lv-card"><div class="lv-l">'+(nx?'Layover':'Stay')+'</div><b>'+(nx?durH(nx.std-t.sta):'–')+'</b><span>'+(nx?'out '+dayLbl(nx.std)+' '+fsHM(nx.std):'no flight out added')+'</span></div></div>');
   if(rec&&rec.lat!=null&&ai){
     var s=sunTimes(rec.lat,rec.lon,ymdAt(t.sta,ai.off)),day=s.rise?t.sta>s.rise&&t.sta<s.set:s.polar==='day';
     h+='<div class="lv-card prep-sun"><span>'+(s.rise?'Sunrise <b>'+tzInfo(tz,s.rise).hm+'</b> · sunset <b>'+tzInfo(tz,s.set).hm+'</b>':s.polar==='day'?'Sun up all day':'No sunrise that day')+'</span><em class="'+(day?'d':'n')+'">'+(day?'You land in daylight':'You land in the dark')+'</em></div>';
@@ -7428,15 +7440,40 @@ function prepLayHTML(t,L,now){
     '<button type="button" class="lv-more" data-act="prepTpl" data-id="'+esc(t.id)+'">Use this list for new trips</button></div>';
   return h;
 }
+
+// a duty: from leaving home base to getting back, the flights that join up within 10 days
+function prepDuty(t,L){
+  var home=prepHome(),A=L.slice().sort(function(a,b){return a.std-b.std;}),i=A.indexOf(t),a=i,b=i,G=10*86400000;
+  if(i<0) return [t];
+  while(a>0&&A[a].dep!==home&&A[a-1].dest===A[a].dep&&A[a].std-A[a-1].sta<G) a--;
+  while(b<A.length-1&&A[b].dest!==home&&A[b+1].dep===A[b].dest&&A[b+1].std-A[b].sta<G) b++;
+  return A.slice(a,b+1);
+}
+function prepRemove(id){
+  var L=prepTrips(Date.now()),t=L.filter(function(x){return x.id===id;})[0];if(!t) return;
+  var D=prepDuty(t,L),nm=t.fno||(ap3(t.dep)+'–'+ap3(t.dest));
+  function go(list){
+    var before=JSON.stringify(state),ids=list.map(function(x){return x.id;}),H=state.prepHidden||(state.prepHidden=[]);
+    state.trips=(state.trips||[]).filter(function(x){return ids.indexOf(x.id)<0;});
+    list.forEach(function(x){if(x.src!=='me'&&H.indexOf(x.id)<0) H.push(x.id);if(state.prep) delete state.prep[x.id];});
+    if(H.length>300) H.splice(0,H.length-300);
+    if(ids.indexOf(prepSel)>=0) prepSel=null;
+    if(!prepTrips(Date.now()).length) prepEdit=false;
+    save();refreshTool();offerUndo(before,list.length>1?'Duty removed':nm+' removed');
+  }
+  if(D.length<2){go([t]);return;}
+  openSheet('<h3>Remove '+esc(nm)+'?</h3><p class="hint">It’s part of a duty: '+esc(D.map(function(x){return x.fno||(ap3(x.dep)+'–'+ap3(x.dest));}).join(', '))+'.</p>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="one">Only '+esc(nm)+'</button><button type="button" class="btn danger" data-sact="all">The whole duty</button></div>',
+  function(act){closeSheet();if(act==='one') go([t]);else if(act==='all') go(D);});
+}
 function prepTripOf(id){return prepTrips(Date.now()).filter(function(t){return t.id===id;})[0]||null;}
 function prepAct(act,el){
   var id=el.getAttribute('data-id'),v=el.getAttribute('data-v');
   switch(act){
     case 'prepAdd': prepAddSheet();return;
     case 'prepPaste': rosterPaste();return;
-    case 'prepDel':
-      confirmSheet('Remove this trip from Prepare?','Remove',function(){state.trips=(state.trips||[]).filter(function(t){return t.id!==id;});if(state.prep) delete state.prep[id];prepSel=null;save();refreshTool();});
-      return;
+    case 'prepRm': prepRemove(id);return;
+    case 'prepEditL': prepEdit=!prepEdit;refreshTool();return;
     case 'prepNotesEdit': openTool('apn');apnOpenAirport(v);return;
     case 'prepFc': prepFetch(v,true);refreshTool();return;
     case 'prepWx':
@@ -7495,6 +7532,7 @@ function rosterImport(list){
     // a trip you added by hand stays as it is; the roster only fills in the rest
     if(mine.some(function(x){return x.dep===t.dep&&x.dest===t.dest&&Math.abs(x.std-t.std)<3*3600000;})) return;
     var id='r-'+t.fno+'-'+t.dep+'-'+new Date(t.std).toISOString().slice(0,13),o=old[id];
+    if((state.prepHidden||[]).indexOf(id)>=0) return; // you removed it
     keep.push({id:id,fno:t.fno,dep:t.dep,dest:t.dest,std:t.std,sta:t.sta,rep:t.rep||(o&&o.rep)||0,src:'roster',alts:o?o.alts:[]});n++;
   });
   state.trips=keep;save();return n;
