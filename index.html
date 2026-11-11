@@ -1580,6 +1580,7 @@ body.editing .toast,html.kb .toast{bottom:calc(env(safe-area-inset-bottom,0px) +
 .pa-grid label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:650;color:var(--muted)}
 .pa-grid input{border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font:max(16px,calc(16px*var(--ts))) -apple-system,system-ui,sans-serif;padding:9px 10px;min-width:0}
 .pa-err{color:var(--danger);font-size:14px;min-height:1em;margin:4px 0}
+.prep-addrow{display:flex;gap:8px}.prep-addrow .btn{flex:1}
 
 
 /* Flight strip under the clock: departure to arrival, a plane at the time now, your rest in purple */
@@ -2232,7 +2233,7 @@ function normEvents(a){
 }
 function normTrips(a){
   return Array.isArray(a)?a.filter(function(t){return t&&typeof t.std==='number'&&typeof t.sta==='number'&&isFinite(t.std)&&isFinite(t.sta)&&/^[A-Z0-9]{4}$/.test(t.dep)&&/^[A-Z0-9]{4}$/.test(t.dest);})
-    .map(function(t){return {id:str(t.id)||uid(),fno:str(t.fno).slice(0,10),dep:t.dep,dest:t.dest,std:t.std,sta:t.sta,src:t.src==='roster'?'roster':'me',alts:normIcaoList(t.alts,4)};}).slice(-200):[];
+    .map(function(t){return {id:str(t.id)||uid(),fno:str(t.fno).slice(0,10),dep:t.dep,dest:t.dest,std:t.std,sta:t.sta,rep:typeof t.rep==='number'&&isFinite(t.rep)?t.rep:0,src:t.src==='roster'?'roster':'me',alts:normIcaoList(t.alts,4)};}).slice(-200):[];
 }
 function normPrep(o){
   var out={};if(!o||typeof o!=='object') return out;
@@ -2322,7 +2323,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='79';
+var APP_VERSION='80';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -7306,14 +7307,14 @@ function prepListHTML(L,now){
     var r=prepReady(t,L),n=r.filter(function(x){return x[1];}).length,nx=prepNext(t,L);
     var sub=t.src==='flight'?'The flight that’s set':nx?'Layover '+durH(nx.std-t.sta):t.src==='roster'?'From your roster':'';
     return '<button type="button" class="prep-trip'+(t.id===prepSel?' on':'')+'" data-act="prepOpen" data-id="'+esc(t.id)+'">'+prepRing(n,r.length)+
-      '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+fsHM(t.std)+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></button>';
+      '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+(t.rep?'report '+fsHM(t.rep):fsHM(t.std))+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></button>';
   }).join('')+'</div>':'<div class="lv-card"><p class="hint" style="margin:0">No trips yet. Add one, or set your flight: it shows here by itself.</p></div>';
-  return h+'<button type="button" class="btn small ghost tcd-add" data-act="prepAdd">'+I.plus+'Add a trip</button>';
+  return h+'<div class="prep-addrow"><button type="button" class="btn small ghost tcd-add" data-act="prepAdd">'+I.plus+'Add a trip</button><button type="button" class="btn small ghost tcd-add" data-act="prepPaste">'+I.copy+'Paste roster</button></div>';
 }
 function prepTripHTML(t,L,now,wide){
   var r=prepReady(t,L),n=r.filter(function(x){return x[1];}).length,nm=apName(t.dest).replace(/\s*\([A-Z-]{2}\)$/,'');
   var h='<div class="prep-hd">'+(wide?'':'<button type="button" class="ib round" data-act="prepBack" aria-label="All trips">'+I.left+'</button>')+
-    '<div class="prep-ti"><b>'+esc(t.dest)+(nm?' <span>'+esc(nm)+'</span>':'')+'</b><i>'+esc((t.fno?t.fno+' · ':'')+ap3(t.dep)+' → '+ap3(t.dest)+' · '+dayLbl(t.std))+'</i></div>'+
+    '<div class="prep-ti"><b>'+esc(t.dest)+(nm?' <span>'+esc(nm)+'</span>':'')+'</b><i>'+esc((t.fno?t.fno+' · ':'')+ap3(t.dep)+' → '+ap3(t.dest)+' · '+dayLbl(t.std)+(t.rep?' · report '+fsHM(t.rep):' · off '+fsHM(t.std)))+'</i></div>'+
     (t.src==='flight'?'':'<button type="button" class="ib round" data-act="prepDel" data-id="'+esc(t.id)+'" aria-label="Remove this trip">'+I.trash+'</button>')+'</div>';
   h+='<div class="prep-ready">'+r.map(function(x){return '<span class="'+(x[1]?'on':'')+'">'+(x[1]?I.check:'')+esc(x[0])+'</span>';}).join('')+'</div>';
   h+='<div class="seg prep-tabs">'+[['place','Place'],['notes','Notes'],['wx','Weather'],['lay','Layover']].map(function(x){
@@ -7432,6 +7433,7 @@ function prepAct(act,el){
   var id=el.getAttribute('data-id'),v=el.getAttribute('data-v');
   switch(act){
     case 'prepAdd': prepAddSheet();return;
+    case 'prepPaste': rosterPaste();return;
     case 'prepDel':
       confirmSheet('Remove this trip from Prepare?','Remove',function(){state.trips=(state.trips||[]).filter(function(t){return t.id!==id;});if(state.prep) delete state.prep[id];prepSel=null;save();refreshTool();});
       return;
@@ -7458,6 +7460,65 @@ function prepAct(act,el){
     case 'prepBiAdd': var bi=$('#prepBiIn'),bv=String(bi&&bi.value||'').trim();if(!bv) return;prepData(id).before.push({id:uid(),t:bv.slice(0,80),done:false});save();refreshTool();var b2=$('#prepBiIn');if(b2) b2.focus();return;
     case 'prepTpl': state.prepTpl=prepData(id).before.filter(function(x){return !x.auto;}).map(function(x){return x.t;});save();toast('New trips start with this list');return;
   }
+}
+
+// Roster as text: CrewPulse's event notes ("201 / DXB - 12 Nov 2026 08:30 / JFK - 12 Nov 2026 14:05"), local times at each airport,
+// with an optional "Report 12 Nov 2026 07:05" line before a trip. Claude can read the calendar and hand this over.
+function localToUTC(s,tz){
+  var m=/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s+(\d{4})\s+(\d{1,2}):(\d{2})/.exec(s);if(!m) return null;
+  var mo=MONS.indexOf(m[2].charAt(0).toUpperCase()+m[2].slice(1,3).toLowerCase());if(mo<0) return null;
+  var g=Date.UTC(+m[3],mo,+m[1],+m[4],+m[5]),t=g;if(!tz) return g;
+  for(var i=0;i<3;i++){var inf=tzInfo(tz,t);if(!inf) return g;t=g-inf.off*60000;}
+  return t;
+}
+function rosterParse(txt){
+  var D='(\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4}\\s+\\d{1,2}:\\d{2})';
+  var re=new RegExp('(?:^|\\n)[ \\t]*report[ \\t:]*'+D+'|(?:^|\\n)[ \\t]*(?:EK[ \\t]?)?(\\d{1,4}[A-Z]?)[ \\t]*\\n[ \\t]*([A-Z]{3,4})[ \\t]*[-–][ \\t]*'+D+'[ \\t]*\\n[ \\t]*([A-Z]{3,4})[ \\t]*[-–][ \\t]*'+D,'gi');
+  var out=[],m,rep=null;txt=String(txt||'').replace(/\r/g,'');
+  while((m=re.exec(txt))){
+    if(m[1]){rep=m[1];continue;}
+    var dep=apCode(m[3].toUpperCase()),dest=apCode(m[5].toUpperCase()),a=apRecOf(dep),b=apRecOf(dest);if(!a||!b) continue;
+    var std=localToUTC(m[4],a.tz),sta=localToUTC(m[6],b.tz);if(std===null||sta===null||sta<=std) continue;
+    var t={fno:/^\d/.test(m[2])?'EK'+m[2]:m[2].toUpperCase(),dep:dep,dest:dest,std:std,sta:sta};
+    if(rep){var r=localToUTC(rep,a.tz);if(r!==null&&r<std&&std-r<6*3600000) t.rep=r;rep=null;}
+    out.push(t);
+  }
+  return out;
+}
+function rosterImport(list){
+  if(!list.length) return 0;
+  var mine=(state.trips||[]).filter(function(t){return t.src!=='roster';}),n=0;
+  var lo=Math.min.apply(null,list.map(function(t){return t.std;})),hi=Math.max.apply(null,list.map(function(t){return t.std;}));
+  var old={};(state.trips||[]).forEach(function(t){if(t.src==='roster') old[t.id]=t;});
+  var keep=(state.trips||[]).filter(function(t){return t.src!=='roster'||t.std<lo-3600000||t.std>hi+3600000;});
+  list.forEach(function(t){
+    // a trip you added by hand stays as it is; the roster only fills in the rest
+    if(mine.some(function(x){return x.dep===t.dep&&x.dest===t.dest&&Math.abs(x.std-t.std)<3*3600000;})) return;
+    var id='r-'+t.fno+'-'+t.dep+'-'+new Date(t.std).toISOString().slice(0,13),o=old[id];
+    keep.push({id:id,fno:t.fno,dep:t.dep,dest:t.dest,std:t.std,sta:t.sta,rep:t.rep||(o&&o.rep)||0,src:'roster',alts:o?o.alts:[]});n++;
+  });
+  state.trips=keep;save();return n;
+}
+function rosterPasteSheet(pre){
+  openSheet('<h3>Paste your roster</h3><p class="hint">Paste what Claude gave you, or the notes of a CrewPulse event from your calendar. Times are local at each airport.</p>'+
+    '<textarea id="rsTx" class="ev-in" rows="8" placeholder="201&#10;DXB - 12 Nov 2026 08:30&#10;JFK - 12 Nov 2026 14:05">'+esc(pre||'')+'</textarea><p class="pa-err" id="rsErr"></p>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Add flights</button></div>',
+  function(act){
+    if(act!=='save'){closeSheet();return;}
+    var L=rosterParse($('#rsTx').value);
+    if(!L.length){$('#rsErr').textContent='No flights found. Each one needs its number, then “DXB - 12 Nov 2026 08:30” and the arrival line.';return;}
+    var n=rosterImport(L);closeSheet();prepSel=null;refreshTool();
+    toast(n?n+' flight'+(n>1?'s':'')+' added to Prepare':'Those flights are already there');
+  });
+}
+function rosterPaste(){
+  // with a clipboard that can be read, go straight in; otherwise a box to paste into
+  function go(t){var L=t?rosterParse(t):[];if(L.length){var n=rosterImport(L);prepSel=null;refreshTool();toast(n?n+' flight'+(n>1?'s':'')+' added to Prepare':'Those flights are already there');}else rosterPasteSheet('');}
+  var ready=window.AIRPORT_DATA?Promise.resolve():loadAirports();
+  ready.then(function(){
+    if(navigator.clipboard&&navigator.clipboard.readText) navigator.clipboard.readText().then(go,function(){rosterPasteSheet('');});
+    else rosterPasteSheet('');
+  },function(){toast('The airport list didn’t load. Try again.');});
 }
 function prepAddSheet(){
   var d=new Date();

@@ -26,6 +26,8 @@ arrival, layover, sunrise and sunset, a forecast for your stay, last time there)
 (METAR and TAF around your arrival, alternates you add) and the Layover (hotel, pick-up time with a countdown, places you
 saved, a Before you go list). On a wide iPad the trips sit on the left; in Slide Over and on the iPhone, one at a time.
 The forecast comes from Open-Meteo when you're online and stays on the device for the flight.
+Paste roster reads CrewPulse's event notes (flight number, then "DXB - 12 Nov 2026 08:30" and the arrival line, local
+times), from the clipboard or a box; Claude can read the Work calendar and hand the text over. Pasting again replaces them.
 
 THE FLIGHT STRIP under the clock appears once Set flight has an ETD and an ETA: a plane at the time now, the time
 flown, the time to go, and your break from Crew rest in purple with a countdown ("rest in 2:40", then "1:10 left").
