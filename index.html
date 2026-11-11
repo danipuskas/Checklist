@@ -458,7 +458,8 @@ body.selecting [data-act="editMod"],body.selecting [data-act="editSec"]{visibili
 .cr-r{flex:0 1 auto;max-width:60%;font-weight:700;text-align:right;overflow-wrap:anywhere}
 /* Three spaces instead of dots: the text just sits on the right, no dots, same weight */
 .cr.rt .cr-l{color:transparent}.cr.rt .cr-l::before{content:none}
-.cr.rt .cr-r{font-weight:inherit}
+.cr.rt .cr-r{font-weight:650;color:var(--accent)}
+.item.done .cr.rt .cr-r{color:inherit;font-weight:inherit}
 .drag-hidden{display:none!important}
 .drag-ph{margin:6px 10px;border:2px dashed var(--accent);border-radius:12px;background:var(--accent-weak)}
 .kids > .drag-ph{margin-left:44px}
@@ -2332,7 +2333,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='84';
+var APP_VERSION='85';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
