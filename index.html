@@ -2330,7 +2330,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='82';
+var APP_VERSION='83';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -3689,9 +3689,6 @@ function wxAtisHTML(ic,list){
 function wxRefreshViews(){
   app.querySelectorAll('.module.wx,.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
   if(toolOpen&&toolKind==='wx') refreshTool();
-  if(toolOpen&&toolKind==='apn'&&toolApnView==='brief'){
-    var f=$('#apFind');if(!f||(!f.value.trim()&&document.activeElement!==f)) refreshTool(); // don't wipe a search you're typing
-  }
 }
 function wxPaint(){
   var now=Date.now();
@@ -5670,7 +5667,7 @@ function openMenu(){
       case 'settings': openSettings();break;
       case 'tcd': openTool('cd');closeSheet();break;
       case 'trest': openTool('rest');closeSheet();break;
-      case 'tapn': toolApnSel=null;toolApnIcao=null;toolApnView='brief';openTool('apn');closeSheet();break;
+      case 'tapn': toolApnSel=null;toolApnIcao=null;toolApnView='notes';openTool('apn');closeSheet();break;
       case 'tflog': toolFlFilter='';openTool('flog');closeSheet();break;
       case 'tpos': openTool('pos');closeSheet();break;
       case 'tnear': openTool('near');closeSheet();break;
@@ -7735,10 +7732,9 @@ function apnPanelHTML(){
   if(toolApnSel==='all') h+='<button type="button" class="back-all" data-act="apnSel" data-v="all">'+I.left+'All airports</button>';
   var nf=state.flights.filter(function(f){return f.dep.icao===icao||f.arr.icao===icao;}).length,nn=apNoteCount(icao);
   var apn=apName(icao).replace(/\s*\([A-Z-]{2}\)$/,'');
-  h+='<div class="aphead three"><div class="apname">'+(toolApnSel==='all'||!apn?esc(icao)+' ':'')+esc(apn)+'</div><div class="seg apview three"><button type="button" class="'+(toolApnView==='brief'?'on':'')+'" data-act="apnView" data-v="brief">Brief</button><button type="button" class="'+(toolApnView==='notes'?'on':'')+'" data-act="apnView" data-v="notes">Notes'+(nn?'<small>'+nn+'</small>':'')+'</button>'+
+  h+='<div class="aphead three"><div class="apname">'+(toolApnSel==='all'||!apn?esc(icao)+' ':'')+esc(apn)+'</div><div class="seg apview three"><button type="button" class="'+(toolApnView!=='stats'?'on':'')+'" data-act="apnView" data-v="notes">Notes'+(nn?'<small>'+nn+'</small>':'')+'</button>'+
     '<button type="button" class="'+(toolApnView==='stats'?'on':'')+'" data-act="apnView" data-v="stats">My stats'+(nf?'<small>'+nf+'</small>':'')+'</button></div></div>';
   if(toolApnView==='stats') return h+apStatsHTML(icao);
-  if(toolApnView==='brief') return h+apBriefHTML(icao);
   var notes=state.apNotes[icao]||{},ord=toolApnOrd;
   var empty=[];
   if(ord) h+='<div class="apn-ord-tip">'+I.grip+'<span>Drag ≡ to change the order. Drop a note in another section to move it there.</span></div>';
@@ -7831,43 +7827,6 @@ function altSummary(ic,w){
   return '';
 }
 var apbTried={};
-function apBriefHTML(ic){
-  var st=state.settings,now=Date.now(),rec=apLookup(ic);
-  var role=st.dest&&st.dest.icao===ic?'To':st.dep&&st.dep.icao===ic?'From':(st.alts.indexOf(ic)>=0?'Alternate':'');
-  var tz=(role==='To'&&st.dest.tz)||(role==='From'&&st.dep.tz)||(rec&&rec.tz);
-  var S=apStats(ic),w=role?wxWin({ic:ic,role:role}):null,dep=role==='From'||(!role&&!S.arr&&S.dep>0);
-  // weather for an airport that isn't part of the flight is fetched when you open its brief
-  if(st.wxUrl&&navigator.onLine!==false&&!wxSt.busy&&(!wx[ic]||now-wx[ic].f>WX_EVERY)&&(apbTried[ic]||0)<now){apbTried[ic]=now+120000;setTimeout(function(){wxFetch([ic]);},0);}
-  var h=briefTimeHTML(ic,tz,rec,w,now);
-  h+='<div class="pb-h"><span>Weather</span>'+(st.wxUrl?'<button type="button" class="lnkbtn" data-act="apbWx" data-v="'+ic+'">'+(wxSt.busy?'Updating…':'Update')+'</button>':'')+'</div>';
-  h+=(st.wxUrl||wxData(ic))?wxCardHTML({ic:ic,role:role},false):'<p class="pb-none">Load the LIDO package or set up the weather relay in Briefing to see METAR and TAF here.</p>';
-  if(role==='To'&&st.alts.length){
-    h+='<div class="pb-card pb-alts">'+st.alts.map(function(a){
-      var d=wxData(a),w2=wxWin({ic:a,role:'Alternate'}),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';
-      return '<button type="button" class="pb-alt" data-act="apnPick" data-v="'+a+'" aria-label="Open '+a+'"><b>'+a+'</b>'+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+
-        '<span class="q">'+esc(altSummary(a,w2))+'</span>'+I.right+'</button>';
-    }).join('')+'</div>';
-  }
-  h+=brApSectionHTML(ic);
-  var notes=state.apNotes[ic]||{},ns=state.apSections.filter(function(x){return (notes[x.id]||[]).length;});
-  h+='<div class="pb-h"><span>Your notes</span><button type="button" class="lnkbtn" data-act="apnView" data-v="notes">'+(ns.length?'Edit':'Add')+'</button></div>';
-  h+=ns.length?'<div class="rf-wrap">'+ns.map(function(x){var arr=notes[x.id],fo=!!toolApnFold[x.id];return apnCardHTML(x,arr,fo,'apnPFold','');}).join('')+'</div>':
-    '<p class="pb-none">No notes for '+esc(ic)+' yet.</p>';
-  var n=dep?S.dep:S.arr;
-  if(S.arr||S.dep){
-    h+='<div class="pb-h"><span>My stats</span><button type="button" class="lnkbtn" data-act="apnView" data-v="stats">All</button></div>';
-    h+=n?'<div class="pb-card pb-mini"><div class="mini">'+apstMiniHTML(S,!dep,n)+'</div></div>':'<p class="pb-none">No '+(dep?'departures':'arrivals')+' logged here yet.</p>';
-  }
-  var fl=flSorted().filter(function(f){return f.arr.icao===ic||f.dep.icao===ic;}).slice(0,3);
-  h+='<div class="pb-h"><span>Your last visits</span>'+(fl.length?'<button type="button" class="lnkbtn" data-act="apbFlights" data-v="'+ic+'">All</button>':'')+'</div>';
-  h+=fl.length?'<div class="pb-card pb-visits">'+fl.map(function(f){
-    var a=f.arr.icao===ic,p=a?f.arr:f.dep;
-    var line=(a?[p.star,(p.app+' '+p.rwy).trim(),p.stand]:[p.stand,p.rwy,p.sid]).filter(Boolean).join(' · ');
-    return '<button type="button" class="pb-vis" data-act="flOpen" data-id="'+f.id+'"><span class="d">'+esc(fmtDay(f.date))+' · '+(a?'arrival from '+esc(f.dep.icao||'—'):'departure to '+esc(f.arr.icao||'—'))+'</span>'+
-      (line?'<b>'+esc(line)+'</b>':'<span style="color:var(--muted)">No details</span>')+(typeof p.tmin==='number'?' · '+p.tmin+' min':'')+(p.notes?'<span class="nt">'+esc(p.notes)+'</span>':'')+'</button>';
-  }).join('')+'</div>':'<p class="pb-none">No flights logged here yet.</p>';
-  return h;
-}
 function apnAdd(sid){
   var icao=apnPanelIcao();
   if(!icao){toast('Choose an airport first');var ai=$('#apFind');if(ai) ai.focus();return;}
@@ -9608,7 +9567,7 @@ tabBar.addEventListener('click',function(e){
   var same=toolOpen&&toolKind===k;
   if(k==='apn'){
     // tapping Airports again goes back to its first view
-    if(same||(toolApnSel===null&&toolApnIcao===null)){toolApnSel=null;toolApnIcao=null;toolApnView='brief';toolApnOrd=false;}
+    if(same||(toolApnSel===null&&toolApnIcao===null)){toolApnSel=null;toolApnIcao=null;toolApnView='notes';toolApnOrd=false;}
     openTool('apn');return;
   }
   if(same){toolWrap.scrollTop=0;return;}
