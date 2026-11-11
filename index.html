@@ -508,6 +508,8 @@ button.hd-row:active,.hd-row[role=button]:active{background:var(--press)}
 .loc .route{color:var(--muted);font-weight:600}
 .loc span.lt{color:var(--muted);font-size:.72em;font-weight:800;letter-spacing:.06em;margin-left:3px;vertical-align:.1em}
 .loc span.off{color:var(--muted);font-weight:600;font-size:.9em}
+/* the pencil edits the checklist, so it only shows there (and stays while editing, to get out again) */
+html.pg-tool body:not(.editing) #editBtn{visibility:hidden;pointer-events:none}
 .swap{display:flex;justify-content:center;margin:-4px 0 8px}
 .apcount{color:var(--accent);font-weight:700;font-size:13px;margin-top:3px}
 .apn-tag{font-size:calc(11px*var(--ts));font-weight:700;color:var(--accent);background:var(--accent-weak);padding:3px 8px;border-radius:999px;flex:none}
@@ -2330,7 +2332,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='83';
+var APP_VERSION='84';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -7685,7 +7687,7 @@ function openTool(kind){
   else if(kind==='evt') h+=evPanelHTML(Date.now());
   else if(kind==='prep') h+=prepPanelHTML(Date.now());
   else h+=renderRest(T.rest);
-  toolPanel.innerHTML=h;toolOpen=true;liveAt=Date.now();
+  toolPanel.innerHTML=h;toolOpen=true;liveAt=Date.now();document.documentElement.classList.add('pg-tool');
   if(GPS_KINDS[kind]) gpsStart();else gpsStop();
   if((GPS_KINDS[kind]||kind==='evt'||kind==='prep')&&!window.AIRPORT_DATA) loadAirports().then(function(){if(!toolOpen) return;if(GPS_KINDS[toolKind]){liveAt=0;livePaint(true);}else if(toolKind==='prep') refreshTool();},function(){});
   if(kind==='apn') apFindWire();
@@ -7902,7 +7904,7 @@ function closeTool(){
   refreshShared();
   if(wasDec){decPath=[];render();}
   if(document.activeElement&&toolPanel.contains(document.activeElement)) document.activeElement.blur();
-  toolOpen=false;toolWrap.classList.remove('show');paintTabs();
+  toolOpen=false;document.documentElement.classList.remove('pg-tool');toolWrap.classList.remove('show');paintTabs();
   if(sheetWrap.hidden||!sheetWrap.classList.contains('show')) document.body.classList.remove('noscroll');
   clearTimeout(toolHideT);
   toolHideT=setTimeout(function(){toolWrap.hidden=true;toolPanel.innerHTML='';},200);
