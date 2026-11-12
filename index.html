@@ -2333,7 +2333,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='85';
+var APP_VERSION='86';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -7124,10 +7124,11 @@ function posBodyHTML(now){
 function nearFind(P,n){
   // the airports in the company documents: departure, destination, alternates and en-route airports in the LIDO package
   if(P.la==null) return [];
-  var c=[];Object.keys(brCodes()).forEach(function(ic){var l=apLL(ic);if(l) c.push({a:{ic:ic,name:apName(ic),la:l.la,lo:l.lo},d:nmBetween(P,l),b:brgTo(P,l)});});
+  var c=[];Object.keys(pkgCodes()).forEach(function(ic){var l=apLL(ic);if(l) c.push({a:{ic:ic,name:apName(ic),la:l.la,lo:l.lo},d:nmBetween(P,l),b:brgTo(P,l)});});
   return c.sort(function(x,y){return x.d-y.d;}).slice(0,n);
 }
-function brCodes(){
+// every airport the package names (not to be confused with brCodes, which groups the Briefing's NOTAMs by airport)
+function pkgCodes(){
   var o={};if(!brief) return o;var f=brief.flight||{};
   [f.dep,f.dest].concat((f.altns||[]).map(function(x){return x.icao;})).forEach(function(c){if(c) o[c]=1;});
   ((brief.notams&&brief.notams.groups)||[]).forEach(function(g){if(g.ad&&g.code) o[g.code]=1;});
