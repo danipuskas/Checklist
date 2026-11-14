@@ -1218,6 +1218,72 @@ body.pkgdrag .pkg-drop,.pkg-box.busy .pkg-drop{border-color:var(--accent);backgr
 .nt-badge.k svg{width:10px;height:10px;fill:currentColor;stroke-width:2.5}
 .nt-tip{display:flex;align-items:center;gap:9px;margin:0 3px 10px;font-size:calc(13.5px*var(--ts));color:var(--muted);line-height:1.35}
 .nt-tip svg{width:19px;height:19px;color:var(--accent);flex:none}
+/* NOTAM keywords: one colour per word */
+.kw0{--k:#c98200}.kw1{--k:#1f7fb8}.kw2{--k:#d1453b}.kw3{--k:#7c5cd6}.kw4{--k:#1f9d63}.kw5{--k:#c2477f}.kw6{--k:#0f8f9c}.kw7{--k:#8a6d3b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kw0{--k:#f0a830}:root:not([data-theme="light"]) .kw1{--k:#4fb0e8}:root:not([data-theme="light"]) .kw2{--k:#f07a70}:root:not([data-theme="light"]) .kw3{--k:#a58cf0}:root:not([data-theme="light"]) .kw4{--k:#4cc98a}:root:not([data-theme="light"]) .kw5{--k:#e77fae}:root:not([data-theme="light"]) .kw6{--k:#3fc4cf}:root:not([data-theme="light"]) .kw7{--k:#c4a170}}
+:root[data-theme="dark"] .kw0{--k:#f0a830}:root[data-theme="dark"] .kw1{--k:#4fb0e8}:root[data-theme="dark"] .kw2{--k:#f07a70}:root[data-theme="dark"] .kw3{--k:#a58cf0}:root[data-theme="dark"] .kw4{--k:#4cc98a}:root[data-theme="dark"] .kw5{--k:#e77fae}:root[data-theme="dark"] .kw6{--k:#3fc4cf}:root[data-theme="dark"] .kw7{--k:#c4a170}
+:root[data-theme="night"] .kw0{--k:#a87a2a}:root[data-theme="night"] .kw1{--k:#3c7fa6}:root[data-theme="night"] .kw2{--k:#a8564f}:root[data-theme="night"] .kw3{--k:#7a6aaa}:root[data-theme="night"] .kw4{--k:#3d8f66}:root[data-theme="night"] .kw5{--k:#a35d7d}:root[data-theme="night"] .kw6{--k:#3a8f96}:root[data-theme="night"] .kw7{--k:#8f7a58}
+:root[data-theme="red"] [class*="kw"]{--k:var(--accent)}
+mark.kw{background:color-mix(in srgb,var(--k) 22%,transparent);color:inherit;border-radius:4px;padding:0 2px;margin:0 -1px;box-shadow:inset 0 -2px 0 var(--k)}
+.nt-card.kwm{border-left-color:var(--k)}
+.nt-card.kwhid .nt-main{opacity:.6}
+.nt-kw{font-size:11px;font-weight:800;letter-spacing:.03em;border-radius:5px;padding:1px 6px;font-style:normal;color:var(--k);background:color-mix(in srgb,var(--k) 14%,transparent)}
+#toolPanel .nt-card > .nt-main{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.kw-bar{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 10px}
+.kw-chip{appearance:none;display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:5px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--text);font:inherit;font-size:calc(14.5px*var(--ts));font-weight:700;cursor:pointer}
+.kw-chip i{width:9px;height:9px;border-radius:50%;background:var(--k);flex:none}
+.kw-chip em{font-style:normal;color:var(--muted);font-weight:650;font-size:calc(13px*var(--ts));font-variant-numeric:tabular-nums}
+.kw-chip.z{color:var(--muted)}
+.kw-chip.z i{opacity:.45}
+.kw-chip.on{border-color:var(--k);background:color-mix(in srgb,var(--k) 13%,var(--paper))}
+.kw-chip.add{color:var(--accent);border-style:dashed;padding:5px 10px}
+.kw-chip.add svg{width:17px;height:17px}
+.kw-only{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--k);background:color-mix(in srgb,var(--k) 9%,var(--paper));margin:0 0 10px;font-size:calc(14.5px*var(--ts));font-weight:650}
+.kw-only span{flex:1;min-width:0}
+.kw-only .lnkbtn{font-weight:700;white-space:nowrap}
+.kw-lbl{display:flex;align-items:center;gap:6px;margin:10px 3px 6px;font-size:11.5px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.kw-lbl svg{width:14px;height:14px;color:var(--accent)}
+.kw-tip{margin-top:10px}
+.kw-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--k);flex:none}
+.br-row .kw-dot{margin-left:-2px}
+.kw-add{display:flex;gap:8px;margin:0 0 12px}
+.kw-add .fl-in{flex:1;min-width:0}
+.kw-rows{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:2px 12px;margin:0 0 6px}
+.kw-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line-soft)}
+.kw-row:first-child{border-top:0}
+.kw-row .kw-dot{width:13px;height:13px}
+.kw-n{flex:1;min-width:0}
+.kw-n b{display:block;font:750 calc(15.5px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
+.kw-n span,.kw-n .lnkbtn{font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.kw-n .lnkbtn{color:var(--accent)}
+.kw-seg{display:flex;background:var(--surface2);border-radius:9px;padding:2px;flex:none}
+.kw-seg button{appearance:none;border:0;background:none;color:var(--muted);font:inherit;font-size:calc(13px*var(--ts));font-weight:700;padding:6px 8px;border-radius:7px}
+.kw-seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.kw-seg button.on.hd{color:var(--warn)}
+.kw-x{width:34px;height:34px;flex:none;color:var(--muted)}
+.kw-x svg{width:17px;height:17px}
+.kw-none{color:var(--muted);font-size:calc(14px*var(--ts));margin:10px 0}
+.kw-sug{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px}
+.kw-sug button{appearance:none;display:inline-flex;align-items:baseline;gap:5px;border:0;border-radius:999px;background:var(--accent-weak);color:var(--accent);font:inherit;font-size:calc(14px*var(--ts));font-weight:700;padding:6px 11px}
+.kw-sug button svg{width:13px;height:13px;align-self:center}
+.kw-sug small{font-weight:600;font-size:calc(12px*var(--ts));opacity:.8}
+.kws{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 12px 6px;margin:4px 0 6px}
+.kws-h1{display:flex;align-items:center;gap:8px;margin:0 0 4px}
+.kws-h1 svg{width:18px;height:18px;color:var(--accent)}
+.kws-h1 b{flex:1;font-size:calc(15px*var(--ts))}
+.kws-row{appearance:none;width:100%;display:flex;align-items:center;gap:8px;border:0;border-top:1px solid var(--line-soft);background:none;color:var(--text);font:inherit;padding:9px 0;text-align:left;cursor:pointer}
+.kws-row b{font:750 calc(14.5px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace;width:44px;flex:none}
+.kws-row small{color:var(--muted);font-size:calc(11.5px*var(--ts));font-weight:650;width:74px;flex:none;line-height:1.2}
+.kws-m{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:4px}
+.kws-no{color:var(--muted);font-size:calc(13px*var(--ts))}
+.kws-h{color:var(--muted);font-size:calc(12.5px*var(--ts));white-space:nowrap}
+.kws-row > svg{width:15px;height:15px;color:var(--muted);flex:none}
+.kws-note{margin:4px 0 6px;font-size:calc(12.5px*var(--ts));color:var(--muted);line-height:1.35}
+.kw-selbox{position:fixed;border-radius:5px;background:rgba(31,127,184,.18);outline:2px solid var(--accent);pointer-events:none}
+.lp-t{padding:9px 16px 7px;font-size:12px;font-weight:750;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--line-soft)}
+.lp-menu .lp-t + button{border-top:0}
+.lp-menu.kwh-menu{width:min(310px,calc(100vw - 20px))}
+.kws-h1 .lnkbtn{font-size:calc(14.5px*var(--ts));font-weight:700;text-decoration:none}
 .ntb .mod-body{padding:0 10px calc(10px*var(--sp))}
 .ntb-ap{display:flex;align-items:baseline;gap:8px;margin:6px 2px 5px}
 .ntb-ap b{font-size:calc(14.5px*var(--ts))}
@@ -2333,7 +2399,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='86';
+var APP_VERSION='87';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2374,7 +2440,7 @@ function normSettings(st){
   var ts=+st.textScale;
   return {csign:str(st.csign||st.fno).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8),theme:['light','dark','night','red'].indexOf(st.theme)>=0?st.theme:'auto',fingerDraw:!!st.fingerDraw,sound:st.sound!==false,dest:normDest(st.dest),dep:normDest(st.dep),routes:normRoutes(st),alts:normIcaoList(st.alts,4),wxUrl:normWxUrl(st.wxUrl),wxWatch:normIcaoList(st.wxWatch,6),textScale:ts>0?TEXT_SIZES.reduce(function(a,x){return Math.abs(x[0]-ts)<Math.abs(a-ts)?x[0]:a;},1):1,
     recent:Array.isArray(st.recent)?st.recent.map(normDest).filter(Boolean).slice(0,6):[],
-    etdT:numT(st.etdT),etaT:numT(st.etaT),altMin:normAltMin(st.altMin)};
+    etdT:numT(st.etdT),etaT:numT(st.etaT),altMin:normAltMin(st.altMin),ntKw:normNtKw(st.ntKw),ntSum:!!st.ntSum};
 }
 function seed(){
   function c(text,o){o=o||{};var n=newCheck(text);n.note=o.note||'';n.children=(o.kids||[]).map(function(k){return newCheck(k);});return n;}
@@ -3976,6 +4042,7 @@ function brPanelHTML(){
   if(st.wxUrl) h+=wxStatusHTML();
   if(!brKeptCount()) h+='<p class="nt-tip">'+I.bm+'<span>Keep the NOTAMs that matter with the bookmark. They show in the NOTAMs block of your checklists (Edit → NOTAMs).</span></p>';
   if((brief.alerts||[]).length) h+=brAlertsHTML();
+  h+=kwSumHTML(by);
   var tabs=[['dep',f.dep||'DEP',brKeptIn(by.dep)+brKeptIn(by.toalt)],['dest',f.dest||'DEST',brKeptIn(by.dest)],['altn','ALTN',brKeptIn(by.altn)],
     ['enr','ENR',brKeptIn(by.enr)+brKeptIn(by.area)]];
   if(!tabs.some(function(x){return x[0]===brTab;})) brTab='dep';
@@ -3986,13 +4053,14 @@ function brPanelHTML(){
   if(brTab==='dep'||brTab==='dest'){
     var dep=brTab==='dep',ic=dep?f.dep:f.dest,rw=dep?f.depRwy:f.arrRwy;
     if(ic) h+=wxCardHTML({ic:ic,role:same?(dep?'From':'To'):''},false);
+    h+=kwBarHTML(dep?by.dep.concat(by.toalt):by.dest);
     h+=brListHTML(dep?by.dep:by.dest,rw,brTab,(dep?'at ETD '+hmOf(t.etd):'at ETA '+hmOf(t.eta))+' ± 1 h'+(rw?' · runway '+rw:''));
     if(dep&&by.toalt.length){
       var ta=brCodes(by.toalt);
       h+='<div class="nt-sec"><b>Take-off alternate</b></div>'+ta.order.map(function(c){return brApBlockHTML(c,ta.map[c],{name:brCap(ta.map[c][0].g.name),wx:true,sec:'toalt'});}).join('');
     }
   }else if(brTab==='altn'){
-    h+='<div class="nt-sec"><b>Alternates</b><span>NOTAMs from ETA '+hmOf(t.eta)+' for 2 h</span></div>';
+    h+='<div class="nt-sec"><b>Alternates</b><span>NOTAMs from ETA '+hmOf(t.eta)+' for 2 h</span></div>'+kwBarHTML(by.altn);
     var al=brCodes(by.altn),order=(f.altns||[]).map(function(a){return a.icao;});
     al.order.forEach(function(c){if(order.indexOf(c)<0) order.push(c);});
     if(!order.length) h+='<p class="nt-none">No alternates in the package.</p>';
@@ -4007,13 +4075,15 @@ function brPanelHTML(){
     h+=on.length?on.map(sgCardHTML).join(''):'<p class="nt-none">None on your route at your time.</p>';
     if(off.length){h+=ntFoldHTML('enr:sg','Other SIGMETs and advisories',off.length);if(brFold.has('enr:sg')) h+='<div class="nt-in">'+off.map(sgCardHTML).join('')+'</div>';}
     var en=brCodes(by.enr);
+    if(by.enr.length||by.area.length) h+='<div class="nt-sec"><b>NOTAMs en route</b></div>'+kwBarHTML(by.enr.concat(by.area));
     en.order.sort(function(a,b){return (en.map[a][0].g.section==='enalt'?0:1)-(en.map[b][0].g.section==='enalt'?0:1);});
     if(en.order.length) h+='<div class="nt-sec"><b>En-route airports</b><span>tap for weather and NOTAMs</span></div><div class="br-rows">'+en.order.map(function(c){return brEnrRowHTML(c,en.map[c]);}).join('')+'</div>';
-    if(by.area.length){
-      h+=ntFoldHTML('enr:area','FIR and area NOTAMs',by.area.length);
-      if(brFold.has('enr:area')){
+    var arN=brKwOnly?by.area.filter(function(x){var m=kwMatch(x);return m.hl.concat(m.hide).some(function(k){return k.w===brKwOnly;});}).length:by.area.length;
+    if(arN){
+      h+=ntFoldHTML('enr:area','FIR and area NOTAMs',arN);
+      if(brFold.has('enr:area')||brKwOnly){
         var ar=brCodes(by.area);
-        h+='<div class="nt-in">'+ar.order.map(function(c){var g=ar.map[c][0].g,nm=g.name&&g.name!==g.code?g.name.replace(new RegExp('^'+g.code+'\\s+'),''):'';return brApBlockHTML(c,ar.map[c],{name:nm===c?'':nm,sec:'area',mid:true});}).join('')+'</div>';
+        h+='<div class="nt-in">'+ar.order.map(function(c){var g=ar.map[c][0].g,nm=g.name&&g.name!==g.code?g.name.replace(new RegExp('^'+g.code+'\\s+'),''):'';return brKwOnly&&!ar.map[c].some(function(x){var m=kwMatch(x);return m.hl.concat(m.hide).some(function(k){return k.w===brKwOnly;});})?'':brApBlockHTML(c,ar.map[c],{name:nm===c?'':nm,sec:'area',mid:true});}).join('')+'</div>';
       }
     }
     if(st.wxUrl){
@@ -4028,13 +4098,14 @@ function brPanelHTML(){
 // NOTAMs for one airport in Airports → Brief
 function brGo(ic){
   var g=brief&&brief.notams.groups.filter(function(x){return x.code===ic&&x.ad;})[0];if(!g) return;
-  var s=g.section;brTab=s==='dep'||s==='toalt'?'dep':s==='dest'?'dest':s==='altn'?'altn':'enr';
+  var s=g.section;brTab=s==='dep'||s==='toalt'?'dep':s==='dest'?'dest':s==='altn'?'altn':'enr';brKwOnly='';
   if(brTab==='enr') brEnrOpen.add(ic);
   openTool('wx');
   var el=toolPanel.querySelector('[data-ap="'+ic+'"]');
   if(el&&(brTab==='enr'||brTab==='altn')){var r=el.getBoundingClientRect(),w=toolWrap.getBoundingClientRect();toolWrap.scrollTop+=r.top-w.top-12;}
 }
 function brTabTo(v){
+  if(v!==brTab) brKwOnly='';
   brTab=v;refreshTool();
   var tb=toolPanel.querySelector('.nt-tabs');
   if(tb){var r=tb.getBoundingClientRect(),w=toolWrap.getBoundingClientRect();if(r.top<w.top) toolWrap.scrollTop+=r.top-w.top-10;}
@@ -4349,9 +4420,9 @@ function ntMiniHTML(x,mid){
   var n=x.n,open=brOpenSet.has('b:'+x.key),f=brief.flight,c=x.g.code,rw=c===f.dep?f.depRwy:c===f.dest?f.arrRwy:'';
   var when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
   return '<div class="ntm'+(open?' open':'')+'" data-act="ntbOpen" data-v="'+esc('b:'+x.key)+'" data-id="'+mid+'" role="button" aria-expanded="'+open+'">'+
-    '<div class="ntm-head">'+ntHL(ntHead(n),rw)+'</div>'+
+    '<div class="ntm-head">'+kwMark(ntHL(ntHead(n),rw),c)+'</div>'+
     '<div class="ntm-when">'+(when?esc(when)+' · ':'')+'<span class="nt-id">'+esc(n.id)+'</span></div>'+
-    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+ntHL(n.body||'',rw).replace(/\n/g,'<br>')+'</div>':'')+'</div>';
+    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+kwMark(ntHL(n.body||'',rw),c).replace(/\n/g,'<br>')+'</div>':'')+'</div>';
 }
 function renderNtBlock(m){
   var h='<div class="module ntb'+(m.collapsed?' collapsed':'')+'" data-mod="'+m.id+'"><div class="mod-head"><button type="button" class="mod-toggle" data-act="modToggle" data-id="'+m.id+'">'+I.bm+
@@ -4421,35 +4492,324 @@ function brOrder(L){
 function ntCardHTML(x,rw){
   var n=x.n,c=ntCat(n),k=ntKey(x.g,n),kept=brIsKept(k),open=brOpenSet.has(x.key),off=x.level==='later'||x.level==='none';
   var why=x.why.filter(function(w){return w!=='Company';}),when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
+  var km=kwMatch(x),kh=km.hl,code=x.g.code,kwu={};
+  kh.forEach(function(q){kwu[q.w]=1;});
+  why=why.filter(function(w){return !kwu[String(w).toUpperCase()];});
   if(off) why.unshift('Not at your time');
-  var top=(c?'<span class="nt-cat '+c[1]+'">'+c[0]+'</span>':'')+why.slice(0,3).map(function(w){return '<span class="nt-why'+(w==='Not at your time'?' off':'')+'">'+esc(w)+'</span>';}).join('');
-  return '<div class="nt-card'+(kept?' kept':'')+(off?' off':'')+(open?' open':'')+'">'+
+  var top=(c?'<span class="nt-cat '+c[1]+'">'+c[0]+'</span>':'')+kh.map(function(q){return '<span class="nt-kw kw'+q.c+'">'+esc(q.w)+'</span>';}).join('')+
+    why.slice(0,kh.length?2:3).map(function(w){return '<span class="nt-why'+(w==='Not at your time'?' off':'')+'">'+esc(w)+'</span>';}).join('');
+  return '<div class="nt-card'+(kept?' kept':'')+(off?' off':'')+(open?' open':'')+(kh.length?' kwm kw'+kh[0].c:'')+(x.kwHid?' kwhid':'')+'">'+
     '<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'">'+(top?'<div class="nt-top">'+top+'</div>':'')+
-    '<div class="nt-head">'+ntHL(ntHead(n),rw)+'</div>'+
+    '<div class="nt-head">'+kwMark(ntHL(ntHead(n),rw),code)+'</div>'+
     '<div class="nt-when">'+(when?esc(when)+' · ':'')+'<span class="nt-id">'+esc(n.id)+'</span></div>'+
-    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+ntHL(n.body||'',rw).replace(/\n/g,'<br>')+'</div>':'')+'</div>'+
+    (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+kwMark(ntHL(n.body||'',rw),code).replace(/\n/g,'<br>')+'</div>':'')+'</div>'+
     ntKeepHTML(k,kept)+'</div>';
 }
 function brListHTML(L,rw,pre,ctx){
   var h='<div class="nt-sec"><b>NOTAMs</b><span>'+L.length+' · '+esc(ctx)+'</span></div>';
   if(!L.length) return h+'<p class="nt-none">None in the package.</p>';
-  return h+ntCards(brOrder(L),rw);
+  return h+kwListHTML(L,rw,pre,true);
 }
-// one airport (or FIR) with all its NOTAMs, company ones first
+// one airport (or FIR) with all its NOTAMs: your keywords first, then company ones, then the rest
 function brApBlockHTML(code,L,o){
   var d=o.wx&&wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'';
   var h='<div class="nt-ap" data-ap="'+esc(code)+'"><b>'+esc(code)+'</b><span>'+esc(o.name||'')+'</span>'+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+'</div>'+(o.info?'<div class="nt-apinfo">'+esc(o.info)+'</div>':'');
   if(o.wx) h+=wxCardHTML({ic:code,role:o.role||''},false,true);
-  return h+(L.length?ntCards(brOrder(L),''):'<p class="nt-none sm">No NOTAMs in the package</p>');
+  return h+(L.length?kwListHTML(L,'',(o.sec||'ap')+':'+code,false):'<p class="nt-none sm">No NOTAMs in the package</p>');
 }
 function brEnrRowHTML(code,L){
-  var g=L[0].g,open=brEnrOpen.has(code),d=wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'',kn=brKeptIn(L);
+  var g=L[0].g,d=wxData(code),cat=d&&d.m&&/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat)?d.m.cat:'',kn=brKeptIn(L);
+  var ks=kwSeen(L),hit=brKwOnly?ks.filter(function(q){return q.w===brKwOnly;}).length>0:false;
+  if(brKwOnly&&!hit) return '';
+  var open=brEnrOpen.has(code)||hit;
   var nm=apName(code).replace(/\s*\([A-Z-]{2}\)$/,'')||brCap(g.name);
   var h='<button type="button" class="br-row'+(open?' open':'')+'" data-act="brEnr" data-v="'+esc(code)+'" data-ap="'+esc(code)+'" aria-expanded="'+open+'"><b>'+esc(code)+'</b><span class="n">'+esc(nm)+'</span>'+
-    (g.section==='enalt'?'<i class="br-era">ERA</i>':'')+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+(kn?'<small class="nt-badge k" aria-label=", '+kn+' kept">'+I.bm+kn+'</small>':'')+'<em>'+L.length+'</em>'+I.right+'</button>';
+    (g.section==='enalt'?'<i class="br-era">ERA</i>':'')+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+
+    ks.slice(0,3).map(function(q){return '<i class="kw-dot kw'+q.c+'" title="'+esc(q.w)+'"></i>';}).join('')+
+    (kn?'<small class="nt-badge k" aria-label=", '+kn+' kept">'+I.bm+kn+'</small>':'')+'<em>'+L.length+'</em>'+I.right+'</button>';
   if(!open) return h;
-  return h+'<div class="br-rowin">'+wxCardHTML({ic:code,role:''},false,true)+ntCards(brOrder(L),'')+'</div>';
+  return h+'<div class="br-rowin">'+wxCardHTML({ic:code,role:''},false,true)+kwListHTML(L,'','enr:'+code,false)+'</div>';
 }
+// ---- NOTAM keywords: your own words, highlighted or hidden in every airport's NOTAMs ----
+// Kept in the settings (they go with the backup), not with the package: they're yours, for every flight.
+var KW_N=8,brKwOnly='',kwReC={};
+function kwClean(s){return String(s||'').toUpperCase().replace(/[^A-Z0-9 \/.+-]/g,' ').replace(/\s+/g,' ').trim().slice(0,24);}
+function normNtKw(L){
+  var out=[],seen={};
+  (Array.isArray(L)?L:[]).forEach(function(k){
+    if(!k||typeof k!=='object') return;
+    var w=kwClean(k.w),ap=/^[A-Z0-9]{3,4}$/.test(k.ap)?k.ap:'',c=Math.round(+k.c);
+    if(!w||seen[w+'|'+ap]) return;seen[w+'|'+ap]=1;
+    out.push({w:w,m:k.m==='hide'?'hide':'hl',ap:ap,c:c>=0&&c<8?c:out.length%8});
+  });
+  return out.slice(0,40);
+}
+function kwAll(){return state.settings.ntKw||(state.settings.ntKw=[]);}
+function kwFor(code){return kwAll().filter(function(k){return !k.ap||k.ap===code;});}
+function reEsc(s){return s.replace(/[.*+?^${}()|[\]\\\/-]/g,'\\$&');}
+// whole words only: 22L finds “RWY 04R/22L” but not “122L”
+function kwRe(w,g){
+  var id=w+(g?'|g':'');
+  if(!kwReC[id]) kwReC[id]=new RegExp('(^|[^A-Z0-9&])('+w.split(' ').map(reEsc).join('\\s+')+')(?![A-Z0-9])',g?'gi':'i');
+  return kwReC[id];
+}
+function kwMatch(x){
+  var t=(x.n&&x.n.body)||'',o={hl:[],hide:[]},seen={};
+  if(!t||!x.g) return o;
+  kwFor(x.g.code).forEach(function(k){if(!seen[k.w+k.m]&&kwRe(k.w).test(t)){seen[k.w+k.m]=1;o[k.m].push(k);}});
+  return o;
+}
+// the highlight words found in a list, in your order (for the chips and the en-route rows)
+function kwSeen(L){
+  var m={};L.forEach(function(x){kwMatch(x).hl.forEach(function(k){m[k.w]=(m[k.w]||0)+1;});});
+  var o=[],u={};kwAll().forEach(function(k){if(k.m==='hl'&&m[k.w]&&!u[k.w]){u[k.w]=1;o.push({w:k.w,c:k.c,n:m[k.w]});}});
+  return o;
+}
+// mark your words in text that is already HTML, leaving the tags alone
+function kwMark(html,code){
+  var K=kwFor(code).filter(function(k){return k.m==='hl';});if(!K.length) return html;
+  K=K.slice().sort(function(a,b){return b.w.length-a.w.length;});
+  return html.split(/(<[^>]*>)/).map(function(p,i){
+    if(i%2||!p) return p;
+    K.forEach(function(k){p=p.replace(kwRe(k.w,true),function(m,a,b){return a+'\u0001'+k.c+'\u0002'+b+'\u0003';});});
+    return p.replace(/\u0001(\d)\u0002/g,'<mark class="kw kw$1">').replace(/\u0003/g,'</mark>');
+  }).join('');
+}
+// a list of NOTAMs: your keywords first, then the rest; the ones with a Hide word folded at the end (never the ones you keep)
+function kwListHTML(L,rw,fk,labels){
+  var M=[],R=[],H=[],hw={};
+  brOrder(L).forEach(function(x){
+    var m=kwMatch(x);x.kwHid=false;
+    if(brKwOnly){if(m.hl.concat(m.hide).some(function(k){return k.w===brKwOnly;})) M.push(x);return;}
+    if(m.hl.length) M.push(x);
+    else if(m.hide.length&&!brIsKept(ntKey(x.g,x.n))){x.kwHid=true;H.push(x);m.hide.forEach(function(k){hw[k.w]=1;});}
+    else R.push(x);
+  });
+  if(brKwOnly) return M.length?ntCards(M,rw):'<p class="nt-none sm">None with '+esc(brKwOnly)+'</p>';
+  var h='';
+  if(labels&&M.length&&R.length) h+='<div class="kw-lbl">'+IC_TAG+'Your keywords · '+M.length+'</div>';
+  h+=ntCards(M,rw);
+  if(labels&&M.length&&R.length) h+='<div class="kw-lbl">Other NOTAMs · '+R.length+'</div>';
+  h+=ntCards(R,rw);
+  if(H.length){
+    var key='kwh:'+fk;
+    h+=ntFoldHTML(key,'Hidden by your keywords: '+Object.keys(hw).join(', '),H.length);
+    if(brFold.has(key)) h+='<div class="nt-in">'+ntCards(H,rw)+'</div>';
+  }
+  return h;
+}
+var IC_TAG=sv('<path d="M3.5 12.5V4.5h8l9 9-8 8z"/><circle cx="8" cy="9" r="1.4"/>');
+var IC_EYEOFF=sv('<path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-3 3.6M6.7 6.7C4 8.4 2.5 12 2.5 12S6 18 12 18a9 9 0 0 0 4.2-1"/>');
+// the chips over a tab's NOTAMs: tap one to see only those, + to change the list
+function kwBarHTML(L){
+  var K=kwAll(),ks=kwSeen(L),hl=[],u={};
+  if(!K.length) return '<p class="nt-tip kw-tip">'+IC_TAG+'<span>Pick out the words that matter to you, like your runway, ILS or CRANE. <button type="button" class="lnkbtn" data-act="kwList">Add keywords</button></span></p>';
+  K.forEach(function(k){if(k.m==='hl'&&!u[k.w]){u[k.w]=1;hl.push(k);}});
+  var cnt={};ks.forEach(function(q){cnt[q.w]=q.n;});
+  var h='<div class="kw-bar" role="group" aria-label="Your NOTAM keywords">'+hl.map(function(k){
+    var n=cnt[k.w]||0,on=brKwOnly===k.w;
+    return '<button type="button" class="kw-chip kw'+k.c+(on?' on':'')+(n?'':' z')+'" data-act="kwOnly" data-v="'+esc(k.w)+'" aria-pressed="'+on+'"><i></i>'+esc(k.w)+'<em>'+n+'</em></button>';
+  }).join('')+'<button type="button" class="kw-chip add" data-act="kwList" aria-label="Keywords">'+(hl.length?I.gear:I.plus+'Keyword')+'</button></div>';
+  if(brKwOnly){
+    var q=kwAll().filter(function(k){return k.w===brKwOnly;})[0],n2=L.filter(function(x){var m=kwMatch(x);return m.hl.concat(m.hide).some(function(k){return k.w===brKwOnly;});}).length;
+    h+='<div class="kw-only kw'+(q?q.c:0)+'"><span>Only NOTAMs with <mark class="kw kw'+(q?q.c:0)+'">'+esc(brKwOnly)+'</mark> · '+n2+' of '+L.length+'</span><button type="button" class="lnkbtn" data-act="kwOnly" data-v="">Show all</button></div>';
+  }
+  return h;
+}
+function kwOnly(w){
+  if(w&&w!==brKwOnly){
+    var L=brTabList();
+    if(!L.some(function(x){return kwMatch(x).hl.some(function(k){return k.w===w;});})){toast('No NOTAMs with '+w+' here');return;}
+  }
+  brKwOnly=w===brKwOnly?'':w;refreshTool();
+  var b=toolPanel.querySelector('.kw-bar');
+  if(b){var r=b.getBoundingClientRect(),wr=toolWrap.getBoundingClientRect();if(r.top<wr.top) toolWrap.scrollTop+=r.top-wr.top-10;}
+}
+// every NOTAM on the open tab
+function brTabList(){
+  if(!brief) return [];
+  var by=brBy(brReview());
+  return brTab==='dep'?by.dep.concat(by.toalt):brTab==='dest'?by.dest:brTab==='altn'?by.altn:by.enr.concat(by.area);
+}
+function kwAdd(w,m,ap){
+  w=kwClean(w);if(!w) return null;
+  var K=kwAll(),hit=null;
+  if(!ap){for(var i=K.length-1;i>=0;i--) if(K[i].w===w&&K[i].ap){if(!hit) hit=K[i];K.splice(i,1);}} // everywhere replaces the one-airport ones
+  K.forEach(function(k){if(k.w===w&&k.ap===(ap||'')) hit=k;});
+  if(hit&&K.indexOf(hit)>=0){hit.m=m;save();return hit;}
+  var used={};K.forEach(function(k){used[k.c]=(used[k.c]||0)+1;});
+  var c=0;for(var j=1;j<KW_N;j++) if((used[j]||0)<(used[c]||0)) c=j;
+  var o={w:w,m:m,ap:ap||'',c:hit?hit.c:c};K.push(o);save();return o;
+}
+// ---- the list of your keywords ----
+var KW_SUG=['ILS','PAPI','ALS','GNSS','CRANE','RNP','VOR','DME','STAND','TWY','BIRD','OBST LGT'];
+function kwSugs(){
+  var f=brief&&brief.flight||{},have={},o=[];
+  kwAll().forEach(function(k){have[k.w]=1;});
+  function a(w,why){w=kwClean(w);if(w&&!have[w]){have[w]=1;o.push([w,why]);}}
+  if(f.depRwy) a(f.depRwy,'departure runway');
+  if(f.arrRwy) a(f.arrRwy,'arrival runway');
+  if(f.type) a(String(f.type).split('-')[0],'your aircraft');
+  KW_SUG.forEach(function(w){a(w,'');});
+  return o.slice(0,10);
+}
+function kwRowsHTML(){
+  var K=kwAll(),L=brief?brReview():[];
+  if(!K.length) return '<p class="kw-none">No keywords yet. Type one above, or tap a suggestion.</p>';
+  return K.map(function(k,i){
+    var n=L.filter(function(x){return (!k.ap||x.g.code===k.ap)&&kwRe(k.w).test(x.n.body||'');}).length;
+    var sub=[k.ap?k.ap+' only':'',brief?(n?n+(k.m==='hide'?' hidden':' found'):'none now'):(k.ap?'':'All airports')].filter(Boolean).join(' · ');
+    return '<div class="kw-row"><i class="kw-dot kw'+k.c+'"></i><div class="kw-n"><b>'+esc(k.w)+'</b>'+
+      (k.ap?'<button type="button" class="lnkbtn" data-sact="scope" data-v="'+i+'">'+esc(sub)+'</button>':'<span>'+esc(sub)+'</span>')+'</div>'+
+      '<div class="kw-seg" role="radiogroup" aria-label="'+esc(k.w)+'"><button type="button" role="radio" aria-checked="'+(k.m==='hl')+'" class="'+(k.m==='hl'?'on':'')+'" data-sact="mode" data-v="'+i+':hl">Highlight</button>'+
+      '<button type="button" role="radio" aria-checked="'+(k.m==='hide')+'" class="'+(k.m==='hide'?'on hd':'')+'" data-sact="mode" data-v="'+i+':hide">Hide</button></div>'+
+      '<button type="button" class="ib kw-x" data-sact="del" data-v="'+i+'" aria-label="Remove '+esc(k.w)+'">'+I.x+'</button></div>';
+  }).join('');
+}
+function kwSugHTML(){
+  var S=kwSugs();
+  return S.length?'<div class="set-h">Suggestions</div><div class="kw-sug">'+S.map(function(s){return '<button type="button" data-sact="sug" data-v="'+esc(s[0])+'">'+I.plus+esc(s[0])+(s[1]?'<small>'+esc(s[1])+'</small>':'')+'</button>';}).join('')+'</div>':'';
+}
+function kwSumRowHTML(){
+  var on=!!state.settings.ntSum;
+  return '<button type="button" data-sact="sum" role="switch" aria-checked="'+on+'">'+IC_TAG+'<span class="mt">Checkup summary<small>'+(on?'On: a card at the top of the Briefing shows your keywords at each airport':'Off: turn on for a card with your keywords at each airport')+'</small></span><span class="tog'+(on?' on':'')+'"></span></button>';
+}
+function openKwList(){
+  openSheet('<div class="menu-head"><h3>NOTAM keywords</h3><button type="button" class="ib round" data-sact="cancel" aria-label="Close">'+I.x+'</button></div>'+
+    '<p class="hint">Highlight the words that matter to you, or hide NOTAMs you never need. They work at every airport, whole words only: 22L also finds RWY 04R/22L.</p>'+
+    '<div class="kw-add"><input type="text" class="fl-in" id="kwIn" maxlength="24" placeholder="Add a word, e.g. PAPI" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off" enterkeyhint="done"><button type="button" class="btn primary" data-sact="add">Add</button></div>'+
+    '<div class="kw-rows" id="kwRows">'+kwRowsHTML()+'</div><div id="kwSug">'+kwSugHTML()+'</div>'+
+    '<div class="set-h">Option</div><div class="menu" id="kwSum">'+kwSumRowHTML()+'</div>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Done</button></div>',
+  function(act,btn){
+    var v=btn&&btn.getAttribute('data-v'),K=kwAll();
+    switch(act){
+      case 'add':
+        var inp=$('#kwIn'),w=kwClean(inp&&inp.value);
+        if(!w){toast('Type a word first');if(inp) inp.focus();return;}
+        kwAdd(w,'hl','');inp.value='';break;
+      case 'sug': kwAdd(v,v==='BIRD'||v==='OBST LGT'?'hide':'hl','');break;
+      case 'mode': var p=v.split(':'),k=K[+p[0]];if(k){k.m=p[1];save();}break;
+      case 'scope': var k2=K[+v];if(k2){var dup=K.some(function(o){return o!==k2&&o.w===k2.w&&!o.ap;});if(dup) K.splice(+v,1);else k2.ap='';save();}break;
+      case 'del':
+        var k3=K[+v];if(!k3) return;
+        K.splice(+v,1);save();
+        toast('Removed '+k3.w,4000,'Undo',function(){kwAll().splice(Math.min(+v,kwAll().length),0,k3);save();kwRefresh();});
+        break;
+      case 'sum': state.settings.ntSum=!state.settings.ntSum;save();$('#kwSum').innerHTML=kwSumRowHTML();refreshTool();return;
+      default: closeSheet();return;
+    }
+    kwRefresh();
+  });
+  var inp=$('#kwIn');
+  if(inp) inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('add',null);}});
+}
+function kwRefresh(){
+  var r=$('#kwRows'),s=$('#kwSug');
+  if(r) r.innerHTML=kwRowsHTML();
+  if(s) s.innerHTML=kwSugHTML();
+  if(brKwOnly&&!kwAll().some(function(k){return k.w===brKwOnly&&k.m==='hl';})) brKwOnly='';
+  refreshTool();
+  app.querySelectorAll('.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
+}
+// ---- the checkup summary (an option): your words at each airport of the flight ----
+function kwSumHTML(by){
+  if(!state.settings.ntSum||!kwAll().length) return '';
+  var f=brief.flight,rows=[],done={};
+  function grp(L){var o={},ord=[];L.forEach(function(x){if(!x.g.ad) return;var c=x.g.code;if(!o[c]){o[c]=[];ord.push(c);}o[c].push(x);});return {o:o,ord:ord};}
+  function add(c,L,lab,always){
+    if(done[c]||!L) return;
+    var ks=kwSeen(L),hid=L.filter(function(x){var m=kwMatch(x);return !m.hl.length&&m.hide.length&&!brIsKept(ntKey(x.g,x.n));}).length;
+    if(!always&&!ks.length) return;
+    done[c]=1;
+    rows.push('<button type="button" class="kws-row" data-act="brGo" data-v="'+esc(c)+'"><b>'+esc(c)+'</b><small>'+esc(lab)+'</small><span class="kws-m">'+
+      (ks.length?ks.map(function(q){return '<i class="nt-kw kw'+q.c+'">'+esc(q.w)+(q.n>1?' ×'+q.n:'')+'</i>';}).join(''):'<span class="kws-no">Nothing matches</span>')+'</span>'+
+      (hid?'<span class="kws-h">'+hid+' hidden</span>':'')+I.right+'</button>');
+  }
+  var d=grp(by.dep),t=grp(by.toalt),a=grp(by.dest),al=grp(by.altn),en=grp(by.enr);
+  d.ord.forEach(function(c){add(c,d.o[c],'Departure',true);});
+  t.ord.forEach(function(c){add(c,t.o[c],'Take-off alt',true);});
+  a.ord.forEach(function(c){add(c,a.o[c],'Destination',true);});
+  var ao=(f.altns||[]).map(function(x){return x.icao;});al.ord.forEach(function(c){if(ao.indexOf(c)<0) ao.push(c);});
+  ao.forEach(function(c){add(c,al.o[c],'Alternate',true);});
+  var eL=by.enr.filter(function(x){return x.g.ad;}),eks=kwSeen(eL);
+  if(eks.length){
+    var eh=eL.filter(function(x){var m=kwMatch(x);return !m.hl.length&&m.hide.length&&!brIsKept(ntKey(x.g,x.n));}).length;
+    var ec=en.ord.filter(function(c){return kwSeen(en.o[c]).length;}).length;
+    rows.push('<button type="button" class="kws-row" data-act="brTab" data-v="enr"><b>ENR</b><small>'+ec+' airport'+(ec===1?'':'s')+'</small><span class="kws-m">'+
+      eks.map(function(q){return '<i class="nt-kw kw'+q.c+'">'+esc(q.w)+(q.n>1?' ×'+q.n:'')+'</i>';}).join('')+'</span>'+(eh?'<span class="kws-h">'+eh+' hidden</span>':'')+I.right+'</button>');
+  }
+  if(!rows.length) return '';
+  var rw=[f.depRwy?f.depRwy+' at '+(f.dep||'departure'):'',f.arrRwy?f.arrRwy+' at '+(f.dest||'destination'):''].filter(Boolean);
+  return '<div class="kws"><div class="kws-h1">'+IC_TAG+'<b>NOTAM checkup</b><button type="button" class="lnkbtn" data-act="kwList">Keywords</button></div>'+rows.join('')+
+    (rw.length?'<p class="kws-note">Your runway'+(rw.length>1?'s':'')+' ('+esc(rw.join(', '))+') '+(rw.length>1?'are':'is')+' picked out too, as before.</p>':'')+'</div>';
+}
+// ---- hold a word in a NOTAM to make it a keyword ----
+var ntLp=null;
+function ntLpCancel(){if(ntLp){clearTimeout(ntLp.t);ntLp=null;}}
+// the word under the finger (letters and digits; U/S and A/C stay whole), with where it sits on the screen
+function wordAt(el,x,y){
+  var tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),n,best=null,bd=1e9,rg=document.createRange();
+  while((n=tw.nextNode())){
+    var t=n.nodeValue,re=/[A-Za-z0-9]+(?:\/[A-Za-z]{1,2}(?![A-Za-z0-9]))?/g,m;
+    while((m=re.exec(t))){
+      rg.setStart(n,m.index);rg.setEnd(n,m.index+m[0].length);
+      var rs=rg.getClientRects();
+      for(var i=0;i<rs.length;i++){
+        var r=rs[i],dx=x<r.left?r.left-x:x>r.right?x-r.right:0,dy=y<r.top?r.top-y:y>r.bottom?y-r.bottom:0,dd=dx*dx*1+dy*dy*4;
+        if(dd<bd){bd=dd;best={w:m[0].toUpperCase(),r:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}
+      }
+    }
+  }
+  return best&&bd<=900?best:null;
+}
+// the airport a card belongs to, from its key (group index : NOTAM id)
+function ntCodeOf(key){
+  var i=parseInt(key,10),g=brief&&!isNaN(i)?brief.notams.groups[i]:null;
+  return g?{code:g.code,ad:!!g.ad}:{code:'',ad:false};
+}
+function kwHold(p){
+  var hit=wordAt(p.el,p.x,p.y);if(!hit) return;
+  var w=kwClean(hit.w);if(!w) return;
+  lpSwallow=Date.now();
+  var ap=ntCodeOf(p.el.getAttribute('data-v')||''),K=kwAll(),mine=K.filter(function(k){return k.w===w;}),rows=[];
+  function r(a,t,ic,cls){rows.push('<button type="button" data-lp="'+a+'"'+(cls?' class="'+cls+'"':'')+'><span>'+t+'</span>'+ic+'</button>');}
+  var hlAll=mine.some(function(k){return !k.ap&&k.m==='hl';}),hlHere=mine.some(function(k){return k.ap===ap.code&&k.m==='hl';}),hid=mine.some(function(k){return k.m==='hide';});
+  if(!hlAll) r('all','Highlight '+esc(w)+' everywhere',IC_TAG);
+  if(ap.ad&&!hlAll&&!hlHere) r('here','Highlight at '+esc(ap.code)+' only',IC_TAG);
+  if(!hid) r('hide','Hide NOTAMs with '+esc(w),IC_EYEOFF);
+  if(mine.length) r('rm','Remove '+esc(w)+' from keywords',I.trash,'dg');
+  r('list','All keywords…',I.gear,'sp');
+  lpClose();
+  lpEl=document.createElement('div');lpEl.className='lp-wrap';
+  lpEl.innerHTML='<i class="kw-selbox" style="left:'+(hit.r.left-3)+'px;top:'+(hit.r.top-2)+'px;width:'+(hit.r.width+6)+'px;height:'+(hit.r.height+4)+'px"></i>'+
+    '<div class="lp-menu kwh-menu" role="menu"><div class="lp-t">“'+esc(w)+'”</div>'+rows.join('')+'</div>';
+  document.body.appendChild(lpEl);
+  lpPlace(lpEl.querySelector('.lp-menu'),hit.r,p.x,p.y);
+  lpEl.addEventListener('click',function(e){
+    var b=e.target.closest('[data-lp]'),a=b&&b.getAttribute('data-lp');
+    lpClose();if(!a) return;
+    if(a==='list'){openKwList();return;}
+    if(a==='rm'){var KK=kwAll();for(var i=KK.length-1;i>=0;i--) if(KK[i].w===w) KK.splice(i,1);save();toast('Removed '+w);}
+    else if(a==='hide'){kwAdd(w,'hide','');toast('NOTAMs with '+w+' are hidden',5000,'Undo',function(){var KK=kwAll();for(var i=KK.length-1;i>=0;i--) if(KK[i].w===w&&KK[i].m==='hide') KK.splice(i,1);save();kwRefresh();});}
+    else{kwAdd(w,'hl',a==='here'?ap.code:'');toast(w+' highlighted'+(a==='here'?' at '+ap.code:' everywhere'));}
+    kwRefresh();
+  });
+  try{if(navigator.vibrate) navigator.vibrate(8);}catch(_){}
+  lpNoSel();setTimeout(lpNoSel,120);setTimeout(lpNoSel,600);
+}
+toolPanel.addEventListener('pointerdown',function(e){
+  if(e.pointerType==='mouse'&&e.button!==0) return;
+  var mn=e.target.closest&&e.target.closest('.nt-card:not(.sg) > .nt-main');
+  if(!mn||editMode) return;
+  ntLpCancel();
+  ntLp={el:mn,x:e.clientX,y:e.clientY,pid:e.pointerId,t:setTimeout(function(){var p=ntLp;ntLp=null;if(p) kwHold(p);},480)};
+});
+window.addEventListener('pointermove',function(e){if(ntLp&&e.pointerId===ntLp.pid&&Math.abs(e.clientX-ntLp.x)+Math.abs(e.clientY-ntLp.y)>10) ntLpCancel();},true);
+window.addEventListener('pointerup',function(){ntLpCancel();},true);
+window.addEventListener('pointercancel',function(){ntLpCancel();},true);
+toolWrap.addEventListener('scroll',function(){ntLpCancel();},{passive:true});
+toolPanel.addEventListener('contextmenu',function(e){if(e.target.closest&&e.target.closest('.nt-card > .nt-main')) e.preventDefault();});
 // Airports → Brief: the NOTAMs you kept for this airport
 function brApSectionHTML(ic){
   if(!brief) return '';
@@ -9105,7 +9465,7 @@ window.addEventListener('scroll',function(){lpCancel();},true);
 app.addEventListener('contextmenu',function(e){if(!editMode&&e.target.closest&&e.target.closest('.item > .row,.sec-body > .hd,.sec-body > .module')&&!e.target.closest('a,input,textarea,[contenteditable]')) e.preventDefault();});
 // iPhone: a hold also asks to select the word under the finger; no selection while a press is pending or its menu is open
 function lpNoSel(){try{var g=window.getSelection();if(g&&g.rangeCount&&!(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName))) g.removeAllRanges();}catch(_){}}
-document.addEventListener('selectstart',function(e){var t=e.target&&e.target.nodeType===1?e.target:e.target&&e.target.parentNode;if((lp||lpEl||lpSwallow)&&!(t&&t.closest&&t.closest('input,textarea,[contenteditable]'))) e.preventDefault();},true);
+document.addEventListener('selectstart',function(e){var t=e.target&&e.target.nodeType===1?e.target:e.target&&e.target.parentNode;if((lp||lpEl||lpSwallow||ntLp)&&!(t&&t.closest&&t.closest('input,textarea,[contenteditable]'))) e.preventDefault();},true);
 function lpClose(){if(lpEl){lpEl.remove();lpEl=null;}app.querySelectorAll('.lp-on').forEach(function(x){x.classList.remove('lp-on');});}
 function lpMenu(id,anchor,px,py){
   var f=find(id);if(!f) return;
@@ -9303,7 +9663,7 @@ function onAct(e){
   if(dragSuppress){dragSuppress=false;if(Date.now()-dragEndT<300) return;}
   var root=e.currentTarget,el=e.target.closest('[data-act]');if(!el||!root.contains(el)) return;
   var id=el.getAttribute('data-id'),c,act0=el.getAttribute('data-act');
-  if(root===app&&lpSwallow&&Date.now()-lpSwallow<900){lpSwallow=0;return;} // the finger lifting after a long press
+  if((root===app||root===toolPanel)&&lpSwallow&&Date.now()-lpSwallow<900){lpSwallow=0;return;} // the finger lifting after a long press
   if(selMode&&root===app&&['editItem','olOpen','selMode','toggleSec','toggleKids','headFold','lists'].indexOf(act0)<0) return; // while selecting, a tap only picks items
   switch(act0){
     case 'tick': tick(id);break;
@@ -9362,6 +9722,8 @@ function onAct(e){
       break;
     case 'wxSetUrl': wxSetUrl();break;
     case 'brTab': brTabTo(el.getAttribute('data-v'));break;
+    case 'kwList': openKwList();break;
+    case 'kwOnly': kwOnly(el.getAttribute('data-v')||'');break;
     case 'ntOpen': var ntk=el.getAttribute('data-v');if(brOpenSet.has(ntk)) brOpenSet.delete(ntk);else brOpenSet.add(ntk);refreshTool();break;
     case 'ntKeep': brKeepToggle(el.getAttribute('data-v'));break;
     case 'ntbOpen': var nbk=el.getAttribute('data-v');if(brOpenSet.has(nbk)) brOpenSet.delete(nbk);else brOpenSet.add(nbk);refreshModule(id);break;

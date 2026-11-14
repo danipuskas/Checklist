@@ -76,6 +76,12 @@ The NOTAMs that matter for your times and runways come first. The rest are folde
 Pasting only NOTAMs or weather later (the Briefing's load button) updates the briefing for those airports.
 Tap the bookmark on a NOTAM to keep it. Kept NOTAMs show in a NOTAMs block you add to any checklist section
 (Edit > NOTAMs), for the airports you choose: departure, destination, alternates, en route, company alerts.
+NOTAM KEYWORDS: your own words (22L, ILS, CRANE…), each in its own colour. NOTAMs with a Highlight word come
+first with the word marked; tap a word's chip to see only those NOTAMs. NOTAMs with a Hide word (BIRD…) fold away
+at the end of each list, one tap to show them; kept NOTAMs are never hidden. Whole words only: 22L finds
+RWY 04R/22L. Change the list with the gear next to the chips, or press and hold any word in a NOTAM to highlight
+it everywhere, at that airport only, or hide NOTAMs with it. Option in the list: Checkup summary, a card at the
+top of the Briefing with your words at each airport of the flight. Keywords are kept with your settings (and backup).
 
 LIVE WEATHER (optional): the Briefing tab can also show live METAR, TAF (aviationweather.gov) and US D-ATIS (atis.info)
 through a small free Cloudflare Worker you create once. Paste weather-relay-worker.js into a new "Hello World" Worker,
