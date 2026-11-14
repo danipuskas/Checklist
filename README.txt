@@ -73,6 +73,10 @@ and hold the box and Paste; or paste copied text; or drag the PDF in; or open it
 and the Briefing tab shows the NOTAMs for departure, destination, alternates and en-route airports, the
 SIGMETs on your route, company alerts and the package weather. The PDF is read on the iPad; nothing is sent anywhere.
 The NOTAMs that matter for your times and runways come first. The rest are folded, never hidden.
+RUNWAY IN USE: the departure and arrival runways come from the OFP. When one changes, tap the runway row at the top
+of the departure or destination tab and pick the new one (the runways in that airport's NOTAMs, or type one). The NOTAMs
+for your runway, the runway highlights and the summary follow it; the row turns amber and shows the OFP's, with Back to
+the OFP runway. Loading an updated copy of the same package keeps your choice unless its OFP has a different runway.
 Pasting only NOTAMs or weather later (the Briefing's load button) updates the briefing for those airports.
 Tap the bookmark on a NOTAM to keep it. Kept NOTAMs show in a NOTAMs block you add to any checklist section
 (Edit > NOTAMs), for the airports you choose: departure, destination, alternates, en route, company alerts.

@@ -1120,6 +1120,21 @@ a.rtag.rl svg{width:.95em;height:.95em;vertical-align:-.12em;margin-left:2px;str
 /* Briefing: the LIDO package with NOTAMs, weather and SIGMETs */
 .nt-pkg{background:var(--surface2);border:1px solid var(--line);border-radius:13px;padding:10px 13px;margin:0 0 10px}
 .nt-pkg-t{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.rw-row{appearance:none;width:100%;display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:9px 12px;margin:0 0 10px;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.rw-row > svg{width:19px;height:19px;color:var(--muted);flex:none}
+.rw-row > svg:last-child{width:15px;height:15px}
+.rw-l{flex:1;min-width:0;font-size:calc(14.5px*var(--ts));font-weight:650}
+.rw-l small{display:block;font-size:calc(12.5px*var(--ts));font-weight:600;color:var(--muted)}
+.rw-row b{font:750 calc(19px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+.rw-c{color:var(--accent);font-weight:700;font-size:calc(14px*var(--ts))}
+.rw-row.ch{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 7%,var(--paper))}
+.rw-row.ch .rw-l small{color:var(--warn)}
+.rw-row.ch > svg:first-child{color:var(--warn)}
+.rw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin:0 0 12px}
+.rw-grid button{appearance:none;border:1.5px solid var(--line);background:var(--paper);color:var(--text);border-radius:12px;padding:11px 4px 9px;font:750 calc(18px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer}
+.rw-grid button small{font:700 calc(10.5px*var(--ts)) -apple-system,system-ui,sans-serif;letter-spacing:.06em;color:var(--muted)}
+.rw-grid button.on{border-color:var(--accent);background:var(--accent-weak);color:var(--accent)}
+.rw-back{width:100%;margin:0 0 4px}
 .nt-pkg-t b{flex:1 1 auto;font-size:calc(16px*var(--ts));font-weight:700}
 .nt-pkg-t span{font-size:calc(13px*var(--ts));color:var(--muted);font-weight:600}
 .nt-pkg small{display:block;margin-top:3px;font-size:calc(13px*var(--ts));color:var(--muted)}
@@ -2399,7 +2414,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='87';
+var APP_VERSION='88';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -3970,7 +3985,7 @@ function brTimes(){
 }
 function brReview(){
   if(!brief) return [];
-  var t=brTimes(),k=brief.at+'|'+t.etd+'|'+t.eta;
+  var t=brTimes(),k=brief.at+'|'+t.etd+'|'+t.eta+'|'+(brief.flight.depRwy||'')+'|'+(brief.flight.arrRwy||'');
   if(brRv&&brRv.k===k) return brRv.rv;
   var G=brief.notams.groups,f=brief.flight,rv=NotamReader.review(brief.notams,{etd:t.etd,eta:t.eta,now:t.etd,dep:f.dep,dest:f.dest,depRwy:f.depRwy,arrRwy:f.arrRwy});
   rv.forEach(function(x){x.key=G.indexOf(x.g)+':'+x.n.id;});
@@ -4034,6 +4049,62 @@ function brFlightHTML(){
     '<small>'+esc(t3)+' · <button type="button" class="lnkbtn" data-act="brRemove">Remove</button></small>'+
     (!same&&f.dest?'<p class="nt-other">Your flight isn’t set to this route. <button type="button" class="lnkbtn" data-act="brFill">Fill the flight from it</button></p>':'')+'</div>';
 }
+// ---- the runway in use: the OFP's, or the one you pick when it changes ----
+// Setting one keeps the OFP's in depRwyOfp / arrRwyOfp, so you can go back. Everything that reads depRwy / arrRwy follows it.
+function rwOk(r){
+  var m=/^(?:RWY\s*)?(\d{1,2})\s*([LRC]?)$/.exec(String(r||'').toUpperCase().trim());
+  if(!m) return '';var n=+m[1];return n>=1&&n<=36?(n<10?'0':'')+n+m[2]:'';
+}
+function rwChanged(w){return !!brief&&((w+'RwyOfp') in brief.flight);}
+function rwOfp(w){var f=brief.flight;return rwChanged(w)?f[w+'RwyOfp']||'':f[w+'Rwy']||'';}
+function rwSet(w,r){
+  var f=brief.flight,k=w+'Rwy',ko=k+'Ofp';
+  if(!(ko in f)) f[ko]=f[k]||'';
+  f[k]=r===null?f[ko]:r;
+  if((f[k]||'')===(f[ko]||'')) delete f[ko];
+  brRv=null;brSave();refreshTool();
+  app.querySelectorAll('.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
+}
+// the runways at an airport, from its NOTAMs (both ends), plus the OFP's and the one set
+function rwCands(ic,w){
+  var o=[],u={},R=NotamReader.recip;
+  function add(r){r=rwOk(r);if(r&&!u[r]){u[r]=1;o.push(r);}}
+  brief.notams.groups.forEach(function(g){
+    if(g.code!==ic||!g.ad) return;
+    g.notams.forEach(function(n){var re=/\bRWY\s*(\d{2}[LRC]?)\b(?:\s*\/\s*(\d{2}[LRC]?)\b)?/g,m;while((m=re.exec(n.body||''))){add(m[1]);if(m[2]) add(m[2]);}});
+  });
+  add(rwOfp(w));add(brief.flight[w+'Rwy']);
+  o.slice().forEach(function(r){add(R(r));});
+  return o.sort(function(a,b){return (+a.slice(0,2))-(+b.slice(0,2))||'LCR'.indexOf(a.charAt(2))-'LCR'.indexOf(b.charAt(2));});
+}
+function rwRowHTML(w){
+  var f=brief.flight,r=f[w+'Rwy']||'',ch=rwChanged(w),of=rwOfp(w);
+  var sub=ch?(of?'Changed · OFP '+of:'Set by you'):(r?'From the OFP':'Not in the package');
+  return '<button type="button" class="rw-row'+(ch?' ch':'')+'" data-act="rwPick" data-v="'+w+'">'+I.plane+'<span class="rw-l">'+(w==='dep'?'Departure runway':'Arrival runway')+'<small>'+esc(sub)+'</small></span>'+
+    '<b>'+esc(r||'–')+'</b><span class="rw-c">'+(r?'Change':'Set')+'</span>'+I.right+'</button>';
+}
+function openRwPick(w){
+  if(!brief) return;
+  var f=brief.flight,ic=w==='dep'?f.dep:f.dest,cur=f[w+'Rwy']||'',of=rwOfp(w),C=rwCands(ic,w);
+  openSheet('<div class="menu-head"><h3>'+(w==='dep'?'Departure':'Arrival')+' runway</h3><button type="button" class="ib round" data-sact="cancel" aria-label="Close">'+I.x+'</button></div>'+
+    '<p class="hint">'+esc(ic||'')+(of?' · OFP '+esc(of):'')+'. When the runway changes, pick the new one: the NOTAMs for your runway, the runway highlights and the summary follow it.</p>'+
+    (C.length?'<div class="rw-grid" role="radiogroup">'+C.map(function(r){return '<button type="button" role="radio" aria-checked="'+(r===cur)+'" class="'+(r===cur?'on':'')+'" data-sact="pick" data-v="'+r+'">'+r+(r===of?'<small>OFP</small>':'')+'</button>';}).join('')+'</div>':'')+
+    '<div class="kw-add"><input type="text" class="fl-in" id="rwIn" maxlength="6" placeholder="'+(C.length?'Another runway, e.g. ':'Runway, e.g. ')+(C.length?NotamReader.recip(C[0])||'27L':'27L')+'" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off" inputmode="text" enterkeyhint="done"><button type="button" class="btn" data-sact="set">Set</button></div>'+
+    (rwChanged(w)?'<button type="button" class="btn rw-back" data-sact="ofp">Back to the OFP'+(of?' runway '+esc(of):'')+'</button>':'')+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Done</button></div>',
+  function(act,btn){
+    var r=null;
+    if(act==='pick') r=btn.getAttribute('data-v');
+    else if(act==='set'){var inp=$('#rwIn');r=rwOk(inp&&inp.value);if(!r){toast('Type a runway, like 27L');if(inp) inp.focus();return;}}
+    else if(act==='ofp'){closeSheet();rwSet(w,null);toast((w==='dep'?'Departure':'Arrival')+' runway back to the OFP'+(of?' '+of:''));return;}
+    else{closeSheet();return;}
+    closeSheet();
+    if(r===cur) return;
+    rwSet(w,r);toast((w==='dep'?'Departure':'Arrival')+' runway '+r+(r===of?' (OFP)':''));
+  });
+  var inp=$('#rwIn');
+  if(inp) inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('set',null);}});
+}
 // one airport (or FIR) with its important NOTAMs and the rest folded
 function wxAddHTML(){return '<div class="wxadd"><input type="text" class="fl-in" id="wxAddIn" maxlength="4" placeholder="Add ICAO or IATA" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off"><button type="button" class="btn" data-act="wxWatch">'+I.plus+'Add</button></div>';}
 function brPanelHTML(){
@@ -4052,6 +4123,7 @@ function brPanelHTML(){
   }).join('')+'</div>';
   if(brTab==='dep'||brTab==='dest'){
     var dep=brTab==='dep',ic=dep?f.dep:f.dest,rw=dep?f.depRwy:f.arrRwy;
+    if(ic) h+=rwRowHTML(dep?'dep':'arr');
     if(ic) h+=wxCardHTML({ic:ic,role:same?(dep?'From':'To'):''},false);
     h+=kwBarHTML(dep?by.dep.concat(by.toalt):by.dest);
     h+=brListHTML(dep?by.dep:by.dest,rw,brTab,(dep?'at ETD '+hmOf(t.etd):'at ETA '+hmOf(t.eta))+' ± 1 h'+(rw?' · runway '+rw:''));
@@ -4298,6 +4370,9 @@ document.addEventListener('drop',function(e){
 function brSetFrom(P,keep){
   var old=brief,f=P.flight,keep={},of=old&&old.flight,st=state.settings;
   if(of&&old.keep&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon) keep=old.keep; // a newer copy of the same flight keeps what you kept
+  if(of&&f.dep&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon) ['dep','arr'].forEach(function(w){ // and the runway you set, unless its OFP changed it
+    var k=w+'Rwy',ko=k+'Ofp';if((ko in of)&&(of[ko]||'')===(f[k]||'')){f[ko]=of[ko];f[k]=of[k];}
+  });
   if(!f.dep&&!f.dest){ // no OFP in it: the NOTAMs and weather go with the flight that's set
     var k=keep||brHint();
     f.dep=k.dep||'';f.dest=k.dest||'';f.fromApp=true;
@@ -9723,6 +9798,7 @@ function onAct(e){
     case 'wxSetUrl': wxSetUrl();break;
     case 'brTab': brTabTo(el.getAttribute('data-v'));break;
     case 'kwList': openKwList();break;
+    case 'rwPick': openRwPick(el.getAttribute('data-v'));break;
     case 'kwOnly': kwOnly(el.getAttribute('data-v')||'');break;
     case 'ntOpen': var ntk=el.getAttribute('data-v');if(brOpenSet.has(ntk)) brOpenSet.delete(ntk);else brOpenSet.add(ntk);refreshTool();break;
     case 'ntKeep': brKeepToggle(el.getAttribute('data-v'));break;
