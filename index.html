@@ -1650,11 +1650,23 @@ body.editing .toast,html.kb .toast{bottom:calc(env(safe-area-inset-bottom,0px) +
 .gl-k{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;color:var(--muted);font-size:calc(13px*var(--ts))}
 .gl-p{display:block;margin-top:6px;color:var(--muted);font-size:calc(13.5px*var(--ts));line-height:1.4}
 @media (min-width:1100px){
-  .br-main,.br-main .nt-in,.br-main .br-rowin{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:12px;align-items:start}
-  .br-main > *,.br-main .nt-in > *,.br-main .br-rowin > *{grid-column:1/-1}
-  .br-main > .nt-card,.br-main .nt-in > .nt-card,.br-main .br-rowin > .nt-card{grid-column:auto}
   .br-main .wxcols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);column-gap:28px}
 }
+.nt-card.full .nt-main{cursor:default}
+.nt-card.full .nt-body{margin-top:6px;font-size:calc(15px*var(--ts));line-height:1.5}
+.wl-wx{position:sticky;top:-12px;z-index:6;background:var(--bg);padding:12px 0 8px;margin:-6px 0 2px}
+.wl-wx .wxfold{top:20px!important}
+.wl-wx .wxc{margin:0}
+.wl-wx .wxh{padding-right:76px}
+.wl-wx .wxfold{appearance:none;position:absolute;top:14px;right:10px;z-index:1;display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--accent);font:inherit;font-weight:700;font-size:calc(13.5px*var(--ts));padding:8px 6px;cursor:pointer}
+.wl-wx .wxfold svg{width:16px;height:16px}
+.wxmin{appearance:none;width:100%;display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:9px 14px;color:var(--text);font:inherit;text-align:left;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.wxmin b{font:750 calc(15px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace;flex:none}
+.wxmin .wxcat{flex:none}
+.wxmin-r{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:500 calc(14px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace}
+.wxmin small{color:var(--muted);font-size:calc(12.5px*var(--ts));white-space:nowrap;flex:none}
+.wxmin-c{display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-weight:700;font-size:calc(13.5px*var(--ts));flex:none}
+.wxmin-c svg{width:16px;height:16px}
 @media (max-width:1099px){
   .wl{grid-template-columns:240px minmax(0,1fr);gap:16px}
   .wl .wl-ap .wxcat,.wl .wl-ap .n small{display:none}
@@ -2473,7 +2485,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='89';
+var APP_VERSION='90';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -4170,6 +4182,7 @@ function openRwPick(w){
 function wxAddHTML(){return '<div class="wxadd"><input type="text" class="fl-in" id="wxAddIn" maxlength="4" placeholder="Add ICAO or IATA" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off"><button type="button" class="btn" data-act="wxWatch">'+I.plus+'Add</button></div>';}
 function brPanelHTML(){
   if(!brief) return brEmptyHTML()+wxPanelHTML();
+  ntFull=false;
   var st=state.settings,f=brief.flight,t=brTimes(),rv=brReview(),by=brBy(rv),sg=brSigs(),same=brSame(),h=brFlightHTML(),wide=wideNow();
   if(wide) pgWide=true;
   if(st.wxUrl) h+=wxStatusHTML();
@@ -4185,6 +4198,7 @@ function brPanelHTML(){
     if(order.indexOf(brAltSel)<0) brAltSel=order[0]||'';
     var side=h+brSideHTML(by,f,t,sg,order,al);
     h='<div class="wl-h">'+brMainHead(f,t,order)+'</div>';
+    ntFull=true;
   }else
   h+='<div class="seg big nt-tabs" role="tablist">'+tabs.map(function(x){
     var on=x[0]===brTab;
@@ -4192,7 +4206,7 @@ function brPanelHTML(){
   }).join('')+'</div>';
   if(brTab==='dep'||brTab==='dest'){
     var dep=brTab==='dep',ic=dep?f.dep:f.dest,rw=dep?f.depRwy:f.arrRwy;
-    if(wide) h+='<div class="wl-top">'+(ic?rwRowHTML(dep?'dep':'arr'):'')+kwBarHTML(dep?by.dep.concat(by.toalt):by.dest)+'</div>'+(ic?wxCardHTML({ic:ic,role:same?(dep?'From':'To'):''},false):'');
+    if(wide) h+='<div class="wl-top">'+(ic?rwRowHTML(dep?'dep':'arr'):'')+kwBarHTML(dep?by.dep.concat(by.toalt):by.dest)+'</div>'+(ic?brWxPinHTML({ic:ic,role:same?(dep?'From':'To'):''}):'');
     else{
     if(ic) h+=rwRowHTML(dep?'dep':'arr');
     if(ic) h+=wxCardHTML({ic:ic,role:same?(dep?'From':'To'):''},false);
@@ -4210,7 +4224,7 @@ function brPanelHTML(){
     else{
       var inf=[typeof aa.min==='number'?'+'+durM(aa.min*60000,false)+' from '+(f.dest||'destination'):'',aa.dist?aa.dist+' nm':''].filter(Boolean).join(' · ');
       h+='<div class="wl-top"><div class="rw-row st">'+I.plane+'<span class="rw-l">Alternate runway<small>'+esc(inf||'From the OFP')+'</small></span><b>'+esc(aa.rwy||'–')+'</b></div>'+kwBarHTML(La)+'</div>'+
-        wxCardHTML({ic:ca,role:same&&st.alts.indexOf(ca)>=0?'Alternate':''},false)+
+        brWxPinHTML({ic:ca,role:same&&st.alts.indexOf(ca)>=0?'Alternate':''})+
         '<div class="nt-sec"><b>NOTAMs</b><span>'+La.length+' · from ETA '+hmOf(t.eta)+' for 2 h</span></div>'+
         (La.length?kwListHTML(La,'','altn:'+ca,true):'<p class="nt-none">None in the package.</p>');
     }
@@ -4246,8 +4260,31 @@ function brPanelHTML(){
   }
   if(st.wxUrl) h+='<p class="wxset">Live weather relay: '+esc(st.wxUrl)+' · <button type="button" class="lnkbtn" data-act="wxChangeUrl">Change</button></p>';
   else h+=brSetup?'<div class="nt-sec"><b>Live weather</b></div>'+wxPanelHTML():'<p class="wxset">The weather is from the package. For live METAR and TAF, <button type="button" class="lnkbtn" data-act="brSetup">set up the relay</button>.</p>';
+  ntFull=false;
   if(wide) return '<div class="wl"><aside class="wl-side">'+side+'</aside><section class="wl-main br-main">'+h+'</section></div>';
   return h;
+}
+// the weather at the top of the wide Briefing: stays in view while you read the NOTAMs, folds to one line
+var ntFull=false,brWxMin=false;
+function brWxPinHTML(a){
+  if(!brWxMin) return '<div class="wl-wx"><button type="button" class="wxfold" data-act="wxFold" aria-expanded="true" aria-label="Fold the weather to one line">Fold'+I.up+'</button>'+wxCardHTML(a,false)+'</div>';
+  var d=wxData(a.ic),m=d&&d.m,cat=m&&/^(VFR|MVFR|IFR|LIFR)$/.test(m.cat)?m.cat:'',ot=m?wxObsTime(m.raw,m.time):0;
+  var raw=m?String(m.raw).replace(/^(METAR|SPECI)\s+(COR\s+)?/,'').replace(/^[A-Z0-9]{4}\s+\d{6}Z\s+/,'').replace(/=$/,''):'';
+  return '<div class="wl-wx min"><button type="button" class="wxmin" data-act="wxFold" aria-expanded="false" aria-label="Show the weather for '+esc(a.ic)+'">'+
+    '<b>'+esc(a.ic)+'</b>'+(cat?'<span class="wxcat '+cat+'">'+cat+'</span>':'')+'<span class="wxmin-r">'+(raw?wxSig(raw):'No METAR')+'</span>'+
+    (ot?'<small>'+ageText(Date.now()-ot)+'</small>':'')+'<span class="wxmin-c">TAF'+I.down+'</span></button></div>';
+}
+// fold or show it, keeping the NOTAM you were reading where it was
+function wxFold(){
+  var wx=toolPanel.querySelector('.wl-wx'),top=toolWrap.getBoundingClientRect().top,key=null,off=0,stuck=false;
+  if(wx){
+    var b=wx.getBoundingClientRect();stuck=b.top<=top+2&&toolWrap.scrollTop>0;
+    var cs=toolPanel.querySelectorAll('.wl-main .nt-card > .nt-main');
+    for(var i=0;i<cs.length;i++){var r=cs[i].getBoundingClientRect();if(r.bottom>b.bottom+4){key=cs[i].getAttribute('data-v');off=r.top-b.bottom;break;}}
+  }
+  brWxMin=!brWxMin;refreshTool();
+  var wx2=toolPanel.querySelector('.wl-wx'),el=key&&toolPanel.querySelector('.wl-main .nt-main[data-v="'+key+'"]');
+  if(stuck&&wx2&&el) toolWrap.scrollTop+=el.getBoundingClientRect().top-wx2.getBoundingClientRect().bottom-off;
 }
 // ---- iPad full screen: the flight's airports down the side, the one you pick beside them ----
 var WIDE_MIN=800,pgWide=false,brAltSel='';
@@ -4686,7 +4723,7 @@ function brOrder(L){
   return L.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){return (ntIsCo(b.x)?1:0)-(ntIsCo(a.x)?1:0)||a.i-b.i;}).map(function(o){return o.x;});
 }
 function ntCardHTML(x,rw){
-  var n=x.n,c=ntCat(n),k=ntKey(x.g,n),kept=brIsKept(k),open=brOpenSet.has(x.key),off=x.level==='later'||x.level==='none';
+  var n=x.n,c=ntCat(n),k=ntKey(x.g,n),kept=brIsKept(k),open=ntFull||brOpenSet.has(x.key),off=x.level==='later'||x.level==='none';
   var why=x.why.filter(function(w){return w!=='Company';}),when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
   var km=kwMatch(x),kh=km.hl,code=x.g.code,kwu={};
   kh.forEach(function(q){kwu[q.w]=1;});
@@ -4694,9 +4731,9 @@ function ntCardHTML(x,rw){
   if(off) why.unshift('Not at your time');
   var top=(c?'<span class="nt-cat '+c[1]+'">'+c[0]+'</span>':'')+kh.map(function(q){return '<span class="nt-kw kw'+q.c+'">'+esc(q.w)+'</span>';}).join('')+
     why.slice(0,kh.length?2:3).map(function(w){return '<span class="nt-why'+(w==='Not at your time'?' off':'')+'">'+esc(w)+'</span>';}).join('');
-  return '<div class="nt-card'+(kept?' kept':'')+(off?' off':'')+(open?' open':'')+(kh.length?' kwm kw'+kh[0].c:'')+(x.kwHid?' kwhid':'')+'">'+
-    '<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'">'+(top?'<div class="nt-top">'+top+'</div>':'')+
-    '<div class="nt-head">'+kwMark(ntHL(ntHead(n),rw),code)+'</div>'+
+  return '<div class="nt-card'+(kept?' kept':'')+(off?' off':'')+(open?' open':'')+(ntFull?' full':'')+(kh.length?' kwm kw'+kh[0].c:'')+(x.kwHid?' kwhid':'')+'">'+
+    (ntFull?'<div class="nt-main" data-v="'+esc(x.key)+'">':'<div class="nt-main" data-act="ntOpen" data-v="'+esc(x.key)+'" role="button" aria-expanded="'+open+'">')+(top?'<div class="nt-top">'+top+'</div>':'')+
+    (ntFull?'':'<div class="nt-head">'+kwMark(ntHL(ntHead(n),rw),code)+'</div>')+
     '<div class="nt-when">'+(when?esc(when)+' · ':'')+'<span class="nt-id">'+esc(n.id)+'</span></div>'+
     (open?'<div class="nt-body">'+(n.sched?'<div class="nt-sch">'+esc(n.sched)+'</div>':'')+kwMark(ntHL(n.body||'',rw),code).replace(/\n/g,'<br>')+'</div>':'')+'</div>'+
     ntKeepHTML(k,kept)+'</div>';
@@ -8217,7 +8254,7 @@ function restPillHTML(T){
   return !editMode&&(restEditing.has(T.rest.id)||!restCalc(T.rest).err)?'<button type="button" class="pill" data-act="'+(restEditing.has(T.rest.id)?'restDone':'restEdit')+'" data-id="'+T.rest.id+'">'+(restEditing.has(T.rest.id)?'Done':'Edit')+'</button>':'';
 }
 function openTool(kind){
-  pgWide=false;
+  pgWide=false;ntFull=false;
   // countdowns and crew rest share the Timers page
   var toRest=kind==='rest';if(kind==='cd'||kind==='rest') kind='tm';
   clearTimeout(toolHideT);if(kind!==toolKind) toolApnOrd=false;toolKind=kind;
@@ -9973,6 +10010,7 @@ function onAct(e){
     case 'brTab': brTabTo(el.getAttribute('data-v'));break;
     case 'kwList': openKwList();break;
     case 'brSide': brSide(el.getAttribute('data-v'),el.getAttribute('data-ap'));break;
+    case 'wxFold': wxFold();break;
     case 'rwPick': openRwPick(el.getAttribute('data-v'));break;
     case 'kwOnly': kwOnly(el.getAttribute('data-v')||'');break;
     case 'ntOpen': var ntk=el.getAttribute('data-v');if(brOpenSet.has(ntk)) brOpenSet.delete(ntk);else brOpenSet.add(ntk);refreshTool();break;
