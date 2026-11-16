@@ -73,6 +73,13 @@ and hold the box and Paste; or paste copied text; or drag the PDF in; or open it
 and the Briefing tab shows the NOTAMs for departure, destination, alternates and en-route airports, the
 SIGMETs on your route, company alerts and the package weather. The PDF is read on the iPad; nothing is sent anywhere.
 The NOTAMs that matter for your times and runways come first. The rest are folded, never hidden.
+IPAD FULL SCREEN: when the app has the whole screen (800 points wide or more), the Briefing shows the flight's
+airports down the side (departure, take-off alternate, destination, each alternate, en route) with NOTAM counts,
+weather category and keyword dots; tap one to see its runway, METAR and TAF side by side, and its NOTAMs in two
+columns (one column with the iPad upright). Airports shows your airports down the side (this flight, its alternates,
+all airports), the notes in the middle, and At a glance on the right: local time now and at ETD/ETA, daylight,
+runway in use, weather, NOTAMs here (tap to open them in the Briefing) and your stats. In Slide Over, Split View
+or on the iPhone both pages stay as before.
 RUNWAY IN USE: the departure and arrival runways come from the OFP. When one changes, tap the runway row at the top
 of the departure or destination tab and pick the new one (the runways in that airport's NOTAMs, or type one). The NOTAMs
 for your runway, the runway highlights and the summary follow it; the row turns amber and shows the OFP's, with Back to
