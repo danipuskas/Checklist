@@ -1120,6 +1120,8 @@ a.rtag.rl svg{width:.95em;height:.95em;vertical-align:-.12em;margin-left:2px;str
 /* Briefing: the LIDO package with NOTAMs, weather and SIGMETs */
 .nt-pkg{background:var(--surface2);border:1px solid var(--line);border-radius:13px;padding:10px 13px;margin:0 0 10px}
 .nt-pkg-t{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.wxnone.old{color:var(--warn)}
+.wxnone .lnkbtn{font-weight:700;text-decoration:none}
 .brwx{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:calc(13px*var(--ts));color:var(--muted)}
 .brwx > span{flex:1;min-width:0;display:inline-flex;align-items:center;gap:6px}
 .brwx > span svg{width:14px;height:14px}
@@ -2492,7 +2494,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='91';
+var APP_VERSION='92';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -3845,9 +3847,10 @@ function wxFetch(ids){
     wxSt.retry=Date.now()+60000;
   }).then(function(){clearTimeout(tm);wxSt.busy=false;wxRefreshViews();});
 }
+function wxUpdHTML(ic){return state.settings.wxUrl?' <button type="button" class="lnkbtn" data-act="wxOneNow" data-v="'+esc(ic)+'">Update</button>':'';}
 function wxOne(ic){
   var now=Date.now();
-  if(!state.settings.wxUrl||wxSt.busy||navigator.onLine===false||!/^[A-Z0-9]{4}$/.test(ic||'')) return;
+  if(!state.settings.wxUrl||wxSt.busy||navigator.onLine===false||now<wxSt.retry||!/^[A-Z0-9]{4}$/.test(ic||'')) return;
   if(wx[ic]&&now-(wx[ic].f||0)<WX_EVERY) return;
   wxFetch([ic]);
 }
@@ -3881,12 +3884,15 @@ function wxAtisHTML(ic,list){
 function wxRefreshViews(){
   app.querySelectorAll('.module.wx,.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
   if(toolOpen&&toolKind==='wx') refreshTool();
+  else if(toolOpen&&toolKind==='apn'){var gl=toolPanel.querySelector('.wl-glance'),ic=apnPanelIcao();if(gl&&ic) gl.innerHTML=apGlanceHTML(ic);}
 }
 function wxPaint(){
   var now=Date.now();
   document.querySelectorAll('[data-etaw]').forEach(function(el){var x=el.querySelector('[data-etain]');if(x) x.textContent=relT(+el.getAttribute('data-etaw'),now);});document.querySelectorAll('[data-wxst]').forEach(function(el){el.innerHTML=wxStatusInner();el.classList.toggle('old',wxStale());});
   if(brief) document.querySelectorAll('[data-brwx]').forEach(function(el){el.innerHTML=brWxInner();var f=brWxLast();el.classList.toggle('old',!!state.settings.wxUrl&&(!f||Date.now()-f>60*60000));});}
-function ageText(ms){var m=Math.max(0,Math.round(ms/60000));return m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+m%60+' min':'');}
+function ageText(ms){var m=Math.max(0,Math.round(ms/60000));return m<60?m+' min':m<48*60?Math.floor(m/60)+' h'+(m%60?' '+m%60+' min':''):Math.floor(m/1440)+' days';}
+// a time with its date when it isn't today's
+function dayHm(t){var d=new Date(t);return (Math.abs(Date.now()-t)>20*3600000?d.getUTCDate()+' '+MON[d.getUTCMonth()]+' ':'')+hmOf(t);}
 function wxLastFetch(ids){var f=0;ids.forEach(function(ic){if(wx[ic]&&wx[ic].f>f) f=wx[ic].f;});return f;}
 function wxStale(){var f=wxLastFetch(wxAirports().map(function(x){return x.ic;}));return !!f&&Date.now()-f>60*60000;}
 function wxStatusInner(){
@@ -3998,10 +4004,14 @@ function wxCardHTML(a,removable,bare){
   if(d.m){
     var ot=wxObsTime(d.m.raw,d.m.time),age=ot?now-ot:0;
     h+='<div class="wxl">METAR</div><div class="wxraw">'+wxSig(d.m.raw)+'</div>'+(ot?'<div class="wxm'+(age>75*60000?' old':'')+'">'+hmOf(ot)+' · '+ageText(age)+' old'+(d.m.pkg?' · LIDO package':d.f?' · live':'')+'</div>':'');
+  }else if(d.mOld){
+    var oo=wxObsTime(d.mOld.raw,d.mOld.time);
+    h+='<div class="wxl">METAR</div><div class="wxnone old">No recent METAR. The last one here is from '+dayHm(oo)+' ('+ageText(now-oo)+' old).'+wxUpdHTML(a.ic)+'</div>';
   }else h+='<div class="wxl">METAR</div><div class="wxnone">None available</div>';
   if(Array.isArray(d.a)) h+=wxAtisHTML(a.ic,d.a);
   h+='</div><div class="wxcol">';
   if(tf) h+=tf.html+(d.t.time?'<div class="wxm">Issued '+hmOf(d.t.time)+(d.t.pkg?' · LIDO package':d.f?' · live':'')+'</div>':'');
+  else if(d.tOld) h+='<div class="wxl">TAF</div><div class="wxnone old">No current TAF. The last one here ended '+dayHm(d.tOld.end)+'.'+(d.mOld?'':wxUpdHTML(a.ic))+'</div>';
   else h+='<div class="wxl">TAF</div><div class="wxnone">None available</div>';
   return h+'</div></div></div>';
 }
@@ -4087,7 +4097,23 @@ function brPkgWx(P){
 }
 function brHasWx(){return !!(brief&&brief.wx&&Object.keys(brief.wx).length);}
 // the relay's weather when it's newer, the package's otherwise, so the cards work offline too
-function wxData(ic){
+var WX_MOLD=12*3600000;
+function tafEndOf(t){
+  if(!t||!t.raw) return 0;
+  var sp=tafSpans(wxTafLines(t.raw).split('\n'),t.time||wxObsTime(t.raw)||Date.now());
+  return sp.v?sp.v.e:0;
+}
+// what's still current; the old ones are kept aside so a card can say when the last one was
+function wxCurrent(d){
+  if(!d) return d;
+  var now=Date.now(),o={m:d.m,t:d.t,f:d.f,a:d.a};
+  if(o.m){var ot=wxObsTime(o.m.raw,o.m.time);if(ot&&now-ot>WX_MOLD){o.mOld=o.m;o.m=null;}}
+  if(o.t){var te=tafEndOf(o.t);if(te&&te<now){o.tOld={raw:o.t.raw,time:o.t.time,end:te,pkg:o.t.pkg};o.t=null;}}
+  if(Array.isArray(o.a)) o.a=o.a.filter(function(x){var t=atisTime(x);return !t||now-t<6*3600000;});
+  return o;
+}
+function wxData(ic){return wxCurrent(wxDataAll(ic));}
+function wxDataAll(ic){
   var d=wx[ic],p=brief&&brief.wx&&brief.wx[ic];
   if(!p) return d;
   var dm=d&&d.m?wxObsTime(d.m.raw,d.m.time)||0:0,dt=d&&d.t?d.t.time||0:0;
@@ -8431,6 +8457,7 @@ function apnWideHTML(all,body,icao,fh){
   if(all.length) side+='<div class="wl-grp">All airports · '+all.length+'</div><div class="wl-list">'+all.map(function(c){return row(c,'',toolApnSel==='all'&&icao===c&&alts.indexOf(c)<0,apNoteCount(c)||'');}).join('')+'</div>';
   else side+='<p class="hint">Your airports with notes or flights show here.</p>';
   var head=icao?'<div class="wl-h"><b>'+esc(icao)+'</b><span>'+esc(apShort(icao))+'</span></div>':'';
+  if(icao) setTimeout(function(){wxOne(icao);},0);
   return '<div class="wl ap3"><aside class="wl-side">'+fh+side+'</aside><section class="wl-main ap-main">'+head+body+'</section>'+
     (icao?'<aside class="wl-glance">'+apGlanceHTML(icao)+'</aside>':'')+'</div>';
 }
@@ -10060,6 +10087,7 @@ function onAct(e){
       if(!wxIdsAll().length){toast('Set the flight or load a package first');break;}
       wxSt.retry=0;wxFetch(wxIdsAll());break;
     case 'wxOpen': openTool('wx');break;
+    case 'wxOneNow': if(state.settings.wxUrl&&!wxSt.busy){wxSt.retry=0;wxFetch([el.getAttribute('data-v')]);}break;
     case 'wxAtis':
       var ak=el.getAttribute('data-v');if(wxAtisOpen.has(ak)) wxAtisOpen.delete(ak);else wxAtisOpen.add(ak);
       el.classList.toggle('clamp',!wxAtisOpen.has(ak));

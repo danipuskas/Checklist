@@ -79,6 +79,9 @@ future flight gets the newest METAR and TAF too. En-route airports update when y
 "Live weather · updated 2210Z" with an Update button (or "Weather from the package" without the relay); every report
 says "LIDO package" or "live". The newer of the two is shown. Each card shows your ETD/ETA at that airport, the TAF
 lines for it, and says when the TAF ends before (or starts after) your time.
+OLD WEATHER: a METAR more than 12 h old or a TAF whose time is over is never shown as current weather; the card says
+"No recent METAR. The last one here is from 30 Oct 1730Z (17 days old)" with Update. Airports (full screen) updates
+the weather of the airport you open. Ages past two days are given in days.
 IPAD FULL SCREEN: when the app has the whole screen (800 points wide or more), the Briefing shows the flight's
 airports down the side (departure, take-off alternate, destination, each alternate, en route) with NOTAM counts,
 weather category and keyword dots; tap one to see its runway, METAR and TAF side by side, and its NOTAMs one under
