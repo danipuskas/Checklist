@@ -80,6 +80,9 @@ future flight gets the newest METAR and TAF too. En-route airports update when y
 says "LIDO package" or "live". The newer of the two is shown. Each card shows your ETD/ETA at that airport, the TAF
 lines for it, and says when the TAF ends before (or starts after) your time. This shows only when the package
 is the flight set in the app and that time is still ahead; a package you read just to brief shows its weather plainly.
+NOTAMs follow the same rule: for your flight (until 2 h after its ETA) they're read against your ETD/ETA, the ones
+not active then dimmed as "Not at your time"; for a package you read just to brief, or a flight that's over, every
+NOTAM is shown at full strength, rated on its content only, with "From …" when it starts later than now.
 OLD WEATHER: a METAR more than 12 h old or a TAF whose time is over is never shown as current weather; the card says
 "No recent METAR. The last one here is from 30 Oct 1730Z (17 days old)" with Update. Airports (full screen) updates
 the weather of the airport you open. Ages past two days are given in days.

@@ -2494,7 +2494,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='93';
+var APP_VERSION='94';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -4129,12 +4129,25 @@ function brTimes(){
   if(eta<=etd) eta=etd+3600000;
   return {etd:etd,eta:eta,shift:f.etd?etd-f.etd:0};
 }
+// is the package the flight you're on, still ahead or under way? Then NOTAMs and weather are read against its times.
+// Otherwise (a package you read just to brief, or a flight that's over) everything is shown plainly.
+function brLive(){
+  if(!brief||!brSame()) return false;
+  return Date.now()<brTimes().eta+2*3600000;
+}
 function brReview(){
   if(!brief) return [];
-  var t=brTimes(),k=brief.at+'|'+t.etd+'|'+t.eta+'|'+(brief.flight.depRwy||'')+'|'+(brief.flight.arrRwy||'');
+  var t=brTimes(),live=brLive(),k=brief.at+'|'+t.etd+'|'+t.eta+'|'+(brief.flight.depRwy||'')+'|'+(brief.flight.arrRwy||'')+'|'+live;
   if(brRv&&brRv.k===k) return brRv.rv;
-  var G=brief.notams.groups,f=brief.flight,rv=NotamReader.review(brief.notams,{etd:t.etd,eta:t.eta,now:t.etd,dep:f.dep,dest:f.dest,depRwy:f.depRwy,arrRwy:f.arrRwy});
-  rv.forEach(function(x){x.key=G.indexOf(x.g)+':'+x.n.id;});
+  var G=brief.notams.groups,f=brief.flight,rv=NotamReader.review(brief.notams,{etd:t.etd,eta:t.eta,now:t.etd,dep:f.dep,dest:f.dest,depRwy:f.depRwy,arrRwy:f.arrRwy}),now=Date.now();
+  rv.forEach(function(x){
+    x.key=G.indexOf(x.g)+':'+x.n.id;
+    if(live) return;
+    // no time to read them against: rate on content only, and say "From …" for the ones that start later than now
+    x.level=x.score>=5?'high':x.score>=2?'mid':'low';
+    if((x.g.section==='enroute'||x.g.section==='area')&&x.level==='high'&&!/GNSS|Company/.test(x.why.join())) x.level='mid';
+    x.win=[now,now];
+  });
   brRv={k:k,rv:rv};return rv;
 }
 function brBy(rv){
@@ -4284,7 +4297,7 @@ function brPanelHTML(){
     if(ic) h+=wxCardHTML({ic:ic,role:same?(dep?'From':'To'):'',win:brWin(dep?'dep':'dest',ic)},false);
     h+=kwBarHTML(dep?by.dep.concat(by.toalt):by.dest);
     }
-    h+=brListHTML(dep?by.dep:by.dest,rw,brTab,(dep?'at ETD '+hmOf(t.etd):'at ETA '+hmOf(t.eta))+' ± 1 h'+(rw?' · runway '+rw:''));
+    h+=brListHTML(dep?by.dep:by.dest,rw,brTab,brLive()?(dep?'at ETD '+hmOf(t.etd):'at ETA '+hmOf(t.eta))+' ± 1 h'+(rw?' · runway '+rw:''):(rw?'runway '+rw:'all in the package'));
     if(dep&&by.toalt.length){
       var ta=brCodes(by.toalt);
       h+='<div class="nt-sec"><b>Take-off alternate</b></div>'+ta.order.map(function(c){return brApBlockHTML(c,ta.map[c],{name:brCap(ta.map[c][0].g.name),wx:true,sec:'toalt',win:brWin('dep',c)});}).join('');
@@ -4297,11 +4310,11 @@ function brPanelHTML(){
       var inf=[typeof aa.min==='number'?'+'+durM(aa.min*60000,false)+' from '+(f.dest||'destination'):'',aa.dist?aa.dist+' nm':''].filter(Boolean).join(' · ');
       h+='<div class="wl-top"><div class="rw-row st">'+I.plane+'<span class="rw-l">Alternate runway<small>'+esc(inf||'From the OFP')+'</small></span><b>'+esc(aa.rwy||'–')+'</b></div>'+kwBarHTML(La)+'</div>'+
         brWxPinHTML({ic:ca,role:same&&st.alts.indexOf(ca)>=0?'Alternate':'',win:brWin('altn',ca)})+
-        '<div class="nt-sec"><b>NOTAMs</b><span>'+La.length+' · from ETA '+hmOf(t.eta)+' for 2 h</span></div>'+
+        '<div class="nt-sec"><b>NOTAMs</b><span>'+La.length+(brLive()?' · from ETA '+hmOf(t.eta)+' for 2 h':'')+'</span></div>'+
         (La.length?kwListHTML(La,'','altn:'+ca,true):'<p class="nt-none">None in the package.</p>');
     }
   }else if(brTab==='altn'){
-    h+='<div class="nt-sec"><b>Alternates</b><span>NOTAMs from ETA '+hmOf(t.eta)+' for 2 h</span></div>'+kwBarHTML(by.altn);
+    h+='<div class="nt-sec"><b>Alternates</b>'+(brLive()?'<span>NOTAMs from ETA '+hmOf(t.eta)+' for 2 h</span>':'')+'</div>'+kwBarHTML(by.altn);
     if(!order.length) h+='<p class="nt-none">No alternates in the package.</p>';
     h+=order.map(function(c){
       var a=(f.altns||[]).filter(function(x){return x.icao===c;})[0]||{},L=al.map[c]||[];
