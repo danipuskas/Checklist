@@ -78,7 +78,8 @@ date (departure, take-off alternate, destination, alternates), whatever flight t
 future flight gets the newest METAR and TAF too. En-route airports update when you open them. The package card says
 "Live weather · updated 2210Z" with an Update button (or "Weather from the package" without the relay); every report
 says "LIDO package" or "live". The newer of the two is shown. Each card shows your ETD/ETA at that airport, the TAF
-lines for it, and says when the TAF ends before (or starts after) your time.
+lines for it, and says when the TAF ends before (or starts after) your time. This shows only when the package
+is the flight set in the app and that time is still ahead; a package you read just to brief shows its weather plainly.
 OLD WEATHER: a METAR more than 12 h old or a TAF whose time is over is never shown as current weather; the card says
 "No recent METAR. The last one here is from 30 Oct 1730Z (17 days old)" with Update. Airports (full screen) updates
 the weather of the airport you open. Ages past two days are given in days.

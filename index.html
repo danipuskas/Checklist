@@ -2494,7 +2494,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='92';
+var APP_VERSION='93';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -3962,7 +3962,7 @@ function tafSpans(lines,ref){
 function durM(ms,up){var m=up?Math.ceil(ms/60000):Math.floor(ms/60000);return Math.floor(m/60)+':'+pad2(m%60);}
 function relT(t,now){return t>now?'in '+durM(t-now,true):durM(now-t,false)+' ago';}
 function wxWin(a){
-  if(a.win) return a.win; // Prepare gives its own arrival or departure time
+  if(a.win!==undefined) return a.win; // the Briefing, Airports and Prepare give their own time (or none)
   var st=state.settings,t=0,o={};
   if(a.role==='To'&&st.etaT){t=st.etaT;o={k:'ETA',tz:st.dest&&st.dest.tz};}
   else if(a.role==='From'&&st.etdT){t=st.etdT;o={k:'ETD',tz:st.dep&&st.dep.tz};}
@@ -3970,7 +3970,7 @@ function wxWin(a){
     var m=st.altMin[st.dest.icao+'>'+a.ic];
     if(typeof m==='number'){t=st.etaT+m*60000;o={k:'ETA',approx:true,sub:st.dest.icao+' + '+m+' min'};}
   }
-  if(!t) return null;
+  if(!t||t+3600000<Date.now()) return null; // your time has passed: nothing to show it against
   o.t=t;o.s=t-3600000;o.e=t+3600000;return o;
 }
 function wxStripHTML(w,extra){
@@ -4363,7 +4363,9 @@ var WIDE_MIN=800,pgWide=false,brAltSel='';
 function wideNow(){return window.innerWidth>=WIDE_MIN;}
 function apShort(c,g){return (c&&apName(c).replace(/\s*\([A-Z-]{2}\)$/,''))||(g?brCap(g.name):'')||c||'';}
 // your time at an airport of the package, for its weather card
+// only for the flight you're on: a package you read just to brief shows its weather plainly
 function brWin(kind,ic){
+  if(!brSame()) return null;
   var t=brTimes(),f=brief.flight,x=0,o={},rec=apRecOf(ic);
   if(kind==='dep'&&t.etd){x=t.etd;o={k:'ETD'};}
   else if(kind==='dest'&&t.eta){x=t.eta;o={k:'ETA'};}
@@ -4372,7 +4374,7 @@ function brWin(kind,ic){
     if(a&&typeof a.min==='number'){x=t.eta+a.min*60000;o={k:'ETA',approx:true,sub:(f.dest||'destination')+' + '+a.min+' min'};}
     else{x=t.eta;o={k:'ETA',approx:true,sub:'at '+(f.dest||'destination')+' ETA'};}
   }
-  if(!x) return null;
+  if(!x||x+3600000<Date.now()) return null;
   o.t=x;o.s=x-3600000;o.e=x+3600000;o.tz=rec&&rec.tz||'';return o;
 }
 function brSideRowHTML(o){
@@ -8469,7 +8471,7 @@ function apGlanceHTML(ic){
   h+=briefTimeHTML(ic,tz,rec,w,now);
   var bf=brief&&brief.flight;
   if(bf&&brSame()&&(bf.dep===ic||bf.dest===ic)) h+=rwRowHTML(bf.dep===ic?'dep':'arr');
-  h+=wxCardHTML({ic:ic,role:isDep?'From':isDest?'To':(st.alts||[]).indexOf(ic)>=0?'Alternate':'',win:w&&w.t?{k:w.k,t:w.t,s:w.t-3600000,e:w.t+3600000,tz:tz}:null},false);
+  h+=wxCardHTML({ic:ic,role:isDep?'From':isDest?'To':(st.alts||[]).indexOf(ic)>=0?'Alternate':'',win:w&&w.t&&w.t+3600000>Date.now()&&(!brief||brSame()||!(isDep||isDest))?{k:w.k,t:w.t,s:w.t-3600000,e:w.t+3600000,tz:tz}:null},false);
   if(brief){
     var L=brReview().filter(function(x){return x.g.ad&&x.g.code===ic;});
     if(L.length){
