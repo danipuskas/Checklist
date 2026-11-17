@@ -86,7 +86,7 @@ NOTAM is shown at full strength, rated on its content only, with "From …" when
 OLD WEATHER: a METAR more than 12 h old or a TAF whose time is over is never shown as current weather; the card says
 "No recent METAR. The last one here is from 30 Oct 1730Z (17 days old)" with Update. Airports (full screen) updates
 the weather of the airport you open. Ages past two days are given in days.
-IPAD FULL SCREEN: when the app has the whole screen (800 points wide or more), the Briefing shows the flight's
+IPAD FULL SCREEN (the side list and the page beside it scroll separately): when the app has the whole screen (800 points wide or more), the Briefing shows the flight's
 airports down the side (departure, take-off alternate, destination, each alternate, en route) with NOTAM counts,
 weather category and keyword dots; tap one to see its runway, METAR and TAF side by side, and its NOTAMs one under
 another with their full text (nothing to tap open). The weather stays at the top while you scroll the NOTAMs;
@@ -101,6 +101,8 @@ the OFP runway. Loading an updated copy of the same package keeps your choice un
 Pasting only NOTAMs or weather later (the Briefing's load button) updates the briefing for those airports.
 Tap the bookmark on a NOTAM to keep it. Kept NOTAMs show in a NOTAMs block you add to any checklist section
 (Edit > NOTAMs), for the airports you choose: departure, destination, alternates, en route, company alerts.
+KEPT ONLY: the Kept chip first in the row over the NOTAMs shows only the NOTAMs you kept (bookmarked), on every
+airport until you tap it again or Show all; it turns off by itself when you un-keep the last one.
 NOTAM KEYWORDS: your own words (22L, ILS, CRANE…), each in its own colour. NOTAMs with a Highlight word come
 first with the word marked; tap a word's chip to see only those NOTAMs. NOTAMs with a Hide word (BIRD…) fold away
 at the end of each list, one tap to show them; kept NOTAMs are never hidden. Whole words only: 22L finds
