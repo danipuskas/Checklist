@@ -4,7 +4,7 @@ FLIGHT CHECKLISTS – OFFLINE SETUP (about 10 minutes, once)
 2. Sign in or sign up at github.com in Safari.
 3. Tap + > New repository. Give it a name (e.g. checklists), set it to Public, create it.
 4. Tap "uploading an existing file" and add every file from the unzipped folder:
-   index.html, airports.js, sw.js, manifest.webmanifest, icon-180.png, icon-192.png, icon-512.png,
+   index.html, airports.js, runways.js, sw.js, manifest.webmanifest, icon-180.png, icon-192.png, icon-512.png,
    and the lib folder (pdf.js and pdf.worker.js, used to read the LIDO package).
    Tap Commit changes.
 5. In the repository: Settings > Pages > Source: Deploy from a branch > Branch: main, folder / (root) > Save.
@@ -80,6 +80,8 @@ future flight gets the newest METAR and TAF too. En-route airports update when y
 says "LIDO package" or "live". The newer of the two is shown. Each card shows your ETD/ETA at that airport, the TAF
 lines for it, and says when the TAF ends before (or starts after) your time. This shows only when the package
 is the flight set in the app and that time is still ahead; a package you read just to brief shows its weather plainly.
+New weather goes into the cards where they are: the page doesn't redraw, so the NOTAM you're reading stays where it is
+and a search you're typing keeps the keyboard.
 NOTAMs follow the same rule: for your flight (until 2 h after its ETA) they're read against your ETD/ETA, the ones
 not active then dimmed as "Not at your time"; for a package you read just to brief, or a flight that's over, every
 NOTAM is shown at full strength, rated on its content only, with "From …" when it starts later than now.
@@ -109,7 +111,33 @@ at the end of each list, one tap to show them; kept NOTAMs are never hidden. Who
 RWY 04R/22L. Change the list with the gear next to the chips, or press and hold any word in a NOTAM to highlight
 it everywhere, at that airport only, or hide NOTAMs with it. Option in the list: Checkup summary, a card at the
 top of the Briefing with your words at each airport of the flight. Keywords are kept with your settings (and backup).
+SEARCH EVERY NOTAM: on the full iPad screen, the box at the top of the side list; on the iPhone and in Slide Over, the
+magnifier at the top of the Briefing. It looks through every NOTAM in the package (and their numbers), for words that
+start with what you type: CRANE finds CRANES, RANE doesn't. Several words must all be there (CRANE 12L). The results
+are grouped by airport in the package's order with the words marked; in the side list the airports without any fade.
+Open goes to that airport with the search cleared. Up to 200 results; add a word to narrow it down.
+WHAT CHANGED: load a newer copy of the same flight's package and a sheet shows what's different from the copy you
+had: ETD and ETA, runways, alternates, aircraft, fuel, trip time, levels, route; new NOTAMs; NOTAMs no longer in the
+package (only for airports the new copy has); new TAFs. Tap a new NOTAM to go to its airport. In the Briefing the package card
+says "New copy 1312Z · 4 new · 2 removed · ETD +35 min" with See changes; airports show "+2 new"; new NOTAMs are
+marked New and come first; the ones gone are struck through at the end of their airport (folded when more than 3).
+The marks stay until Clear the marks in the sheet, or until you load another copy. Loading only NOTAMs does the same
+for those airports.
+WIND ON YOUR RUNWAY (off until you tap Wind on a weather card): headwind or tailwind and crosswind on your runway from
+the METAR, with gusts, a small compass, and what a varying wind (250V320) can do. "Around your ETA" gives the strongest
+wind the TAF has at your time and its components. All runways now lists every runway, most into the wind first, with
+yours marked. The runway is the OFP's (or the one you set), and an alternate's from the OFP. Tailwind and crosswinds of
+15 kt or more are amber. A chip next to the runway row shows the same in a few letters. True runway headings come from
+runways.js (OurAirports, public domain); for an airport it doesn't have, the runway number is used (within a few
+degrees). Wind and Trend are one setting for every card; tap again to hide.
+WEATHER TREND (off until you tap Trend): the last METARs of up to 3 hours, as a table on the iPad, as small bars on
+the iPhone, with worse values in amber and a line saying what changed: visibility, ceiling, new weather and since
+when, a small temperature spread, QNH, wind. The app keeps every METAR it gets (6 hours, on the device). The relay
+from version 3 sends the last 3 hours at once; with an older relay the trend fills in as the weather updates.
+On the full iPad screen, Wind and Trend sit under the weather that stays at the top (also when it's folded).
 
 LIVE WEATHER (optional): the Briefing tab can also show live METAR, TAF (aviationweather.gov) and US D-ATIS (atis.info)
 through a small free Cloudflare Worker you create once. Paste weather-relay-worker.js into a new "Hello World" Worker,
 deploy it, and enter its address (https://….workers.dev) in Briefing.
+UPDATING THE RELAY (version 3, for the 3-hour trend): Cloudflare dashboard > Workers & Pages > your relay > Edit code,
+select all, paste the new weather-relay-worker.js, Deploy. The address stays the same; nothing to change in the app.

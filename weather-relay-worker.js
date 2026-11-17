@@ -1,5 +1,6 @@
-// Weather relay for Flight Checklists (version 2).
+// Weather relay for Flight Checklists (version 3).
 // METAR and TAF from aviationweather.gov (NOAA), and D-ATIS for US airports from atis.info (FAA data).
+// Version 3 also sends the METARs of the last 3 hours, for the weather trend.
 const AWC = 'https://aviationweather.gov/api/data/';
 const DATIS = 'https://atis.info/api/';
 const UA = { 'User-Agent': 'FlightChecklists-weather-relay' };
@@ -21,15 +22,20 @@ export default {
     const us = ids.filter(x => /^[KP]/.test(x)); // D-ATIS exists for US airports only
     try {
       const [m, t, a] = await Promise.all([
-        get(AWC + 'metar?' + q, 120),
+        get(AWC + 'metar?' + q + '&hours=3', 120),
         get(AWC + 'taf?' + q, 600),
         Promise.all(us.map(id => getAtis(id)))
       ]);
-      const out = { ok: true, v: 2, at: Date.now(), metar: {}, taf: {}, atis: {} };
+      const out = { ok: true, v: 3, at: Date.now(), metar: {}, taf: {}, atis: {}, hist: {} };
       for (const r of m) {
         const id = r.icaoId || r.stationId, raw = r.rawOb || r.rawText || r.raw_text;
-        if (id && raw && !out.metar[id]) out.metar[id] = { raw, time: when(r.obsTime ?? r.reportTime), cat: r.fltCat || '' };
+        if (!id || !raw) continue;
+        const time = when(r.obsTime ?? r.reportTime), cur = out.metar[id];
+        // the latest one is the METAR; all of them (newest first, up to 8) are the history
+        if (!cur || (time || 0) > (cur.time || 0)) out.metar[id] = { raw, time, cat: r.fltCat || '' };
+        (out.hist[id] = out.hist[id] || []).push({ raw, time });
       }
+      for (const id in out.hist) out.hist[id] = out.hist[id].sort((a, b) => (b.time || 0) - (a.time || 0)).slice(0, 8);
       for (const r of t) {
         const id = r.icaoId || r.stationId, raw = r.rawTAF || r.rawText || r.raw_text;
         if (id && raw && !out.taf[id]) out.taf[id] = { raw, time: when(r.issueTime ?? r.bulletinTime) };
