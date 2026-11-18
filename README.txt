@@ -99,7 +99,9 @@ or on the iPhone both pages stay as before.
 RUNWAY IN USE: the departure and arrival runways come from the OFP. When one changes, tap the runway row at the top
 of the departure or destination tab and pick the new one (the runways in that airport's NOTAMs, or type one). The NOTAMs
 for your runway, the runway highlights and the summary follow it; the row turns amber and shows the OFP's, with Back to
-the OFP runway. Loading an updated copy of the same package keeps your choice unless its OFP has a different runway.
+the OFP runway. Each alternate has its own runway row too (on its page on the iPad, under its name on the iPhone):
+the OFP's, or tap it to pick another; its NOTAMs, highlights and wind follow it, and the side list says "(changed)".
+Loading an updated copy of the same package keeps your choices unless its OFP has a different runway.
 Pasting only NOTAMs or weather later (the Briefing's load button) updates the briefing for those airports.
 Tap the bookmark on a NOTAM to keep it. Kept NOTAMs show in a NOTAMs block you add to any checklist section
 (Edit > NOTAMs), for the airports you choose: departure, destination, alternates, en route, company alerts.
@@ -123,11 +125,11 @@ says "New copy 1312Z · 4 new · 2 removed · ETD +35 min" with See changes; air
 marked New and come first; the ones gone are struck through at the end of their airport (folded when more than 3).
 The marks stay until Clear the marks in the sheet, or until you load another copy. Loading only NOTAMs does the same
 for those airports.
-WIND ON YOUR RUNWAY (off until you tap Wind on a weather card): headwind or tailwind and crosswind on your runway from
-the METAR, with gusts, a small compass, and what a varying wind (250V320) can do. "Around your ETA" gives the strongest
+WIND ON YOUR RUNWAY: the runway row always shows the wind on it in a few letters (HW 7 XW 11R, tailwind as TW), from
+the METAR. Tap Wind on a weather card for the rest: headwind or tailwind and crosswind with gusts, a small compass, and what a varying wind (250V320) can do. "Around your ETA" gives the strongest
 wind the TAF has at your time and its components. All runways now lists every runway, most into the wind first, with
-yours marked. The runway is the OFP's (or the one you set), and an alternate's from the OFP. Tailwind and crosswinds of
-15 kt or more are amber. A chip next to the runway row shows the same in a few letters. True runway headings come from
+yours marked. The runway is the OFP's or the one you set, alternates included. Tailwind and crosswinds of
+15 kt or more are amber. True runway headings come from
 runways.js (OurAirports, public domain); for an airport it doesn't have, the runway number is used (within a few
 degrees). Wind and Trend are one setting for every card; tap again to hide.
 WEATHER TREND (off until you tap Trend): the last METARs of up to 3 hours, as a table on the iPad, as small bars on

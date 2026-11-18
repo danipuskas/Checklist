@@ -1924,6 +1924,10 @@ html.split.pg-open .split-hint{display:none}
 .rwchip:empty{display:none}
 .rwchip i{font-style:normal;padding:2px 6px;border-radius:6px;background:var(--surface2)}
 .rwchip i.x{color:var(--warn)}
+@media (max-width:600px){
+  .rw-row{flex-wrap:wrap;row-gap:4px}
+  .rw-row .rwchip:not(:empty){order:10;flex-basis:100%;padding-left:29px}
+}
 /* the trend */
 .wxtr-n{font-weight:600;letter-spacing:0;margin-left:6px}
 .wxtr-t{width:100%;border-collapse:collapse;margin-top:4px;font:600 calc(13.5px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace}
@@ -2162,7 +2166,7 @@ function rank(n,g,ctx){
   if(n.id.indexOf('CO')===0){score+=3;why.push('Company');}
   if(cat==='RUNWAY') score+=3;else if(cat==='APPROACH PROCEDURE') score+=2;else if(cat==='AIRPORT') score+=1;else if(cat==='CHART NOTAM') score+=1;else if(cat==='AMDB NOTAM') score-=2;
   HI.forEach(function(h){if(h[0].test(txt)){score+=h[1]==='A380'?2:3;why.push(h[1]);}});
-  var rw=g.code===ctx.dep?ctx.depRwy:g.code===ctx.dest?ctx.arrRwy:'';
+  var rw=g.code===ctx.dep?ctx.depRwy:g.code===ctx.dest?ctx.arrRwy:g.ad&&ctx.alt&&ctx.alt[g.code]||'';
   if(rw){
     var rr=recip(rw),re=new RegExp('\\bRWY\\s*(?:'+rw+'|'+rr+')\\b|\\bRWY\\s*'+rw.slice(0,2)+'[LRC]?\\/|\\/'+rw+'\\b|\\b'+rw+'\\/'+rr+'\\b|\\b'+rr+'\\/'+rw+'\\b');
     if(re.test(txt)){score+=3;why.unshift('Your runway '+rw);}
@@ -2175,7 +2179,7 @@ function rank(n,g,ctx){
 }
 function review(res,opt){
   opt=opt||{};
-  var f=res.flight,etd=opt.etd||f.etd||f.from,eta=opt.eta||f.eta||f.to,ctx={dep:opt.dep||f.dep,dest:opt.dest||f.dest,depRwy:opt.depRwy||f.depRwy,arrRwy:opt.arrRwy||f.arrRwy,now:opt.now||etd};
+  var f=res.flight,etd=opt.etd||f.etd||f.from,eta=opt.eta||f.eta||f.to,ctx={dep:opt.dep||f.dep,dest:opt.dest||f.dest,depRwy:opt.depRwy||f.depRwy,arrRwy:opt.arrRwy||f.arrRwy,alt:opt.alt||null,now:opt.now||etd};
   var H=3600000,out=[];
   res.groups.forEach(function(g){
     var w=g.section==='dep'?[etd-H,etd+H]:g.section==='dest'?[eta-H,eta+H]:g.section==='altn'?[eta,eta+2*H]:[etd,eta+H];
@@ -2635,7 +2639,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='96';
+var APP_VERSION='97';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -4255,14 +4259,15 @@ function metarParse(raw){
   return o;
 }
 // ---- the runways: true headings from runways.js (OurAirports), loaded the first time the wind is shown ----
-var rwP=null;
+var rwP=null,rwFail=0;
 function loadRunways(){
   if(window.RUNWAYS) return Promise.resolve();
   if(rwP) return rwP;
+  if(rwFail>=2) return Promise.reject();
   rwP=new Promise(function(res,rej){
     var sc=document.createElement('script');sc.src='runways.js';
     sc.onload=function(){window.RUNWAYS?res():rej();};
-    sc.onerror=function(){rwP=null;sc.remove();rej();};
+    sc.onerror=function(){rwP=null;rwFail++;sc.remove();rej();};
     document.head.appendChild(sc);
   });
   return rwP;
@@ -4294,8 +4299,7 @@ function wxRwyOf(ic){
   var f=brief.flight;
   if(ic===f.dep) return f.depRwy||'';
   if(ic===f.dest) return f.arrRwy||'';
-  var a=(f.altns||[]).filter(function(x){return x.icao===ic;})[0];
-  return a&&a.rwy||'';
+  return altRw(ic,f);
 }
 function wxRwFor(a){return a.rw!==undefined?a.rw:(brSame()?wxRwyOf(a.ic):'');}
 // the directions a variable wind goes through (dddVddd), in 10° steps
@@ -4380,8 +4384,9 @@ function wxWindHTML(a,d){
 }
 // the wind on a runway in a few characters, next to it in the runway row
 function rwChipHTML(ic,r){
-  var st=state.settings,inner='';
-  if(st.wxWind&&ic&&r){
+  var inner='';
+  if(ic&&r&&!window.RUNWAYS) loadRunways().then(function(){wxUpdateViews(true);},function(){});
+  if(ic&&r){
     var d=wxData(ic),p=d&&d.m?metarParse(d.m.raw):null,w=p&&p.w;
     if(w&&w.dir!==null&&w.spd){var y=rwHdg(ic,r),c=rwComp(w.dir,w.spd,y.h),g=w.gst?rwComp(w.dir,w.gst,y.h):c;inner='<i'+(c.hw<0?' class="x"':'')+'>'+hwTxt(c.hw)+'</i><i'+(Math.abs(g.xw)>=15?' class="x"':'')+'>XW '+xwTxt(c.xw)+'</i>';}
     else if(w) inner='<i>'+(w.spd?'VRB '+w.spd:'Calm')+'</i>';
@@ -4615,9 +4620,10 @@ function brLive(){
 }
 function brReview(){
   if(!brief) return [];
-  var t=brTimes(),live=brLive(),k=brief.at+'|'+t.etd+'|'+t.eta+'|'+(brief.flight.depRwy||'')+'|'+(brief.flight.arrRwy||'')+'|'+live;
+  var alt={};(brief.flight.altns||[]).forEach(function(a){var r=altRw(a.icao);if(r) alt[a.icao]=r;});Object.keys(brief.flight.altRwy||{}).forEach(function(c){alt[c]=brief.flight.altRwy[c];});
+  var t=brTimes(),live=brLive(),k=brief.at+'|'+t.etd+'|'+t.eta+'|'+(brief.flight.depRwy||'')+'|'+(brief.flight.arrRwy||'')+'|'+JSON.stringify(alt)+'|'+live;
   if(brRv&&brRv.k===k) return brRv.rv;
-  var G=brief.notams.groups,f=brief.flight,rv=NotamReader.review(brief.notams,{etd:t.etd,eta:t.eta,now:t.etd,dep:f.dep,dest:f.dest,depRwy:f.depRwy,arrRwy:f.arrRwy}),now=Date.now();
+  var G=brief.notams.groups,f=brief.flight,rv=NotamReader.review(brief.notams,{etd:t.etd,eta:t.eta,now:t.etd,dep:f.dep,dest:f.dest,depRwy:f.depRwy,arrRwy:f.arrRwy,alt:alt}),now=Date.now();
   rv.forEach(function(x){
     x.key=G.indexOf(x.g)+':'+x.n.id;
     if(live) return;
@@ -4692,13 +4698,30 @@ function rwOk(r){
   var m=/^(?:RWY\s*)?(\d{1,2})\s*([LRC]?)$/.exec(String(r||'').toUpperCase().trim());
   if(!m) return '';var n=+m[1];return n>=1&&n<=36?(n<10?'0':'')+n+m[2]:'';
 }
-function rwChanged(w){return !!brief&&((w+'RwyOfp') in brief.flight);}
-function rwOfp(w){var f=brief.flight;return rwChanged(w)?f[w+'RwyOfp']||'':f[w+'Rwy']||'';}
+// an alternate's: the one you set, or the OFP's
+function altRw(ic,f){f=f||brief&&brief.flight;if(!f) return '';var a=(f.altns||[]).filter(function(x){return x.icao===ic;})[0];return f.altRwy&&(ic in f.altRwy)?f.altRwy[ic]:a&&a.rwy||'';}
+function rwAlt(w){return String(w).indexOf('alt:')===0?w.slice(4):'';}
+function rwIcao(w){var f=brief.flight,a=rwAlt(w);return a||(w==='dep'?f.dep:f.dest)||'';}
+function rwCur(w){var a=rwAlt(w);return a?altRw(a):brief.flight[w+'Rwy']||'';}
+function rwChanged(w){if(!brief) return false;var f=brief.flight,a=rwAlt(w);return a?!!f.altRwy&&(a in f.altRwy):((w+'RwyOfp') in f);}
+function rwOfp(w){
+  var f=brief.flight,a=rwAlt(w);
+  if(a){var x=(f.altns||[]).filter(function(y){return y.icao===a;})[0];return x&&x.rwy||'';}
+  return rwChanged(w)?f[w+'RwyOfp']||'':f[w+'Rwy']||'';
+}
+function rwName(w){return rwAlt(w)?'Alternate runway':w==='dep'?'Departure runway':'Arrival runway';}
 function rwSet(w,r){
-  var f=brief.flight,k=w+'Rwy',ko=k+'Ofp';
-  if(!(ko in f)) f[ko]=f[k]||'';
-  f[k]=r===null?f[ko]:r;
-  if((f[k]||'')===(f[ko]||'')) delete f[ko];
+  var f=brief.flight,a=rwAlt(w);
+  if(a){
+    var of=rwOfp(w);f.altRwy=f.altRwy||{};
+    if(r===null||(r||'')===of) delete f.altRwy[a];else f.altRwy[a]=r;
+    if(!Object.keys(f.altRwy).length) delete f.altRwy;
+  }else{
+    var k=w+'Rwy',ko=k+'Ofp';
+    if(!(ko in f)) f[ko]=f[k]||'';
+    f[k]=r===null?f[ko]:r;
+    if((f[k]||'')===(f[ko]||'')) delete f[ko];
+  }
   brRv=null;brSave();refreshTool();
   app.querySelectorAll('.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
 }
@@ -4710,21 +4733,26 @@ function rwCands(ic,w){
     if(g.code!==ic||!g.ad) return;
     g.notams.forEach(function(n){var re=/\bRWY\s*(\d{2}[LRC]?)\b(?:\s*\/\s*(\d{2}[LRC]?)\b)?/g,m;while((m=re.exec(n.body||''))){add(m[1]);if(m[2]) add(m[2]);}});
   });
-  add(rwOfp(w));add(brief.flight[w+'Rwy']);
+  add(rwOfp(w));add(rwCur(w));
+  rwEnds(ic).forEach(function(e){add(e.n);});
   o.slice().forEach(function(r){add(R(r));});
   return o.sort(function(a,b){return (+a.slice(0,2))-(+b.slice(0,2))||'LCR'.indexOf(a.charAt(2))-'LCR'.indexOf(b.charAt(2));});
 }
-function rwRowHTML(w){
-  var f=brief.flight,r=f[w+'Rwy']||'',ch=rwChanged(w),of=rwOfp(w);
-  var sub=ch?(of?'Changed · OFP '+of:'Set by you'):(r?'From the OFP':'Not in the package');
-  return '<button type="button" class="rw-row'+(ch?' ch':'')+'" data-act="rwPick" data-v="'+w+'">'+I.plane+'<span class="rw-l">'+(w==='dep'?'Departure runway':'Arrival runway')+'<small>'+esc(sub)+'</small></span>'+
-    '<b>'+esc(r||'–')+'</b>'+rwChipHTML(w==='dep'?f.dep:f.dest,r)+'<span class="rw-c">'+(r?'Change':'Set')+'</span>'+I.right+'</button>';
+function rwRowHTML(w,info){
+  var r=rwCur(w),ch=rwChanged(w),of=rwOfp(w);
+  var sub=ch?(of?'Changed · OFP '+of:'Set by you'):info||(r?'From the OFP':'Not in the package');
+  return '<button type="button" class="rw-row'+(ch?' ch':'')+'" data-act="rwPick" data-v="'+esc(w)+'">'+I.plane+'<span class="rw-l">'+(rwAlt(w)?'Runway':rwName(w))+'<small>'+esc(sub)+'</small></span>'+
+    '<b>'+esc(r||'–')+'</b>'+rwChipHTML(rwIcao(w),r)+'<span class="rw-c">'+(r?'Change':'Set')+'</span>'+I.right+'</button>';
 }
 function openRwPick(w){
   if(!brief) return;
-  var f=brief.flight,ic=w==='dep'?f.dep:f.dest,cur=f[w+'Rwy']||'',of=rwOfp(w),C=rwCands(ic,w);
-  openSheet('<div class="menu-head"><h3>'+(w==='dep'?'Departure':'Arrival')+' runway</h3><button type="button" class="ib round" data-sact="cancel" aria-label="Close">'+I.x+'</button></div>'+
-    '<p class="hint">'+esc(ic||'')+(of?' · OFP '+esc(of):'')+'. When the runway changes, pick the new one: the NOTAMs for your runway, the runway highlights and the summary follow it.</p>'+
+  if(!window.RUNWAYS){loadRunways().then(function(){rwPickNow(w);},function(){rwPickNow(w);});return;}
+  rwPickNow(w);
+}
+function rwPickNow(w){
+  var ic=rwIcao(w),cur=rwCur(w),of=rwOfp(w),C=rwCands(ic,w),nm=rwName(w),nm0=nm.split(' ')[0];
+  openSheet('<div class="menu-head"><h3>'+nm+(rwAlt(w)?' · '+esc(ic):'')+'</h3><button type="button" class="ib round" data-sact="cancel" aria-label="Close">'+I.x+'</button></div>'+
+    '<p class="hint">'+esc(ic||'')+(of?' · OFP '+esc(of):'')+'. When the runway changes, pick the new one: the NOTAMs for your runway, the runway highlights, the summary and the wind follow it.</p>'+
     (C.length?'<div class="rw-grid" role="radiogroup">'+C.map(function(r){return '<button type="button" role="radio" aria-checked="'+(r===cur)+'" class="'+(r===cur?'on':'')+'" data-sact="pick" data-v="'+r+'">'+r+(r===of?'<small>OFP</small>':'')+'</button>';}).join('')+'</div>':'')+
     '<div class="kw-add"><input type="text" class="fl-in" id="rwIn" maxlength="6" placeholder="'+(C.length?'Another runway, e.g. ':'Runway, e.g. ')+(C.length?NotamReader.recip(C[0])||'27L':'27L')+'" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off" inputmode="text" enterkeyhint="done"><button type="button" class="btn" data-sact="set">Set</button></div>'+
     (rwChanged(w)?'<button type="button" class="btn rw-back" data-sact="ofp">Back to the OFP'+(of?' runway '+esc(of):'')+'</button>':'')+
@@ -4733,11 +4761,11 @@ function openRwPick(w){
     var r=null;
     if(act==='pick') r=btn.getAttribute('data-v');
     else if(act==='set'){var inp=$('#rwIn');r=rwOk(inp&&inp.value);if(!r){toast('Type a runway, like 27L');if(inp) inp.focus();return;}}
-    else if(act==='ofp'){closeSheet();rwSet(w,null);toast((w==='dep'?'Departure':'Arrival')+' runway back to the OFP'+(of?' '+of:''));return;}
+    else if(act==='ofp'){closeSheet();rwSet(w,null);toast(nm+' back to the OFP'+(of?' '+of:''));return;}
     else{closeSheet();return;}
     closeSheet();
     if(r===cur) return;
-    rwSet(w,r);toast((w==='dep'?'Departure':'Arrival')+' runway '+r+(r===of?' (OFP)':''));
+    rwSet(w,r);toast(nm0+(rwAlt(w)?' '+ic:'')+' runway '+r+(r===of?' (OFP)':''));
   });
   var inp=$('#rwIn');
   if(inp) inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(sheetHandler) sheetHandler('set',null);}});
@@ -4790,18 +4818,19 @@ function brPanelHTML(){
     if(!ca) h+='<p class="nt-none">No alternates in the package.</p>';
     else{
       var inf=[typeof aa.min==='number'?'+'+durM(aa.min*60000,false)+' from '+(f.dest||'destination'):'',aa.dist?aa.dist+' nm':''].filter(Boolean).join(' · ');
-      h+='<div class="wl-top"><div class="rw-row st">'+I.plane+'<span class="rw-l">Alternate runway<small>'+esc(inf||'From the OFP')+'</small></span><b>'+esc(aa.rwy||'–')+'</b>'+rwChipHTML(ca,aa.rwy||'')+'</div>'+kwBarHTML(La)+'</div>'+
-        brWxPinHTML({ic:ca,role:same&&st.alts.indexOf(ca)>=0?'Alternate':'',win:brWin('altn',ca),rw:aa.rwy||''})+
-        '<div class="nt-sec"><b>NOTAMs</b><span>'+La.length+(brLive()?' · from ETA '+hmOf(t.eta)+' for 2 h':'')+'</span></div>'+
-        (La.length?kwListHTML(La,'','altn:'+ca,true):'<p class="nt-none">None in the package.</p>')+brGoneHTML(ca,true);
+      var ar=altRw(ca);
+      h+='<div class="wl-top">'+rwRowHTML('alt:'+ca,inf)+kwBarHTML(La)+'</div>'+
+        brWxPinHTML({ic:ca,role:same&&st.alts.indexOf(ca)>=0?'Alternate':'',win:brWin('altn',ca),rw:ar})+
+        '<div class="nt-sec"><b>NOTAMs</b><span>'+La.length+(brLive()?' · from ETA '+hmOf(t.eta)+' for 2 h':'')+(ar?' · runway '+esc(ar):'')+'</span></div>'+
+        (La.length?kwListHTML(La,ar,'altn:'+ca,true):'<p class="nt-none">None in the package.</p>')+brGoneHTML(ca,true);
     }
   }else if(brTab==='altn'){
     h+='<div class="nt-sec"><b>Alternates</b>'+(brLive()?'<span>NOTAMs from ETA '+hmOf(t.eta)+' for 2 h</span>':'')+'</div>'+kwBarHTML(by.altn);
     if(!order.length) h+='<p class="nt-none">No alternates in the package.</p>';
     h+=order.map(function(c){
       var a=(f.altns||[]).filter(function(x){return x.icao===c;})[0]||{},L=al.map[c]||[];
-      var info=[typeof a.min==='number'?'+'+durM(a.min*60000,false)+' from '+(f.dest||'destination'):'',a.dist?a.dist+' nm':'',a.rwy?'runway '+a.rwy:''].filter(Boolean).join(' · ');
-      return brApBlockHTML(c,L,{name:L[0]?brCap(L[0].g.name):apName(c).replace(/\s*\([A-Z-]{2}\)$/,''),info:info,wx:true,sec:'altn',role:same&&st.alts.indexOf(c)>=0?'Alternate':'',win:brWin('altn',c),rw:a.rwy||''});
+      var info=[typeof a.min==='number'?'+'+durM(a.min*60000,false)+' from '+(f.dest||'destination'):'',a.dist?a.dist+' nm':''].filter(Boolean).join(' · ');
+      return brApBlockHTML(c,L,{name:L[0]?brCap(L[0].g.name):apName(c).replace(/\s*\([A-Z-]{2}\)$/,''),rwRow:rwRowHTML('alt:'+c,info),wx:true,sec:'altn',role:same&&st.alts.indexOf(c)>=0?'Alternate':'',win:brWin('altn',c),rw:altRw(c)});
     }).join('');
   }else{
     var on=sg.filter(function(x){return x.on;}),off=sg.filter(function(x){return !x.on;});
@@ -4894,7 +4923,8 @@ function brSideHTML(by,f,t,sg,order,al){
   h+='<div class="wl-grp">Destination</div><div class="wl-list">'+brSideRowHTML({v:'dest',code:f.dest||'DEST',name:apShort(f.dest)||'Destination',sub:'ETA '+hmOf(t.eta),L:by.dest,wx:!!f.dest,on:brTab==='dest'})+'</div>';
   if(order.length) h+='<div class="wl-grp">Alternates</div><div class="wl-list">'+order.map(function(c){
     var a=(f.altns||[]).filter(function(x){return x.icao===c;})[0]||{},L=al.map[c]||[];
-    return brSideRowHTML({v:'altn',ap:c,code:c,name:apShort(c,L[0]&&L[0].g),sub:typeof a.min==='number'?'+'+durM(a.min*60000,false)+(a.rwy?' · runway '+a.rwy:''):'',L:L,wx:true,on:brTab==='altn'&&brAltSel===c});
+    var ar=altRw(c);
+    return brSideRowHTML({v:'altn',ap:c,code:c,name:apShort(c,L[0]&&L[0].g),sub:[typeof a.min==='number'?'+'+durM(a.min*60000,false):'',ar?'runway '+ar+(rwChanged('alt:'+c)?' (changed)':''):''].filter(Boolean).join(' · '),L:L,wx:true,on:brTab==='altn'&&brAltSel===c});
   }).join('')+'</div>';
   var nE=en.order.length;
   h+='<div class="wl-grp">En route</div><div class="wl-list">'+brSideRowHTML({v:'enr',code:'ENR',name:nE+' airport'+(nE===1?'':'s')+' · FIRs',sub:son?son+' SIGMET'+(son===1?'':'s')+' on your route':'',L:by.enr.concat(by.area),on:brTab==='enr'})+'</div>';
@@ -5131,6 +5161,14 @@ function brSetFrom(P,hint){
   if(of&&f.dep&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon) ['dep','arr'].forEach(function(w){ // and the runway you set, unless its OFP changed it
     var k=w+'Rwy',ko=k+'Ofp';if((ko in of)&&(of[ko]||'')===(f[k]||'')){f[ko]=of[ko];f[k]=of[k];}
   });
+  if(of&&f.dep&&of.altRwy&&of.fno===f.fno&&of.dep===f.dep&&of.dest===f.dest&&of.day===f.day&&of.mon===f.mon){
+    var ar={};
+    Object.keys(of.altRwy).forEach(function(c){
+      function o(F){var a=(F.altns||[]).filter(function(x){return x.icao===c;})[0];return a?a.rwy||'':null;}
+      if(o(f)!==null&&o(f)===o(of)) ar[c]=of.altRwy[c];
+    });
+    if(Object.keys(ar).length) f.altRwy=ar;
+  }
   if(!f.dep&&!f.dest){ // no OFP in it: the NOTAMs and weather go with the flight that's set
     var k=hint||brHint();
     f.dep=k.dep||'';f.dest=k.dest||'';f.fromApp=true;
@@ -5252,7 +5290,7 @@ var NTB_SHOW=[['dep','Departure'],['dest','Destination'],['alts','Alternates'],[
 function newNtBlock(){return {id:uid(),type:'nt',show:['dest','alts'],collapsed:false};}
 function ntScope(x){var s=x.g.section;return s==='co'?'co':s==='dep'||s==='toalt'?'dep':s==='dest'?'dest':s==='altn'?'alts':'enr';}
 function ntMiniHTML(x,mid){
-  var n=x.n,open=brOpenSet.has('b:'+x.key),f=brief.flight,c=x.g.code,rw=c===f.dep?f.depRwy:c===f.dest?f.arrRwy:'';
+  var n=x.n,open=brOpenSet.has('b:'+x.key),c=x.g.code,rw=x.g.ad?wxRwyOf(c):'';
   var when=x.whenTxt!==undefined?x.whenTxt:ntWhen(n,x.win);
   return '<div class="ntm'+(open?' open':'')+'" data-act="ntbOpen" data-v="'+esc('b:'+x.key)+'" data-id="'+mid+'" role="button" aria-expanded="'+open+'">'+
     '<div class="ntm-head">'+kwMark(ntHL(ntHead(n),rw),c)+'</div>'+
@@ -5349,9 +5387,9 @@ function brListHTML(L,rw,pre,ctx){
 // one airport (or FIR) with all its NOTAMs: your keywords first, then company ones, then the rest
 function brApBlockHTML(code,L,o){
   var d=o.wx&&wxData(code);
-  var h='<div class="nt-ap" data-ap="'+esc(code)+'"><b>'+esc(code)+'</b><span>'+esc(o.name||'')+'</span>'+(o.wx?wxCatHTML(code)+(d?wxTgHTML():''):'')+'</div>'+(o.info?'<div class="nt-apinfo">'+esc(o.info)+'</div>':'');
+  var h='<div class="nt-ap" data-ap="'+esc(code)+'"><b>'+esc(code)+'</b><span>'+esc(o.name||'')+'</span>'+(o.wx?wxCatHTML(code)+(d?wxTgHTML():''):'')+'</div>'+(o.info?'<div class="nt-apinfo">'+esc(o.info)+'</div>':'')+(o.rwRow||'');
   if(o.wx){var a={ic:code,role:o.role||'',win:o.win||null,notg:true};if(o.rw!==undefined) a.rw=o.rw;h+=wxCardHTML(a,false,true);}
-  return h+(L.length?kwListHTML(L,'',(o.sec||'ap')+':'+code,false):'<p class="nt-none sm">No NOTAMs in the package</p>')+brGoneHTML(code,o.sec!=='area');
+  return h+(L.length?kwListHTML(L,o.rw||'',(o.sec||'ap')+':'+code,false):'<p class="nt-none sm">No NOTAMs in the package</p>')+brGoneHTML(code,o.sec!=='area');
 }
 function brEnrRowHTML(code,L){
   var g=L[0].g,kn=brKeptIn(L),nn=brNewIn(L);
@@ -5460,6 +5498,7 @@ function brDiff(old,P,nOnly){
     t('ETD',of.etd,f.etd);t('ETA',of.eta,f.eta);
     v('Departure runway',rwo('dep'),f.depRwy);v('Arrival runway',rwo('arr'),f.arrRwy);
     v('Alternates',(of.altns||[]).map(function(x){return x.icao;}).join(' '),(f.altns||[]).map(function(x){return x.icao;}).join(' '));
+    (f.altns||[]).forEach(function(a){var b=(of.altns||[]).filter(function(x){return x.icao===a.icao;})[0];if(b&&(b.rwy||'')!==(a.rwy||'')) v(a.icao+' runway',b.rwy,a.rwy);});
     if(of.reg&&f.reg) v('Aircraft',of.reg,f.reg);
     if(of.toFuel&&f.toFuel) v('Take-off fuel',of.toFuel,f.toFuel,fuel);
     if(of.tripFuel&&f.tripFuel) v('Trip fuel',of.tripFuel,f.tripFuel,fuel);
@@ -5574,7 +5613,7 @@ function brQResHTML(rv,T,wide){
   var full0=ntFull;ntFull=true;qMarkT=T;
   G.forEach(function(o){
     if(shown>=MAX) return;
-    var g=o.g,c=g.code,nm=g.ad?apShort(c,g):(g.name&&g.name!==c?g.name.replace(new RegExp('^'+reEsc(c)+'\\s+'),''):''),rw=g.ad&&c===f.dep?f.depRwy:g.ad&&c===f.dest?f.arrRwy:'';
+    var g=o.g,c=g.code,nm=g.ad?apShort(c,g):(g.name&&g.name!==c?g.name.replace(new RegExp('^'+reEsc(c)+'\\s+'),''):''),rw=g.ad?wxRwyOf(c):'';
     h+='<div class="nt-ap sr" data-qv="'+brQTab(g)+'" data-ap="'+esc(c)+'"><b>'+esc(c)+'</b><span>'+esc([nm,brQSec(g),o.L.length].filter(function(x){return x!=='';}).join(' · '))+'</span><button type="button" class="lnkbtn" data-act="brQGo" data-v="'+esc(c)+'" data-ad="'+(g.ad?1:0)+'">Open</button></div>';
     var L=o.L.slice(0,MAX-shown);shown+=L.length;
     h+=L.map(function(x){x.kwHid=false;return ntCardHTML(x,rw||'');}).join('');
@@ -5853,7 +5892,7 @@ function brApSectionHTML(ic){
   if(!brief) return '';
   var rv=brReview().filter(function(x){return x.g.code===ic&&x.g.ad;});
   if(!rv.length) return '';
-  var f=brief.flight,rw=ic===f.dep?f.depRwy:ic===f.dest?f.arrRwy:'',kept=brOrder(rv.filter(function(x){return brIsKept(ntKey(x.g,x.n));}));
+  var rw=wxRwyOf(ic),kept=brOrder(rv.filter(function(x){return brIsKept(ntKey(x.g,x.n));}));
   return '<div class="pb-h"><span>NOTAMs</span><button type="button" class="lnkbtn" data-act="brGo" data-v="'+esc(ic)+'">All '+rv.length+'</button></div>'+
     (kept.length?'<div class="nt-brief">'+ntCards(kept,rw)+'</div>':'<p class="pb-none">None kept yet. Keep the ones that matter in the Briefing.</p>');
 }
@@ -9206,6 +9245,7 @@ function apGlanceHTML(ic){
   h+=briefTimeHTML(ic,tz,rec,w,now);
   var bf=brief&&brief.flight;
   if(bf&&brSame()&&(bf.dep===ic||bf.dest===ic)) h+=rwRowHTML(bf.dep===ic?'dep':'arr');
+  else if(bf&&brSame()&&(bf.altns||[]).some(function(a){return a.icao===ic;})) h+=rwRowHTML('alt:'+ic);
   h+=wxCardHTML({ic:ic,role:isDep?'From':isDest?'To':(st.alts||[]).indexOf(ic)>=0?'Alternate':'',win:w&&w.t&&w.t+3600000>Date.now()&&(!brief||brSame()||!(isDep||isDest))?{k:w.k,t:w.t,s:w.t-3600000,e:w.t+3600000,tz:tz}:null},false);
   if(brief){
     var L=brReview().filter(function(x){return x.g.ad&&x.g.code===ic;});
