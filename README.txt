@@ -125,6 +125,15 @@ says "New copy 1312Z · 4 new · 2 removed · ETD +35 min" with See changes; air
 marked New and come first; the ones gone are struck through at the end of their airport (folded when more than 3).
 The marks stay until Clear the marks in the sheet, or until you load another copy. Loading only NOTAMs does the same
 for those airports.
+CREW BRIEF: Briefing > the package card > Crew brief. The flight on one page, made from the package and the live
+weather: ETD, ETA, trip, fuel and levels; departure and destination with the runway, the wind on it, the METAR, the
+TAF lines at your time, the worst TAF wind for your runway and the trend; each alternate with its runway, the wind and
+the TAF at its ETA; SIGMETs on your route while you're in them; your kept NOTAMs under their airport; and what changed
+since the last copy. Times are the planned ones, also for a package you only brief. Print or PDF prints just the
+page, light, on one A4 for a normal flight (in the print sheet, Share > Save to Files keeps a PDF). Send shares it as
+text (Messages, AirDrop, WhatsApp) or copies it. It's a summary; the OFP, NOTAMs and OM stay the reference.
+In the iPad / iPhone app (Xcode), printing needs the app to handle a "print" message and to set
+window.natCaps = {print: true}; until then the Print button is hidden there and Send still works.
 WIND ON YOUR RUNWAY: the runway row always shows the wind on it in a few letters (HW 7 XW 11R, tailwind as TW), from
 the METAR. Tap Wind on a weather card for the rest: headwind or tailwind and crosswind with gusts, a small compass, and what a varying wind (250V320) can do. "Around your ETA" gives the strongest
 wind the TAF has at your time and its components. All runways now lists every runway, most into the wind first, with

@@ -1994,6 +1994,65 @@ button.chg-r .v{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nt-ap.sr .lnkbtn{margin-left:auto;font-weight:700;text-decoration:none;font-size:calc(13.5px*var(--ts));flex:none}
 mark.kwq{--k:var(--accent)}
 .ib.round.on{background:var(--accent-weak);color:var(--accent)}
+
+/* the crew brief */
+.crew-go{appearance:none;display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:9px 0 0;border:0;border-top:1px solid var(--line-soft);background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.crew-go > svg{width:20px;height:20px;color:var(--accent);flex:none}
+.crew-go > svg:last-child{width:15px;height:15px;color:var(--muted)}
+.crew-go span{flex:1;min-width:0;font-weight:700;font-size:calc(14.5px*var(--ts))}
+.crew-go small{display:block;font-weight:600;font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.pill.crew-b{display:inline-flex;align-items:center;gap:6px}
+.pill.crew-b svg{width:16px;height:16px}
+@media (max-width:560px){.pill.crew-b span{display:none}.pill.crew-b{min-width:0;width:44px;height:44px;padding:0;justify-content:center}.pill.crew-b svg{width:19px;height:19px}}
+#toolWrap[data-kind="crew"] .tool-panel{max-width:900px}
+.cbrief{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px 22px 14px;margin:2px 0 16px;color:var(--text)}
+.cb-top{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;border-bottom:2px solid var(--text);padding-bottom:8px}
+.cb-top h1{margin:0;font-size:calc(22px*var(--ts));letter-spacing:-.01em;line-height:1.15}
+.cb-top .cb-s{font-size:calc(13.5px*var(--ts));color:var(--muted);margin-top:3px}
+.cb-top .cb-rr{text-align:right;font-size:12.5px;color:var(--muted);line-height:1.45;flex:none;font-weight:600}
+.cb-k{display:flex;flex-wrap:wrap;gap:6px 24px;margin:10px 0 2px;font-size:12px;color:var(--muted);font-weight:600}
+.cb-k b{display:block;font:750 calc(16px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text)}
+.cbrief h2{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:16px 0 4px;font-weight:800}
+.cb-ap{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 16px;border-top:1px solid var(--line-soft);padding:9px 0;font-size:calc(14px*var(--ts));line-height:1.45}
+.cb-l b{display:block;font:800 calc(16px*var(--ts)) ui-monospace,SFMono-Regular,Menlo,monospace}
+.cb-l span{display:block;color:var(--muted);font-size:12.5px}
+.cb-l .cb-ch{color:var(--warn);font-weight:700}
+.cb-r{min-width:0}
+.cb-chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:2px}
+.cb-chips i{font:700 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--surface2);border-radius:5px;padding:1px 6px;font-style:normal}
+.cb-chips small{color:var(--muted);font-size:12px;font-weight:600}
+.cbrief .x{color:var(--warn)}
+.cbrief .mut{color:var(--muted)}
+.cbrief .sig{color:var(--warn);font-weight:800}
+.cb-m{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1.5;overflow-wrap:anywhere}
+.cb-t{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 8px;margin-top:2px}
+.cb-t .cb-tk{font-size:12.5px;color:var(--muted);font-weight:700;padding-top:1px;white-space:nowrap}
+.cb-n{font-size:13.5px;margin-top:3px}
+.cb-n.x{font-weight:650}
+.cb-kn{margin:5px 0 0;padding-left:18px;font-size:13.5px}
+.cb-kn li{margin:2px 0}
+.cb-kn small,.cb-row small{color:var(--muted)}
+.cb-row{display:flex;gap:12px;border-top:1px solid var(--line-soft);padding:7px 0;font-size:13.5px;line-height:1.4}
+.cb-row .cb-i{font:750 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent);width:118px;flex:none}
+.cb-none{color:var(--muted);font-size:13px;margin:12px 0 0}
+.cb-ft{margin-top:14px;border-top:1px solid var(--line-soft);padding-top:7px;font-size:11.5px;color:var(--muted)}
+@media (max-width:560px){
+  .cbrief{padding:14px 12px 10px}
+  .cb-top{flex-direction:column;align-items:flex-start}.cb-top .cb-rr{text-align:left}
+  .cb-ap{grid-template-columns:1fr;gap:2px}
+  .cb-l{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline}.cb-l span{display:inline}
+  .cb-row .cb-i{width:92px}
+}
+@page{margin:12mm}
+@media print{
+  html.pg-crew,html.pg-crew body{height:auto!important;overflow:visible!important;background:#fff!important;position:static!important;color-scheme:light!important}
+  html.pg-crew body > *:not(#toolWrap){display:none!important}
+  html.pg-crew #toolWrap{position:static!important;display:block!important;opacity:1!important;padding:0!important;overflow:visible!important;background:#fff!important;inset:auto!important;height:auto!important}
+  html.pg-crew #toolPanel{max-width:none!important;width:auto!important;padding:0!important;margin:0!important;background:#fff!important;box-shadow:none!important;border:0!important;transform:none!important}
+  html.pg-crew #toolPanel > *:not(.cbrief){display:none!important}
+  html.pg-crew .cbrief{--text:#17202b;--muted:#56606c;--line:#cfd6de;--line-soft:#e1e6ec;--paper:#fff;--surface2:#eef2f5;--accent:#0b6e8a;--warn:#a35c00;--ts:.9;border:0;border-radius:0;padding:0;margin:0;color:#17202b;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html.pg-crew .cb-ap,html.pg-crew .cb-row{break-inside:avoid}
+}
 </style>
 <script>/* night themes apply before the first paint, so there's no bright flash */try{var t0=localStorage.getItem('flightChecklist.theme');if(t0&&t0!=='auto')document.documentElement.setAttribute('data-theme',t0);}catch(e){}if(/iPhone/.test(navigator.userAgent)&&!window.NATIVE_APP)document.documentElement.classList.add('iphone');</script>
 </head>
@@ -2639,7 +2698,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='97';
+var APP_VERSION='98';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -4034,6 +4093,7 @@ function wxUpdateViews(asked){
   app.querySelectorAll('.module.wx,.module.ntb').forEach(function(el){refreshModule(el.getAttribute('data-mod'));});
   wxPaint();
   if(!toolOpen) return;
+  if(toolKind==='crew'){refreshTool();return;}
   if(toolKind==='apn'){var gl=toolPanel.querySelector('.wl-glance'),ic=apnPanelIcao();if(gl&&ic) gl.innerHTML=apGlanceHTML(ic);}
   if(asked===true) wxRepaint(toolPanel);else keepPlace(function(){wxRepaint(toolPanel);});
 }
@@ -4690,6 +4750,7 @@ function brFlightHTML(){
   var t3=n.count+' NOTAM'+(n.count===1?'':'s')+(brief.wxMade?' · weather '+hmOf(brief.wxMade):'');
   return '<div class="nt-pkg"><div class="nt-pkg-t"><b>'+esc(t1)+'</b><span>'+esc(t2)+'</span></div>'+
     '<small>'+esc(t3)+' · <button type="button" class="lnkbtn" data-act="brRemove">Remove</button></small>'+brChgBanHTML()+brWxStatusHTML()+
+    (crewOK()?'<button type="button" class="crew-go" data-act="crewOpen">'+IC_DOC+'<span>Crew brief<small>The flight on one page: show it, print it or send it</small></span>'+I.right+'</button>':'')+
     (!same&&f.dest?'<p class="nt-other">Your flight isn’t set to this route. <button type="button" class="lnkbtn" data-act="brFill">Fill the flight from it</button></p>':'')+'</div>';
 }
 // ---- the runway in use: the OFP's, or the one you pick when it changes ----
@@ -5581,6 +5642,201 @@ function brGoneHTML(code,ad){
   }).join('');
   if(L.length<=3) return '<div class="kw-lbl gone">No longer in the package · '+L.length+'</div>'+cards;
   return ntFoldHTML(key,'No longer in the package',L.length)+(open?'<div class="nt-in">'+cards+'</div>':'');
+}
+// ---- the one-page crew brief: the flight, runway, wind and weather at your time, alternates, SIGMETs, kept NOTAMs, what changed ----
+var IC_DOC=sv('<path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M14 3.5V8h4M9.5 12h5M9.5 15.5h5"/>');
+var IC_PRINT=sv('<path d="M7 9V3.5h10V9M7 17H4.5V10a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v7H17"/><path d="M7 14h10v6.5H7z"/>');
+function crewOK(){return !!brief&&!!(brief.flight.dep||brief.flight.dest);}
+// can this page print? Safari and the home-screen app can; the iPad app only once it says so
+function crewCanPrint(){return natOn()?!!(window.natCaps&&window.natCaps.print):typeof window.print==='function';}
+// your time at an airport for the brief: the planned one, also for a package you only brief and once it has passed
+function crewWin(kind,ic){
+  var t=brTimes(),f=brief.flight,x=0,o={},rec=apRecOf(ic);
+  if(kind==='dep'&&t.etd){x=t.etd;o={k:'ETD'};}
+  else if(kind==='dest'&&t.eta){x=t.eta;o={k:'ETA'};}
+  else if(kind==='altn'&&t.eta){var a=(f.altns||[]).filter(function(y){return y.icao===ic;})[0];x=t.eta+(a&&typeof a.min==='number'?a.min*60000:0);o={k:'ETA',approx:true};}
+  if(!x) return null;
+  o.t=x;o.s=x-3600000;o.e=x+3600000;o.tz=rec&&rec.tz||'';return o;
+}
+function crewMetBody(raw){return String(raw||'').replace(/^(METAR|SPECI)\s+(COR\s+)?/,'').replace(/^[A-Z0-9]{4}\s+\d{6}Z\s+/,'').replace(/=+\s*$/,'');}
+function crewTafOn(d,w){
+  if(!d||!d.t||!w) return null;
+  var pl=wxTafLines(d.t.raw).split('\n'),sp=tafSpans(pl,d.t.time||Date.now()),on=[];
+  pl.forEach(function(l,i){var x=sp[i];if(x&&x.s<w.e&&x.e>w.s) on.push(l.replace(/^TAF\s+((AMD|COR)\s+)?[A-Z0-9]{4}\s+\d{6}Z\s+/,''));});
+  var out='';
+  if(!on.length&&sp.v) out=w.s>=sp.v.e?'The TAF ends '+hmOf(sp.v.e)+', before your '+w.k+'.':w.e<=sp.v.s?'The TAF starts '+hmOf(sp.v.s)+', after your '+w.k+'.':'';
+  return {on:on,out:out,time:d.t.time||null};
+}
+function crewSg(s){
+  var t=String(s.text||'').replace(/\s+/g,' ');
+  var ph=(/\b(?:(?:OBSC|EMBD|FRQ|SQL|ISOL|OCNL)\s+TS(?:GR)?|SEV\s+(?:TURB|ICE(?:\s*\(FZRA\))?|MTW)|HVY\s+(?:DS|SS)|VA\s+CLD|TC\s+[A-Z]+|RDOACT\s+CLD)\b/.exec(t)||[''])[0];
+  var top=(/\bTOP\s+(?:ABV\s+)?FL\d{3}\b/.exec(t)||[''])[0];
+  return [ph||s.kind||'SIGMET',top].filter(Boolean).join(' · ');
+}
+// everything the page shows, worked out once for the page and for the text you share
+function crewData(){
+  var f=brief.flight,t=brTimes(),rv=brReview(),by=brBy(rv),kept=brKeptList(),now=Date.now();
+  function keptAt(ic){return kept.filter(function(x){return x.g.ad&&x.g.code===ic&&x.g.section!=='enroute'&&x.g.section!=='enalt';});}
+  function ap(kind,ic,rw,info){
+    var w=crewWin(kind==='toalt'?'dep':kind,ic),d=wxData(ic),you=rw?rwHdg(ic,rw):null,o={ic:ic,rw:rw||'',kind:kind,w:w,info:info||'',kept:keptAt(ic)};
+    o.ch=kind==='dep'?rwChanged('dep'):kind==='dest'?rwChanged('arr'):kind==='altn'?rwChanged('alt:'+ic):false;
+    o.ofp=o.ch?rwOfp(kind==='dep'?'dep':kind==='dest'?'arr':'alt:'+ic):'';
+    o.li=w&&w.tz?tzInfo(w.tz,w.t):null;
+    if(d&&d.m){
+      var p=metarParse(d.m.raw),mw=p.w;
+      o.cat=/^(VFR|MVFR|IFR|LIFR)$/.test(d.m.cat||'')?d.m.cat:'';
+      o.met=crewMetBody(d.m.raw);o.metT=wxObsTime(d.m.raw,d.m.time);o.live=!d.m.pkg;
+      if(mw&&you){
+        if(mw.dir===null||!mw.spd) o.wind={txt:mw.spd?'VRB '+mw.spd:'Calm'};
+        else{var c=rwComp(mw.dir,mw.spd,you.h),g=mw.gst?rwComp(mw.dir,mw.gst,you.h):null;o.wind={c:c,g:g};}
+      }
+      var H=wxHist(ic,d);
+      if(H.length>=2) o.trend=wxTrendSum(H.map(function(x){var q=metarParse(x.raw);q.at=x.t;return q;})).filter(function(x){return x[1]!=='Steady';});
+    }else o.noMet=d&&d.mOld?'No recent METAR':'No METAR';
+    o.taf=crewTafOn(d,w);
+    if(d&&d.t&&w&&you){var tw=wxTafWind(d,w,you);if(tw&&tw.c&&(tw.c.hw<0||Math.abs((tw.g||tw.c).xw)>=10)) o.tw=tw;}
+    return o;
+  }
+  var D={f:f,t:t,now:now,dep:null,dest:null,toalt:[],alts:[],sg:[],enr:[],chg:null};
+  if(f.dep) D.dep=ap('dep',f.dep,f.depRwy);
+  brCodes(by.toalt).order.forEach(function(c){D.toalt.push(ap('toalt',c,'','Take-off alternate'));});
+  if(f.dest) D.dest=ap('dest',f.dest,f.arrRwy);
+  var order=(f.altns||[]).map(function(a){return a.icao;});
+  brCodes(by.altn).order.forEach(function(c){if(order.indexOf(c)<0) order.push(c);});
+  order.forEach(function(c){
+    var a=(f.altns||[]).filter(function(x){return x.icao===c;})[0]||{};
+    var info=[typeof a.min==='number'?'+'+durM(a.min*60000,false):'',a.dist?a.dist+' nm':'',a.fuel?(a.fuel/1000).toFixed(1)+' t':''].filter(Boolean).join(' · ');
+    D.alts.push(ap('altn',c,altRw(c),info));
+  });
+  D.sg=brSigs().filter(function(x){return x.on;});
+  D.enr=kept.filter(function(x){return !x.g.ad||x.g.code==='CO'||x.g.section==='enroute'||x.g.section==='enalt';});
+  var n=brChgN();
+  if(n&&(n.nw+n.gone+n.ofp+n.wx)) D.chg={c:brief.chg,n:n};
+  D.nKept=kept.length;
+  return D;
+}
+function crewWindTxt(o){
+  if(!o.wind) return '';
+  if(o.wind.txt) return o.wind.txt;
+  var c=o.wind.c,g=o.wind.g;
+  return hwTxt(c.hw)+(g&&g.hw<c.hw&&c.hw<0?' G'+(-g.hw):'')+' · XW '+xwTxt(c.xw)+(g&&Math.abs(g.xw)>Math.abs(c.xw)?' G'+Math.abs(g.xw):'');
+}
+function crewTwTxt(tw,rw){
+  var c=tw.c,g=tw.g,z=g||c;
+  return 'Worst for '+rw+' then: '+(c.hw<0?'tailwind '+(-c.hw)+(g&&g.hw<c.hw?' G'+(-g.hw):''):'headwind '+c.hw)+', crosswind '+Math.abs(c.xw)+(g&&Math.abs(g.xw)>Math.abs(c.xw)?' G'+Math.abs(g.xw):'')+(c.xw?' from the '+(c.xw>0?'right':'left'):'')+' ('+(tw.pre?tw.pre+' ':'')+tw.w.tok+')';
+}
+function crewApHTML(o){
+  var tk=o.w?o.w.k:'',h='<div class="cb-ap"><div class="cb-l"><b>'+esc(o.ic)+(o.rw?' '+esc(o.rw):'')+'</b>'+
+    (o.w?'<span>'+o.w.k+(o.w.approx?' ≈ ':' ')+hmOf(o.w.t)+(o.li?' · '+o.li.hm+' local':'')+'</span>':'')+
+    (o.info?'<span>'+esc(o.info)+'</span>':'')+(o.ch?'<span class="cb-ch">Runway changed · OFP '+esc(o.ofp||'–')+'</span>':'')+'</div><div class="cb-r">';
+  var chips='';
+  if(o.wind){var x=o.wind.c,gg=o.wind.g;chips+=o.wind.txt?'<i>'+esc(o.wind.txt)+'</i>':'<i'+(x.hw<0?' class="x"':'')+'>'+hwTxt(x.hw)+'</i><i'+(Math.abs((gg||x).xw)>=15?' class="x"':'')+'>XW '+xwTxt(x.xw)+(gg&&Math.abs(gg.xw)>Math.abs(x.xw)?' G'+Math.abs(gg.xw):'')+'</i>';}
+  if(o.cat) chips+='<span class="wxcat '+o.cat+'">'+o.cat+'</span>';
+  if(o.metT) chips+='<small>METAR '+hmOf(o.metT)+(o.live?' live':' package')+'</small>';
+  else if(o.noMet) chips+='<small>'+o.noMet+'</small>';
+  if(chips) h+='<div class="cb-chips">'+chips+'</div>';
+  if(o.met&&o.kind!=='altn') h+='<div class="cb-m">'+wxSig(esc(o.met))+'</div>';
+  if(o.taf){
+    if(o.taf.on.length) h+='<div class="cb-t"><span class="cb-tk">At '+tk+'</span><div class="cb-m">'+o.taf.on.map(function(l){return wxSig(esc(l));}).join('<br>')+'</div></div>';
+    else if(o.taf.out) h+='<div class="cb-n x">'+esc(o.taf.out)+'</div>';
+  }else if(o.w) h+='<div class="cb-n mut">No TAF.</div>';
+  if(o.tw) h+='<div class="cb-n'+(o.tw.c.hw<0||Math.abs((o.tw.g||o.tw.c).xw)>=15?' x':'')+'">'+esc(crewTwTxt(o.tw,o.rw))+'</div>';
+  if(o.trend&&o.trend.length) h+='<div class="cb-n"><span class="mut">Trend:</span> '+o.trend.map(function(x){return '<span'+(x[0]?' class="x"':'')+'>'+esc(x[1])+'</span>';}).join(', ')+'</div>';
+  if(o.kept.length) h+='<ul class="cb-kn">'+o.kept.map(function(x){return '<li>'+esc(ntHead(x.n))+' <small>'+esc(x.n.id)+'</small></li>';}).join('')+'</ul>';
+  return h+'</div></div>';
+}
+function crewHTML(){
+  if(!crewOK()) return '<p class="hint">Load a LIDO package with an OFP in the Briefing first.</p>';
+  var D=crewData(),f=D.f,t=D.t,d=new Date(t.etd),wl=state.settings.wxUrl?brWxLast():0;
+  var h='<article class="cbrief"><div class="cb-top"><div><h1>'+esc([f.fno,(f.dep||'?')+' → '+(f.dest||'?')].filter(Boolean).join(' · '))+'</h1>'+
+    '<div class="cb-s">'+esc([['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getUTCDay()]+' '+d.getUTCDate()+' '+MON[d.getUTCMonth()],[f.type,f.reg].filter(Boolean).join(' '),'crew brief'].filter(Boolean).join(' · '))+'</div></div>'+
+    '<div class="cb-rr">'+(brief.wxMade?'Package weather '+hmOf(brief.wxMade)+'<br>':'')+(wl?'Live weather '+hmOf(wl)+'<br>':'')+'Made '+hmOf(D.now)+'</div></div>';
+  var K=[['ETD',hmOf(t.etd)],['ETA',hmOf(t.eta)]];
+  if(f.trip) K.push(['Trip',durM(f.trip*60000,false)]);
+  if(f.toFuel) K.push(['Take-off fuel',(f.toFuel/1000).toFixed(1)+' t']);
+  if(f.tripFuel) K.push(['Trip fuel',(f.tripFuel/1000).toFixed(1)+' t']);
+  if((f.fls||[]).length){var fl=f.fls.slice().sort(function(a,b){return a-b;});K.push(['Levels',fl.length>1?fl[0]+'–'+fl[fl.length-1]:String(fl[0])]);}
+  h+='<div class="cb-k">'+K.map(function(k){return '<div>'+k[0]+'<b>'+esc(k[1])+'</b></div>';}).join('')+'</div>';
+  if(D.dep||D.dest){
+    h+='<h2>Departure and destination</h2>';
+    if(D.dep) h+=crewApHTML(D.dep);
+    D.toalt.forEach(function(o){h+=crewApHTML(o);});
+    if(D.dest) h+=crewApHTML(D.dest);
+  }
+  if(D.alts.length) h+='<h2>Alternates</h2>'+D.alts.map(crewApHTML).join('');
+  if(D.sg.length||D.enr.length){
+    h+='<h2>En route</h2>';
+    h+=D.sg.map(function(x){var s=x.s;return '<div class="cb-row"><span class="cb-i">'+esc(s.fir)+' '+esc(s.kind||'SIGMET')+'</span><span>'+esc(crewSg(s))+(s.from&&s.to?', '+hmOf(s.from).slice(0,4)+'–'+hmOf(s.to):'')+'. <small>You’re in '+esc(brCap(s.name||s.fir).replace(/\bFir\b/,'FIR'))+' '+hmOf(x.on.a).slice(0,4)+'–'+hmOf(x.on.b)+'.</small></span></div>';}).join('');
+    h+=D.enr.map(function(x){return '<div class="cb-row"><span class="cb-i">'+esc(x.g.code==='CO'?'Company':x.g.code)+'</span><span>'+esc(ntHead(x.n))+' <small>'+esc(x.n.id)+'</small></span></div>';}).join('');
+  }
+  if(!D.nKept) h+='<p class="cb-none">No kept NOTAMs. Keep the ones that matter with the bookmark in the Briefing and they show here, under their airport.</p>';
+  if(D.chg){
+    var c=D.chg.c,n=D.chg.n,bits=[];
+    h+='<h2>Since the last copy</h2>';
+    if(n.ofp) h+='<div class="cb-row"><span class="cb-i">Flight plan</span><span>'+c.ofp.map(function(x){return esc(x.l)+' '+(x.a?esc(x.a)+' → ':'')+esc(x.b)+(x.d?' ('+esc(x.d)+')':'');}).join(' · ')+'</span></div>';
+    if(n.nw) bits.push(n.nw+' new');if(n.gone) bits.push(n.gone+' no longer in the package');
+    if(bits.length) h+='<div class="cb-row"><span class="cb-i">NOTAMs</span><span>'+bits.join(', ')+'</span></div>';
+    if(n.wx) h+='<div class="cb-row"><span class="cb-i">TAFs</span><span>New for '+c.wx.map(function(x){return esc(x.ic);}).join(', ')+'</span></div>';
+  }
+  h+='<div class="cb-ft"><span>Flight Checklists · a summary, not an operational document. The OFP, the NOTAMs and the OM are the reference.</span></div>';
+  return h+'</article>';
+}
+// the same, as text to send
+function crewText(){
+  var D=crewData(),f=D.f,t=D.t,d=new Date(t.etd),L=[];
+  L.push([f.fno,(f.dep||'?')+' → '+(f.dest||'?'),d.getUTCDate()+' '+MON[d.getUTCMonth()],[f.type,f.reg].filter(Boolean).join(' ')].filter(Boolean).join(' · '));
+  var k=['ETD '+hmOf(t.etd),'ETA '+hmOf(t.eta)];
+  if(f.trip) k.push('trip '+durM(f.trip*60000,false));
+  if(f.toFuel) k.push('T/O fuel '+(f.toFuel/1000).toFixed(1)+' t');
+  if(f.tripFuel) k.push('trip fuel '+(f.tripFuel/1000).toFixed(1)+' t');
+  L.push(k.join(' · '));
+  function ap(o){
+    L.push('');
+    L.push(o.ic+(o.rw?' '+o.rw:'')+(o.w?' · '+o.w.k+' '+hmOf(o.w.t)+(o.li?' ('+o.li.hm+' local)':''):'')+(o.info?' · '+o.info:'')+(o.ch?' · runway changed, OFP '+(o.ofp||'–'):''));
+    var a=[crewWindTxt(o),o.cat].filter(Boolean).join(' · ');if(a) L.push('  '+a);
+    if(o.met&&o.kind!=='altn') L.push('  METAR '+o.met);
+    if(o.taf&&o.taf.on.length) L.push('  At '+o.w.k+': '+o.taf.on.join(' / '));
+    else if(o.taf&&o.taf.out) L.push('  '+o.taf.out);
+    if(o.tw) L.push('  '+crewTwTxt(o.tw,o.rw));
+    if(o.trend&&o.trend.length) L.push('  Trend: '+o.trend.map(function(x){return x[1];}).join(', '));
+    o.kept.forEach(function(x){L.push('  • '+ntHead(x.n)+' ('+x.n.id+')');});
+  }
+  if(D.dep) ap(D.dep);D.toalt.forEach(ap);if(D.dest) ap(D.dest);
+  if(D.alts.length){L.push('');L.push('ALTERNATES');D.alts.forEach(ap);}
+  if(D.sg.length||D.enr.length){
+    L.push('');L.push('EN ROUTE');
+    D.sg.forEach(function(x){var s=x.s;L.push('  '+s.fir+' '+(s.kind||'SIGMET')+': '+crewSg(s)+(s.from&&s.to?', '+hmOf(s.from).slice(0,4)+'–'+hmOf(s.to):'')+' (you’re in it '+hmOf(x.on.a).slice(0,4)+'–'+hmOf(x.on.b)+')');});
+    D.enr.forEach(function(x){L.push('  • '+(x.g.code==='CO'?'Company':x.g.code)+': '+ntHead(x.n)+' ('+x.n.id+')');});
+  }
+  if(D.chg){
+    var c=D.chg.c;L.push('');L.push('SINCE THE LAST COPY');
+    c.ofp.forEach(function(x){L.push('  '+x.l+' '+(x.a?x.a+' → ':'')+x.b+(x.d?' ('+x.d+')':''));});
+    if(D.chg.n.nw||D.chg.n.gone) L.push('  NOTAMs: '+[D.chg.n.nw?D.chg.n.nw+' new':'',D.chg.n.gone?D.chg.n.gone+' no longer in the package':''].filter(Boolean).join(', '));
+  }
+  L.push('');L.push('Flight Checklists, made '+hmOf(D.now)+'. A summary, not an operational document.');
+  return L.join('\n');
+}
+function crewShare(){
+  var txt=crewText(),f=brief.flight,title=[f.fno,'crew brief'].filter(Boolean).join(' ');
+  function copy(){
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){toast('Copied as text');},function(){toast('Copy didn’t work here');});
+    else toast('Copy didn’t work here');
+  }
+  if(navigator.share) navigator.share({title:title,text:txt}).catch(function(e){if(e&&e.name!=='AbortError') copy();});
+  else copy();
+}
+function crewPrint(){
+  if(natOn()){
+    if(window.natCaps&&window.natCaps.print) natPost({type:'print',title:[brief.flight.fno,'crew brief'].filter(Boolean).join(' '),html:'<!DOCTYPE html><html><head><meta charset="utf-8"><style>'+crewCSS()+'</style></head><body class="crew-doc">'+crewHTML()+'</body></html>'});
+    return;
+  }
+  try{window.print();}catch(e){toast('Printing isn’t available here');}
+}
+// the page's own styles, for the copy the iPad app prints
+function crewCSS(){
+  var out='';
+  [].forEach.call(document.styleSheets,function(ss){try{[].forEach.call(ss.cssRules,function(r){var t=r.cssText||'';if(/\.(cbrief|cb-|wxcat|sig)/.test(t)&&t.indexOf('@media')<0) out+=t+'\n';});}catch(e){}});
+  return ':root{--text:#17202b;--muted:#56606c;--line:#cfd6de;--line-soft:#e1e6ec;--paper:#fff;--surface2:#eef2f5;--accent:#0b6e8a;--warn:#a35c00;--ts:1}body{margin:0;font-family:-apple-system,system-ui,sans-serif;color:#17202b}'+out+'.cbrief{border:0;padding:0}';
 }
 // ---- search every NOTAM in the package: words that start with what you type, all of them ----
 var brQ='',brQOpen=false,brQTm=null,brQRe={};
@@ -9118,8 +9374,9 @@ function openTool(kind){
   // countdowns and crew rest share the Timers page
   var toRest=kind==='rest';if(kind==='cd'||kind==='rest') kind='tm';
   clearTimeout(toolHideT);if(kind!==toolKind) toolApnOrd=false;toolKind=kind;
-  var tabPage=kind==='tm'||kind==='wx'||kind==='apn';
-  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+'<h3>'+({tm:'Countdowns',cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps',pos:'Position',near:'Nearest now',evt:'Event log',prep:'Prepare'}[kind])+'</h3>'+
+  var tabPage=kind==='tm'||kind==='wx'||kind==='apn'||kind==='crew';
+  document.documentElement.classList.toggle('pg-crew',kind==='crew');
+  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+(kind==='crew'?'<button type="button" class="ib round" data-act="crewBack" aria-label="Back to the Briefing">'+I.left+'</button>':'')+'<h3>'+({crew:'Crew brief',tm:'Countdowns',cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps',pos:'Position',near:'Nearest now',evt:'Event log',prep:'Prepare'}[kind])+'</h3>'+
     (kind==='cd'||kind==='tm'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
     (kind==='apn'?(toolApnOrd&&apnCanOrder()?'<button type="button" class="pill" data-act="apnReorder">Done</button>':
       (apnCanOrder()?'<button type="button" class="ib round" data-act="apnReorder" aria-label="Change the order of the notes">'+I.swap+'</button>':'')+
@@ -9129,6 +9386,8 @@ function openTool(kind){
     (kind==='wx'&&state.settings.wxUrl?'<button type="button" class="ib round" data-act="wxRefresh" aria-label="Update weather">'+I.reset+'</button>':'')+
     (kind==='wx'&&brief&&!wideNow()?'<button type="button" class="ib round'+(brQOpen||brQ?' on':'')+'" data-act="brQOpen" aria-label="Search every NOTAM" aria-pressed="'+!!(brQOpen||brQ)+'">'+IC_SEARCH+'</button>':'')+
     (kind==='wx'&&brief?'<button type="button" class="ib round" data-act="brLoad" aria-label="Load or update the LIDO package">'+I.paste+'</button>':'')+
+    (kind==='crew'&&crewOK()&&crewCanPrint()?'<button type="button" class="pill crew-b" data-act="crewPrint" aria-label="Print or save as PDF">'+IC_PRINT+'<span>Print or PDF</span></button>':'')+
+    (kind==='crew'&&crewOK()?'<button type="button" class="pill crew-b" data-act="crewShare" aria-label="Send as text">'+I.share+'<span>Send</span></button>':'')+
     (tabPage&&!editMode?'':'<button type="button" class="ib round" data-act="toolClose" aria-label="Close">'+I.x+'</button>')+'</div>';
   if(kind==='cd'||kind==='tm'){
     if(!T.cds.length) h+='<p class="hint">No countdowns yet. Tap + to add one.</p>';
@@ -9141,6 +9400,7 @@ function openTool(kind){
   }else if(kind==='apn') h+=apnPanelHTML();
   else if(kind==='flog') h+=flogPanelHTML();
   else if(kind==='wx') h+=brPanelHTML();
+  else if(kind==='crew') h+=brief?crewHTML():'<p class="hint">Load a LIDO package in the Briefing first.</p>';
   else if(kind==='dec') h+=decPanelHTML();
   else if(kind==='pos') h+='<div id="liveBox">'+posBodyHTML(Date.now())+'</div>';
   else if(kind==='near') h+='<div id="liveBox">'+nearBodyHTML(Date.now())+'</div>';
@@ -9415,7 +9675,7 @@ function closeTool(){
   refreshShared();
   if(wasDec){decPath=[];render();}
   if(document.activeElement&&toolPanel.contains(document.activeElement)) document.activeElement.blur();
-  toolOpen=false;document.documentElement.classList.remove('pg-tool');toolWrap.classList.remove('show');paintTabs();
+  toolOpen=false;document.documentElement.classList.remove('pg-tool','pg-crew');toolWrap.classList.remove('show');paintTabs();
   if(sheetWrap.hidden||!sheetWrap.classList.contains('show')) document.body.classList.remove('noscroll');
   clearTimeout(toolHideT);
   toolHideT=setTimeout(function(){toolWrap.hidden=true;toolPanel.innerHTML='';},200);
@@ -10878,6 +11138,10 @@ function onAct(e){
     case 'wxFold': wxFold();break;
     case 'wxWind': case 'wxTrend': wxTg(act0);break;
     case 'brChg': brChgSheet();break;
+    case 'crewOpen': openTool('crew');break;
+    case 'crewBack': openTool('wx');break;
+    case 'crewPrint': crewPrint();break;
+    case 'crewShare': crewShare();break;
     case 'brChgClear': brChgClear();break;
     case 'brQOpen': brQOpenTg();break;
     case 'brQClear': brQClear();break;
@@ -11059,7 +11323,7 @@ menuBtn.addEventListener('click',openMenu);
 function tabNow(){
   if(document.documentElement.classList.contains('more-open')) return 'more';
   if(!toolOpen) return 'list';
-  return {tm:'tm',wx:'wx',apn:'apn',flog:'more',pos:'more',near:'more',evt:'more',prep:'more'}[toolKind]||'list';
+  return {tm:'tm',wx:'wx',crew:'wx',apn:'apn',flog:'more',pos:'more',near:'more',evt:'more',prep:'more'}[toolKind]||'list';
 }
 function paintTabs(now){
   if(!tabBar||!tabBar.firstChild) return;
