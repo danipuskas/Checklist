@@ -55,6 +55,13 @@ and the other device checks every 20 seconds and whenever it is opened. Changes 
 back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
 change wins. Ticks, answers, filled-in fields, times, reminders and folding always stay on each device.
 
+PHOTOS: each photo is kept on the device in three sizes: a small one for the lists, a 2048-pixel copy that the
+viewer opens, and the original (up to 8 megapixels), which the viewer loads only when you zoom in past the copy. Big
+originals on their own could come up black or blurry on the iPad when it was short of memory (Slide Over, or heavy
+apps open in flight). If the original still can't open, the copy stays on screen with a note, never a black screen.
+Photos added before version 99 get their copy the first time they're opened, or in the background while the app is
+idle. Nothing needs the internet; a photo that hasn't come over from your other device yet says so in the viewer.
+
 EDITING: tap the pencil at the top. The checklist shows as an outline: one line per section, header and item, with small tags
 for notes, links and photos. Tap anything to open it as a page (text, note, type, sub-items, links, photos, reminder, in or out
 a level, duplicate, move, delete); Cancel and Done stay at the top. In a new item, Return keeps it and starts the next one. Drag ≡

@@ -1098,6 +1098,7 @@ a.rtag.rl svg{width:.95em;height:.95em;vertical-align:-.12em;margin-left:2px;str
 .lb-stage{position:absolute;inset:0;padding:calc(env(safe-area-inset-top,0px) + 60px) 8px calc(env(safe-area-inset-bottom,0px) + 48px);display:flex;align-items:center;justify-content:center;touch-action:none;overflow:hidden}
 .lb-img{flex:none;max-width:none;max-height:none;transform-origin:50% 50%;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;visibility:hidden}
 .lb-img.ready{visibility:visible}
+.lb-note{position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(560px,calc(100% - 32px));background:rgba(0,0,0,.72);color:#fff;font:600 14px -apple-system,system-ui,sans-serif;line-height:1.4;padding:8px 14px;border-radius:12px;text-align:center;pointer-events:none;z-index:3}
 .lb-btn{position:absolute;appearance:none;border:0;width:44px;height:44px;border-radius:999px;background:rgba(18,22,28,.74);box-shadow:0 0 0 1px rgba(255,255,255,.2);color:#fff;display:grid;place-items:center;padding:0;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .lb-btn svg{width:22px;height:22px;stroke-width:2.4}
 .lb-btn[hidden]{display:none}
@@ -2698,7 +2699,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='98';
+var APP_VERSION='99';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2836,6 +2837,10 @@ function scaleImage(img,max,q){
   c.width=c.height=0; // frees the canvas memory straight away on iPad
   return out;
 }
+// The viewer's copy: 2048 px on the long side. The iPad shows it without running short of memory (an 8-megapixel
+// photo can come up black or blurry in Slide Over, or with heavy apps open in flight). 'f' means the original is that small.
+var PH_M=2048;
+function scaleMid(img){return Math.max(img.naturalWidth,img.naturalHeight)>PH_M*1.15?scaleImage(img,PH_M,0.86):'f';}
 // Full-size copy: up to about 8 megapixels, so small print stays sharp when zoomed
 function scaleFull(img){
   var w=img.naturalWidth,h=img.naturalHeight,k=Math.min(1,Math.sqrt(8e6/(w*h)),6000/Math.max(w,h));
@@ -2847,7 +2852,7 @@ function readPhoto(file){
     rd.onerror=function(){rej(new Error('Unreadable file'));};
     rd.onload=function(){
       var img=new Image();
-      img.onload=function(){try{res({f:scaleFull(img),t:scaleImage(img,360,0.78)});}catch(e){rej(e);}};
+      img.onload=function(){try{res({f:scaleFull(img),m:scaleMid(img),t:scaleImage(img,360,0.78)});}catch(e){rej(e);}};
       img.onerror=function(){rej(new Error('Unreadable image'));};
       img.src=rd.result;
     };
@@ -2865,9 +2870,48 @@ function fillImages(root){
     }).catch(function(){});
   });
 }
+// a photo as a blob: address, which the iPad decodes with far less memory than a long data: address
+function dataBlob(d){
+  var i=d.indexOf(','),type=(d.slice(5,i).split(';')[0])||'image/jpeg',b=atob(d.slice(i+1)),n=b.length,u=new Uint8Array(n);
+  for(var k=0;k<n;k++) u[k]=b.charCodeAt(k);
+  return new Blob([u],{type:type});
+}
+function blobUrlOf(d){
+  var p=window.fetch?fetch(d).then(function(r){return r.blob();}):Promise.reject();
+  return p.catch(function(){return dataBlob(d);}).then(function(b){return URL.createObjectURL(b);});
+}
+// the viewer's copy of a photo kept from before: made once from the original, then kept
+function makeMid(f){
+  return blobUrlOf(f).then(function(u){
+    return new Promise(function(res,rej){
+      var img=new Image();
+      img.onload=function(){var m;try{m=scaleMid(img);}catch(e){URL.revokeObjectURL(u);rej(e);return;}URL.revokeObjectURL(u);img.removeAttribute('src');res(m);};
+      img.onerror=function(){URL.revokeObjectURL(u);rej(new Error('image'));};
+      img.src=u;
+    });
+  });
+}
+function imgMid(id,v){
+  if(v.m) return Promise.resolve(v.m);
+  if(!v.f) return Promise.reject(new Error('none'));
+  return makeMid(v.f).then(function(m){v.m=m;imgPut(id,{f:v.f,t:v.t,m:m}).catch(function(){});return m;});
+}
+// older photos get their viewer's copy in the background, one at a time while the app is idle
+var midBusy=false,midDone=false;
+function midWork(){
+  if(midBusy||midDone||document.visibilityState==='hidden'||(typeof lb!=='undefined'&&!lb.hidden)) return;
+  midBusy=true;
+  var ids=Array.from(allImgIds());
+  (function next(i){
+    if(i>=ids.length){midBusy=false;midDone=true;return;}
+    if(document.visibilityState==='hidden'||(typeof lb!=='undefined'&&!lb.hidden)){midBusy=false;return;}
+    imgGet(ids[i]).then(function(v){return v&&!v.m&&v.f?imgMid(ids[i],v):null;}).catch(function(){}).then(function(){setTimeout(function(){next(i+1);},400);});
+  })(0);
+}
+setTimeout(function(){midWork();setInterval(midWork,60000);},8000);
 function collectImages(){
   var ids=Array.from(allImgIds()),out={};
-  return Promise.all(ids.map(function(id){return imgGet(id).then(function(v){if(v) out[id]=v;});})).then(function(){return out;});
+  return Promise.all(ids.map(function(id){return imgGet(id).then(function(v){if(v) out[id]={f:v.f,t:v.t};});})).then(function(){return out;});
 }
 
 var loaded=load(),loadedOK=!!loaded;
@@ -4319,7 +4363,19 @@ function metarParse(raw){
   return o;
 }
 // ---- the runways: true headings from runways.js (OurAirports), loaded the first time the wind is shown ----
-var rwP=null,rwFail=0;
+var rwP=null,rwFail=0,RWKEY='flightChecklist.runways';
+function rwFromText(t){try{var sc=document.createElement('script');sc.textContent=t;document.head.appendChild(sc);}catch(e){}return !!window.RUNWAYS;}
+// the app built in Xcode doesn't carry runways.js: it uses a copy fetched once from the web page and kept
+function rwFromWeb(res,rej){
+  var c=null;try{c=localStorage.getItem(RWKEY);}catch(e){}
+  if(c&&rwFromText(c)){res();return;}
+  if(navigator.onLine===false||!window.fetch){rwP=null;rwFail++;rej();return;}
+  fetch('https://danipuskas.github.io/Checklist/runways.js',{cache:'no-store'}).then(function(r){return r.ok?r.text():Promise.reject();}).then(function(t){
+    if(!rwFromText(t)) throw new Error('bad');
+    try{localStorage.setItem(RWKEY,t);}catch(e){}
+    res();
+  }).catch(function(){rwP=null;rwFail++;rej();});
+}
 function loadRunways(){
   if(window.RUNWAYS) return Promise.resolve();
   if(rwP) return rwP;
@@ -4327,7 +4383,7 @@ function loadRunways(){
   rwP=new Promise(function(res,rej){
     var sc=document.createElement('script');sc.src='runways.js';
     sc.onload=function(){window.RUNWAYS?res():rej();};
-    sc.onerror=function(){rwP=null;rwFail++;sc.remove();rej();};
+    sc.onerror=function(){sc.remove();if(natOn()) rwFromWeb(res,rej);else{rwP=null;rwFail++;rej();}};
     document.head.appendChild(sc);
   });
   return rwP;
@@ -7733,7 +7789,7 @@ function photoFromBlob(b){
     rd.onerror=function(){rej(new Error('read'));};
     rd.onload=function(){
       var f='data:image/jpeg;base64,'+String(rd.result).slice(String(rd.result).indexOf(',')+1),img=new Image();
-      img.onload=function(){try{res({f:f,t:scaleImage(img,360,0.78)});}catch(e){rej(e);}};
+      img.onload=function(){try{res({f:f,m:scaleMid(img),t:scaleImage(img,360,0.78)});}catch(e){rej(e);}};
       img.onerror=function(){rej(new Error('image'));};
       img.src=f;
     };
@@ -10090,7 +10146,7 @@ $('#lbClose').innerHTML=I.x;lbPrev.innerHTML=I.left;lbNext.innerHTML=I.right;
 // at full detail instead of stretching the screen-sized picture.
 function zLayout(){lbImg.style.width=(baseW*zL)+'px';lbImg.style.height=(baseH*zL)+'px';}
 function zApply(anim){lbImg.style.transition=anim?'transform .2s ease':'none';lbImg.style.transform='translate('+ztx+'px,'+zty+'px) scale('+(zs/zL)+')';}
-function zCommit(){clearTimeout(commitT);if(gest||zL===zs) return;zL=zs;zLayout();zApply(false);}
+function zCommit(){clearTimeout(commitT);if(gest||zL===zs) return;zL=zs;zLayout();zApply(false);if(typeof lbMaybeFull==='function') lbMaybeFull();}
 function zCommitSoon(ms){clearTimeout(commitT);commitT=setTimeout(zCommit,ms);}
 function zBase(){
   var w=lbImg.naturalWidth,h=lbImg.naturalHeight;if(!w||!h) return;
@@ -10100,7 +10156,36 @@ function zBase(){
   var k=Math.min(W/w,H/h);baseW=Math.round(w*k);baseH=Math.round(h*k);
   zLayout();
 }
-function lbSetSrc(src){lbImg.src=src;if(lbImg.complete&&lbImg.naturalWidth){zBase();lbImg.classList.add('ready');}}
+var lbTok=0,lbCur={id:'',u:[],lvl:0,v:null,full:false,good:''},lbNoteEl=null;
+function lbSetSrc(src){lbImg.src=src;if(lbImg.complete&&lbImg.naturalWidth){zBase();lbImg.classList.add('ready');lbCur.good=src;}}
+function lbFree(){lbCur.u.forEach(function(u){try{URL.revokeObjectURL(u);}catch(e){}});lbCur.u=[];}
+function lbNote(t){
+  if(!lbNoteEl){lbNoteEl=document.createElement('div');lbNoteEl.className='lb-note';lb.appendChild(lbNoteEl);}
+  lbNoteEl.textContent=t||'';lbNoteEl.hidden=!t;
+}
+// decode it off-screen first, then swap it in; if it can't be opened, what's showing stays
+function lbLoad(d,lvl){
+  var tok=lbTok;
+  return blobUrlOf(d).then(function(u){
+    if(tok!==lbTok){URL.revokeObjectURL(u);return false;}
+    lbCur.u.push(u);
+    var im=new Image();im.src=u;
+    var ok=im.decode?im.decode():new Promise(function(res,rej){im.onload=res;im.onerror=rej;});
+    return ok.then(function(){
+      if(tok!==lbTok||lb.hidden) return false;
+      lbCur.lvl=lvl;lbSetSrc(u);return true;
+    },function(){
+      if(tok===lbTok) lbNote(lvl===2?'The full-size photo didn’t open here (short of memory), so this is a smaller copy.':'Only a preview opened: the iPad is short of memory. Closing a few apps helps.');
+      return false;
+    });
+  },function(){return false;});
+}
+// zoomed in past the viewer's copy: the original
+function lbMaybeFull(){
+  var v=lbCur.v;if(!v||lbCur.full||lbCur.lvl!==1||!v.f||v.m==='f') return;
+  var px=baseW*zL*(window.devicePixelRatio||1);
+  if(lbImg.naturalWidth&&px>lbImg.naturalWidth*1.05){lbCur.full=true;lbLoad(v.f,2);}
+}
 function zReset(anim){zs=1;ztx=0;zty=0;zApply(anim);if(zL!==1) zCommitSoon(anim?220:0);}
 function zCenter(){var r=lbStage.getBoundingClientRect();return {x:r.left+lbImg.offsetLeft+lbImg.offsetWidth/2,y:r.top+lbImg.offsetTop+lbImg.offsetHeight/2};}
 function zClamp(){
@@ -10116,17 +10201,19 @@ function zZoomAt(x,y,ns,anim){
 function lbShow(i){
   lbIdx=(i+lbList.length)%lbList.length;
   clearTimeout(commitT);zs=1;ztx=0;zty=0;zL=1;zApply(false);
-  lbImg.classList.remove('ready');
-  var id=lbList[lbIdx],t=thumbCache.get(id);
+  lbImg.classList.remove('ready');lbFree();lbNote('');
+  var id=lbList[lbIdx],t=thumbCache.get(id),tok=++lbTok;
+  lbCur={id:id,u:[],lvl:0,v:null,full:false,good:''};
   if(t) lbSetSrc(t);else lbImg.removeAttribute('src');
-  // Decode the full photo off-screen, then swap it in without a flash
   imgGet(id).then(function(v){
-    if(!v||lbList[lbIdx]!==id) return;
-    thumbCache.set(id,v.t);
-    var full=new Image();full.src=v.f;
-    (full.decode?full.decode():Promise.resolve()).catch(function(){}).then(function(){
-      if(lbList[lbIdx]===id&&!lb.hidden) lbSetSrc(v.f);
-    });
+    if(tok!==lbTok) return;
+    if(!v||!v.f){lbNote('This photo isn’t on this device yet. It comes with your sync the next time you’re online.');return;}
+    lbCur.v=v;
+    if(v.t){thumbCache.set(id,v.t);if(!t) lbSetSrc(v.t);}
+    return imgMid(id,v).then(function(m){
+      if(tok!==lbTok) return;
+      return lbLoad(m==='f'?v.f:m,m==='f'?2:1).then(function(ok){if(ok) lbMaybeFull();});
+    },function(){if(tok===lbTok) return lbLoad(v.f,2);});
   }).catch(function(){});
   var many=lbList.length>1;
   lbCount.textContent=many?(lbIdx+1)+' of '+lbList.length:'';
@@ -10141,7 +10228,8 @@ function closeViewer(){
   lb.classList.remove('show');
   if(sheetWrap.hidden&&!toolOpen) document.body.classList.remove('noscroll');
   lbPts.clear();gest=null;clearTimeout(lbHideT);
-  lbHideT=setTimeout(function(){lb.hidden=true;lbImg.classList.remove('ready');lbImg.removeAttribute('src');},200);
+  lbTok++;
+  lbHideT=setTimeout(function(){lb.hidden=true;lbImg.classList.remove('ready');lbImg.removeAttribute('src');lbFree();lbNote('');},200);
 }
 function lbDist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
 function lbBegin(){
@@ -10208,7 +10296,9 @@ lbStage.addEventListener('wheel',function(e){
   if(ns<=1.001) zReset(false);else zZoomAt(e.clientX,e.clientY,ns,false);
 },{passive:false});
 lbImg.addEventListener('dragstart',function(e){e.preventDefault();});
-lbImg.addEventListener('load',function(){zBase();lbImg.classList.add('ready');});
+lbImg.addEventListener('load',function(){zBase();lbImg.classList.add('ready');lbCur.good=lbImg.src;});
+// a copy that won't open: back to the one that did
+lbImg.addEventListener('error',function(){if(lbCur.good&&lbImg.src!==lbCur.good) lbImg.src=lbCur.good;});
 window.addEventListener('resize',function(){if(!lb.hidden){zBase();zClamp();zApply(false);}});
 document.addEventListener('gesturestart',function(e){if(!lb.hidden) e.preventDefault();});
 $('#lbClose').addEventListener('click',closeViewer);
