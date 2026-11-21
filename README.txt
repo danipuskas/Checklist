@@ -13,13 +13,22 @@ FLIGHT CHECKLISTS – OFFLINE SETUP (about 10 minutes, once)
 8. Open it once from the Home Screen while online. From then on it works offline.
 
 THE BAR AT THE BOTTOM: Checklist, Timers (countdowns and crew rest on one page), Briefing, Airports and More
-(flight log, checklists, untick all, new flight, search, settings). Away from Timers, its tab shows the time left to the
+(event log, Prepare, flight log, checklists, untick all, new flight, search, settings). Away from Timers, its tab shows the time left to the
 next countdown, or to your rest. The bar steps aside while you edit or type.
 
-FLIGHT TOOLS in More: Position (next waypoint, off track, ground speed, ETA and the next FIRs, from the phone's GPS,
-which works in airplane mode on an iPhone, or from the flight plan without a fix), Nearest now (the airports in your LIDO
-package, nearest first, with distance, time, weather and NOTAMs) and Event log (one tap stamps the time and position;
-copy or share it). The route comes from the LIDO package: load it in Briefing.
+EVENT LOG in More: one tap stamps the time and the position (the phone's GPS, which works in airplane mode on an
+iPhone, or the flight plan's position once the LIDO package is loaded); copy or share it.
+
+PREVIOUS FLIGHTS (your arrivals and departures, like the "Previous flights" in a Notes page): on an airport's page in
+Airports, under its notes, tap Log arrival or Log departure. The flight number and the date fill in for the flight
+that's set (from the package or Prepare); write what to remember, one point per line (STAR, approach, runway, taxi,
+stand, clearance…), and Save. The chips under the box start a line for you, with the runway in use when the package
+has it. Photos can go with it. The newest come first; tap one to change or delete it. Tapping Log arrival again for
+the same flight opens the one you wrote. At a glance shows the last arrival and departure there.
+More > Flight log lists all of them, newest first, with a Find box, and + adds a past one for any airport.
+A Flight log block in a checklist has the same buttons for the current flight; a Last time here block shows your last
+arrival and departure at the destination (or departure). The old flight log was moved over: each flight became a
+departure and an arrival with its stand, taxi, runway, route and notes as lines; taxi times and registrations went.
 
 PREPARE in More: your next trips (added by hand, plus the flight that's set), each with tabs for the Place (local time,
 arrival, layover, sunrise and sunset, a forecast for your stay, last time there), your Notes for its airports, the Weather
@@ -49,7 +58,7 @@ limited to that repository with Contents: Read and write. The steps are shown in
 SYNC BETWEEN iPAD AND iPHONE (optional, needs Online backup): on the iPad, More > Settings > Online backup and sync >
 turn on "Sync with your other devices". On the iPhone, open the same address in Safari > Share > Add to Home Screen,
 open it, then More > Settings > Online backup and sync, enter the same repository and token and choose
-"Use the synced checklists". From then on checklists, airport notes, the flight log, countdown and crew rest set-up
+"Use the synced checklists". From then on checklists, airport notes, previous flights, countdown and crew rest set-up
 and photos stay the same on both, while the app is open and online: a change is sent a few seconds after you make it,
 and the other device checks every 20 seconds and whenever it is opened. Changes made offline are sent when you are
 back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
@@ -101,7 +110,7 @@ weather category and keyword dots; tap one to see its runway, METAR and TAF side
 another with their full text (nothing to tap open). The weather stays at the top while you scroll the NOTAMs;
 Fold shrinks it to one line (the METAR), tap that line to open it again. Airports shows your airports down the side (this flight, its alternates,
 all airports), the notes in the middle, and At a glance on the right: local time now and at ETD/ETA, daylight,
-runway in use, weather, NOTAMs here (tap to open them in the Briefing) and your stats. In Slide Over, Split View
+runway in use, weather, NOTAMs here (tap to open them in the Briefing) and Last time here. In Slide Over, Split View
 or on the iPhone both pages stay as before.
 RUNWAY IN USE: the departure and arrival runways come from the OFP. When one changes, tap the runway row at the top
 of the departure or destination tab and pick the new one (the runways in that airport's NOTAMs, or type one). The NOTAMs
@@ -139,8 +148,6 @@ the TAF at its ETA; SIGMETs on your route while you're in them; your kept NOTAMs
 since the last copy. Times are the planned ones, also for a package you only brief. Print or PDF prints just the
 page, light, on one A4 for a normal flight (in the print sheet, Share > Save to Files keeps a PDF). Send shares it as
 text (Messages, AirDrop, WhatsApp) or copies it. It's a summary; the OFP, NOTAMs and OM stay the reference.
-In the iPad / iPhone app (Xcode), printing needs the app to handle a "print" message and to set
-window.natCaps = {print: true}; until then the Print button is hidden there and Send still works.
 WIND ON YOUR RUNWAY: the runway row always shows the wind on it in a few letters (HW 7 XW 11R, tailwind as TW), from
 the METAR. Tap Wind on a weather card for the rest: headwind or tailwind and crosswind with gusts, a small compass, and what a varying wind (250V320) can do. "Around your ETA" gives the strongest
 wind the TAF has at your time and its components. All runways now lists every runway, most into the wind first, with
