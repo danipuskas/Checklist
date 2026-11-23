@@ -1,5 +1,5 @@
 // Offline cache: serves the app from the iPad and checks GitHub for a newer version when online.
-const CACHE = 'flight-checklists-v106';
+const CACHE = 'flight-checklists-v107';
 const ASSETS = ['./', './index.html', './airports.js', './runways.js', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './lib/pdf.js', './lib/pdf.worker.js'];
 
 self.addEventListener('install', e => {
@@ -18,8 +18,23 @@ self.addEventListener('activate', e => {
 const REFRESH_EVERY = 10 * 60 * 1000, lastCheck = new Map();
 let netDownUntil = 0;
 const canNet = () => self.navigator.onLine !== false && Date.now() >= netDownUntil;
+// Map tiles (OpenStreetMap) you've looked at are kept, so the Layover map works offline; the oldest go after about 3,000
+const TILES = 'flight-map-tiles';
+let tilePuts = 0;
+const trimTiles = c => c.keys().then(ks => ks.length > 3000 ? Promise.all(ks.slice(0, ks.length - 2500).map(k => c.delete(k))) : null).catch(() => {});
 self.addEventListener('fetch', e => {
   const req = e.request;
+  if (req.method === 'GET' && new URL(req.url).hostname === 'tile.openstreetmap.org') {
+    e.respondWith(caches.open(TILES).then(c => c.match(req.url).then(hit => {
+      if (hit) return hit;
+      if (!canNet()) return new Response('', { status: 504 });
+      return fetch(new Request(req.url, { mode: 'cors', credentials: 'omit' })).then(res => {
+        if (res.ok) { c.put(req.url, res.clone()).then(() => { if (++tilePuts % 50 === 0) trimTiles(c); }).catch(() => {}); }
+        return res;
+      }).catch(() => fetch(req));
+    })).catch(() => fetch(req)));
+    return;
+  }
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   const nav = req.mode === 'navigate';
   const key = nav ? './index.html' : req;

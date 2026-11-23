@@ -52,8 +52,7 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   on it too. On top, the weather hour by hour (Open-Meteo): temperature and sky, rain shaded blue, and good hours to
   be outside outlined green (daylight, dry, 8-28 degrees, not while you sleep), listed under it with the rain.
 - Weather for your stay (Open-Meteo, with the UV), money (the rate to AED from a free daily source, a converter both
-  ways; kept for offline), Before you go (your list; the app adds an adaptor when the plugs differ from Dubai's,
-  sunscreen for a high UV, an umbrella or a warm jacket from the forecast; one you delete stays away), emergency
+  ways; kept for offline), emergency
   numbers (built in for the countries Emirates flies to, tap to call) and your own numbers for that airport (hotel,
   station, embassy), good to know (plugs, volts, driving side, clock, money, tipping, tap water, shop hours, air
   quality during the stay, public holidays while you're there, and a few phrases the iPhone reads out where English
@@ -68,7 +67,15 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   number; Change picks another one for this trip only, or for every trip on that flight. With several hotels and none
   for the flight, it asks once and remembers. The room number is kept for the trip. Near the hotel opens Maps for a
   supermarket, pharmacy, coffee, gym, ATM or laundry. (The old single hotel note became the first hotel.)
-- Your places: each has a type (eat, drinks, coffee, walk, run, shop, see) and a note, a filter, and Go for directions.
+- Your places: type a name and Add: the app searches OpenStreetMap and lists the matches nearest the hotel first, so
+  you pick the right branch of a chain; or paste a place shared from Apple Maps or Google Maps (Share > Copy); or keep
+  just the name (offline it's kept by name to pin later). A pinned place has its exact spot and address, a type from
+  the map (cafe, restaurant, shop...) and its distance from the hotel; Go takes you there by public transport from
+  the hotel's pin, in Apple Maps or Google Maps. Tap a place to change its name, type or note, or find it again.
+  A map above the list shows the hotel (H) and the pinned places, numbered as in the list: drag, pinch, double-tap
+  or + and - to zoom, the square to see everything, tap a pin for Go. Pin the hotel from its card. The map is
+  OpenStreetMap; the parts you've looked at are kept, so it works offline on the layover.
+  Before you go has left the Layover page: make it a checklist of your own among the checklists.
 - To buy here: a shopping list per city that stays until you tick it, on every trip there; the trip list shows "2 to buy".
 Holidays come from Nager.Date, or are worked out by the date-holidays library (jsDelivr) when that doesn't answer;
 air quality from Open-Meteo. Both are fetched when online and kept.
@@ -77,7 +84,7 @@ text), or CrewPulse's event notes. Only the flights are read (no names, days off
 local at each airport. It shows what's new, changed or the same before adding; a changed flight keeps your wake-up,
 pick-up and plan.
 With sync on (More → Settings), Layover syncs like the notes: trips, wake-up and pick-up, what you planned on the
-timeline, Before you go (ticks too), hotels (with Wi-Fi and flight numbers), the hotel and room picked for a trip,
+timeline, hotels (with Wi-Fi, flight numbers and their pin), the hotel and room picked for a trip,
 places, tips, the shopping lists, numbers, removed duties and the list for new trips. The same item added on both
 devices before they synced shows once. The event log stays on each device. The sync file is now
 format 4 (it carries the hotels and shopping lists): a device still on an older version says it can't read it until you
@@ -104,11 +111,10 @@ SYNC BETWEEN iPAD AND iPHONE (optional, needs Online backup): on the iPad, More 
 turn on "Sync with your other devices". On the iPhone, open the same address in Safari > Share > Add to Home Screen,
 open it, then More > Settings > Online backup and sync, enter the same repository and token and choose
 "Use the synced checklists". From then on checklists, airport notes, previous flights, Layover (trips, wake-up and
-pick-up, timeline plans, Before you go, hotel, places, numbers), countdown and crew rest set-up and photos stay the same on both, while the app is open and online: a change is sent a few seconds after you make it,
+pick-up, timeline plans, hotels, places and their pins, numbers), countdown and crew rest set-up and photos stay the same on both, while the app is open and online: a change is sent a few seconds after you make it,
 and the other device checks every 20 seconds and whenever it is opened. Changes made offline are sent when you are
 back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
-change wins. Ticks, answers, filled-in fields, times, reminders, folding and the event log stay on each device
-(Before you go ticks do sync).
+change wins. Ticks, answers, filled-in fields, times, reminders, folding and the event log stay on each device.
 
 PHOTOS: each photo is kept on the device in three sizes: a small one for the lists, a 2048-pixel copy that the
 viewer opens, and the original (up to 8 megapixels), which the viewer loads only when you zoom in past the copy. Big
