@@ -1872,6 +1872,7 @@ line.tl-tk{opacity:.5}line.tl-tk.mid{opacity:.9;stroke-width:1.6}text.tl-tk{stro
 .fd-it{appearance:none;display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:var(--text);background:none;border:0;border-bottom:1px solid var(--line-soft);padding:9px 2px;cursor:pointer}
 .fd-it>i{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--surface2);color:#fff;flex:none}.fd-it>i svg{width:17px;height:17px}.fd-it>i:not([style]) svg{color:var(--accent)}
 .fd-it span{flex:1;min-width:0}.fd-it b{display:block;font-size:calc(15px*var(--ts));font-weight:650}.fd-it small{display:block;font-size:calc(12.5px*var(--ts));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fd-acts{flex-wrap:wrap}.fd-acts .btn{flex:1 1 auto;white-space:nowrap;padding-left:12px;padding-right:12px}.fd-acts .btn[hidden]{display:none}
 .fd-hd{margin:8px 0 2px!important;font-weight:600}.fd-note{margin:8px 0 4px!important;padding:8px 10px;border-radius:10px;background:var(--accent-weak);color:var(--text)!important;line-height:1.4}.fd-tip{margin:8px 0 2px!important}.fd-it.far{opacity:.75}
 .fd-map{position:relative;height:min(46vh,300px);margin:6px 0 6px;border-radius:12px;overflow:hidden;background:#e8e4dc;touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab}
 .fd-x{position:absolute;left:50%;top:50%;z-index:3;width:40px;height:40px;margin:-37px 0 0 -20px;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}.fd-x svg{width:40px;height:40px;display:block}
@@ -3034,7 +3035,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='110';
+var APP_VERSION='111';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -10220,8 +10221,8 @@ function prepFindSheet(o){
     '<p class="hint fd-note" id="fdN" hidden></p><div class="fd-r" id="fdR"></div>'+
     '<div class="fd-pick" id="fdP" hidden><div class="fd-map" id="fdM"></div><p class="hint">Move the map until the pin sits on the place.</p></div>'+
     '<div class="fld fd-lk"><span class="fl">Or paste a link from Apple Maps or Google Maps</span><div class="fd-q"><input type="url" id="fdL" maxlength="500" placeholder="Share → Copy in Maps, then paste here" autocomplete="off"><button type="button" class="btn small" data-sact="link">Use</button></div></div>'+
-    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button>'+(o.plain?'<button type="button" class="btn" data-sact="plain">Just the name</button>':'')+
-      (o.hotel?'':'<button type="button" class="btn" data-sact="lnkonly" id="fdKb" hidden>Keep just the link</button>')+
+    '<div class="sh-actions fd-acts"><button type="button" class="btn" data-sact="cancel">Cancel</button>'+(o.plain?'<button type="button" class="btn" data-sact="plain">Just the name</button>':'')+
+      (o.hotel?'':'<button type="button" class="btn" data-sact="lnkonly" id="fdKb" hidden>Just the link</button>')+
       (o.at||o.from?'<button type="button" class="btn" data-sact="map" id="fdMb">'+I.pin+'Pick on the map</button><button type="button" class="btn" data-sact="list" id="fdLb" hidden>Back to the list</button><button type="button" class="btn primary" data-sact="spot" id="fdSb" hidden>Use this spot</button>':'')+'</div>',
   function(act,btn){
     if(act==='go'){mapMode(false);run();return;}
@@ -10266,8 +10267,8 @@ function prepFindSheet(o){
   // a link without its spot: it's kept (it opens the place in Maps); the pin comes from the list or the map
   function linkOnly(L){
     pend=L;var n=$('#fdN'),k=$('#fdKb'),lk=$('.sheet .fd-lk');
-    if(n){n.hidden=false;n.innerHTML='<b>Link kept.</b> Short links from Maps don’t say where the place is, so the app can’t show the distance or put it on the map. '+(o.hotel?'Pick the hotel below':'Pick the place below')+(o.from?', or on the map':'')+(o.hotel?'.':', or keep just the link.');}
-    if(k) k.hidden=false;if(lk) lk.hidden=true;
+    if(n){n.hidden=false;n.innerHTML='<b>Link kept.</b> Short links from Maps don’t say where the place is, so the app can’t show the distance or put it on the map. '+(o.hotel?'Pick the hotel below':'Pick the place below')+(o.from?', or on the map':'')+(o.hotel?'.':', or save just the link.');}
+    if(k) k.hidden=false;if(lk) lk.hidden=true;var pb=$('.sheet [data-sact="plain"]');if(pb) pb.hidden=true;
     var q=$('#fdQ');if(q&&!String(q.value||'').trim()&&L.n) q.value=L.n;
     if(q&&String(q.value||'').trim()&&!res.length) run();else if(q&&!String(q.value||'').trim()) setTimeout(function(){q.focus();},60);
   }

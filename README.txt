@@ -89,8 +89,8 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   Pick on the map: move the map until the pin sits on the place, then Use this spot.
   Links from Maps: a long link (with the spot in it) pins the place straight away, also pasted into Add. The short
   links the iPhone shares now (maps.apple/p/..., maps.app.goo.gl/...) don't say where the place is, so the app keeps
-  the link and asks you to pick the place from the list or on the map; then it has its distance and its pin. Keep
-  just the link saves it unpinned (Go then opens the link).
+  the link and asks you to pick the place from the list or on the map; then it has its distance and its pin. Just
+  the link saves it unpinned (Go then opens the link).
   Airport positions are now to about 1 km, so distances from the airport are right.
   Before you go has left the Layover page: make it a checklist of your own among the checklists.
 - To buy here: a shopping list per city that stays until you tick it, on every trip there; the trip list shows "2 to buy".
