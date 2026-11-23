@@ -1969,6 +1969,65 @@ label.chk{display:flex;align-items:center;gap:9px;font-size:calc(14.5px*var(--ts
 .prep-sun em{font-style:normal;font-weight:700;font-size:calc(13px*var(--ts));padding:3px 9px;border-radius:999px}
 .prep-sun em.d{background:rgba(211,154,20,.16);color:#a46f00}.prep-sun em.n{background:var(--accent-weak);color:var(--accent)}
 .prep-fch{display:flex;justify-content:space-between}.prep-fch i{font-style:normal;text-transform:none;letter-spacing:0;font-weight:600}
+.pt-cd,.tl-sh,.fc-up,.mp-hd,.go-addtip{display:none}
+@media (max-width:600px){
+  .prep-pg .prep-rep{display:none}
+  .pt-cd{display:inline;margin-left:auto;text-transform:none;letter-spacing:0;font-weight:750;color:var(--accent);font-size:calc(12.5px*var(--ts));white-space:nowrap}
+  .prep-pg .lv-card{margin:0 0 8px;border-radius:14px}
+  .prep-grid .lv-card,.prep-pg .pt-card .pt-out{padding:10px 12px}
+  .prep-pg .pt-card{padding:0}.prep-pg .pt-out{padding:7px 12px}
+  .pt-line{margin-top:3px;font-size:calc(14px*var(--ts));gap:6px}
+  .pt-row>div{padding:7px 12px 8px}
+  .pt-big{font-size:calc(21px*var(--ts))}.pt-sub{font-size:calc(13px*var(--ts));margin-top:0}.pt-sun{font-size:calc(11.5px*var(--ts));margin-top:2px}
+  .pt-chips{margin-top:5px;gap:5px}.pt-chip{min-height:30px;padding:2px 9px;font-size:calc(12.5px*var(--ts))}
+  .tl-hint{display:none}
+  .tl-list{margin-top:6px}
+  .tl-it{grid-template-columns:10px minmax(0,1fr) auto auto;column-gap:8px;padding:6px 2px;align-items:center}
+  .tl-it b{font-size:calc(14px*var(--ts))}.tl-it span{font-size:calc(13.5px*var(--ts));white-space:nowrap}
+  .tl-it em{grid-column:4;text-align:right;font-size:calc(12px*var(--ts));white-space:nowrap}
+  .tl-it .tl-lg{display:none}.tl-it .tl-sh{display:inline;font-size:inherit}
+  .tl-sum{padding-top:4px;font-size:calc(12px*var(--ts))}
+  .prep-grid .pc-h{margin-bottom:6px}.prep-grid .pc-h .lv-l{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .prep-grid .prep-sh{margin:8px 0 5px}
+  .pc-note{margin-top:6px;font-size:calc(11.5px*var(--ts))}
+  .prep-grid .lv-card>.lv-more{padding:6px 2px 2px;font-size:calc(14px*var(--ts))}
+  .fc-at,.fc-more{display:none}
+  .fc-up{display:inline-flex;align-items:center;gap:3px;appearance:none;border:0;background:none;padding:0;color:var(--accent);font:600 calc(12px*var(--ts)) -apple-system,system-ui,sans-serif;text-transform:none;letter-spacing:0;cursor:pointer}.fc-up svg{width:13px;height:13px}
+  .pdays{margin-top:4px;gap:4px}.pdays div{padding:3px 0}.pdays svg{width:22px;height:22px;margin:2px auto}.pdays b{font-size:calc(14px*var(--ts))}
+  .go-pay{padding:7px 10px;gap:10px;border-radius:12px;margin-bottom:2px}.go-pay>i{width:32px;height:32px;border-radius:9px}.go-pay>i svg{width:19px;height:19px}
+  .go-pay strong{font-size:calc(14.5px*var(--ts))}.go-pay span{font-size:calc(12.5px*var(--ts));line-height:1.3}
+  .go-rows .ct{padding:6px 0;align-items:center;cursor:pointer}.go-rows .ct svg{margin-top:0}
+  .go-rows .ct>span{display:flex;align-items:baseline;gap:6px;min-width:0}
+  .go-rows .ct span b{display:inline;flex:none;font-size:calc(14px*var(--ts))}.go-rows .ct small{display:inline;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .go-rows .ct:after{content:'\203A';color:var(--muted);font-size:18px;line-height:1;margin-left:2px;transition:transform .15s}
+  .go-rows .ct.open{align-items:flex-start}.go-rows .ct.open>span{display:block}.go-rows .ct.open span b{display:block}.go-rows .ct.open small{display:block;white-space:normal}.go-rows .ct.open:after{transform:rotate(90deg)}
+  .go-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -12px 2px;padding:0 12px}.go-chips::-webkit-scrollbar{display:none}.go-chip{flex:none;padding:5px 10px 5px 8px;font-size:calc(13px*var(--ts))}
+  .go-card>.mp-sw{display:none}
+  .mp-hd{display:flex;flex:none;margin:0;gap:0;flex-wrap:nowrap;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .mp-hd button{border:0;border-radius:0;padding:3px 9px;font-size:calc(11.5px*var(--ts))}.mp-hd button+button{border-left:1px solid var(--line)}
+  .go-tip{margin-top:6px;padding:6px 4px 6px 10px;font-size:calc(13.5px*var(--ts))}
+  .go-card:not(.tip-on)>.go-tipin{display:none}
+  .go-card:not(.tip-on)>.go-addtip{display:inline-flex;align-items:center;gap:5px;appearance:none;border:0;background:none;color:var(--accent);font:600 calc(14px*var(--ts)) -apple-system,system-ui,sans-serif;padding:8px 2px 0;cursor:pointer}.go-addtip svg{width:15px;height:15px}
+  .pc-long,.fx-note{display:none}
+  .fx-r b{font-size:calc(19px*var(--ts))}.fx-r span{font-size:calc(13px*var(--ts))}
+  .fx-c{margin:6px 0}.fx-c label{padding:3px 10px;border-radius:10px}.fx-c small{font-size:10.5px}.fx-c input{font-size:max(16px,calc(18px*var(--ts)))}
+  .fx-q div{padding:3px 0}.fx-q b{font-size:calc(13.5px*var(--ts))}.fx-q span{font-size:calc(11.5px*var(--ts))}
+  .sos{padding:6px 10px;gap:10px;border-radius:12px;margin-bottom:2px}.sos>b{font-size:calc(24px*var(--ts))}.sos>span{font-size:calc(12px*var(--ts));line-height:1.3}.sos strong{font-size:calc(14px*var(--ts))}.sos>i{width:38px;height:38px}.sos>i svg{width:18px;height:18px}
+  .prep-grid .ct{padding:6px 0}.prep-grid .ct span{font-size:calc(14px*var(--ts))}.prep-grid .ct b{font-size:calc(14.5px*var(--ts))}
+  .ho-hn{padding:0 0 8px;margin-bottom:8px}.ho-hn b{font-size:calc(16px*var(--ts))}.ho-hn em{margin-top:1px}.ho-btn{padding:5px 9px;font-size:calc(13px*var(--ts))}
+  .ho-kv{gap:6px 12px}.ho-kv>div{font-size:calc(13.5px*var(--ts));line-height:1.3}.ho-kv svg{width:16px;height:16px}.ho-kv b{font-size:calc(10.5px*var(--ts))}
+  .ho-acts{flex-wrap:nowrap;gap:16px;padding-top:0}.ho-acts .lv-more{padding:6px 2px 2px;font-size:calc(14px*var(--ts))}
+  .pl-nomap{padding:6px 10px;margin:0 0 6px;font-size:calc(13px*var(--ts))}.pl-nomap span{min-width:0}
+  .pl-f{margin:0 0 4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.pl-f::-webkit-scrollbar{display:none}.pl-f button{flex:none;padding:3px 9px}
+  .pl-main{padding:6px 0;gap:9px}.pl-main>i{width:30px;height:30px;border-radius:9px}.pl-main>i svg{width:17px;height:17px}.pl-main b{font-size:calc(14.5px*var(--ts))}.pl-main small{font-size:calc(12px*var(--ts))}
+  .pl-go{padding:5px 8px;font-size:calc(12.5px*var(--ts))}
+  .prep-grid .pi-row{padding:5px 0;font-size:calc(15px*var(--ts))}
+  .prep-grid .pi-add{padding:6px 0 0;gap:6px}.prep-grid .pi-add input{padding:6px 10px}.prep-grid .pi-add .btn{padding:7px 12px;font-size:calc(14px*var(--ts));border-radius:10px}
+  .go-card .pi-add,.pl-card .pi-add,.buy-card .pi-add{margin-top:4px}
+  .gk{gap:6px 12px}.gk div{font-size:calc(13.5px*var(--ts));line-height:1.3}.gk svg{width:16px;height:16px}.gk b{font-size:calc(10.5px*var(--ts))}
+  .pn-mine h4{margin:4px 0 1px}
+  .prep-more{margin:0}.prep-more>.lv-more{margin:0 0 2px 2px;padding:6px 2px;font-size:calc(14px*var(--ts));text-align:left}
+}
 .pdays{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:6px;margin-top:8px;text-align:center}
 .pdays div{padding:6px 0;border-radius:12px}.pdays div.on{background:var(--accent-weak)}
 .pdays svg{display:block;width:26px;height:26px;margin:3px auto;color:var(--accent)}
@@ -2974,7 +3033,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='108';
+var APP_VERSION='109';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -9048,6 +9107,7 @@ window.addEventListener('resize',function(){fsPlace();});
 var gps={fix:null,err:'',watch:null},evOld=false;
 var EVK={med:'Medical',tech:'Technical',atc:'ATC',wx:'Weather',note:'Note'};
 var IX={
+  redo:sv('<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>'),
   evt:sv('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
     med:sv('<path d="M9.5 4h5v5.5H20v5h-5.5V20h-5v-5.5H4v-5h5.5z"/>'),
   tech:sv('<path d="M14.5 5.5a4 4 0 0 0-5 5L4 16v4h4l5.5-5.5a4 4 0 0 0 5-5L16 12l-4-4z"/>'),
@@ -9531,7 +9591,7 @@ function prepTlHTML(t,nx,wide){
     '<div class="tl-sc">'+prepTlSVG(D,{fit:false,pxh:17,pad:200})+'</div></div>'+wxWinHTML(D)+'<p class="tl-hint">Slide the timeline · tap the purple lane to add sleep, a nap, a workout…</p>';
   var P=D.plan.slice().sort(function(p,q){return p.s-q.s;});
   if(P.length) h+='<div class="tl-list">'+P.map(function(p){var K=PLAN_K[p.k];
-    return '<button type="button" class="tl-it" data-act="prepPlan" data-id="'+esc(t.id)+'" data-v="'+p.id+'"><i style="background:'+K[2]+'"></i><b>'+esc(p.t||K[0])+'</b><span>'+wdHm(D.tz,p.s)+'–'+hmAt(D.tz,p.e)+'</span><em>'+esc(D.hcity)+' '+wdHm(D.htz,p.s)+'–'+hmAt(D.htz,p.e)+'</em></button>';}).join('')+
+    return '<button type="button" class="tl-it" data-act="prepPlan" data-id="'+esc(t.id)+'" data-v="'+p.id+'"><i style="background:'+K[2]+'"></i><b>'+esc(p.t||K[0])+'</b><span>'+wdHm(D.tz,p.s)+'–'+hmAt(D.tz,p.e)+'</span><em><span class="tl-lg">'+esc(D.hcity)+' '+wdHm(D.htz,p.s)+'</span><span class="tl-sh">'+esc(ap3(prepHome()||'OMDB'))+' '+hmAt(D.htz,p.s)+'</span>–'+hmAt(D.htz,p.e)+'</em></button>';}).join('')+
     (function(){var z=P.filter(function(p){return p.k==='sleep'||p.k==='nap';}).reduce(function(s,p){return s+Math.max(0,Math.min(p.e,D.b)-Math.max(p.s,D.a));},0);return z?'<span class="tl-sum">Sleep and naps planned: '+durTxt(z)+'</span>':'';})()+'</div>';
   return h+'</div>';
 }
@@ -9747,13 +9807,13 @@ function prepTripHTML(t,L,now,wide){
     (li&&!isHome?'<div class="lo-now"><b>'+li.hm+'</b><span>'+esc(li.wd)+' · '+(dm===0?'same as '+esc(prepHomeCity()):hDiff(dm)+(dm<0?' behind':' ahead'))+'</span></div>':'')+'</div>'+
     '<a class="lo-cr" hidden target="_blank" rel="noopener">Photo: Wikipedia</a></div>';
   if(t.rep&&t.rep>now) h+='<div class="prep-rep">'+IX.evt+'Report in '+inTxt(t.rep-now)+' · '+esc(wdHm(apRecOf(t.dep)&&apRecOf(t.dep).tz,t.rep))+' '+esc(prepCity(t.dep)||t.dep)+'</div>';
-  h+=prepTimesHTML(t,nx,isHome);
+  h+=prepTimesHTML(t,nx,isHome,now);
   if(!isHome&&nx&&nx.std-t.sta>=6*3600000) h+=prepTlHTML(t,nx,wide);
   else if(!isHome&&!nx) h+='<div class="lv-card"><p class="hint" style="margin:0">Add your flight out of '+esc(prepCity(t.dest)||t.dest)+' (Import roster or Add a trip) to plan the layover on a timeline.</p></div>';
   if(isHome) return h+'<div class="lv-card"><p class="hint" style="margin:0">Back home'+(nx?': '+durH(nx.std-t.sta)+' until '+esc(nx.fno||'the next duty')+' on '+dayLbl(nx.std,tzOffAt(htz,nx.std)):'.')+'</p></div>';
   var ho=tripHotel(t).h,g=[prepFcHTML(t,L,tz),prepGoHTML(t,ho)];
   if(C&&C[0]!=='AED') g.push(prepFxHTML(C[0]));
-  g.push(prepSosHTML(t,C),prepHotelHTML(t),prepPlacesHTML(t,ho),prepBuyHTML(t),prepGoodHTML(t,C,tz,htz,now,L),prepMyNotesHTML(t));
+  g.push(prepHotelHTML(t),prepPlacesHTML(t,ho),prepBuyHTML(t),prepGoodHTML(t,C,tz,htz,now,L),prepMyNotesHTML(t),prepSosHTML(t,C));
   h+='<div class="prep-grid">'+g.join('')+'</div>';
   h+='<div class="prep-more"><button type="button" class="lv-more" data-act="prepShow" data-v="notes">'+I.chev+(prepTab==='notes'?'Hide':'Read')+' all notes for '+esc(t.dest)+', '+esc(t.dep)+' and the alternates</button>'+(prepTab==='notes'?prepNotesHTML(t):'')+'</div>';
   h+='<div class="prep-more"><button type="button" class="lv-more" data-act="prepShow" data-v="wx">'+I.chev+(prepTab==='wx'?'Hide':'Show')+' live weather (METAR / TAF) and alternates</button>'+(prepTab==='wx'?prepWxHTML(t,now):'')+'</div>';
@@ -9764,10 +9824,10 @@ function prepTimeChip(tr,k,tz){
   var d=prepData(tr.id),v=d[k],nm=k==='wake'?'Wake-up':'Pick-up';
   return '<button type="button" class="pt-chip'+(v?' on':'')+' '+k+'" data-act="prepTime" data-id="'+esc(tr.id)+'" data-v="'+k+'">'+(k==='wake'?IX.alarm:IX.car)+(v?nm+' '+hmAt(tz,v):'+ '+nm)+'</button>';
 }
-function prepTimesHTML(t,nx,isHome){
+function prepTimesHTML(t,nx,isHome,now){
   var ra=apRecOf(t.dep),rb=apRecOf(t.dest),tza=ra&&ra.tz,tzb=rb&&rb.tz,htz=prepHomeTz(),hc=prepHomeCity(),ca=prepCity(t.dep)||t.dep,cb=prepCity(t.dest)||t.dest;
   function hm2(tz,x,city){return '<div class="pt-big">'+hmAt(tz,x)+'<small>'+esc(city)+'</small></div>'+(tz!==htz?'<div class="pt-sub"><b>'+hmAt(htz,x)+'</b> '+esc(hc)+' <em>· '+fsHM(x)+'</em></div>':'<div class="pt-sub"><em>'+fsHM(x)+'</em></div>');}
-  var h='<div class="lv-card pt-card"><div class="pt-out"><div class="pt-tt">'+IX.dep+'Leave '+esc(ca)+' · '+esc(dayLbl(t.std,tzOffAt(tza,t.std)))+'</div>'+
+  var h='<div class="lv-card pt-card"><div class="pt-out"><div class="pt-tt">'+IX.dep+'Leave '+esc(ca)+' · '+esc(dayLbl(t.std,tzOffAt(tza,t.std)))+(t.rep&&now&&t.rep>now?'<span class="pt-cd">in '+inTxt(t.rep-now)+'</span>':'')+'</div>'+
     '<div class="pt-line"><span>'+(t.rep?'Report <b>'+hmAt(tza,t.rep)+'</b> · ':'')+'Off <b>'+hmAt(tza,t.std)+'</b> '+esc(ca)+' <em>· '+fsHM(t.std)+'</em></span>'+prepTimeChip(t,'wake',tza)+prepTimeChip(t,'pick',tza)+'</div></div>';
   h+='<div class="pt-row"><div><div class="pt-tt">'+IX.land+'Land · '+dayMo(t.sta,tzOffAt(tzb,t.sta))+'</div>'+hm2(tzb,t.sta,cb)+prepSunTxt(t,rb,tzb)+'</div>';
   if(!isHome&&nx){
@@ -9793,7 +9853,8 @@ function prepFxHTML(cur){
     '<div class="fx-c"><label><small>'+cur+'</small><input type="text" inputmode="decimal" data-fx="loc" data-r="'+r+'" value="'+fxFmt(nice[1]||nice[0])+'" autocomplete="off"></label><span class="fx-sw">='+'</span>'+
     '<label><small>AED</small><input type="text" inputmode="decimal" data-fx="aed" data-r="'+r+'" value="'+fxFmt((nice[1]||nice[0])*aedPer)+'" autocomplete="off"></label></div>'+
     '<div class="fx-q">'+nice.map(function(v){return '<div><b>'+fxFmt(v)+'</b><span>'+fxFmt(v*aedPer)+' AED</span></div>';}).join('')+'</div>';
-  return h+'<p class="pc-note">'+(Date.now()-(fxCache.at||0)>36*3600000?'From '+esc(fxCache.date||'an earlier day')+'. ':'')+'Mid-market rate; cards and exchanges add a margin.</p></div>';
+  var old=Date.now()-(fxCache.at||0)>36*3600000;
+  return h+'<p class="pc-note'+(old?'':' fx-note')+'">'+(old?'From '+esc(fxCache.date||'an earlier day')+'. ':'')+'Mid-market rate; cards and exchanges add a margin.</p></div>';
 }
 function prepBeforeHTML(t){
   var d=prepData(t.id),nd=d.before.filter(function(x){return x.done;}).length;
@@ -9901,7 +9962,7 @@ function mapsGo(h,ic,to){
   var hg=h&&geoPt(h),d=encodeURIComponent(to+', '+(prepCity(ic)||ic)),o=hg?encodeURIComponent(hg.lat+','+hg.lon):h?encodeURIComponent(hotelQ(h,ic)):'';
   return mapsG()?'https://www.google.com/maps/dir/?api=1'+(o?'&origin='+o:'')+'&destination='+d+'&travelmode=transit':'https://maps.apple.com/?'+(o?'saddr='+o+'&':'')+'daddr='+d+'&dirflg=r';
 }
-function mapsSwHTML(){return '<div class="mp-sw"><span>Maps open in</span>'+[['apple','Apple Maps'],['google','Google Maps']].map(function(x){var on=(x[0]==='google')===mapsG();return '<button type="button" class="'+(on?'on':'')+'" data-act="prepMaps" data-v="'+x[0]+'" aria-pressed="'+on+'">'+IX.map+x[1]+'</button>';}).join('')+'</div>';}
+function mapsSwHTML(hd){return '<div class="mp-sw'+(hd?' mp-hd':'')+'">'+(hd?'':'<span>Maps open in</span>')+[['apple','Apple'],['google','Google']].map(function(x){var on=(x[0]==='google')===mapsG();return '<button type="button" class="'+(on?'on':'')+'" data-act="prepMaps" data-v="'+x[0]+'" aria-pressed="'+on+'"'+(hd?' aria-label="Maps open in '+x[1]+' Maps"':'')+'>'+(hd?x[1]:IX.map+x[1]+' Maps')+'</button>';}).join('')+'</div>';}
 function prepHotelHTML(t){
   var pl=prepPlace(t.dest),r=tripHotel(t),h=r.h,d=prepData(t.id),f=fnoKey(t.fno),city=prepCity(t.dest)||t.dest;
   var hd='<div class="pc-h"><span class="lv-l">'+IX.hotel+'Hotel</span>'+(pl.hotels.length?'<button type="button" class="lv-more" data-act="prepHoPick" data-id="'+esc(t.id)+'">Change</button>':'')+'</div>';
@@ -9983,16 +10044,17 @@ function prepHotelSheet(ic,hid,tid){
 // getting around: the city’s notes, directions from the hotel to your places, your own tips
 function prepGoHTML(t,h){
   var r=apRecOf(t.dest),g=goOf(r&&r.iata),pl=prepPlace(t.dest),city=prepCity(t.dest)||t.dest,wv='https://en.wikivoyage.org/wiki/'+encodeURIComponent(city.replace(/ /g,'_'))+'#Get_around';
-  var s='<div class="lv-card go-card"><div class="pc-h"><span class="lv-l">'+IX.train+'Getting around '+esc(city)+'</span></div>';
+  var s='<div class="lv-card go-card'+(prepTipOpen===t.dest?' tip-on':'')+'"><div class="pc-h"><span class="lv-l">'+IX.train+'Getting around '+esc(city)+'</span>'+mapsSwHTML(1)+'</div>';
   if(g&&g.p) s+='<div class="go-pay"><i>'+IX.tap+'</i><span><strong>'+esc(g.p[0])+'</strong>'+esc(g.p[1])+'</span></div>';
-  if(g) s+='<div class="go-rows">'+g.r.map(function(x){return '<div class="ct">'+goIcon(x[0])+'<span><b>'+esc(x[1])+'</b><small>'+esc(x[2])+'</small></span></div>';}).join('')+'</div>';
+  if(g) s+='<div class="go-rows">'+g.r.map(function(x){return '<div class="ct" data-act="prepGoRow">'+goIcon(x[0])+'<span><b>'+esc(x[1])+'</b><small>'+esc(x[2])+'</small></span></div>';}).join('')+'</div>';
   else s+='<p class="hint" style="margin:0 0 6px">No built-in notes for '+esc(city)+' yet. <a href="'+esc(wv)+'" target="_blank" rel="noopener">Get around on Wikivoyage</a></p>';
   s+='<div class="lv-l prep-sh">'+(h?'By public transport from the hotel':'By public transport from where you are')+'</div><div class="go-chips">'+
     pl.items.slice(0,10).map(function(x){return '<a class="go-chip" href="'+esc(mapsTo(h,t.dest,x))+'" target="_blank" rel="noopener">'+I.pin+esc(x.t.length>34?x.t.slice(0,32)+'…':x.t)+'</a>';}).join('')+
     '<button type="button" class="go-chip ghost" data-act="prepGoElse" data-id="'+esc(t.id)+'">'+I.search+'Somewhere else</button></div>'+mapsSwHTML();
   s+=pl.tips.map(function(x){return '<div class="go-tip">'+IX.quote+'<span>'+esc(x.t)+'</span><button type="button" class="ib" data-act="prepTipDel" data-v="'+t.dest+'" data-id="'+esc(x.id)+'" aria-label="Remove this tip">'+I.x+'</button></div>';}).join('');
-  s+='<div class="pi-add"><input type="text" id="prepTipIn" maxlength="300" placeholder="Your tip: the quicker bus, the station exit…"><button type="button" class="btn small" data-act="prepTipAdd" data-v="'+t.dest+'">Add</button></div>';
-  return s+'<p class="pc-note">'+(g?'Built-in notes, checked Nov 2026. Things change, so add what you find. ':'')+'Places open '+mapsName()+' with public transport directions. <a href="'+esc(wv)+'" target="_blank" rel="noopener">More on Wikivoyage</a></p></div>';
+  s+='<div class="pi-add go-tipin"><input type="text" id="prepTipIn" maxlength="300" placeholder="Your tip: the quicker bus, the station exit…"><button type="button" class="btn small" data-act="prepTipAdd" data-v="'+t.dest+'">Add</button></div>'+
+    '<button type="button" class="go-addtip" data-act="prepTipOpen" data-v="'+t.dest+'">'+I.plus+'Add a tip</button>';
+  return s+'<p class="pc-note">'+(g?'Built-in notes, checked Nov 2026. <span class="pc-long">Things change, so add what you find. </span>':'')+'<span class="pc-long">Places open '+mapsName()+' with public transport directions. </span><a href="'+esc(wv)+'" target="_blank" rel="noopener">More on Wikivoyage</a></p></div>';
 }
 function prepGoElse(tid){
   var t=prepTripOf(tid);if(!t) return;var h=tripHotel(t).h;
@@ -10519,14 +10581,15 @@ function prepFcHTML(t,L,tz){
   var c=prepCache[t.dest],nx=prepNext(t,L),ai=tz&&tzInfo(tz,t.sta),off=ai?ai.off:0;
   var d0=ymdAt(t.sta,off),d1=nx?ymdAt(nx.std,off):ymdAt(t.sta+2*86400000,off);
   var days=c&&c.days?c.days.filter(function(x){return x.d>=d0&&x.d<=d1;}).slice(0,7):[];
-  var h='<div class="lv-card"><div class="lv-l prep-fch">Weather for your stay'+(c&&c.at?'<i>updated '+fsHM(c.at)+'</i>':'')+'</div>';
+  var h='<div class="lv-card"><div class="lv-l prep-fch">Weather for your stay'+(c&&c.at?'<i class="fc-at">updated '+fsHM(c.at)+'</i>':'')+
+    '<button type="button" class="fc-up" data-act="prepFc" data-v="'+t.dest+'" aria-label="Update the forecast">'+IX.redo+(prepBusy[t.dest]?'Updating…':c&&c.at?fsHM(c.at):'Update')+'</button></div>';
   if(days.length){var dd0=prepData(t.id);if(!dd0.seen.wx){dd0.seen.wx=true;saveSoon();}}
   if(days.length) h+='<div class="pdays">'+days.map(function(x,i){
     var dd=new Date(x.d+'T12:00:00Z');
     return '<div class="'+(i===0?'on ':'')+wmoIcon(x.c)+'"><span>'+WDS[dd.getUTCDay()]+' '+dd.getUTCDate()+'</span>'+WXI[wmoIcon(x.c)]+'<b>'+Math.round(x.hi)+'°/'+Math.round(x.lo)+'°</b>'+(x.p!=null&&x.p>=40?'<span class="rn">'+x.p+'% rain</span>':'')+(x.uv!=null&&x.uv>=6?'<span class="uv">UV '+Math.round(x.uv)+'</span>':'')+'</div>';
   }).join('')+'</div>';
   else h+='<p class="hint" style="margin:6px 0 0">'+(prepBusy[t.dest]?'Getting the forecast…':c&&c.days?'The forecast doesn’t reach your stay yet: it goes 16 days ahead.':navigator.onLine===false?'No internet. The forecast comes when you’re online.':'No forecast yet.')+'</p>';
-  return h+'<button type="button" class="lv-more" data-act="prepFc" data-v="'+t.dest+'">'+(prepBusy[t.dest]?'Updating…':'Update the forecast')+'</button></div>';
+  return h+'<button type="button" class="lv-more fc-more" data-act="prepFc" data-v="'+t.dest+'">'+(prepBusy[t.dest]?'Updating…':'Update the forecast')+'</button></div>';
 }
 function prepFetch(ic,force){
   var rec=apRecOf(ic);if(!rec||rec.lat==null||prepBusy[ic]) return;
@@ -10624,6 +10687,7 @@ function prepRemove(id){
     '<div class="sh-actions"><button type="button" class="btn" data-sact="one">Only '+esc(nm)+'</button><button type="button" class="btn danger" data-sact="all">The whole duty</button></div>',
   function(act){closeSheet();if(act==='one') go([t]);else if(act==='all') go(D);});
 }
+var prepTipOpen='';
 function prepTripOf(id){return prepTrips(Date.now()).filter(function(t){return t.id===id;})[0]||null;}
 function prepAct(act,el){
   var id=el.getAttribute('data-id'),v=el.getAttribute('data-v');
@@ -10676,7 +10740,9 @@ function prepAct(act,el){
       var hc=prepPlace(v).hotels.filter(function(x){return x.id===id;})[0];if(!hc||!hc.wp) return;
       (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(hc.wp):Promise.reject()).then(function(){toast('Wi-Fi password copied');},function(){toast(hc.wp,4000);});return;
     case 'prepGoElse': prepGoElse(id);return;
-    case 'prepTipAdd': var ti=$('#prepTipIn'),tv=String(ti&&ti.value||'').trim();if(!tv) return;prepPlace(v).tips.push({id:uid(),t:tv.slice(0,300)});save();refreshTool();return;
+    case 'prepTipAdd': var ti=$('#prepTipIn'),tv=String(ti&&ti.value||'').trim();if(!tv) return;prepPlace(v).tips.push({id:uid(),t:tv.slice(0,300)});prepTipOpen='';save();refreshTool();return;
+    case 'prepTipOpen': prepTipOpen=v;var gc=el.closest('.go-card');if(gc) gc.classList.add('tip-on');var tin=$('#prepTipIn');if(tin) tin.focus();return;
+    case 'prepGoRow': el.classList.toggle('open');return;
     case 'prepTipDel': var pq=prepPlace(v);pq.tips=pq.tips.filter(function(x){return x.id!==id;});save();refreshTool();return;
     case 'prepBuy': prepPlace(v).buy.forEach(function(x){if(x.id===id){x.done=!x.done;x.at=x.done?Date.now():0;}});save();refreshTool();return;
     case 'prepBuyAdd': var bu=$('#prepBuyIn'),bw=String(bu&&bu.value||'').trim();if(!bw) return;prepPlace(v).buy.push({id:uid(),t:bw.slice(0,80),done:false,at:0});save();refreshTool();var b4=$('#prepBuyIn');if(b4) b4.focus();return;
@@ -12825,7 +12891,7 @@ function onAct(e){
     case 'prepOpen': prepSel=id;refreshTool();toolWrap.scrollTop=0;break;
     case 'prepBack': prepSel=null;refreshTool();toolWrap.scrollTop=0;break;
     case 'prepAp': prepAp=el.getAttribute('data-v');refreshTool();break;
-    default: if(act0.indexOf('prep')===0) prepAct(act0,el);
+    default: if(act0.indexOf('prep')===0) prepAct(act0,el);break;
     case 'apbWx': if(!wxSt.busy) wxFetch([el.getAttribute('data-v')]);refreshTool();break;
     case 'apnPFold': var ps=el.getAttribute('data-apsec');toolApnFold[ps]=!toolApnFold[ps];refreshTool();break;
     case 'apnAdd': apnAdd(el.getAttribute('data-v'));break;

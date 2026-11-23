@@ -57,6 +57,13 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   station, embassy), good to know (plugs, volts, driving side, clock, money, tipping, tap water, shop hours, air
   quality during the stay, public holidays while you're there, and a few phrases the iPhone reads out where English
   isn't spoken), your Layover notes and last time there. Below: all the notes for its airports, and live METAR/TAF.
+  The emergency numbers are the last card on the page.
+- On the iPhone the page is more compact (about a quarter shorter; the iPad stays as it was): the photo and the top
+  of the timeline keep their size, everything else sits closer. The report countdown is in the Leave Dubai line; each
+  plan is one line with the Dubai time short (DXB 15:00-23:30); the time in the weather title updates the forecast;
+  Apple | Google is in the Getting around title; airport, ferries and taxis are one line each (tap one for the rest);
+  the places by public transport and Near the hotel are one row that slides; "Add a tip" opens the tip field. The
+  timeline hint and the note about the mid-market rate only show on the iPad (the rate's date still shows when old).
 - Getting around: built in for about 100 airports crews stay at (checked November 2026): how to pay (tap your bank
   card, Suica in Apple Wallet...), the airport train, ferries or night trains, taxis and ride apps. Your places and
   "Somewhere else" open public transport directions from the hotel. Add your own tips. Elsewhere it links to Wikivoyage.
