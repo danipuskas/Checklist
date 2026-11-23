@@ -1545,6 +1545,19 @@ main{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}
 .tabbar{position:fixed;z-index:48;left:50%;transform:translateX(-50%);bottom:max(10px,calc(env(safe-area-inset-bottom,0px) - 10px));width:min(480px,calc(100% - 28px));height:64px;display:flex;padding:0 6px;border-radius:32px;background:color-mix(in srgb,var(--surface2) 93%,transparent);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border:1px solid color-mix(in srgb,var(--line-strong) 70%,transparent);box-shadow:var(--shadow)}
 .tabbar button{flex:1;min-width:0;appearance:none;-webkit-appearance:none;border:0;background:none;color:var(--muted);margin:5px 0;border-radius:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 4px 3px;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 .tabbar button.on{color:var(--accent);background:var(--accent-weak)}
+.tabbar{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.tabbar.t6{width:min(560px,calc(100% - 16px));padding:0 4px}.tabbar.t6 button{padding:0 1px 3px}
+.tabbar .tfl{position:absolute;right:-11px;top:-6px;font-style:normal;font-size:12px;line-height:1}
+.te-link{appearance:none;display:flex;align-items:center;gap:8px;width:100%;margin:-4px 0 12px;padding:8px 4px;border:0;background:none;color:var(--accent);font:650 calc(14.5px*var(--ts)) -apple-system,system-ui,sans-serif;cursor:pointer}
+.te-link svg{width:17px;height:17px}.te-link small{margin-left:auto;color:var(--muted);font-weight:500;font-size:calc(12.5px*var(--ts))}
+.te-h{font-size:calc(12px*var(--ts));font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 4px 2px}
+.te-row{display:flex;align-items:center;gap:4px;border-top:1px solid var(--line-soft)}
+.te-main{appearance:none;flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 4px;border:0;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.te-main svg{width:22px;height:22px;color:var(--muted);flex:none}.te-row.on .te-main>svg{color:var(--accent)}
+.te-main b{flex:1;font-weight:600;font-size:calc(16px*var(--ts))}
+.te-main i{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;border:2px solid var(--box);flex:none;box-sizing:border-box}
+.te-row.on .te-main i{background:var(--accent);border-color:var(--accent)}.te-main i svg{width:14px;height:14px;color:#fff;stroke-width:3}
+.te-row.fix{opacity:.55}.te-up svg{width:18px;height:18px}.te-up[disabled]{opacity:.3}
 .tabbar .ti{position:relative;display:block;height:24px}
 .tabbar svg{width:24px;height:24px;stroke-width:1.85}
 .tabbar .tl{display:block;max-width:100%;font-size:11px;font-weight:650;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2704,9 +2717,14 @@ var I={
   back:sv('<path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/>')
 };
 menuBtn.innerHTML=I.more;
-tabBar.innerHTML=[['list','Checklist',I.list],['tm','Timers',I.timer],['wx','Briefing',I.brief],['apn','Airports',I.pin],['more','More',I.more]].map(function(t){
-  return '<button type="button" data-tab="'+t[0]+'" aria-label="'+t[1]+'"><span class="ti">'+t[2]+'</span><span class="tl">'+t[1]+'</span></button>';
-}).join('');
+I.suit=sv('<rect x="3.5" y="7" width="17" height="13" rx="2.5"/><path d="M8.5 7V5a1.5 1.5 0 0 1 1.5-1.5h4A1.5 1.5 0 0 1 15.5 5v2M3.5 12.5h17"/>');
+I.clk=sv('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>');
+// the bottom bar: up to five of these, as you choose on each device (More → Edit the tab bar), and More at the end
+var TAB_K={list:['Checklist',I.list],tm:['Timers',I.timer],wx:['Briefing',I.brief],apn:['Airports',I.pin],prep:['Layover',I.suit],flog:['Flight log',I.log],evt:['Event log',I.clk]},TAB_DEF=['list','tm','wx','apn','prep'];
+function tabsOn(){var t=typeof state!=='undefined'&&state&&state.settings&&state.settings.tabs;return t&&t.length?t:TAB_DEF;}
+function tabsHTML(){return tabsOn().concat(['more']).map(function(k){var t=k==='more'?['More',I.more]:TAB_K[k];
+  return '<button type="button" data-tab="'+k+'" aria-label="'+t[0]+'"><span class="ti">'+t[1]+'</span><span class="tl">'+t[0]+'</span></button>';}).join('');}
+tabBar.innerHTML=tabsHTML();tabBar.classList.toggle('t6',tabsOn().length>=5);
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
 function str(v,d){return typeof v==='string'?v:(d||'');}
@@ -2930,7 +2948,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='105';
+var APP_VERSION='106';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2971,7 +2989,8 @@ function normSettings(st){
   var ts=+st.textScale;
   return {csign:str(st.csign||st.fno).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8),theme:['light','dark','night','red'].indexOf(st.theme)>=0?st.theme:'auto',fingerDraw:!!st.fingerDraw,sound:st.sound!==false,dest:normDest(st.dest),dep:normDest(st.dep),routes:normRoutes(st),alts:normIcaoList(st.alts,4),wxUrl:normWxUrl(st.wxUrl),wxWatch:normIcaoList(st.wxWatch,6),textScale:ts>0?TEXT_SIZES.reduce(function(a,x){return Math.abs(x[0]-ts)<Math.abs(a-ts)?x[0]:a;},1):1,
     recent:Array.isArray(st.recent)?st.recent.map(normDest).filter(Boolean).slice(0,6):[],
-    etdT:numT(st.etdT),etaT:numT(st.etaT),altMin:normAltMin(st.altMin),ntKw:normNtKw(st.ntKw),ntSum:!!st.ntSum,wxWind:!!st.wxWind,wxTrend:!!st.wxTrend,maps:st.maps==='google'?'google':'apple'};
+    etdT:numT(st.etdT),etaT:numT(st.etaT),altMin:normAltMin(st.altMin),ntKw:normNtKw(st.ntKw),ntSum:!!st.ntSum,wxWind:!!st.wxWind,wxTrend:!!st.wxTrend,maps:st.maps==='google'?'google':'apple',
+    tabs:Array.isArray(st.tabs)&&st.tabs.length?st.tabs.filter(function(k,i,a){return ['list','tm','wx','apn','prep','flog','evt'].indexOf(k)>=0&&a.indexOf(k)===i;}).slice(0,5):null};
 }
 function seed(){
   function c(text,o){o=o||{};var n=newCheck(text);n.note=o.note||'';n.children=(o.kids||[]).map(function(k){return newCheck(k);});return n;}
@@ -7560,10 +7579,17 @@ function menuTilesHTML(now){
     var x=v[k];
     return '<button type="button" data-sact="'+act+'"'+(cls?' class="'+cls+'"':'')+'><span class="mi">'+icon+label+'</span><b data-mv="'+k+'"'+(x[2]===true&&k==='rest'?' class="on"':'')+'>'+(k==='wx'?x[0]:esc(x[0]))+'</b><i data-ms="'+k+'">'+esc(x[1])+'</i></button>';
   }
-  // countdowns, crew rest, airports and the briefing are in the bottom bar; the flight tools sit above the flight log
-  var nv=newTileVals(now);
-  function tx(k,act,icon,label){var x=nv[k];return '<button type="button" data-sact="'+act+'"><span class="mi">'+icon+label+'</span><b data-mv="'+k+'">'+esc(x[0])+'</b><i data-ms="'+k+'">'+esc(x[1])+'</i></button>';}
-  return tx('evt','tevt',IX.evt,'Event log')+tx('prep','tprep',IX.prep,'Layover')+tile('fl','tflog',I.log,'Flight log','wide');
+  // what isn't in the bottom bar is here; the last one spans the width when they don't pair up
+  var nv=newTileVals(now),on=tabsOn(),T=[];
+  function tx(k,act,icon,label,cls){var x=nv[k];return '<button type="button" data-sact="'+act+'"'+(cls?' class="'+cls+'"':'')+'><span class="mi">'+icon+label+'</span><b data-mv="'+k+'">'+esc(x[0])+'</b><i data-ms="'+k+'">'+esc(x[1])+'</i></button>';}
+  if(on.indexOf('list')<0) T.push(function(c){var L=cur(),n=listCount(L);return '<button type="button" data-sact="tlist"'+(c?' class="'+c+'"':'')+'><span class="mi">'+I.list+'Checklist</span><b>'+(n.t?n.d+'/'+n.t:'–')+'</b><i>'+esc(L.title)+'</i></button>';});
+  if(on.indexOf('tm')<0) T.push(function(c){return tile('cd','ttm',I.timer,'Timers',c);});
+  if(on.indexOf('wx')<0) T.push(function(c){return tile('wx','twx',I.brief,'Briefing',c);});
+  if(on.indexOf('apn')<0) T.push(function(c){return tile('ap','tapn',I.pin,'Airports',c);});
+  if(on.indexOf('evt')<0) T.push(function(c){return tx('evt','tevt',IX.evt,'Event log',c);});
+  if(on.indexOf('prep')<0) T.push(function(c){return tx('prep','tprep',IX.prep,'Layover',c);});
+  if(on.indexOf('flog')<0) T.push(function(c){return tile('fl','tflog',I.log,'Flight log',c);});
+  return T.map(function(f,i){return f(i===T.length-1&&T.length%2?'wide':'');}).join('');
 }
 function paintMenuTiles(now){
   var box=document.getElementById('mTiles');if(!box||!box.offsetParent) return;
@@ -7582,6 +7608,7 @@ function openMenu(){
     '<button type="button" class="ib round" data-sact="settings" aria-label="Settings'+(warn?', needs attention':'')+'">'+I.gear+(warn?'<span class="dot"></span>':'')+'</button>'+
     '<button type="button" class="ib round" data-sact="cancel" aria-label="Close menu">'+I.x+'</button></div>'+
     '<div class="mtiles" id="mTiles">'+menuTilesHTML(now)+'</div>'+
+    '<button type="button" class="te-link" data-sact="tabs">'+I.edit+'Edit the tab bar<small>or hold the bar</small></button>'+
     '<div class="mrow"><button type="button" data-sact="lists">'+I.list+'Checklists</button>'+
     '<button type="button" data-sact="untick">'+I.reset+'Untick all</button>'+
     '<button type="button" data-sact="flight" class="pri">'+I.plane+'New flight</button></div>',
@@ -7596,6 +7623,9 @@ function openMenu(){
       case 'tflog': toolFlFilter='';openTool('flog');closeSheet();break;
       case 'tevt': openTool('evt');closeSheet();break;
       case 'tprep': openTool('prep');closeSheet();break;
+      case 'ttm': openTool('tm');closeSheet();break;
+      case 'tlist': closeSheet();if(toolOpen) closeTool();break;
+      case 'tabs': openTabsEdit('menu');break;
       case 'twx': openTool('wx');closeSheet();wxMaybe();break;
       case 'lists': openLists();break;
       case 'untick':
@@ -7620,6 +7650,30 @@ function openMenu(){
   });
   sheetWrap.classList.add('at-bottom');document.documentElement.classList.add('more-open');paintTabs();
 }
+// choose the tabs: up to five, More always last; it changes as you tap, so the bar below shows it
+function openTabsEdit(from){
+  var on=tabsOn().slice();
+  function row(k,i){var t=TAB_K[k],inb=on.indexOf(k)>=0;
+    return '<div class="te-row'+(inb?' on':'')+'"><button type="button" class="te-main" data-sact="'+(inb?'rm':'add')+'" data-v="'+k+'" aria-pressed="'+inb+'">'+t[1]+'<b>'+t[0]+'</b><i>'+(inb?I.check:'')+'</i></button>'+
+      (inb?'<button type="button" class="ib te-up" data-sact="up" data-v="'+k+'"'+(i===0?' disabled':'')+' aria-label="Move '+t[0]+' left">'+I.up+'</button>':'')+'</div>';}
+  function body(){
+    var off=Object.keys(TAB_K).filter(function(k){return on.indexOf(k)<0;});
+    return '<div class="te-h">In the tab bar · '+on.length+' of 5</div>'+on.map(row).join('')+'<div class="te-row on fix"><span class="te-main">'+I.more+'<b>More</b><i>'+I.check+'</i></span></div>'+
+      (off.length?'<div class="te-h">In More</div>'+off.map(function(k){return row(k,0);}).join(''):'');
+  }
+  openSheet('<h3>Tab bar</h3><p class="hint">Up to five, and More at the end. Tap one to take it out or put it in; the arrow moves it left. What isn’t in the bar is in More. Each device keeps its own.</p>'+
+    '<div id="teBox">'+body()+'</div><div class="sh-actions"><button type="button" class="btn" data-sact="reset">Reset</button><button type="button" class="btn primary" data-sact="done">Done</button></div>',
+  function(act,btn){
+    var v=btn&&btn.getAttribute('data-v');
+    if(act==='rm'){if(on.length<=1){toast('Keep at least one');return;}on=on.filter(function(x){return x!==v;});}
+    else if(act==='add'){if(on.length>=5){toast('Five at most: take one out first');return;}on.push(v);}
+    else if(act==='up'){var i=on.indexOf(v);if(i>0){on.splice(i,1);on.splice(i-1,0,v);}}
+    else if(act==='reset') on=TAB_DEF.slice();
+    else{closeSheet();if(from==='menu') openMenu();else if(from==='settings') openSettings();return;}
+    state.settings.tabs=on.slice();save();buildTabs();if(toolOpen) refreshTool();
+    var bx=$('#teBox');if(bx) bx.innerHTML=body();
+  });
+}
 function openSettings(){
   var fd=state.settings.fingerDraw,snd=state.settings.sound;
   setTimeout(storRefresh,0);
@@ -7630,6 +7684,7 @@ function openSettings(){
       THEMES.map(function(t){var on=state.settings.theme===t[0];return '<button type="button" role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-sact="theme" data-v="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div></div>'+
     '<button type="button" data-sact="finger" role="switch" aria-checked="'+fd+'">'+I.hand+'<span class="mt">Draw with finger<small>'+(fd?'On: one finger draws in notepads':'Off: Apple Pencil draws, finger scrolls')+'</small></span><span class="tog'+(fd?' on':'')+'"></span></button>'+
     '<button type="button" data-sact="sound" role="switch" aria-checked="'+snd+'">'+I.bell+'<span class="mt">Alert sound<small>'+(snd?'On: alerts beep while the app is open':'Off: alerts are silent')+'</small></span><span class="tog'+(snd?' on':'')+'"></span></button>'+
+    '<button type="button" data-sact="tabs">'+I.list+'<span class="mt">Tab bar<small>'+esc(tabsOn().map(function(k){return TAB_K[k][0];}).join(', '))+', More</small></span></button>'+
     '</div><div class="set-h">Backup</div><div class="menu">'+
     '<button type="button" data-sact="cloud">'+I.cloud+'<span class="mt">Online backup<small'+(cloud.on&&cloud.err?' class="warn"':'')+'>'+esc(cloudMenuText())+'</small></span></button>'+
     '<button type="button" data-sact="export">'+I.share+'<span class="mt">Back up<small>Copy or share everything as a backup</small></span></button>'+
@@ -7654,6 +7709,7 @@ function openSettings(){
       case 'finger':
         state.settings.fingerDraw=!fd;save();document.body.classList.toggle('finger',state.settings.fingerDraw);openSettings();break;
       case 'cloud': openCloud();break;
+      case 'tabs': openTabsEdit('settings');break;
       case 'export': openExport();break;
       case 'import': openImport();break;
       case 'upd': appRestart();break;
@@ -9552,8 +9608,16 @@ function prepTrips(now){
   var L=(state.trips||[]).slice(),st=state.settings;
   if(st.dep&&st.dest&&st.etdT&&!L.some(function(t){return t.dep===st.dep.icao&&t.dest===st.dest.icao&&Math.abs(t.std-st.etdT)<6*3600000;}))
     L.push({id:'cur-'+st.dep.icao+'-'+st.dest.icao+'-'+new Date(st.etdT).toISOString().slice(0,10),fno:st.csign||'',dep:st.dep.icao,dest:st.dest.icao,std:st.etdT,sta:st.etaT||st.etdT+8*3600000,src:'flight',alts:(st.alts||[]).slice()});
-  var hid=state.prepHidden||[];
-  return L.filter(function(t){return t.sta>now-12*3600000&&hid.indexOf(t.id)<0;}).sort(function(a,b){return a.std-b.std;});
+  var hid=state.prepHidden||[],home=prepHome();
+  // a trip stays 12 hours after landing, or until the flight out of there when that's later (the whole layover)
+  return L.filter(function(t){if(hid.indexOf(t.id)>=0) return false;if(t.sta>now-12*3600000) return true;if(t.dest===home) return false;
+    var nx=prepNext(t,L);return !!nx&&nx.std>now&&nx.std-t.sta<14*86400000;}).sort(function(a,b){return a.std-b.std;});
+}
+// the trip to show first: the layover you're on (landed, not yet left), else the next one away from home
+function prepFocus(L,now){
+  var home=prepHome();
+  var on=L.filter(function(t){var nx=prepNext(t,L);return t.dest!==home&&t.sta<=now&&nx&&nx.std>now;})[0];
+  return on||L.filter(function(t){return t.dest!==home&&t.sta>now;})[0]||L[0]||null;
 }
 function prepNext(t,L){return L.filter(function(x){return x.dep===t.dest&&x.std>t.sta;}).sort(function(a,b){return a.std-b.std;})[0]||null;}
 function prepData(id){
@@ -10613,7 +10677,7 @@ function openTool(kind){
   // countdowns and crew rest share the Timers page
   var toRest=kind==='rest';if(kind==='cd'||kind==='rest') kind='tm';
   clearTimeout(toolHideT);if(kind!==toolKind) toolApnOrd=false;toolKind=kind;
-  var tabPage=kind==='tm'||kind==='wx'||kind==='apn'||kind==='crew';
+  var tabPage=tabsOn().indexOf(kind==='crew'?'wx':kind)>=0;
   document.documentElement.classList.toggle('pg-crew',kind==='crew');
   var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+(kind==='crew'?'<button type="button" class="ib round" data-act="crewBack" aria-label="Back to the Briefing">'+I.left+'</button>':'')+'<h3>'+({crew:'Crew brief',tm:'Countdowns',cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps',evt:'Event log',prep:'Layover'}[kind])+'</h3>'+
     (kind==='cd'||kind==='tm'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
@@ -12584,8 +12648,20 @@ menuBtn.addEventListener('click',openMenu);
 // Bottom bar
 function tabNow(){
   if(document.documentElement.classList.contains('more-open')) return 'more';
-  if(!toolOpen) return 'list';
-  return {tm:'tm',wx:'wx',crew:'wx',apn:'apn',flog:'more',evt:'more',prep:'more'}[toolKind]||'list';
+  var on=tabsOn(),li=on.indexOf('list')>=0?'list':'';
+  if(!toolOpen) return li;
+  var k={crew:'wx',cd:'tm',rest:'tm'}[toolKind]||toolKind;
+  return on.indexOf(k)>=0?k:TAB_K[k]?'more':li;
+}
+function buildTabs(){tabBar.innerHTML=tabsHTML();tabBar.classList.toggle('t6',tabsOn().length>=5);tabFlag={};paintTabs();}
+// the Layover tab wears the flag of where you are, or where you go next
+var tabFlag={};
+function prepTabFlag(now){
+  if(!window.AIRPORT_DATA) return '';
+  var m=Math.floor(now/60000),n=(state.trips||[]).length+':'+(state.prepHidden||[]).length+':'+!!state.settings.etdT;
+  if(tabFlag.m===m&&tabFlag.n===n) return tabFlag.f;
+  var t=prepFocus(prepTrips(now),now);
+  tabFlag={m:m,n:n,f:t&&t.dest!==prepHome()?flagOf(t.dest):''};return tabFlag.f;
 }
 function paintTabs(now){
   if(!tabBar||!tabBar.firstChild) return;
@@ -12598,19 +12674,29 @@ function paintTabs(now){
   });
   // away from Timers, its tab shows the time to the next countdown, or to (or left of) your rest
   var tl=tabBar.querySelector('[data-tab="tm"] .tl'),txt='Timers',live=false,warn=false;
-  if(on!=='tm'){
+  if(tl&&on!=='tm'){
     now=now||Date.now();
     var up=state.tools.cds.filter(function(c){return c.target!==null&&c.target>now;}).sort(function(a,b){return a.target-b.target;})[0];
     if(up){txt=tileTime(Math.floor((up.target-now)/60000));live=true;warn=!!up.lead&&up.target-now<=up.lead*60000;}
     else{var rm=restSource(),t=rm&&restTop(rm,now);if(t){txt=tileTime(t.min);live=true;}}
   }
-  if(tl.textContent!==txt) tl.textContent=txt;
-  tl.classList.toggle('tlv',live);tl.classList.toggle('tlate',warn);
+  if(tl){if(tl.textContent!==txt) tl.textContent=txt;tl.classList.toggle('tlv',live);tl.classList.toggle('tlate',warn);}
+  var lt=tabBar.querySelector('[data-tab="prep"] .ti');
+  if(lt){var fl=prepTabFlag(now||Date.now()),fe=lt.querySelector('.tfl');
+    if(fl&&!fe){lt.insertAdjacentHTML('beforeend','<i class="tfl" aria-hidden="true"></i>');fe=lt.querySelector('.tfl');}
+    if(fe){if(!fl) fe.parentNode.removeChild(fe);else if(fe.textContent!==fl) fe.textContent=fl;}}
   // the online backup needs attention: a dot on More, as on Settings inside it
   var mi=tabBar.querySelector('[data-tab="more"] .ti'),need=cloud.on&&!!cloud.err,d=mi.querySelector('.dot');
   if(need&&!d) mi.insertAdjacentHTML('beforeend','<i class="dot"></i>');else if(!need&&d) d.parentNode.removeChild(d);
 }
+// hold the bar to choose its tabs
+var tabHoldT=0,tabHeld=false,tabHoldXY=null;
+tabBar.addEventListener('pointerdown',function(e){tabHeld=false;tabHoldXY=[e.clientX,e.clientY];clearTimeout(tabHoldT);tabHoldT=setTimeout(function(){tabHeld=true;if(navigator.vibrate) try{navigator.vibrate(10);}catch(_){}openTabsEdit();},650);});
+tabBar.addEventListener('pointermove',function(e){if(tabHoldXY&&Math.abs(e.clientX-tabHoldXY[0])+Math.abs(e.clientY-tabHoldXY[1])>12) clearTimeout(tabHoldT);});
+['pointerup','pointercancel','pointerleave'].forEach(function(n){tabBar.addEventListener(n,function(){clearTimeout(tabHoldT);});});
+tabBar.addEventListener('contextmenu',function(e){e.preventDefault();});
 tabBar.addEventListener('click',function(e){
+  if(tabHeld){tabHeld=false;e.preventDefault();return;}
   var b=e.target.closest&&e.target.closest('[data-tab]');if(!b) return;
   var k=b.getAttribute('data-tab'),more=document.documentElement.classList.contains('more-open');
   if(k==='more'){if(more) closeSheet();else openMenu();return;}
@@ -12622,6 +12708,12 @@ tabBar.addEventListener('click',function(e){
     if(same||(toolApnSel===null&&toolApnIcao===null)){toolApnSel=null;toolApnIcao=null;toolApnView='notes';toolApnOrd=false;}
     openTool('apn');return;
   }
+  if(k==='prep'){
+    // Layover opens on the trip you're on, or the next one; again on the same trip goes back to its top
+    var L=prepTrips(Date.now());
+    if(!(same&&prepSel&&L.some(function(t){return t.id===prepSel;}))){var f=prepFocus(L,Date.now());prepSel=f?f.id:null;openTool('prep');toolWrap.scrollTop=0;var s2=pgScr();if(s2!==toolWrap) s2.scrollTop=0;return;}
+  }
+  if(k==='flog'&&!same) toolFlFilter='';
   if(same){toolWrap.scrollTop=0;var sc=pgScr();if(sc!==toolWrap) sc.scrollTop=0;return;}
   openTool(k);
   if(k==='wx') wxMaybe();
@@ -12641,7 +12733,7 @@ if(window.visualViewport) window.visualViewport.addEventListener('resize',kbSync
 function tbSync(){var tb=document.querySelector('.topbar');if(tb) document.documentElement.style.setProperty('--tbh',tb.offsetHeight+'px');}
 tbSync();window.addEventListener('resize',tbSync);
 if(window.ResizeObserver) new ResizeObserver(tbSync).observe(document.querySelector('.topbar'));
-paintTabs();
+buildTabs();
 document.addEventListener('keydown',function(e){if((e.metaKey||e.ctrlKey)&&(e.key==='f'||e.key==='F')){e.preventDefault();openSearch();}});
 document.addEventListener('keydown',function(e){
   if(!lb.hidden){
@@ -12666,7 +12758,13 @@ try{var restY=+sessionStorage.getItem('flightChecklist.y');sessionStorage.remove
   if(!(restY>0)){var ui=JSON.parse(localStorage.getItem('flightChecklist.ui')||'null');if(ui&&ui.l===state.current&&Date.now()-ui.t<3*3600000) restY=+ui.y;}
   if(restY>0) window.scrollTo(0,restY);}catch(e){}
 try{localStorage.removeItem('flightChecklist.diag');}catch(e){} // the return record is no longer kept
-function uiKeep(){try{localStorage.setItem('flightChecklist.ui',JSON.stringify({l:state.current,y:Math.round(window.scrollY),t:Date.now()}));}catch(e){}}
+function uiKeep(){try{localStorage.setItem('flightChecklist.ui',JSON.stringify({l:state.current,y:Math.round(window.scrollY),t:Date.now(),k:toolOpen&&toolKind?toolKind:'',trip:prepSel||''}));}catch(e){}}
+try{(function(){
+  var u=JSON.parse(localStorage.getItem('flightChecklist.ui')||'null');if(!u||!u.k||!(Date.now()-u.t<12*3600000)) return;
+  var k={cd:'tm',rest:'tm',crew:'wx'}[u.k]||u.k;if(!TAB_K[k]||k==='list') return;
+  if(k==='prep'&&u.trip) prepSel=u.trip;if(k==='flog') toolFlFilter='';
+  openTool(k);if(k==='wx') setTimeout(wxMaybe,0);
+})();}catch(e){}
 window.addEventListener('pagehide',uiKeep);
 // while the app is hidden (e.g. in Slide Over), give back the notepads' drawing memory, so iPadOS is less likely to unload the app
 document.addEventListener('visibilitychange',function(){

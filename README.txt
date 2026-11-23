@@ -30,8 +30,15 @@ A Flight log block in a checklist has the same buttons for the current flight; a
 arrival and departure at the destination (or departure). The old flight log was moved over: each flight became a
 departure and an arrival with its stand, taxi, runway, route and notes as lines; taxi times and registrations went.
 
-LAYOVER in More (it was called Prepare): your next trips, one page each. On a wide iPad the trips sit on the left,
-each with the country's flag.
+THE TAB BAR has six places: Checklist, Timers, Briefing, Airports, Layover and More. Choose your own in
+More > Edit the tab bar (or hold the bar, or More > Settings > Tab bar): up to five, More always last; tap one to take it
+out or put it in, the arrow moves it left. Flight log and Event log can be tabs too. What isn't in the bar is in More.
+Each device keeps its own choice. The app also opens where you left off: the page you had open (and the trip on
+Layover) when it was closed less than 12 hours ago.
+
+LAYOVER (its own tab, with the flag of where you are or go next; it was called Prepare): your next trips, one page
+each. The tab opens the trip you're on, or the next one; the trip you're on stays in the list until you fly out.
+On a wide iPad the trips sit on the left, each with the country's flag.
 - At the top: a photo of the city (Wikipedia's picture for the city, fetched once when online and kept for offline;
   without one, the colour of the sky there now), the city, the local time there and how far it is from Dubai, and a
   countdown to report.
