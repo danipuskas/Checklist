@@ -2845,7 +2845,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='101';
+var APP_VERSION='102';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -7909,7 +7909,7 @@ function cloudRestore(sha,latest){
 }
 
 /* ---------- Sync: the same checklists on all your devices, through the online backup's repository ----------
-   sync.json holds the content only (checklists, airport notes, previous flights, countdown and crew rest set-up, weather relay).
+   sync.json holds the content only (checklists, airport notes, previous flights, Prepare, countdown and crew rest set-up, weather relay).
    Ticks, answers, filled-in fields, times and folding stay on each device. Each device keeps the last synced copy (the base),
    so a sync merges both sides' changes item by item: an edit on one device and another edit on the other both survive. */
 var SYKEY='flightChecklist.sync',SYNC_FILE='sync.json',SYNC_POLL=20000,SYNC_QUIET=2500,SYNC_GAP=8000;
@@ -7993,6 +7993,26 @@ function synFlat(st){
   Object.keys(st.apNotes).sort().forEach(function(ic){Object.keys(st.apNotes[ic]).sort().forEach(function(sid){items(st.apNotes[ic][sid],'apn/'+ic+'/'+sid);});});
   (st.apLog||[]).forEach(function(x){var o=JSON.parse(JSON.stringify(x));delete o.id;put('V:'+x.id,'aplog',o);});
   st.tools.cds.forEach(function(x){put('C:'+x.id,'cds',{title:x.title,lead:x.lead});});
+  // Prepare: trips, and per trip the wake-up / pick-up, what you planned, Before you go; per airport the hotel, places and numbers
+  (st.trips||[]).forEach(function(t){var o=JSON.parse(JSON.stringify(t));delete o.id;put('T:'+t.id,'trips',o);});
+  Object.keys(st.prep||{}).sort().forEach(function(id){
+    var d=st.prep[id];
+    // one entry per setting, and none for what isn't set: a pick-up set on one device beats “not set” on the other
+    function q(f,v){put('Q:'+id+'~'+f,'prep',{v:v});}
+    if(d.seen&&d.seen.notes) q('notes',1);if(d.seen&&d.seen.wx) q('wx',1);
+    if(d.wake) q('wake',d.wake);if(d.pick) q('pick',d.pick);if(d.pickup) q('pickup',d.pickup);
+    if(d.skip&&d.skip.length) q('skip',d.skip.slice());if(Array.isArray(d.alts)) q('alts',d.alts.slice());
+    (d.plan||[]).forEach(function(x){put('W:'+x.id,'pplan/'+id,{k:x.k,s:x.s,e:x.e,t:x.t||''});});
+    (d.before||[]).forEach(function(x){put('B:'+id+'~'+x.id,'pbef/'+id,{t:x.t,done:!!x.done,auto:!!x.auto,why:x.why||''});});
+  });
+  Object.keys(st.places||{}).sort().forEach(function(ic){
+    var p=st.places[ic];
+    if(p.hotel) put('O:'+ic+'~hotel','places',{v:p.hotel});if(p.wakeOff) put('O:'+ic+'~wakeOff','places',{v:p.wakeOff});if(p.pickOff) put('O:'+ic+'~pickOff','places',{v:p.pickOff});
+    (p.items||[]).forEach(function(x){put('U:'+x.id,'pitems/'+ic,{t:x.t});});
+    (p.tel||[]).forEach(function(x){put('N:'+x.id,'ptel/'+ic,{n:x.n||'',v:x.v||''});});
+  });
+  (st.prepHidden||[]).forEach(function(id){put('X:'+id,'phid',{});});
+  e.Y={p:'',o:{tpl:st.prepTpl?st.prepTpl.slice():null}};
   var r=st.tools.rest;
   e.R={p:'',o:{title:r.title,n:r.n,buffer:r.buffer,round:r.round,labels:r.labels.slice()}};
   e.G={p:'',o:{wxUrl:st.settings.wxUrl||''}};
@@ -8074,7 +8094,7 @@ function synBuild(M,st){
     }
     return n;
   }
-  var out=JSON.parse(JSON.stringify({v:st.v,current:st.current,settings:st.settings,tools:st.tools}));
+  var out=JSON.parse(JSON.stringify(st)); // everything this device keeps for itself (the event log…) stays as it is
   out.lists=kidsOf('lists').map(function(lk){
     return {id:idOf(lk),title:M.e[lk].o.title,sections:kidsOf(lk+'/s').map(function(sk){var os=loc[sk];return {id:idOf(sk),title:M.e[sk].o.title,collapsed:!!(os&&os.collapsed),items:kidsOf(sk+'/i').map(item)};})};
   });
@@ -8089,6 +8109,29 @@ function synBuild(M,st){
   out.tools.cds=kidsOf('cds').map(function(k){var o=M.e[k].o,old=loc[k];return {id:idOf(k),type:'cd',title:o.title,lead:o.lead,target:old?old.target:null,aL:old?old.aL:false,aZ:old?old.aZ:false,collapsed:old?!!old.collapsed:false};});
   if(M.e.R){var r=M.e.R.o;out.tools.rest.title=r.title;out.tools.rest.n=r.n;out.tools.rest.buffer=r.buffer;out.tools.rest.round=r.round;out.tools.rest.labels=(r.labels||[]).slice();}
   if(M.e.G) out.settings.wxUrl=M.e.G.o.wxUrl||'';
+  // Prepare
+  out.trips=kidsOf('trips').map(function(k){return Object.assign({id:idOf(k)},JSON.parse(JSON.stringify(M.e[k].o)));});
+  out.prep={};out.places={};
+  function pp(id){return out.prep[id]||(out.prep[id]={seen:{},wake:0,pick:0,pickup:0,skip:[],plan:[],before:[]});}
+  function pl(ic){return out.places[ic]||(out.places[ic]={hotel:'',items:[],tel:[]});}
+  function fld(k){var x=idOf(k),i=x.lastIndexOf('~');return [x.slice(0,i),x.slice(i+1)];}
+  kidsOf('prep').forEach(function(k){var f=fld(k),v=M.e[k].o.v,d=pp(f[0]);
+    if(f[1]==='notes'||f[1]==='wx') d.seen[f[1]]=true;else if(f[1]==='skip'||f[1]==='alts') d[f[1]]=(v||[]).slice();else d[f[1]]=v;});
+  kidsOf('places').forEach(function(k){var f=fld(k),p=pl(f[0]);p[f[1]]=M.e[k].o.v;});
+  Object.keys(M.c).forEach(function(p){
+    if(p.indexOf('pplan/')===0) pp(p.slice(6)).plan=kidsOf(p).map(function(k){var o=M.e[k].o;return {id:idOf(k),k:o.k,s:o.s,e:o.e,t:o.t||''};});
+    else if(p.indexOf('pbef/')===0){
+      // the same thing added on both devices before they synced shows once (ticked if either ticked it)
+      var by={},arr=[];
+      kidsOf(p).forEach(function(k){var o=M.e[k].o,t=String(o.t||'').trim().toLowerCase(),it={id:idOf(k).split('~')[1],t:o.t,done:!!o.done,auto:!!o.auto,why:o.why||''};
+        if(by[t]){if(it.done) by[t].done=true;return;}by[t]=it;arr.push(it);});
+      pp(p.slice(5)).before=arr;
+    }
+    else if(p.indexOf('pitems/')===0) pl(p.slice(7)).items=kidsOf(p).map(function(k){return {id:idOf(k),t:M.e[k].o.t};});
+    else if(p.indexOf('ptel/')===0) pl(p.slice(5)).tel=kidsOf(p).map(function(k){var o=M.e[k].o;return {id:idOf(k),n:o.n,v:o.v};});
+  });
+  out.prepHidden=kidsOf('phid').map(idOf);
+  if(M.e.Y) out.prepTpl=M.e.Y.o.tpl?M.e.Y.o.tpl.slice():null;
   return normalize(out);
 }
 function synApply(M,Ms){
@@ -8130,8 +8173,8 @@ function synGet(m){
   var p=m.content?Promise.resolve(b64dec(m.content)):gh('GET','/git/blobs/'+m.sha,null,'application/vnd.github.raw+json').then(function(r){if(!r.ok) throw ghErr(r);return r.text();});
   return p.then(function(txt){
     var d=null;try{d=JSON.parse(txt);}catch(e){}
-    // format 2 (v100) holds Previous flights: a device still on an older version can't read it, so it can't drop them
-    if(!d||(d.format!=='flight-checklists-sync'&&d.format!=='flight-checklists-sync-2')||!d.flat||!d.flat.e||!d.flat.c) throw new Error('The synced copy online can’t be read. If this device has an Update button, tap it.');
+    // format 2 (v100) holds Previous flights, format 3 (v102) Prepare: a device still on an older version can't read it, so it can't drop them
+    if(!d||(d.format!=='flight-checklists-sync'&&d.format!=='flight-checklists-sync-2'&&d.format!=='flight-checklists-sync-3')||!d.flat||!d.flat.e||!d.flat.c) throw new Error('The synced copy online can’t be read. If this device has an Update button, tap it.');
     return d;
   });
 }
@@ -8155,7 +8198,7 @@ function synPut(text,sha){
 function synPush(F,Fs,sha,at,n){
   return synUpPhotos(F).then(function(){
     synProg='Syncing…';synPaint();
-    return synPut(JSON.stringify({format:'flight-checklists-sync-2',v:2,n:n,at:at,dev:devName(),flat:F}),sha);
+    return synPut(JSON.stringify({format:'flight-checklists-sync-3',v:3,n:n,at:at,dev:devName(),flat:F}),sha);
   }).then(function(nsha){
     syn.sha=nsha;syn.n=n;syn.etag='';syn.last=Date.now();synPushAt=Date.now();
     return synBaseSave(Fs);
@@ -8248,7 +8291,7 @@ function synTick(flush){
   if(due&&synIdle()) synRun();
 }
 function synStatus(){
-  if(!syn.on) return {txt:'Checklists, airport notes and previous flights. Ticks and answers stay on each device.',bad:false};
+  if(!syn.on) return {txt:'Checklists, airport notes, previous flights and Prepare (trips, plans, wake-up and pick-up). Ticks and answers stay on each device.',bad:false};
   if(synBusy) return {txt:synProg||'Syncing…',busy:true};
   if(synErr) return {txt:synErr,bad:true};
   if(navigator.onLine===false||synKind==='net') return {txt:'Waiting for internet'+(synDirty?' · changes to send':''),bad:false};
@@ -9240,7 +9283,7 @@ function prepTrips(now){
 function prepNext(t,L){return L.filter(function(x){return x.dep===t.dest&&x.std>t.sta;}).sort(function(a,b){return a.std-b.std;})[0]||null;}
 function prepData(id){
   var P=state.prep||(state.prep={});
-  return P[id]||(P[id]={seen:{},pickup:0,before:(state.prepTpl||PREP_TPL).map(function(x){return {id:uid(),t:x,done:false};})});
+  return P[id]||(P[id]={seen:{},pickup:0,wake:0,pick:0,plan:[],skip:[],before:(state.prepTpl||PREP_TPL).map(function(x){return {id:'tp'+strHash(String(x).toLowerCase()),t:x,done:false};})});
 }
 function prepPlace(ic){var P=state.places||(state.places={}),p=P[ic]||(P[ic]={hotel:'',items:[],tel:[]});if(!p.tel) p.tel=[];return p;}
 function prepAlts(t){var d=state.prep&&state.prep[t.id];return d&&d.alts?d.alts:(t.alts||[]);}
@@ -9288,7 +9331,7 @@ function prepListHTML(L,now){
 // an item Before you go adds by itself (once: one you deleted stays away)
 function prepAddAuto(d,t,why){
   var k=t.toLowerCase();if((d.skip||[]).indexOf(k)>=0||d.before.some(function(x){return x.t.toLowerCase()===k;})) return false;
-  d.before.push({id:uid(),t:t,done:false,auto:true,why:why});return true;
+  d.before.push({id:'au'+strHash(k),t:t,done:false,auto:true,why:why});return true;
 }
 function prepPlugAuto(t){
   var C=CTRY[ctryOf(t.dest)],H=CTRY[ctryOf(prepHome()||'OMDB')];if(!C||!H||t.dest===prepHome()) return;

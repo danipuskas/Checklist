@@ -49,6 +49,10 @@ Import roster reads the roster report from the crew portal ("Emirates Crew Roste
 text), or CrewPulse's event notes. Only the flights are read (no names, days off, standby or training); times are
 local at each airport. It shows what's new, changed or the same before adding; a changed flight keeps your wake-up,
 pick-up and plan.
+With sync on (More → Settings), Prepare syncs like the notes: trips, wake-up and pick-up, what you planned on the
+timeline, Before you go (ticks too), the hotel, places and numbers, removed duties and the list for new trips. The same
+item added on both devices before they synced shows once. The event log stays on each device. The sync file is now
+format 3: a device still on an older version says it can't read it until you tap Update there.
 
 THE FLIGHT STRIP under the clock appears once Set flight has an ETD and an ETA: a plane at the time now, the time
 flown, the time to go, and your break from Crew rest in purple with a countdown ("rest in 2:40", then "1:10 left").
@@ -70,11 +74,12 @@ limited to that repository with Contents: Read and write. The steps are shown in
 SYNC BETWEEN iPAD AND iPHONE (optional, needs Online backup): on the iPad, More > Settings > Online backup and sync >
 turn on "Sync with your other devices". On the iPhone, open the same address in Safari > Share > Add to Home Screen,
 open it, then More > Settings > Online backup and sync, enter the same repository and token and choose
-"Use the synced checklists". From then on checklists, airport notes, previous flights, countdown and crew rest set-up
-and photos stay the same on both, while the app is open and online: a change is sent a few seconds after you make it,
+"Use the synced checklists". From then on checklists, airport notes, previous flights, Prepare (trips, wake-up and
+pick-up, timeline plans, Before you go, hotel, places, numbers), countdown and crew rest set-up and photos stay the same on both, while the app is open and online: a change is sent a few seconds after you make it,
 and the other device checks every 20 seconds and whenever it is opened. Changes made offline are sent when you are
 back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
-change wins. Ticks, answers, filled-in fields, times, reminders and folding always stay on each device.
+change wins. Ticks, answers, filled-in fields, times, reminders, folding and the event log stay on each device
+(Before you go ticks do sync).
 
 PHOTOS: each photo is kept on the device in three sizes: a small one for the lists, a 2048-pixel copy that the
 viewer opens, and the original (up to 8 megapixels), which the viewer loads only when you zoom in past the copy. Big
