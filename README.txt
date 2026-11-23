@@ -78,7 +78,7 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   you pick the right branch of a chain; or paste a place shared from Apple Maps or Google Maps (Share > Copy); or keep
   just the name (offline it's kept by name to pin later). A pinned place has its exact spot and address, a type from
   the map (cafe, restaurant, shop...) and its distance from the hotel; Go takes you there by public transport from
-  the hotel's pin, in Apple Maps or Google Maps. Tap a place to change its name, type or note, or find it again.
+  where you are now, in Apple Maps or Google Maps (the places under Getting around still go from the hotel). Tap a place to change its name, type or note, or find it again.
   A map above the list shows the hotel (H) and the pinned places, numbered as in the list: drag, pinch, double-tap
   or + and - to zoom, the square to see everything, tap a pin for Go. Pin the hotel from its card. The map is
   OpenStreetMap; the parts you've looked at are kept, so it works offline on the layover.
@@ -87,6 +87,10 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   only, the names with the most of your words first), then the address you saved; only then anywhere, under "Further
   away". OpenStreetMap sometimes knows a hotel by an older name, or has the building without one. Still not there?
   Pick on the map: move the map until the pin sits on the place, then Use this spot.
+  Links from Maps: a long link (with the spot in it) pins the place straight away, also pasted into Add. The short
+  links the iPhone shares now (maps.apple/p/..., maps.app.goo.gl/...) don't say where the place is, so the app keeps
+  the link and asks you to pick the place from the list or on the map; then it has its distance and its pin. Keep
+  just the link saves it unpinned (Go then opens the link).
   Airport positions are now to about 1 km, so distances from the airport are right.
   Before you go has left the Layover page: make it a checklist of your own among the checklists.
 - To buy here: a shopping list per city that stays until you tick it, on every trip there; the trip list shows "2 to buy".

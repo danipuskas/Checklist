@@ -1872,7 +1872,7 @@ line.tl-tk{opacity:.5}line.tl-tk.mid{opacity:.9;stroke-width:1.6}text.tl-tk{stro
 .fd-it{appearance:none;display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:var(--text);background:none;border:0;border-bottom:1px solid var(--line-soft);padding:9px 2px;cursor:pointer}
 .fd-it>i{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--surface2);color:#fff;flex:none}.fd-it>i svg{width:17px;height:17px}.fd-it>i:not([style]) svg{color:var(--accent)}
 .fd-it span{flex:1;min-width:0}.fd-it b{display:block;font-size:calc(15px*var(--ts));font-weight:650}.fd-it small{display:block;font-size:calc(12.5px*var(--ts));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fd-hd{margin:8px 0 2px!important;font-weight:600}.fd-tip{margin:8px 0 2px!important}.fd-it.far{opacity:.75}
+.fd-hd{margin:8px 0 2px!important;font-weight:600}.fd-note{margin:8px 0 4px!important;padding:8px 10px;border-radius:10px;background:var(--accent-weak);color:var(--text)!important;line-height:1.4}.fd-tip{margin:8px 0 2px!important}.fd-it.far{opacity:.75}
 .fd-map{position:relative;height:min(46vh,300px);margin:6px 0 6px;border-radius:12px;overflow:hidden;background:#e8e4dc;touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab}
 .fd-x{position:absolute;left:50%;top:50%;z-index:3;width:40px;height:40px;margin:-37px 0 0 -20px;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}.fd-x svg{width:40px;height:40px;display:block}
 .fd-pick .hint{margin:0 0 8px}.sh-actions #fdMb svg{width:16px;height:16px;margin:0 4px -3px 0}
@@ -2016,7 +2016,8 @@ label.chk{display:flex;align-items:center;gap:9px;font-size:calc(14.5px*var(--ts
   .prep-grid .ct{padding:6px 0}.prep-grid .ct span{font-size:calc(14px*var(--ts))}.prep-grid .ct b{font-size:calc(14.5px*var(--ts))}
   .ho-hn{padding:0 0 8px;margin-bottom:8px}.ho-hn b{font-size:calc(16px*var(--ts))}.ho-hn em{margin-top:1px}.ho-btn{padding:5px 9px;font-size:calc(13px*var(--ts))}
   .ho-kv{gap:6px 12px}.ho-kv>div{font-size:calc(13.5px*var(--ts));line-height:1.3}.ho-kv svg{width:16px;height:16px}.ho-kv b{font-size:calc(10.5px*var(--ts))}
-  .ho-acts{flex-wrap:nowrap;gap:16px;padding-top:0}.ho-acts .lv-more{padding:6px 2px 2px;font-size:calc(14px*var(--ts))}
+  .ho-acts{flex-wrap:nowrap;gap:16px;padding-top:0}.ho-acts .lv-more{padding:6px 2px 2px;font-size:calc(14px*var(--ts));white-space:nowrap;flex:none}
+  .ho-acts .lv-more:first-child{flex:0 1 auto;min-width:0}.ho-acts .lv-more:first-child span{min-width:0;overflow:hidden;text-overflow:ellipsis}
   .pl-nomap{padding:6px 10px;margin:0 0 6px;font-size:calc(13px*var(--ts))}.pl-nomap span{min-width:0}
   .pl-f{margin:0 0 4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.pl-f::-webkit-scrollbar{display:none}.pl-f button{flex:none;padding:3px 9px}
   .pl-main{padding:6px 0;gap:9px}.pl-main>i{width:30px;height:30px;border-radius:9px}.pl-main>i svg{width:17px;height:17px}.pl-main b{font-size:calc(14.5px*var(--ts))}.pl-main small{font-size:calc(12px*var(--ts))}
@@ -3033,7 +3034,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='109';
+var APP_VERSION='110';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -9981,7 +9982,7 @@ function prepHotelHTML(t){
     '<div class="ho-kv">'+kv.join('')+'</div>'+(h.x?'<p class="ho-x">'+esc(h.x)+'</p>':'')+
     '<div class="lv-l prep-sh">Near the hotel</div><div class="go-chips">'+[[IX.cart,'Supermarket'],[IX.plusbox,'Pharmacy'],[IX.coffee,'Coffee'],[IX.gym,'Gym'],[IX.cash,'ATM'],[IX.laundry,'Laundry']].map(function(x){
       return '<a class="go-chip" href="'+esc(mapsNear(h,t.dest,x[1]))+'" target="_blank" rel="noopener">'+x[0]+x[1]+'</a>';}).join('')+'</div>'+
-    '<div class="ho-acts"><button type="button" class="lv-more" data-act="prepHoEdit" data-id="'+esc(t.id)+'" data-v="'+esc(h.id)+'">'+I.edit+'Edit '+esc(h.n)+'</button>'+
+    '<div class="ho-acts"><button type="button" class="lv-more" data-act="prepHoEdit" data-id="'+esc(t.id)+'" data-v="'+esc(h.id)+'">'+I.edit+'<span>Edit '+esc(h.n)+'</span></button>'+
     '<button type="button" class="lv-more" data-act="prepHoFind" data-id="'+esc(t.id)+'" data-v="'+esc(h.id)+'">'+I.pin+(geoPt(h)?'Pin again':'Pin on the map')+'</button></div></div>';
 }
 // pick the hotel for this trip, and keep it for the flight number if you like
@@ -10069,6 +10070,7 @@ function prepGoElse(tid){
   setTimeout(function(){var e=$('#goTo');if(e) e.focus();},60);
 }
 // your places: a type each, and directions by public transport
+IX.bag=sv('<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>');
 var PLACE_K={eat:['Eat',IX.fork,'#d9622b'],drink:['Drinks',IX.glass,'#8a4fd1'],coffee:['Coffee',IX.coffee,'#8b5e3c'],walk:['Walk',IX.walk,'#1a9e5c'],run:['Run',IX.run,'#14804a'],shop:['Shop',IX.bag,'#c2417a'],see:['See',IX.star,'#0a7699'],other:['Other',I.pin,'#6b7280']};
 var prepPlF='';
 function placeGuess(t){
@@ -10085,7 +10087,7 @@ function prepPlacesHTML(t,h){
   var pts=[],num={},n=0;
   if(hg) pts.push({lat:hg.lat,lon:hg.lon,lbl:'H',cls:'h',name:h.n,sub:h.a||''});
   pl.items.forEach(function(x){var g=geoPt(x);if(!g) return;num[x.id]=++n;var K=PLACE_K[x.k]||PLACE_K.other;
-    pts.push({lat:g.lat,lon:g.lon,lbl:String(n),bg:K[2],name:x.t,sub:(x.n||K[0])+(from&&!from.ap?' · '+kmTxt(geoKm(from,g)):''),go:mapsTo(h,t.dest,x)});});
+    pts.push({lat:g.lat,lon:g.lon,lbl:String(n),bg:K[2],name:x.t,sub:(x.n||K[0])+(from&&!from.ap?' · '+kmTxt(geoKm(from,g)):''),go:mapsHere(t.dest,x)});});
   var L=pl.items.filter(function(x){return !prepPlF||(PLACE_K[x.k]?x.k:'other')===prepPlF;});
   var s='<div class="lv-card pl-card"><div class="pc-h"><span class="lv-l">'+I.pin+'Your places in '+esc(city)+'</span></div>';
   if(pts.length) s+='<div class="pl-map" data-k="'+t.dest+'" data-pts="'+esc(JSON.stringify(pts))+'"></div>';
@@ -10094,7 +10096,7 @@ function prepPlacesHTML(t,h){
   s+=L.map(function(x){var K=PLACE_K[x.k]||PLACE_K.other,g=geoPt(x);
     var sub=(x.n||K[0])+(g&&from?' · '+kmTxt(geoKm(from,g))+(from.ap?' from the airport':''):'')+(!g&&x.url?' · from a link':'')+(!g&&!x.url?' · not pinned':'');
     return '<div class="pl-row"><button type="button" class="pl-main" data-act="prepPlOpen" data-v="'+t.dest+'" data-id="'+esc(x.id)+'"><i style="background:'+K[2]+'">'+K[1]+(num[x.id]?'<em>'+num[x.id]+'</em>':'')+'</i><span><b>'+esc(x.t)+'</b><small>'+esc(sub)+'</small></span></button>'+
-      '<a class="pl-go" href="'+esc(mapsTo(h,t.dest,x))+'" target="_blank" rel="noopener" aria-label="Directions to '+esc(x.t)+'">'+IX.train+'Go</a></div>';}).join('');
+      '<a class="pl-go" href="'+esc(mapsHere(t.dest,x))+'" target="_blank" rel="noopener" aria-label="Directions from where you are to '+esc(x.t)+'">'+IX.train+'Go</a></div>';}).join('');
   if(!pl.items.length) s+='<p class="hint" style="margin:0 0 6px">Restaurants, runs, shops you like here: search for the exact one, and they come back on every '+esc(city)+' trip.</p>';
   return s+'<div class="pi-add"><input type="text" id="prepPlIn" maxlength="200" placeholder="A restaurant, a run, a shop…"><button type="button" class="btn small" data-act="prepPlAdd" data-v="'+t.dest+'">Add</button></div></div>';
 }
@@ -10212,33 +10214,36 @@ function mapLink(s){
 }
 // find a place (or the hotel) on the map: the matches nearest first; tap one, or paste a link
 function prepFindSheet(o){
-  var res=[],busy=false,where=o.from?(o.from.ap?'the airport':o.fromName||'the hotel'):'';
+  var res=[],busy=false,pend=null,where=o.from?(o.from.ap?'the airport':o.fromName||'the hotel'):'';
   openSheet('<h3>'+esc(o.title)+'</h3><p class="hint">'+(o.from?'Searching around '+esc(where)+' first. ':'')+'From OpenStreetMap.</p>'+
     '<div class="fd-q"><input type="search" id="fdQ" maxlength="120" value="'+esc(o.q||'')+'" placeholder="A name or an address" autocomplete="off"><button type="button" class="btn small" data-sact="go">Search</button></div>'+
-    '<div class="fd-r" id="fdR"></div>'+
+    '<p class="hint fd-note" id="fdN" hidden></p><div class="fd-r" id="fdR"></div>'+
     '<div class="fd-pick" id="fdP" hidden><div class="fd-map" id="fdM"></div><p class="hint">Move the map until the pin sits on the place.</p></div>'+
     '<div class="fld fd-lk"><span class="fl">Or paste a link from Apple Maps or Google Maps</span><div class="fd-q"><input type="url" id="fdL" maxlength="500" placeholder="Share → Copy in Maps, then paste here" autocomplete="off"><button type="button" class="btn small" data-sact="link">Use</button></div></div>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button>'+(o.plain?'<button type="button" class="btn" data-sact="plain">Just the name</button>':'')+
+      (o.hotel?'':'<button type="button" class="btn" data-sact="lnkonly" id="fdKb" hidden>Keep just the link</button>')+
       (o.at||o.from?'<button type="button" class="btn" data-sact="map" id="fdMb">'+I.pin+'Pick on the map</button><button type="button" class="btn" data-sact="list" id="fdLb" hidden>Back to the list</button><button type="button" class="btn primary" data-sact="spot" id="fdSb" hidden>Use this spot</button>':'')+'</div>',
   function(act,btn){
     if(act==='go'){mapMode(false);run();return;}
-    if(act==='pick'){var r=res[+btn.getAttribute('data-i')];if(!r) return;closeSheet();o.pick(r);return;}
+    if(act==='pick'){var r=res[+btn.getAttribute('data-i')];if(!r) return;if(pend) r=Object.assign({},r,{url:pend.url});closeSheet();o.pick(r);return;}
     if(act==='link'){
       var L=mapLink($('#fdL').value);
       if(!L.url&&L.lat==null){toast(String($('#fdL').value||'').trim()?'That link doesn’t show a place':'Paste a link first');return;}
-      L.k='';closeSheet();o.pick(L);return;
+      L.k='';if(L.lat!=null){closeSheet();o.pick(L);return;}
+      linkOnly(L);return;
     }
+    if(act==='lnkonly'){if(!pend) return;var nm=String($('#fdQ').value||'').trim();closeSheet();o.pick(Object.assign({},pend,{n:pend.n||nm||''}));return;}
     if(act==='plain'){closeSheet();o.pick(null);return;}
     if(act==='map'){mapMode(true);return;}
     if(act==='list'){mapMode(false);return;}
-    if(act==='spot'){var v=mmView.fdpick,g=v&&geoPt(v);if(!g) return;closeSheet();o.pick({lat:g.lat,lon:g.lon,k:''});return;}
+    if(act==='spot'){var v=mmView.fdpick,g=v&&geoPt(v);if(!g) return;closeSheet();o.pick(Object.assign({lat:g.lat,lon:g.lon,k:''},pend?{url:pend.url}:{}));return;}
     closeSheet();
   });
   var q=$('#fdQ');q.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();mapMode(false);run();}});
   // the map to pick on: from the pin it has, else around the airport or the hotel, which is marked on it
   function mapMode(on){
     var P=$('#fdP');if(!P||P.hidden===!on) return;
-    P.hidden=!on;$('#fdR').hidden=on;$('.sheet .fd-lk').hidden=on;
+    P.hidden=!on;$('#fdR').hidden=on;$('.sheet .fd-lk').hidden=on||!!pend;var fn=$('#fdN');if(fn&&pend) fn.hidden=on;
     ['#fdMb','#fdLb','#fdSb'].forEach(function(id,i){var e=$(id);if(e) e.hidden=i?!on:on;});
     if(!on) return;
     var c=o.at||o.from,pts=o.from?[{lat:o.from.lat,lon:o.from.lon,lbl:o.from.ap?'\u2708\ufe0e':'H',name:o.from.ap?'Airport':o.fromName||'Hotel',cls:'h'}]:[];
@@ -10258,18 +10263,27 @@ function prepFindSheet(o){
         return '<button type="button" class="fd-it'+(w==='far'?' far':'')+'" data-sact="pick" data-i="'+i+'">'+(K?'<i style="background:'+K[2]+'">'+K[1]+'</i>':'<i>'+I.pin+'</i>')+'<span><b>'+esc(r.n)+'</b><small>'+esc(r.a||'')+'</small></span>'+(r.km!=null?'<em>'+kmTxt(r.km)+'</em>':'')+'</button>';}).join('')+tip;
     },function(){busy=false;var b=$('#fdR');if(b) b.innerHTML='<p class="hint">The search didn’t answer. Try again, paste a link'+(o.from?', or pick the spot on the map':'')+'.</p>';});
   }
-  if(o.q) run();
-  setTimeout(function(){var e=$('#fdQ');if(e&&!o.q) e.focus();},60);
+  // a link without its spot: it's kept (it opens the place in Maps); the pin comes from the list or the map
+  function linkOnly(L){
+    pend=L;var n=$('#fdN'),k=$('#fdKb'),lk=$('.sheet .fd-lk');
+    if(n){n.hidden=false;n.innerHTML='<b>Link kept.</b> Short links from Maps don’t say where the place is, so the app can’t show the distance or put it on the map. '+(o.hotel?'Pick the hotel below':'Pick the place below')+(o.from?', or on the map':'')+(o.hotel?'.':', or keep just the link.');}
+    if(k) k.hidden=false;if(lk) lk.hidden=true;
+    var q=$('#fdQ');if(q&&!String(q.value||'').trim()&&L.n) q.value=L.n;
+    if(q&&String(q.value||'').trim()&&!res.length) run();else if(q&&!String(q.value||'').trim()) setTimeout(function(){q.focus();},60);
+  }
+  if(o.link) linkOnly(o.link);
+  else if(o.q) run();
+  setTimeout(function(){var e=$('#fdQ');if(e&&!o.q&&!o.link) e.focus();},60);
 }
 function prepFindPlace(ic,pid,tid){
   var pl=prepPlace(ic),p=pl.items.filter(function(x){return x.id===pid;})[0];if(!p) return;
   var t=tid?prepTripOf(tid):null,h=t?tripHotel(t).h:null;
-  prepFindSheet({title:'Which '+p.t+'?',q:p.t,from:geoFrom(h,ic),fromName:h&&h.n,city:prepCity(ic),alt:p.a,at:geoPt(p),pick:function(r){
+  prepFindSheet({title:'Which '+p.t+'?',q:p.t,from:geoFrom(h,ic),fromName:h&&h.n,city:prepCity(ic),alt:p.a,at:geoPt(p),link:!geoPt(p)&&p.url?{url:p.url}:null,pick:function(r){
     if(!r) return;var g=geoPt(r);
     if(g){p.lat=g.lat;p.lon=g.lon;}else{delete p.lat;delete p.lon;}
-    if(r.a) p.a=r.a;if(r.url) p.url=r.url;else delete p.url;
+    if(r.a) p.a=r.a;if(r.url) p.url=r.url;
     if((!p.k||p.k==='other')&&r.k) p.k=r.k;
-    save();refreshTool();toast(g?'Pinned on the map':'Link saved');
+    save();refreshTool();toast(g?'Pinned on the map':'Link kept');
   }});
 }
 function prepFindHotel(tid,hid){
@@ -10291,6 +10305,12 @@ function mapsTo(h,ic,p){
   var hg=h&&geoPt(h),o=hg?hg.lat+','+hg.lon:h?hotelQ(h,ic):'',d=g.lat+','+g.lon;
   return mapsG()?'https://www.google.com/maps/dir/?api=1'+(o?'&origin='+encodeURIComponent(o):'')+'&destination='+encodeURIComponent(d)+'&travelmode=transit':
     'https://maps.apple.com/?'+(o?'saddr='+encodeURIComponent(o)+'&':'')+'daddr='+encodeURIComponent(d)+'&dirflg=r';
+}
+// directions from where you are now, by public transport: to the pin, else the link, else the name in the city
+function mapsHere(ic,p){
+  var g=geoPt(p);if(!g&&p.url) return p.url;
+  var d=g?g.lat+','+g.lon:p.t+', '+(prepCity(ic)||ic);
+  return mapsG()?'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(d)+'&travelmode=transit':'https://maps.apple.com/directions?destination='+encodeURIComponent(d)+'&mode=transit';
 }
 function mapsNear(h,ic,what){var g=geoPt(h);return g&&!mapsG()?'https://maps.apple.com/?q='+encodeURIComponent(what)+'&sll='+g.lat+','+g.lon+'&z=15':mapsQ(what+' near '+hotelQ(h,ic));}
 
@@ -10721,8 +10741,13 @@ function prepAct(act,el){
     case 'prepPlAdd':
       var pi=$('#prepPlIn'),pv=String(pi&&pi.value||'').trim();if(!pv) return;
       var tp=prepTripOf(prepSel),hp=tp&&tp.dest===v?tripHotel(tp).h:null;
-      var addP=function(r){var it={id:uid(),t:(r&&r.n||pv).slice(0,200),k:(r&&r.k)||placeGuess(pv),n:''},g=r&&geoPt(r);if(g){it.lat=g.lat;it.lon=g.lon;}if(r&&r.a) it.a=r.a.slice(0,200);if(r&&r.url) it.url=r.url;prepPlace(v).items.push(it);save();refreshTool();};
+      var isU=/^https?:\/\//i.test(pv),nm0=isU?'':pv;
+      var addP=function(r){var t0=(r&&r.n||nm0||'Place from Maps').slice(0,200),it={id:uid(),t:t0,k:(r&&r.k)||placeGuess(t0),n:''},g=r&&geoPt(r);if(g){it.lat=g.lat;it.lon=g.lon;}if(r&&r.a) it.a=r.a.slice(0,200);if(r&&r.url) it.url=r.url;prepPlace(v).items.push(it);save();refreshTool();};
       // the exact one: search and pick (or paste a link); offline it's saved by name to pin later
+      if(isU){var Lk=mapLink(pv);
+        if(Lk.lat!=null){addP(Lk);toast('Pinned on the map');return;}
+        if(navigator.onLine===false){addP(Lk);toast('Link kept. Pin it when you’re online.');return;}
+        prepFindSheet({title:Lk.n?'Which '+Lk.n+'?':'Which place is this?',q:Lk.n||'',from:geoFrom(hp,v),fromName:hp&&hp.n,city:prepCity(v),link:Lk,pick:addP});return;}
       if(navigator.onLine===false){addP(null);toast('Saved by name. Pin it when you’re online.');return;}
       prepFindSheet({title:'Which '+pv+'?',q:pv,from:geoFrom(hp,v),fromName:hp&&hp.n,city:prepCity(v),plain:true,pick:addP});return;
     case 'prepHoFind': prepFindHotel(id,v);return;
@@ -10786,7 +10811,6 @@ IX.car=sv('<path d="M5 16v-4.5L7 7h10l2 4.5V16M4 16h16M6 16v2M18 16v2M7.5 13.5h.
 IX.dep=sv('<path d="M3 20h18"/><path d="M4.5 14.5l14-4.2c.9-.3 1.4-1.2 1.1-2-.3-.7-1.1-1-1.9-.8l-4.2 1.2L8 4.8l-2 .5 3.2 5.4-3.6 1-1.8-1.3-1.2.3z"/>');
 IX.land=sv('<path d="M3 20h18"/><path d="M5 10l3.5 1 2-5 2 .6-1 5.2 5 1.4c1 .3 1.6 1.2 1.3 2.1-.2.6-.8.8-1.4.7L4.6 12.3z"/>');
 IX.cash=sv('<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>');
-IX.bag=sv('<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>');
 IX.shield=sv('<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>');
 IX.phone=sv('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>');
 IX.fire=sv('<path d="M12 21c4 0 6.5-2.6 6.5-6.3 0-3.2-2.2-5.4-3.6-7.2-.4 1.6-1.3 2.6-2.4 3.1.3-2.9-.9-5.6-3-7.6.2 3-1.5 4.8-2.9 6.5C5.4 11.1 5.5 12.7 5.5 14.7 5.5 18.4 8 21 12 21z"/>');
