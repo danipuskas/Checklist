@@ -75,6 +75,12 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   A map above the list shows the hotel (H) and the pinned places, numbered as in the list: drag, pinch, double-tap
   or + and - to zoom, the square to see everything, tap a pin for Go. Pin the hotel from its card. The map is
   OpenStreetMap; the parts you've looked at are kept, so it works offline on the layover.
+  The search keeps to about 60 km around the hotel (or the airport, for the hotel itself). When nothing has that exact
+  name there, it tries again without small words and the city's name, then word by word (for a hotel, among hotels
+  only, the names with the most of your words first), then the address you saved; only then anywhere, under "Further
+  away". OpenStreetMap sometimes knows a hotel by an older name, or has the building without one. Still not there?
+  Pick on the map: move the map until the pin sits on the place, then Use this spot.
+  Airport positions are now to about 1 km, so distances from the airport are right.
   Before you go has left the Layover page: make it a checklist of your own among the checklists.
 - To buy here: a shopping list per city that stays until you tick it, on every trip there; the trip list shows "2 to buy".
 Holidays come from Nager.Date, or are worked out by the date-holidays library (jsDelivr) when that doesn't answer;
