@@ -1810,6 +1810,11 @@ line.tl-tk{opacity:.5}line.tl-tk.mid{opacity:.9;stroke-width:1.6}text.tl-tk{stro
 .go-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
 .go-chip{appearance:none;display:inline-flex;align-items:center;gap:5px;font:600 calc(13.5px*var(--ts)) -apple-system,system-ui,sans-serif;color:var(--text);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:6px 11px 6px 9px;text-decoration:none;max-width:100%;cursor:pointer}
 .go-chip svg{width:15px;height:15px;color:var(--accent);flex:none}.go-chip.ghost{background:none;border-style:dashed;color:var(--muted)}
+.mp-sw{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:8px 0 2px;font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.mp-sw span{margin-right:2px}
+.mp-sw button{appearance:none;display:inline-flex;align-items:center;gap:5px;font:700 calc(12.5px*var(--ts)) -apple-system,system-ui,sans-serif;color:var(--muted);background:none;border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 8px;cursor:pointer}
+.mp-sw button svg{width:14px;height:14px}
+.mp-sw button.on{color:var(--accent);background:var(--accent-weak);border-color:transparent}
 .go-tip{display:flex;gap:9px;align-items:flex-start;margin-top:8px;padding:8px 4px 8px 11px;border-radius:12px;background:var(--surface2);font-size:calc(14px*var(--ts));line-height:1.4}
 .go-tip>svg{width:18px;height:18px;color:var(--accent);flex:none;margin-top:1px}.go-tip span{flex:1;min-width:0}.go-tip .ib{margin:-6px 0}
 .go-card .pi-add,.pl-card .pi-add,.buy-card .pi-add{margin-top:8px}
@@ -2925,7 +2930,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='104';
+var APP_VERSION='105';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -2966,7 +2971,7 @@ function normSettings(st){
   var ts=+st.textScale;
   return {csign:str(st.csign||st.fno).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8),theme:['light','dark','night','red'].indexOf(st.theme)>=0?st.theme:'auto',fingerDraw:!!st.fingerDraw,sound:st.sound!==false,dest:normDest(st.dest),dep:normDest(st.dep),routes:normRoutes(st),alts:normIcaoList(st.alts,4),wxUrl:normWxUrl(st.wxUrl),wxWatch:normIcaoList(st.wxWatch,6),textScale:ts>0?TEXT_SIZES.reduce(function(a,x){return Math.abs(x[0]-ts)<Math.abs(a-ts)?x[0]:a;},1):1,
     recent:Array.isArray(st.recent)?st.recent.map(normDest).filter(Boolean).slice(0,6):[],
-    etdT:numT(st.etdT),etaT:numT(st.etaT),altMin:normAltMin(st.altMin),ntKw:normNtKw(st.ntKw),ntSum:!!st.ntSum,wxWind:!!st.wxWind,wxTrend:!!st.wxTrend};
+    etdT:numT(st.etdT),etaT:numT(st.etaT),altMin:normAltMin(st.altMin),ntKw:normNtKw(st.ntKw),ntSum:!!st.ntSum,wxWind:!!st.wxWind,wxTrend:!!st.wxTrend,maps:st.maps==='google'?'google':'apple'};
 }
 function seed(){
   function c(text,o){o=o||{};var n=newCheck(text);n.note=o.note||'';n.children=(o.kids||[]).map(function(k){return newCheck(k);});return n;}
@@ -9769,6 +9774,7 @@ IX.wind=sv('<path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/>');
 IX.talk=sv('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/>');
 IX.cal=sv('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>');
 IX.open=sv('<path d="M8 16L16 8M9.5 8H16v6.5"/>');
+IX.map=sv('<path d="M9 4L3 6.5V20l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>');
 function goIcon(k){return k==='moon'?I.moon:k==='dep'?IX.dep:k==='car'?IX.car:IX[k]||IX.train;}
 // a flight number the way the roster writes it: EK414 (from UAE414, EK 0414…)
 function fnoKey(s){
@@ -9796,8 +9802,15 @@ function tripHotel(t){
   return {h:null,how:'choose'};
 }
 function hotelQ(h,ic){return h?(h.a?h.n+', '+h.a:h.n+', '+(prepCity(ic)||ic)):'';}
-function mapsQ(q){return 'https://maps.apple.com/?q='+encodeURIComponent(q);}
-function mapsGo(h,ic,to){return 'https://maps.apple.com/?'+(h?'saddr='+encodeURIComponent(hotelQ(h,ic))+'&':'')+'daddr='+encodeURIComponent(to+', '+(prepCity(ic)||ic))+'&dirflg=r';}
+// maps open in Apple Maps or Google Maps, as you choose on this device (Google's links open its app when it's installed)
+function mapsG(){return state.settings.maps==='google';}
+function mapsName(){return mapsG()?'Google Maps':'Apple Maps';}
+function mapsQ(q){return mapsG()?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q):'https://maps.apple.com/?q='+encodeURIComponent(q);}
+function mapsGo(h,ic,to){
+  var d=encodeURIComponent(to+', '+(prepCity(ic)||ic)),o=h?encodeURIComponent(hotelQ(h,ic)):'';
+  return mapsG()?'https://www.google.com/maps/dir/?api=1'+(o?'&origin='+o:'')+'&destination='+d+'&travelmode=transit':'https://maps.apple.com/?'+(o?'saddr='+o+'&':'')+'daddr='+d+'&dirflg=r';
+}
+function mapsSwHTML(){return '<div class="mp-sw"><span>Maps open in</span>'+[['apple','Apple Maps'],['google','Google Maps']].map(function(x){var on=(x[0]==='google')===mapsG();return '<button type="button" class="'+(on?'on':'')+'" data-act="prepMaps" data-v="'+x[0]+'" aria-pressed="'+on+'">'+IX.map+x[1]+'</button>';}).join('')+'</div>';}
 function prepHotelHTML(t){
   var pl=prepPlace(t.dest),r=tripHotel(t),h=r.h,d=prepData(t.id),f=fnoKey(t.fno),city=prepCity(t.dest)||t.dest;
   var hd='<div class="pc-h"><span class="lv-l">'+IX.hotel+'Hotel</span>'+(pl.hotels.length?'<button type="button" class="lv-more" data-act="prepHoPick" data-id="'+esc(t.id)+'">Change</button>':'')+'</div>';
@@ -9812,7 +9825,7 @@ function prepHotelHTML(t){
   kv.push('<div>'+IX.door+'<span><b>Room</b><input type="text" class="ho-rm" data-room="'+esc(t.id)+'" maxlength="20" value="'+esc(d.room||'')+'" placeholder="This trip" autocomplete="off"></span></div>');
   [[IX.fork,'Breakfast','bf'],[IX.gym,'Gym','gym'],[IX.pool,'Pool','pool'],[IX.evt,'Check-out','co']].forEach(function(x){if(h[x[2]]) kv.push('<div>'+x[0]+'<span><b>'+x[1]+'</b>'+esc(h[x[2]])+'</span></div>');});
   var q=hotelQ(h,t.dest);
-  return '<div class="lv-card ho-card">'+hd+'<div class="ho-hn"><div><b>'+esc(h.n)+'</b><span>'+esc(h.a||city)+'</span>'+(how?'<em>'+esc(how)+'</em>':'')+'</div><a class="ho-btn" href="'+esc(mapsQ(q))+'" target="_blank" rel="noopener">'+IX.open+'Map</a></div>'+
+  return '<div class="lv-card ho-card">'+hd+'<div class="ho-hn"><div><b>'+esc(h.n)+'</b><span>'+esc(h.a||city)+'</span>'+(how?'<em>'+esc(how)+'</em>':'')+'</div><a class="ho-btn" href="'+esc(mapsQ(q))+'" target="_blank" rel="noopener">'+IX.open+mapsName()+'</a></div>'+
     '<div class="ho-kv">'+kv.join('')+'</div>'+(h.x?'<p class="ho-x">'+esc(h.x)+'</p>':'')+
     '<div class="lv-l prep-sh">Near the hotel</div><div class="go-chips">'+[[IX.cart,'Supermarket'],[IX.plusbox,'Pharmacy'],[IX.coffee,'Coffee'],[IX.gym,'Gym'],[IX.cash,'ATM'],[IX.laundry,'Laundry']].map(function(x){
       return '<a class="go-chip" href="'+esc(mapsQ(x[1]+' near '+q))+'" target="_blank" rel="noopener">'+x[0]+x[1]+'</a>';}).join('')+'</div>'+
@@ -9884,14 +9897,14 @@ function prepGoHTML(t,h){
   else s+='<p class="hint" style="margin:0 0 6px">No built-in notes for '+esc(city)+' yet. <a href="'+esc(wv)+'" target="_blank" rel="noopener">Get around on Wikivoyage</a></p>';
   s+='<div class="lv-l prep-sh">'+(h?'By public transport from the hotel':'By public transport from where you are')+'</div><div class="go-chips">'+
     pl.items.slice(0,10).map(function(x){return '<a class="go-chip" href="'+esc(mapsGo(h,t.dest,x.t))+'" target="_blank" rel="noopener">'+I.pin+esc(x.t.length>34?x.t.slice(0,32)+'…':x.t)+'</a>';}).join('')+
-    '<button type="button" class="go-chip ghost" data-act="prepGoElse" data-id="'+esc(t.id)+'">'+I.search+'Somewhere else</button></div>';
+    '<button type="button" class="go-chip ghost" data-act="prepGoElse" data-id="'+esc(t.id)+'">'+I.search+'Somewhere else</button></div>'+mapsSwHTML();
   s+=pl.tips.map(function(x){return '<div class="go-tip">'+IX.quote+'<span>'+esc(x.t)+'</span><button type="button" class="ib" data-act="prepTipDel" data-v="'+t.dest+'" data-id="'+esc(x.id)+'" aria-label="Remove this tip">'+I.x+'</button></div>';}).join('');
   s+='<div class="pi-add"><input type="text" id="prepTipIn" maxlength="300" placeholder="Your tip: the quicker bus, the station exit…"><button type="button" class="btn small" data-act="prepTipAdd" data-v="'+t.dest+'">Add</button></div>';
-  return s+'<p class="pc-note">'+(g?'Built-in notes, checked Nov 2026. Things change, so add what you find. ':'')+'Places open Apple Maps with public transport directions. <a href="'+esc(wv)+'" target="_blank" rel="noopener">More on Wikivoyage</a></p></div>';
+  return s+'<p class="pc-note">'+(g?'Built-in notes, checked Nov 2026. Things change, so add what you find. ':'')+'Places open '+mapsName()+' with public transport directions. <a href="'+esc(wv)+'" target="_blank" rel="noopener">More on Wikivoyage</a></p></div>';
 }
 function prepGoElse(tid){
   var t=prepTripOf(tid);if(!t) return;var h=tripHotel(t).h;
-  openSheet('<h3>Where to?</h3><p class="hint">Apple Maps opens with public transport directions'+(h?' from '+esc(h.n):'')+'.</p>'+
+  openSheet('<h3>Where to?</h3><p class="hint">'+mapsName()+' opens with public transport directions'+(h?' from '+esc(h.n):'')+'.</p>'+
     '<label class="fld"><span class="fl">Place</span><input type="text" id="goTo" maxlength="120" placeholder="A place or an address in '+esc(prepCity(t.dest)||t.dest)+'" autocomplete="off"></label>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="go">Directions</button></div>',
   function(act){
@@ -10305,6 +10318,7 @@ function prepAct(act,el){
     case 'prepBuyDel': var pb=prepPlace(v);pb.buy=pb.buy.filter(function(x){return x.id!==id;});save();refreshTool();return;
     case 'prepBuyClr': var pc=prepPlace(v);pc.buy=pc.buy.filter(function(x){return !x.done;});save();refreshTool();return;
     case 'prepSay': prepSay(v,id);return;
+    case 'prepMaps': state.settings.maps=v==='google'?'google':'apple';save();refreshTool();toast('Maps open in '+mapsName());return;
     case 'prepPlDel': var pp=prepPlace(v);pp.items=pp.items.filter(function(x){return x.id!==id;});save();refreshTool();return;
     case 'prepBi': var db=prepData(id);db.before.forEach(function(x){if(x.id===v) x.done=!x.done;});save();refreshTool();return;
     case 'prepBiDel': var dd=prepData(id);dd.before.forEach(function(x){if(x.id===v&&x.auto){(dd.skip||(dd.skip=[])).push(x.t.toLowerCase());}});dd.before=dd.before.filter(function(x){return x.id!==v;});save();refreshTool();return;

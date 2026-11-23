@@ -53,8 +53,9 @@ each with the country's flag.
   isn't spoken), your Layover notes and last time there. Below: all the notes for its airports, and live METAR/TAF.
 - Getting around: built in for about 100 airports crews stay at (checked November 2026): how to pay (tap your bank
   card, Suica in Apple Wallet...), the airport train, ferries or night trains, taxis and ride apps. Your places and
-  "Somewhere else" open Apple Maps with public transport directions from the hotel. Add your own tips. Elsewhere it
-  links to Wikivoyage.
+  "Somewhere else" open public transport directions from the hotel. Add your own tips. Elsewhere it links to Wikivoyage.
+  "Maps open in" picks Apple Maps or Google Maps for every map button on the page (the hotel, near the hotel, Go);
+  each device remembers its own choice. Google's links open the Google Maps app when it's installed, else Safari.
 - Hotel: a city can have several hotels, each with its address, Wi-Fi (Copy for the password), breakfast, gym, pool,
   check-out and notes, and the flight numbers that stay there (EK414, EK412). A trip uses the hotel of its flight
   number; Change picks another one for this trip only, or for every trip on that flight. With several hotels and none
