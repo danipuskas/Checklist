@@ -1,5 +1,5 @@
 // Offline cache: serves the app from the iPad and checks GitHub for a newer version when online.
-const CACHE = 'flight-checklists-v102';
+const CACHE = 'flight-checklists-v103';
 const ASSETS = ['./', './index.html', './airports.js', './runways.js', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './lib/pdf.js', './lib/pdf.worker.js'];
 
 self.addEventListener('install', e => {
@@ -10,7 +10,7 @@ self.addEventListener('install', e => {
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    .then(keys => Promise.all(keys.filter(k => k !== CACHE && k.indexOf('flight-checklists-') === 0).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 // No network tries while the iPad is offline (in airplane mode iPadOS answers them with an alert),

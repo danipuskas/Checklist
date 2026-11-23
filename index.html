@@ -1710,8 +1710,29 @@ body.editing .toast,html.kb .toast{bottom:calc(env(safe-area-inset-bottom,0px) +
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--tl-day:#4a4227;--tl-dayt:#f1e2b5;--tl-night:#142338;--tl-nightt:#c9d6ea}}
 :root[data-theme="dark"],:root[data-theme="night"]{--tl-day:#4a4227;--tl-dayt:#f1e2b5;--tl-night:#142338;--tl-nightt:#c9d6ea}
 :root[data-theme="red"]{--tl-day:#3a160c;--tl-dayt:#ff9a7a;--tl-night:#160705;--tl-nightt:#d9765a;--tl-cur:#ff5a3c}
-.prep-hd .prep-ring{width:46px;height:46px}.prep-hd .prep-ring svg{width:46px;height:46px}
-.prep-ti b{font-size:calc(26px*var(--ts))}
+.prep-pg{overflow-x:hidden;overflow-x:clip;max-width:100%}
+.pt-flag{width:40px;height:40px;flex:none;border-radius:50%;background:var(--surface2);display:grid;place-items:center;font-size:24px;line-height:1}
+.lo-ban{position:relative;border-radius:18px;overflow:hidden;min-height:calc(150px*var(--ts));margin:0 0 10px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;
+  background-color:#1f5f8a;background-size:cover;background-position:center 40%}
+.lo-ban.day{background-image:linear-gradient(165deg,#6fb2dc 0%,#2f7fb0 55%,#1f5f8a 100%)}
+.lo-ban.night{background-image:linear-gradient(165deg,#0f1f3a 0%,#1d3a63 60%,#2c5585 100%)}
+.lo-ban::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28) 0,rgba(0,0,0,0) 34%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.62) 100%);pointer-events:none}
+.lo-ban>*{position:relative}
+.lo-top{display:flex;align-items:center;padding:8px 8px 0}.lo-top .sp{flex:1}
+.lo-b{background:rgba(0,0,0,.32)!important;color:#fff!important;border-color:transparent!important;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.lo-bot{display:flex;align-items:flex-end;gap:12px;padding:0 16px 14px}
+.lo-t{flex:1;min-width:0;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.lo-t b{display:flex;align-items:center;gap:9px;font-size:calc(30px*var(--ts));font-weight:800;line-height:1.1;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lo-fl{font-size:.9em;text-shadow:none}
+.lo-t i{display:block;font-style:normal;font-size:calc(14px*var(--ts));opacity:.95;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lo-now{flex:none;text-align:right;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.lo-now b{display:block;font-size:calc(26px*var(--ts));font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.lo-now span{display:block;font-size:calc(12.5px*var(--ts));opacity:.95;white-space:nowrap}
+.lo-cr{position:absolute!important;right:10px;top:12px;font-size:10.5px;color:rgba(255,255,255,.8);text-decoration:none;background:rgba(0,0,0,.25);border-radius:5px;padding:1px 5px}
+.lo-ban:not(.has-ph) .lo-cr{display:none}
+.lo-top .lo-b+.lo-b{margin-left:8px}
+@media (min-width:900px){.lo-ban{min-height:180px}.lo-t b{font-size:34px}.lo-cr{top:auto;bottom:6px;right:10px}.lo-ban.has-ph .lo-now{margin-bottom:12px}}
+@media (max-width:600px){.lo-t b{font-size:calc(26px*var(--ts))}.lo-now b{font-size:calc(22px*var(--ts))}.lo-bot{padding:0 13px 12px;gap:8px}.lo-cr{right:56px;top:16px}}
 .prep-now{text-align:right;flex:none;line-height:1.25}.prep-now b{display:block;font-size:calc(22px*var(--ts));font-weight:800;font-variant-numeric:tabular-nums}
 .prep-now span{display:block;font-size:calc(12.5px*var(--ts));color:var(--muted)}
 .prep-rep{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px;font-weight:750;font-size:calc(14px*var(--ts));color:var(--accent);background:var(--accent-weak);border-radius:999px;padding:5px 12px}
@@ -1774,7 +1795,7 @@ line.tl-tk{opacity:.5}line.tl-tk.mid{opacity:.9;stroke-width:1.6}text.tl-tk{stro
 .tl-sum{font-size:calc(12.5px*var(--ts));color:var(--muted);text-align:right;padding-top:6px}
 .prep-grid{display:block}
 @media (min-width:900px){.prep-grid{column-count:2;column-gap:12px}.prep-grid>.lv-card{break-inside:avoid;display:inline-block;width:100%;vertical-align:top}}
-@media (max-width:600px){.prep-hd{flex-wrap:wrap}.prep-now{order:5;flex-basis:100%;display:flex;gap:6px;align-items:baseline;text-align:left;margin:-2px 0 0 52px}.prep-now b{font-size:calc(16px*var(--ts))}.prep-now span{font-size:calc(13px*var(--ts))}.prep-now span+span:before{content:'· '}.prep-ti b{font-size:calc(22px*var(--ts))}}
+
 .pc-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
 .pc-h .lv-l{display:flex;align-items:center;gap:7px}.pc-h .lv-l svg{width:16px;height:16px;color:var(--muted)}
 .pc-h i{font-style:normal;font-size:12px;color:var(--muted)}.pc-h .lv-more{margin:0;padding:2px 0}
@@ -1826,22 +1847,16 @@ label.chk{display:flex;align-items:center;gap:9px;font-size:calc(14.5px*var(--ts
 .prep-list{padding:4px 10px}
 .prep-trip{appearance:none;border:0;border-top:1px solid var(--line-soft);background:none;color:var(--text);font:inherit;width:100%;display:flex;align-items:center;gap:12px;padding:11px 4px;text-align:left;cursor:pointer;border-radius:12px}
 .prep-trip:first-child{border-top:0}
+.prep-trip .pt-t{min-width:0}
 .prep-trip.on{background:var(--accent-weak)}
 .prep-trip.on + .prep-trip{border-top-color:transparent}
 .pt-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .pt-t i{font-style:normal;font-size:calc(11.5px*var(--ts));font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
 .pt-t b{font-size:calc(16.5px*var(--ts))}.pt-t span{font-size:calc(13px*var(--ts));color:var(--muted)}
-.prep-ring{position:relative;width:40px;height:40px;flex:none}
-.prep-ring svg{width:40px;height:40px;fill:none;stroke-width:4.5;stroke-linecap:round}
-.prep-ring .rg-bg{stroke:var(--surface2)}.prep-ring .rg-on{stroke:var(--accent)}.prep-ring.all .rg-on{stroke:var(--done)}
-.prep-ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:11.5px;font-weight:800}
 .prep-hd{display:flex;align-items:center;gap:10px;margin:0 0 8px}
 .prep-ti{flex:1;min-width:0}.prep-ti b{display:block;font-size:calc(22px*var(--ts));font-weight:780;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prep-ti b span{font-size:calc(15px*var(--ts));font-weight:600;color:var(--muted)}
 .prep-ti i{font-style:normal;font-size:calc(13px*var(--ts));color:var(--muted)}
-.prep-ready{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
-.prep-ready span{display:inline-flex;align-items:center;gap:4px;font-size:calc(12.5px*var(--ts));font-weight:650;padding:3px 9px;border-radius:999px;background:var(--surface2);color:var(--muted)}
-.prep-ready span.on{background:var(--done-weak);color:var(--done)}.prep-ready svg{width:13px;height:13px;stroke-width:3}
 .seg.prep-tabs{display:flex;margin:0 0 12px;position:sticky;top:0;z-index:2}
 .seg.prep-tabs button{flex:1}
 .prep-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-radius:18px;padding:16px;margin:0 0 12px;color:#fff;background:linear-gradient(150deg,#1d4f7a,#2f72a0 55%,#c99a66)}
@@ -2845,7 +2860,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='102';
+var APP_VERSION='103';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -7478,7 +7493,7 @@ function menuTilesHTML(now){
   // countdowns, crew rest, airports and the briefing are in the bottom bar; the flight tools sit above the flight log
   var nv=newTileVals(now);
   function tx(k,act,icon,label){var x=nv[k];return '<button type="button" data-sact="'+act+'"><span class="mi">'+icon+label+'</span><b data-mv="'+k+'">'+esc(x[0])+'</b><i data-ms="'+k+'">'+esc(x[1])+'</i></button>';}
-  return tx('evt','tevt',IX.evt,'Event log')+tx('prep','tprep',IX.prep,'Prepare')+tile('fl','tflog',I.log,'Flight log','wide');
+  return tx('evt','tevt',IX.evt,'Event log')+tx('prep','tprep',IX.prep,'Layover')+tile('fl','tflog',I.log,'Flight log','wide');
 }
 function paintMenuTiles(now){
   var box=document.getElementById('mTiles');if(!box||!box.offsetParent) return;
@@ -7909,7 +7924,7 @@ function cloudRestore(sha,latest){
 }
 
 /* ---------- Sync: the same checklists on all your devices, through the online backup's repository ----------
-   sync.json holds the content only (checklists, airport notes, previous flights, Prepare, countdown and crew rest set-up, weather relay).
+   sync.json holds the content only (checklists, airport notes, previous flights, Layover, countdown and crew rest set-up, weather relay).
    Ticks, answers, filled-in fields, times and folding stay on each device. Each device keeps the last synced copy (the base),
    so a sync merges both sides' changes item by item: an edit on one device and another edit on the other both survive. */
 var SYKEY='flightChecklist.sync',SYNC_FILE='sync.json',SYNC_POLL=20000,SYNC_QUIET=2500,SYNC_GAP=8000;
@@ -8291,7 +8306,7 @@ function synTick(flush){
   if(due&&synIdle()) synRun();
 }
 function synStatus(){
-  if(!syn.on) return {txt:'Checklists, airport notes, previous flights and Prepare (trips, plans, wake-up and pick-up). Ticks and answers stay on each device.',bad:false};
+  if(!syn.on) return {txt:'Checklists, airport notes, previous flights and Layover (trips, plans, wake-up and pick-up). Ticks and answers stay on each device.',bad:false};
   if(synBusy) return {txt:synProg||'Syncing…',busy:true};
   if(synErr) return {txt:synErr,bad:true};
   if(navigator.onLine===false||synKind==='net') return {txt:'Waiting for internet'+(synDirty?' · changes to send':''),bad:false};
@@ -8990,7 +9005,7 @@ function newTileVals(now){
   var v={};
   var E=evCur(now);v.evt=[String(E.length),E.length?'last '+fsHM(E[E.length-1].t):'tap to stamp the time'];
   var TL=prepTrips(now),T0=TL[0];
-  if(T0){var rr=prepReady(T0,TL);v.prep=[window.AIRPORT_DATA?ap3(T0.dest):T0.dest,dayLbl(T0.std)+' · '+rr.filter(function(x){return x[1];}).length+' of '+rr.length+' ready'];}
+  if(T0){var nx0=prepNext(T0,TL);v.prep=[window.AIRPORT_DATA?ap3(T0.dest):T0.dest,dayLbl(T0.std)+(T0.dest===prepHome()?' · back home':nx0?' · '+durH(nx0.std-T0.sta):'')];}
   else v.prep=['–','add your next trip'];
   return v;
 }
@@ -9287,24 +9302,14 @@ function prepData(id){
 }
 function prepPlace(ic){var P=state.places||(state.places={}),p=P[ic]||(P[ic]={hotel:'',items:[],tel:[]});if(!p.tel) p.tel=[];return p;}
 function prepAlts(t){var d=state.prep&&state.prep[t.id];return d&&d.alts?d.alts:(t.alts||[]);}
-function prepReady(t,L){
-  var d=(state.prep||{})[t.id]||{seen:{},before:[],pickup:0},pl=(state.places||{})[t.dest]||{},nx=prepNext(t,L),dn=nx&&(state.prep||{})[nx.id]||{};
-  // home base needs no layover, nor a quick turnaround; otherwise a hotel, a pick-up time or a saved place counts as planned
-  var home=t.dest===prepHome(),short=home||(nx&&nx.std-t.sta<10*3600000),lay=short||!!(pl.hotel||d.pickup||dn.pick||dn.wake||(d.plan&&d.plan.length)||(pl.items&&pl.items.length));
-  var bl=d.before&&d.before.length?d.before:null;
-  return [['Notes read',!!(d.seen&&d.seen.notes)],['Weather checked',!!(d.seen&&d.seen.wx)],[home?'Home base':short?'No layover':'Layover planned',lay],['Before you go',!!bl&&bl.every(function(x){return x.done;})]];
-}
-// home base: the airport you leave from most often, in your flight log and your trips
 function prepHome(){var c={};state.apLog.forEach(function(e){if(e.k==='dep') c[e.ic]=(c[e.ic]||0)+1;});(state.trips||[]).forEach(function(t){c[t.dep]=(c[t.dep]||0)+1;});
   var st=state.settings;if(st.dep&&st.dep.icao) c[st.dep.icao]=(c[st.dep.icao]||0)+1;
   return Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0]||'';}
-function prepRing(n,of){
-  var f=of?n/of:0,a=-Math.PI/2+2*Math.PI*f,x=(20+16*Math.cos(a)).toFixed(1),y=(20+16*Math.sin(a)).toFixed(1);
-  var arc=f>=1?'<circle cx="20" cy="20" r="16" class="rg-on"/>':f>0?'<path d="M20 4 A16 16 0 '+(f>.5?1:0)+' 1 '+x+' '+y+'" class="rg-on"/>':'';
-  return '<span class="prep-ring'+(f>=1?' all':'')+'"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" class="rg-bg"/>'+arc+'</svg><b>'+n+'/'+of+'</b></span>';
-}
 function prepPanelHTML(now){
   var L=prepTrips(now),wide=window.innerWidth>=900;prepWide=wide;
+  return '<div class="prep-pg">'+prepPanelBody(L,now,wide)+'</div>';
+}
+function prepPanelBody(L,now,wide){
   if(!window.AIRPORT_DATA) return '<p class="hint">Loading the airport list…</p>';
   L.forEach(function(t){var d=state.prep&&state.prep[t.id],nx;if(d&&d.pickup&&(nx=prepNext(t,L))){var dn=prepData(nx.id);if(!dn.pick) dn.pick=d.pickup;d.pickup=0;saveSoon();}});
   if(prepSel&&!L.some(function(t){return t.id===prepSel;})) prepSel=null;
@@ -9318,11 +9323,11 @@ function prepListHTML(L,now){
   var home=prepHome(),ed=prepEdit&&L.length;
   var h=L.length?'<div class="prep-lh"><span class="lv-l">Your trips</span><button type="button" class="lv-more" data-act="prepEditL">'+(ed?'Done':'Edit')+'</button></div>':'';
   h+=L.length?'<div class="lv-card prep-list'+(ed?' ed':'')+'">'+L.map(function(t){
-    var r=prepReady(t,L),n=r.filter(function(x){return x[1];}).length,nx=prepNext(t,L);
+    var nx=prepNext(t,L);
     var sub=t.src==='flight'?'The flight that’s set':t.dest===home?'Back home':nx?'Layover '+durH(nx.std-t.sta):t.src==='roster'?'From your roster':'';
     if(ed) return '<div class="prep-trip"><button type="button" class="pt-rm" data-act="prepRm" data-id="'+esc(t.id)+'" aria-label="Remove '+esc(t.fno||'this flight')+'"><i></i></button>'+
       '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+(t.rep?'report '+fsHM(t.rep):fsHM(t.std))+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></div>';
-    return '<button type="button" class="prep-trip'+(t.id===prepSel?' on':'')+'" data-act="prepOpen" data-id="'+esc(t.id)+'">'+prepRing(n,r.length)+
+    return '<button type="button" class="prep-trip'+(t.id===prepSel?' on':'')+'" data-act="prepOpen" data-id="'+esc(t.id)+'"><span class="pt-flag" aria-hidden="true">'+flagOf(t.dest)+'</span>'+
       '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+(t.rep?'report '+fsHM(t.rep):fsHM(t.std))+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></button>';
   }).join('')+'</div>':'<div class="lv-card"><p class="hint" style="margin:0">No trips yet. Add one, or set your flight: it shows here by itself.</p></div>';
   if(ed) return h+'<p class="hint">Removing a duty from the roster keeps it away when you import the roster again.</p>';
@@ -9338,16 +9343,60 @@ function prepPlugAuto(t){
   var hp=H[1].split(', ');if(C[1].split(', ').some(function(p){return hp.indexOf(p)>=0;})) return;
   if(prepAddAuto(prepData(t.id),'Adaptor, type '+C[1],'plugs in '+(prepCity(t.dest)||t.dest))) saveSoon();
 }
+// the country's flag (an emoji: no download)
+function flagOf(ic){var cc=ctryOf(ic);if(!/^[A-Z]{2}$/.test(cc)) return '';try{return String.fromCodePoint(0x1F1E6+cc.charCodeAt(0)-65,0x1F1E6+cc.charCodeAt(1)-65);}catch(_){return '';}}
+/* A photo of the city for the top of its Layover page: Wikipedia's picture for the city's article, looked up once when
+   online and kept in the app's storage, so it shows offline too. Without one, the top is the colour of the sky there now */
+var CPKEY='flightChecklist.cityPh',CPC='flight-city-photos',cityUrl={},cityBusy={};
+var cityPh=(function(){try{var o=JSON.parse(localStorage.getItem(CPKEY)||'{}');return o&&typeof o==='object'?o:{};}catch(_){return {};}})();
+function cityPhSave(){try{localStorage.setItem(CPKEY,JSON.stringify(cityPh));}catch(_){}}
+function cityQ(ic){var n='';try{n=new Intl.DisplayNames(['en'],{type:'region'}).of(ctryOf(ic))||'';}catch(_){}return ((prepCity(ic)||ic)+' '+n).trim();}
+function cityGet(ic,cb){
+  if(cityUrl[ic]){cb(cityUrl[ic],cityPh[ic]||{});return;}
+  var c=cityPh[ic],hasC=typeof caches!=='undefined';
+  function show(blob,u){var x=blob?URL.createObjectURL(blob):u;cityUrl[ic]=x;cb(x,cityPh[ic]||{});}
+  function load(u){
+    cityBusy[ic]=1;
+    fetch(u,{mode:'cors'}).then(function(r){
+      if(!r.ok) throw new Error('photo');
+      if(hasC){var r2=r.clone();caches.open(CPC).then(function(ca){return ca.put(u,r2);}).catch(function(){});}
+      return r.blob();
+    }).then(function(b){cityBusy[ic]=0;show(b);},function(){cityBusy[ic]=0;show(null,u);});
+  }
+  if(c&&c.u){
+    (hasC?caches.open(CPC).then(function(ca){return ca.match(c.u);}).then(function(r){return r&&r.ok?r.blob():null;}):Promise.resolve(null))
+      .then(function(b){if(b) show(b);else if(navigator.onLine!==false&&!cityBusy[ic]) load(c.u);},function(){});
+    return;
+  }
+  if(cityBusy[ic]||navigator.onLine===false||(c&&c.fail&&Date.now()-c.fail<86400000)) return;
+  cityBusy[ic]=1;
+  fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=1&gsrnamespace=0&prop=pageimages&piprop=thumbnail&pithumbsize=1280&gsrsearch='+encodeURIComponent(cityQ(ic)))
+    .then(function(r){if(!r.ok) throw new Error('wiki');return r.json();}).then(function(j){
+      var pg=j&&j.query&&j.query.pages,k=pg&&Object.keys(pg)[0],p=k&&pg[k];
+      if(!p||!p.thumbnail||!p.thumbnail.source) throw new Error('no photo');
+      cityPh[ic]={u:p.thumbnail.source,p:p.title,at:Date.now()};cityPhSave();load(p.thumbnail.source);
+    }).catch(function(){cityPh[ic]={fail:Date.now()};cityPhSave();cityBusy[ic]=0;});
+}
+function cityPaint(){
+  toolPanel.querySelectorAll('.lo-ban[data-ic]').forEach(function(el){
+    cityGet(el.getAttribute('data-ic'),function(u,c){
+      if(!el.isConnected) return;
+      el.style.backgroundImage='url("'+u.replace(/"/g,'%22')+'")';el.classList.add('has-ph');
+      var a=el.querySelector('.lo-cr');if(a&&c.p){a.href='https://en.wikipedia.org/wiki/'+encodeURIComponent(c.p.replace(/ /g,'_'));a.hidden=false;}
+    });
+  });
+}
 function prepTripHTML(t,L,now,wide){
   prepPlugAuto(t);
-  var r=prepReady(t,L),n=r.filter(function(x){return x[1];}).length,rec=apRecOf(t.dest),tz=rec&&rec.tz,htz=prepHomeTz(),home=prepHome(),isHome=t.dest===home,nx=prepNext(t,L);
-  var li=tz&&tzInfo(tz,now),dm=tz?tzOffAt(tz,now)-tzOffAt(htz,now):0,cc=ctryOf(t.dest),C=CTRY[cc];
-  var h='<div class="prep-hd">'+(wide?'':'<button type="button" class="ib round" data-act="prepBack" aria-label="All trips">'+I.left+'</button>')+prepRing(n,r.length)+
-    '<div class="prep-ti"><b>'+esc(prepCity(t.dest)||t.dest)+' <span>'+esc(t.dest+(rec&&rec.iata?' · '+rec.iata:''))+'</span></b><i>'+esc((t.fno?t.fno+' · ':'')+ap3(t.dep)+' → '+ap3(t.dest)+' · '+dayLbl(t.std,tzOffAt(apRecOf(t.dep)&&apRecOf(t.dep).tz,t.std)))+'</i></div>'+
-    (li&&!isHome?'<div class="prep-now"><b>'+li.hm+'</b><span>'+esc(li.wd)+' in '+esc(prepCity(t.dest)||t.dest)+'</span><span>'+(dm===0?'same as '+esc(prepHomeCity()):hDiff(dm)+(dm<0?' behind ':' ahead of ')+esc(prepHomeCity()))+'</span></div>':'')+
-    '<button type="button" class="ib round" data-act="prepRm" data-id="'+esc(t.id)+'" aria-label="Remove this trip">'+I.trash+'</button></div>';
+  var rec=apRecOf(t.dest),tz=rec&&rec.tz,htz=prepHomeTz(),home=prepHome(),isHome=t.dest===home,nx=prepNext(t,L);
+  var li=tz&&tzInfo(tz,now),dm=tz?tzOffAt(tz,now)-tzOffAt(htz,now):0,cc=ctryOf(t.dest),C=CTRY[cc],city=prepCity(t.dest)||t.dest;
+  var day=true;if(rec&&rec.lat!=null&&tz){var su=sunTimes(rec.lat,rec.lon,ymdAt(now,tzOffAt(tz,now)));day=su.rise?now>su.rise&&now<su.set:su.polar==='day';}
+  var h='<div class="lo-ban '+(day?'day':'night')+'" data-ic="'+t.dest+'"><div class="lo-top">'+(wide?'':'<button type="button" class="ib round lo-b" data-act="prepBack" aria-label="All trips">'+I.left+'</button>')+'<span class="sp"></span>'+
+    '<button type="button" class="ib round lo-b" data-act="prepRm" data-id="'+esc(t.id)+'" aria-label="Remove this trip">'+I.trash+'</button></div>'+
+    '<div class="lo-bot"><div class="lo-t"><b><span class="lo-fl" aria-hidden="true">'+flagOf(t.dest)+'</span>'+esc(city)+'</b><i>'+esc((t.fno?t.fno+' · ':'')+ap3(t.dep)+' → '+ap3(t.dest)+' · '+dayLbl(t.std,tzOffAt(apRecOf(t.dep)&&apRecOf(t.dep).tz,t.std)))+'</i></div>'+
+    (li&&!isHome?'<div class="lo-now"><b>'+li.hm+'</b><span>'+esc(li.wd)+' · '+(dm===0?'same as '+esc(prepHomeCity()):hDiff(dm)+(dm<0?' behind':' ahead'))+'</span></div>':'')+'</div>'+
+    '<a class="lo-cr" hidden target="_blank" rel="noopener">Photo: Wikipedia</a></div>';
   if(t.rep&&t.rep>now) h+='<div class="prep-rep">'+IX.evt+'Report in '+inTxt(t.rep-now)+' · '+esc(wdHm(apRecOf(t.dep)&&apRecOf(t.dep).tz,t.rep))+' '+esc(prepCity(t.dep)||t.dep)+'</div>';
-  h+='<div class="prep-ready">'+r.map(function(x){return '<span class="'+(x[1]?'on':'')+'">'+(x[1]?I.check:'')+esc(x[0])+'</span>';}).join('')+'</div>';
   h+=prepTimesHTML(t,nx,isHome);
   if(!isHome&&nx&&nx.std-t.sta>=6*3600000) h+=prepTlHTML(t,nx,wide);
   else if(!isHome&&!nx) h+='<div class="lv-card"><p class="hint" style="margin:0">Add your flight out of '+esc(prepCity(t.dest)||t.dest)+' (Import roster or Add a trip) to plan the layover on a timeline.</p></div>';
@@ -9954,7 +10003,7 @@ function openTool(kind){
   clearTimeout(toolHideT);if(kind!==toolKind) toolApnOrd=false;toolKind=kind;
   var tabPage=kind==='tm'||kind==='wx'||kind==='apn'||kind==='crew';
   document.documentElement.classList.toggle('pg-crew',kind==='crew');
-  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+(kind==='crew'?'<button type="button" class="ib round" data-act="crewBack" aria-label="Back to the Briefing">'+I.left+'</button>':'')+'<h3>'+({crew:'Crew brief',tm:'Countdowns',cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps',evt:'Event log',prep:'Prepare'}[kind])+'</h3>'+
+  var T=state.tools,h='<div class="tp-head">'+(kind==='dec'&&decPath.length>1?'<button type="button" class="ib round" data-act="decBack" aria-label="Back">'+I.left+'</button>':'')+(kind==='crew'?'<button type="button" class="ib round" data-act="crewBack" aria-label="Back to the Briefing">'+I.left+'</button>':'')+'<h3>'+({crew:'Crew brief',tm:'Countdowns',cd:'Countdowns',rest:'Crew rest',apn:'Airports',flog:'Flight log',wx:'Briefing',dec:'Answer steps',evt:'Event log',prep:'Layover'}[kind])+'</h3>'+
     (kind==='cd'||kind==='tm'?'<button type="button" class="ib round" data-act="toolCdAdd" aria-label="Add countdown">'+I.plus+'</button>':'')+
     (kind==='apn'?(toolApnOrd&&apnCanOrder()?'<button type="button" class="pill" data-act="apnReorder">Done</button>':
       (apnCanOrder()?'<button type="button" class="ib round" data-act="apnReorder" aria-label="Change the order of the notes">'+I.swap+'</button>':'')+
@@ -9988,7 +10037,7 @@ function openTool(kind){
   if((kind==='evt'||kind==='prep')&&!window.AIRPORT_DATA) loadAirports().then(function(){if(toolOpen&&toolKind==='prep') refreshTool();},function(){});
   if(kind==='apn') apFindWire();
   fillImages(toolPanel);
-  if(kind==='prep') prepTlBind();
+  if(kind==='prep'){prepTlBind();cityPaint();}
   if((kind==='apn'||kind==='wx')&&!window.AIRPORT_DATA&&!apnNamesTried){
     apnNamesTried=true;
     loadAirports().then(function(){if(toolOpen&&(toolKind==='apn'||toolKind==='wx')) refreshTool();},function(){});

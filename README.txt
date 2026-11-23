@@ -13,7 +13,7 @@ FLIGHT CHECKLISTS – OFFLINE SETUP (about 10 minutes, once)
 8. Open it once from the Home Screen while online. From then on it works offline.
 
 THE BAR AT THE BOTTOM: Checklist, Timers (countdowns and crew rest on one page), Briefing, Airports and More
-(event log, Prepare, flight log, checklists, untick all, new flight, search, settings). Away from Timers, its tab shows the time left to the
+(event log, Layover, flight log, checklists, untick all, new flight, search, settings). Away from Timers, its tab shows the time left to the
 next countdown, or to your rest. The bar steps aside while you edit or type.
 
 EVENT LOG in More: one tap stamps the time and the position (the phone's GPS, which works in airplane mode on an
@@ -21,7 +21,7 @@ iPhone, or the flight plan's position once the LIDO package is loaded); copy or 
 
 PREVIOUS FLIGHTS (your arrivals and departures, like the "Previous flights" in a Notes page): on an airport's page in
 Airports, under its notes, tap Log arrival or Log departure. The flight number and the date fill in for the flight
-that's set (from the package or Prepare); write what to remember, one point per line (STAR, approach, runway, taxi,
+that's set (from the package or Layover); write what to remember, one point per line (STAR, approach, runway, taxi,
 stand, clearance…), and Save. The chips under the box start a line for you, with the runway in use when the package
 has it. Photos can go with it. The newest come first; tap one to change or delete it. Tapping Log arrival again for
 the same flight opens the one you wrote. At a glance shows the last arrival and departure there.
@@ -30,8 +30,11 @@ A Flight log block in a checklist has the same buttons for the current flight; a
 arrival and departure at the destination (or departure). The old flight log was moved over: each flight became a
 departure and an arrival with its stand, taxi, runway, route and notes as lines; taxi times and registrations went.
 
-PREPARE in More: your next trips, one page each (no tabs). On a wide iPad the trips sit on the left.
-- At the top: the city, the local time there and how far it is from Dubai, and a countdown to report.
+LAYOVER in More (it was called Prepare): your next trips, one page each. On a wide iPad the trips sit on the left,
+each with the country's flag.
+- At the top: a photo of the city (Wikipedia's picture for the city, fetched once when online and kept for offline;
+  without one, the colour of the sky there now), the city, the local time there and how far it is from Dubai, and a
+  countdown to report.
 - Times: leaving Dubai (report, off blocks), landing (local, Dubai time and UTC, daylight or dark), the layover, and
   leaving again. Wake-up and Pick-up are set by hand for each flight out, in local time; the app remembers how long
   before departure they were at that airport and offers it next time. Each can add a countdown to Timers.
@@ -49,7 +52,7 @@ Import roster reads the roster report from the crew portal ("Emirates Crew Roste
 text), or CrewPulse's event notes. Only the flights are read (no names, days off, standby or training); times are
 local at each airport. It shows what's new, changed or the same before adding; a changed flight keeps your wake-up,
 pick-up and plan.
-With sync on (More → Settings), Prepare syncs like the notes: trips, wake-up and pick-up, what you planned on the
+With sync on (More → Settings), Layover syncs like the notes: trips, wake-up and pick-up, what you planned on the
 timeline, Before you go (ticks too), the hotel, places and numbers, removed duties and the list for new trips. The same
 item added on both devices before they synced shows once. The event log stays on each device. The sync file is now
 format 3: a device still on an older version says it can't read it until you tap Update there.
@@ -74,7 +77,7 @@ limited to that repository with Contents: Read and write. The steps are shown in
 SYNC BETWEEN iPAD AND iPHONE (optional, needs Online backup): on the iPad, More > Settings > Online backup and sync >
 turn on "Sync with your other devices". On the iPhone, open the same address in Safari > Share > Add to Home Screen,
 open it, then More > Settings > Online backup and sync, enter the same repository and token and choose
-"Use the synced checklists". From then on checklists, airport notes, previous flights, Prepare (trips, wake-up and
+"Use the synced checklists". From then on checklists, airport notes, previous flights, Layover (trips, wake-up and
 pick-up, timeline plans, Before you go, hotel, places, numbers), countdown and crew rest set-up and photos stay the same on both, while the app is open and online: a change is sent a few seconds after you make it,
 and the other device checks every 20 seconds and whenever it is opened. Changes made offline are sent when you are
 back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
