@@ -1794,6 +1794,65 @@ line.tl-tk{opacity:.5}line.tl-tk.mid{opacity:.9;stroke-width:1.6}text.tl-tk{stro
 .tl-it span{font-size:calc(14px*var(--ts));font-variant-numeric:tabular-nums}.tl-it em{grid-column:3;font-style:normal;font-size:calc(12.5px*var(--ts));color:var(--muted)}
 .tl-sum{font-size:calc(12.5px*var(--ts));color:var(--muted);text-align:right;padding-top:6px}
 .prep-grid{display:block}
+.tl-wb{fill:var(--surface2)}.tl-wr{fill:rgb(10,118,153);opacity:.34}.tl-wg{fill:rgba(26,158,92,.15);stroke:#1a9e5c;stroke-width:1.4}
+.tl-wi{fill:none;stroke:#d39a14;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}.tl-wi.rain,.tl-wi.storm,.tl-wi.snow{stroke:var(--accent)}.tl-wi.moon,.tl-wi.cloud,.tl-wi.fog{stroke:var(--muted)}
+.tl-wt{fill:var(--text);font-size:11px!important;font-weight:700!important}
+.tl-wx{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 2px;font-size:calc(13px*var(--ts));color:var(--muted)}
+.tl-chip.r{background:var(--accent-weak);color:var(--accent)}.tl-chip.w{background:rgba(211,154,20,.16);color:#8a5a00}.tl-chip.n{background:var(--surface2);color:var(--muted)}
+:root[data-theme="dark"] .tl-chip{color:#62d29b}:root[data-theme="dark"] .tl-chip.s{color:#ff8f86}:root[data-theme="dark"] .tl-chip.p{color:#b7a6f5}:root[data-theme="dark"] .tl-chip.w{color:#f0c36b}:root[data-theme="dark"] .tl-chip.r{color:var(--accent)}:root[data-theme="dark"] .tl-chip.n{color:var(--muted)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tl-chip{color:#62d29b}:root:not([data-theme="light"]) .tl-chip.s{color:#ff8f86}:root:not([data-theme="light"]) .tl-chip.p{color:#b7a6f5}:root:not([data-theme="light"]) .tl-chip.w{color:#f0c36b}:root:not([data-theme="light"]) .tl-chip.r{color:var(--accent)}:root:not([data-theme="light"]) .tl-chip.n{color:var(--muted)}}
+.tl-tg.w{color:#b26a00}
+.go-pay{display:flex;align-items:center;gap:12px;background:var(--accent-weak);border:1px solid rgba(10,118,153,.22);border-radius:14px;padding:10px 12px;margin-bottom:6px}
+.go-pay>i{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--on-accent);flex:none}.go-pay>i svg{width:24px;height:24px}
+.go-pay span{flex:1;font-size:calc(13px*var(--ts));line-height:1.38;color:var(--muted)}.go-pay strong{display:block;font-size:calc(15.5px*var(--ts));color:var(--text);margin-bottom:1px}
+.go-rows .ct{align-items:flex-start}.go-rows .ct svg{margin-top:2px;color:var(--accent)}
+.go-rows .ct span b{display:block;color:var(--text);font-size:calc(14.5px*var(--ts));font-weight:650;white-space:normal}.go-rows .ct small{display:block;font-size:calc(12.5px*var(--ts));color:var(--muted);line-height:1.35}
+.go-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.go-chip{appearance:none;display:inline-flex;align-items:center;gap:5px;font:600 calc(13.5px*var(--ts)) -apple-system,system-ui,sans-serif;color:var(--text);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:6px 11px 6px 9px;text-decoration:none;max-width:100%;cursor:pointer}
+.go-chip svg{width:15px;height:15px;color:var(--accent);flex:none}.go-chip.ghost{background:none;border-style:dashed;color:var(--muted)}
+.go-tip{display:flex;gap:9px;align-items:flex-start;margin-top:8px;padding:8px 4px 8px 11px;border-radius:12px;background:var(--surface2);font-size:calc(14px*var(--ts));line-height:1.4}
+.go-tip>svg{width:18px;height:18px;color:var(--accent);flex:none;margin-top:1px}.go-tip span{flex:1;min-width:0}.go-tip .ib{margin:-6px 0}
+.go-card .pi-add,.pl-card .pi-add,.buy-card .pi-add{margin-top:8px}
+.go-card .pc-note a,.go-card .hint a{color:var(--accent)}
+.prep-grid .prep-sh{margin:12px 0 6px}
+.ho-hn{display:flex;align-items:flex-start;gap:10px;padding:0 0 10px;border-bottom:1px solid var(--line-soft);margin-bottom:10px}
+.ho-hn>div{flex:1;min-width:0}.ho-hn b{display:block;font-size:calc(16.5px*var(--ts))}.ho-hn span{display:block;font-size:calc(13px*var(--ts));color:var(--muted)}
+.ho-hn em{display:block;font-style:normal;font-size:calc(12.5px*var(--ts));font-weight:700;color:var(--accent);margin-top:3px}
+.ho-btn{display:inline-flex;align-items:center;gap:5px;font:700 calc(13.5px*var(--ts)) -apple-system,system-ui,sans-serif;color:var(--accent);background:var(--accent-weak);border-radius:10px;padding:7px 11px;text-decoration:none;white-space:nowrap}.ho-btn svg{width:15px;height:15px}
+.ho-kv{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.ho-kv>div{display:flex;gap:8px;align-items:flex-start;font-size:calc(14px*var(--ts));line-height:1.35;min-width:0}.ho-kv>div>span{min-width:0;flex:1;overflow-wrap:anywhere}
+.ho-kv svg{width:18px;height:18px;flex:none;color:var(--accent);margin-top:1px}
+.ho-kv b{display:block;font-size:calc(11.5px*var(--ts));font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ho-pw{font-style:normal;letter-spacing:.06em}
+.ho-cp{appearance:none;border:0;background:none;color:var(--accent);font:700 calc(12.5px*var(--ts)) -apple-system,system-ui,sans-serif;display:inline-flex;align-items:center;gap:3px;padding:0 0 0 6px;cursor:pointer;vertical-align:baseline}.ho-cp svg{width:13px;height:13px;margin:0}
+.ho-kv input.ho-rm{display:block;width:100%;max-width:120px;height:32px;min-height:0;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--text);font:max(16px,calc(15px*var(--ts))) -apple-system,system-ui,sans-serif;padding:0 8px;margin-top:3px;box-shadow:none}
+.ho-x{font-size:calc(14px*var(--ts));line-height:1.4;white-space:pre-wrap;margin:10px 0 0}
+.ho-card>.lv-more,.go-card>.lv-more{display:inline-flex;align-items:center;gap:5px;padding:10px 2px 2px}.ho-card>.lv-more svg{width:16px;height:16px}
+.ho-ch{display:flex;flex-wrap:wrap;gap:6px}.ho-ch .lvc svg{width:16px;height:16px;color:var(--accent)}.ho-ch .lvc small{color:var(--muted);font-weight:600;margin-left:2px}
+.ho-opts{display:flex;flex-direction:column;gap:6px;margin:4px 0 4px}
+.ho-opt{appearance:none;display:flex;align-items:center;gap:10px;text-align:left;font:inherit;color:var(--text);background:var(--surface2);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
+.ho-opt.on{border-color:var(--accent);background:var(--accent-weak)}
+.ho-opt i{width:18px;height:18px;border-radius:50%;border:2px solid var(--box);flex:none;box-sizing:border-box}.ho-opt.on i{border:5px solid var(--accent)}
+.ho-opt b{display:block;font-size:calc(15.5px*var(--ts))}.ho-opt small{display:block;font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.pl-f{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px}
+.pl-f button{appearance:none;font:700 calc(12.5px*var(--ts)) -apple-system,system-ui,sans-serif;color:var(--muted);background:none;border:1px solid var(--line);border-radius:999px;padding:4px 10px;cursor:pointer}
+.pl-f button.on{background:var(--text);color:var(--surface);border-color:var(--text)}
+.pl-row{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line-soft)}
+.pl-main{appearance:none;flex:1;min-width:0;display:flex;align-items:center;gap:11px;text-align:left;font:inherit;color:var(--text);background:none;border:0;padding:9px 0;cursor:pointer}
+.pl-main>i{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;flex:none;color:#fff}.pl-main>i svg{width:19px;height:19px}
+.pl-main>span{min-width:0}.pl-main b{display:block;font-size:calc(15px*var(--ts));font-weight:650}.pl-main small{display:block;font-size:calc(12.5px*var(--ts));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-go{display:inline-flex;align-items:center;gap:4px;font:700 calc(13px*var(--ts)) -apple-system,system-ui,sans-serif;color:var(--accent);background:var(--accent-weak);border-radius:10px;padding:6px 9px;text-decoration:none;flex:none}.pl-go svg{width:15px;height:15px}
+.buy-card .pi-row i{color:var(--muted)}
+.gk-hol{display:flex;gap:10px;align-items:flex-start;background:rgba(232,89,12,.08);border:1px solid rgba(232,89,12,.28);border-radius:12px;padding:8px 11px;margin:0 0 10px;font-size:calc(13.5px*var(--ts));line-height:1.38;color:var(--muted)}
+.gk-hol svg{width:18px;height:18px;color:#c2410c;flex:none;margin-top:1px}.gk-hol b{display:block;font-size:calc(14.5px*var(--ts));color:var(--text)}
+.gk-ph{margin-top:12px;border-top:1px solid var(--line-soft);padding-top:8px}
+.gk-pt{display:flex;align-items:center;gap:6px;margin-bottom:2px}.gk-pt svg{width:18px;height:18px;color:var(--accent)}
+.gk-pt b{font-size:calc(11.5px*var(--ts));font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}.gk-pt span{font-size:12px;color:var(--muted)}
+.gk-pr{appearance:none;display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:var(--text);background:none;border:0;border-top:1px solid var(--line-soft);padding:7px 0 7px 24px;cursor:pointer}
+.gk-pt+.gk-pr{border-top:0}
+.gk-pr span{flex:1;min-width:0}.gk-pr strong{display:block;font-size:calc(15px*var(--ts))}.gk-pr em{display:block;font-style:normal;font-size:calc(13px*var(--ts));color:var(--muted)}
+.gk-pr i{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--accent-weak);color:var(--accent);flex:none}.gk-pr i svg{width:16px;height:16px}
+.pdays .rn{border:0;padding:0;margin:0;white-space:normal;font-size:12px}
 @media (min-width:900px){.prep-grid{column-count:2;column-gap:12px}.prep-grid>.lv-card{break-inside:avoid;display:inline-block;width:100%;vertical-align:top}}
 
 .pc-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
@@ -2750,7 +2809,7 @@ function normPrep(o){
   var out={};if(!o||typeof o!=='object') return out;
   Object.keys(o).slice(-300).forEach(function(k){var d=o[k];if(!d||typeof d!=='object') return;
     function n(v){return typeof v==='number'&&isFinite(v)?v:0;}
-    out[k]={seen:{notes:!!(d.seen&&d.seen.notes),wx:!!(d.seen&&d.seen.wx)},pickup:n(d.pickup),wake:n(d.wake),pick:n(d.pick),plan:normPlan(d.plan),skip:Array.isArray(d.skip)?d.skip.filter(function(x){return typeof x==='string';}).map(function(x){return x.slice(0,80);}).slice(0,20):[],
+    out[k]={seen:{notes:!!(d.seen&&d.seen.notes),wx:!!(d.seen&&d.seen.wx)},pickup:n(d.pickup),wake:n(d.wake),pick:n(d.pick),hotel:str(d.hotel).slice(0,40),room:str(d.room).slice(0,20),plan:normPlan(d.plan),skip:Array.isArray(d.skip)?d.skip.filter(function(x){return typeof x==='string';}).map(function(x){return x.slice(0,80);}).slice(0,20):[],
       before:Array.isArray(d.before)?d.before.filter(function(x){return x&&x.t;}).map(function(x){return {id:str(x.id)||uid(),t:str(x.t).slice(0,80),done:!!x.done,auto:!!x.auto,why:str(x.why).slice(0,30)};}).slice(0,40):[]};
     if(Array.isArray(d.alts)) out[k].alts=normIcaoList(d.alts,4);
   });
@@ -2759,7 +2818,13 @@ function normPrep(o){
 function normPlaces(o){
   var out={};if(!o||typeof o!=='object') return out;
   Object.keys(o).forEach(function(k){var ic=icaoClean(k),d=o[k];if(!/^[A-Z0-9]{4}$/.test(ic)||!d||typeof d!=='object') return;
-    out[ic]={hotel:str(d.hotel).slice(0,2000),tel:normTels(d.tel),wakeOff:+d.wakeOff>0&&+d.wakeOff<1440?Math.round(+d.wakeOff):0,pickOff:+d.pickOff>0&&+d.pickOff<1440?Math.round(+d.pickOff):0,items:Array.isArray(d.items)?d.items.filter(function(x){return x&&x.t;}).map(function(x){return {id:str(x.id)||uid(),t:str(x.t).slice(0,200)};}).slice(0,40):[]};
+    var hs=normHotels(d.hotels),old=str(d.hotel).trim(),now=Date.now();
+    // the hotel used to be one text box: it becomes the first hotel, with the same id on every device so sync joins them
+    if(!hs.length&&old){var ln=old.split(/\r?\n/);hs=[{id:'hm'+strHash(ic+'|'+old),n:ln[0].trim().slice(0,80)||'Hotel',a:'',w:'',wp:'',bf:'',gym:'',pool:'',co:'',x:ln.slice(1).join('\n').trim().slice(0,1000),f:[]}];}
+    out[ic]={hotels:hs,tel:normTels(d.tel),wakeOff:+d.wakeOff>0&&+d.wakeOff<1440?Math.round(+d.wakeOff):0,pickOff:+d.pickOff>0&&+d.pickOff<1440?Math.round(+d.pickOff):0,
+      items:Array.isArray(d.items)?d.items.filter(function(x){return x&&x.t;}).map(function(x){return {id:str(x.id)||uid(),t:str(x.t).slice(0,200),k:['eat','drink','coffee','walk','run','shop','see','other'].indexOf(x.k)>=0?x.k:'',n:str(x.n).slice(0,120)};}).slice(0,40):[],
+      tips:Array.isArray(d.tips)?d.tips.filter(function(x){return x&&str(x.t).trim();}).map(function(x){return {id:str(x.id)||uid(),t:str(x.t).slice(0,300)};}).slice(0,30):[],
+      buy:Array.isArray(d.buy)?d.buy.filter(function(x){return x&&str(x.t).trim()&&!(x.done&&now-(+x.at||0)>180*86400000);}).map(function(x){return {id:str(x.id)||uid(),t:str(x.t).slice(0,80),done:!!x.done,at:+x.at>0?+x.at:0};}).slice(0,60):[]};
   });
   return out;
 }
@@ -2860,7 +2925,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='103';
+var APP_VERSION='104';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -8015,15 +8080,18 @@ function synFlat(st){
     // one entry per setting, and none for what isn't set: a pick-up set on one device beats “not set” on the other
     function q(f,v){put('Q:'+id+'~'+f,'prep',{v:v});}
     if(d.seen&&d.seen.notes) q('notes',1);if(d.seen&&d.seen.wx) q('wx',1);
-    if(d.wake) q('wake',d.wake);if(d.pick) q('pick',d.pick);if(d.pickup) q('pickup',d.pickup);
+    if(d.wake) q('wake',d.wake);if(d.pick) q('pick',d.pick);if(d.pickup) q('pickup',d.pickup);if(d.hotel) q('hotel',d.hotel);if(d.room) q('room',d.room);
     if(d.skip&&d.skip.length) q('skip',d.skip.slice());if(Array.isArray(d.alts)) q('alts',d.alts.slice());
     (d.plan||[]).forEach(function(x){put('W:'+x.id,'pplan/'+id,{k:x.k,s:x.s,e:x.e,t:x.t||''});});
     (d.before||[]).forEach(function(x){put('B:'+id+'~'+x.id,'pbef/'+id,{t:x.t,done:!!x.done,auto:!!x.auto,why:x.why||''});});
   });
   Object.keys(st.places||{}).sort().forEach(function(ic){
     var p=st.places[ic];
-    if(p.hotel) put('O:'+ic+'~hotel','places',{v:p.hotel});if(p.wakeOff) put('O:'+ic+'~wakeOff','places',{v:p.wakeOff});if(p.pickOff) put('O:'+ic+'~pickOff','places',{v:p.pickOff});
-    (p.items||[]).forEach(function(x){put('U:'+x.id,'pitems/'+ic,{t:x.t});});
+    if(p.wakeOff) put('O:'+ic+'~wakeOff','places',{v:p.wakeOff});if(p.pickOff) put('O:'+ic+'~pickOff','places',{v:p.pickOff});
+    (p.hotels||[]).forEach(function(h){put('H:'+h.id,'phot/'+ic,{n:h.n,a:h.a||'',w:h.w||'',wp:h.wp||'',bf:h.bf||'',gym:h.gym||'',pool:h.pool||'',co:h.co||'',x:h.x||'',f:(h.f||[]).slice()});});
+    (p.items||[]).forEach(function(x){put('U:'+x.id,'pitems/'+ic,{t:x.t,k:x.k||'',n:x.n||''});});
+    (p.tips||[]).forEach(function(x){put('K:'+x.id,'ptip/'+ic,{t:x.t});});
+    (p.buy||[]).forEach(function(x){put('M:'+x.id,'pbuy/'+ic,{t:x.t,done:!!x.done,at:x.at||0});});
     (p.tel||[]).forEach(function(x){put('N:'+x.id,'ptel/'+ic,{n:x.n||'',v:x.v||''});});
   });
   (st.prepHidden||[]).forEach(function(id){put('X:'+id,'phid',{});});
@@ -8128,7 +8196,7 @@ function synBuild(M,st){
   out.trips=kidsOf('trips').map(function(k){return Object.assign({id:idOf(k)},JSON.parse(JSON.stringify(M.e[k].o)));});
   out.prep={};out.places={};
   function pp(id){return out.prep[id]||(out.prep[id]={seen:{},wake:0,pick:0,pickup:0,skip:[],plan:[],before:[]});}
-  function pl(ic){return out.places[ic]||(out.places[ic]={hotel:'',items:[],tel:[]});}
+  function pl(ic){return out.places[ic]||(out.places[ic]={hotel:'',hotels:[],items:[],tel:[],tips:[],buy:[]});}
   function fld(k){var x=idOf(k),i=x.lastIndexOf('~');return [x.slice(0,i),x.slice(i+1)];}
   kidsOf('prep').forEach(function(k){var f=fld(k),v=M.e[k].o.v,d=pp(f[0]);
     if(f[1]==='notes'||f[1]==='wx') d.seen[f[1]]=true;else if(f[1]==='skip'||f[1]==='alts') d[f[1]]=(v||[]).slice();else d[f[1]]=v;});
@@ -8142,7 +8210,16 @@ function synBuild(M,st){
         if(by[t]){if(it.done) by[t].done=true;return;}by[t]=it;arr.push(it);});
       pp(p.slice(5)).before=arr;
     }
-    else if(p.indexOf('pitems/')===0) pl(p.slice(7)).items=kidsOf(p).map(function(k){return {id:idOf(k),t:M.e[k].o.t};});
+    else if(p.indexOf('pitems/')===0) pl(p.slice(7)).items=kidsOf(p).map(function(k){var o=M.e[k].o;return {id:idOf(k),t:o.t,k:o.k||'',n:o.n||''};});
+    else if(p.indexOf('phot/')===0) pl(p.slice(5)).hotels=kidsOf(p).map(function(k){return Object.assign({id:idOf(k)},JSON.parse(JSON.stringify(M.e[k].o)));});
+    else if(p.indexOf('ptip/')===0) pl(p.slice(5)).tips=kidsOf(p).map(function(k){return {id:idOf(k),t:M.e[k].o.t};});
+    else if(p.indexOf('pbuy/')===0){
+      // the same thing added on both devices before they synced shows once (bought if either bought it)
+      var bb={},ba=[];
+      kidsOf(p).forEach(function(k){var o=M.e[k].o,t=String(o.t||'').trim().toLowerCase(),it={id:idOf(k),t:o.t,done:!!o.done,at:o.at||0};
+        if(bb[t]){if(it.done&&!bb[t].done){bb[t].done=true;bb[t].at=it.at;}return;}bb[t]=it;ba.push(it);});
+      pl(p.slice(5)).buy=ba;
+    }
     else if(p.indexOf('ptel/')===0) pl(p.slice(5)).tel=kidsOf(p).map(function(k){var o=M.e[k].o;return {id:idOf(k),n:o.n,v:o.v};});
   });
   out.prepHidden=kidsOf('phid').map(idOf);
@@ -9056,6 +9133,162 @@ var CTRY={
  CI:['XOF','C, E','220','R','','111','185','180',''],SN:['XOF','C, D, E','230','R','','17','','18',''],AO:['AOA','C','220','R','','113','112','115',''],
  CD:['CDF','C, D, E','220','R','112','','','118',''],SD:['SDG','C, D','230','R','999','','','',''],RW:['RWF','C, J','230','R','112','','912','','']
 };
+/* Getting around: what to know about public transport and taxis in the cities crews stay in, kept in the app so it works offline.
+   Checked November 2026; things change, so each city also takes your own tips. Rows: [icon, title, text]; 'dep' is the airport row.
+   An entry with c: shares the city's notes and brings its own airport row. */
+var GO={
+ SYD:{p:['Tap your bank card or phone','On the Opal readers: trains, metro, buses, ferries and light rail. Tap off as well; fares stop at a daily cap.'],r:[['dep','To and from the airport','Train to Central in about 15 min. The airport stations add an access fee.'],['ferry','Ferries','From Circular Quay: Manly in about 30 min, Taronga Zoo in about 12.'],['car','Taxis and ride apps','Uber or DiDi. Taxis take cards.']]},
+ MEL:{p:['Free trams in the centre','Trams inside the Free Tram Zone (the CBD) cost nothing. Elsewhere you need myki: a card, or myki on an Android phone.'],r:[['dep','To and from the airport','SkyBus to Southern Cross in about 20–30 min. No train yet.'],['car','Taxis and ride apps','Uber, DiDi or taxis.']]},
+ BNE:{p:['Tap your bank card or phone','On Translink buses, trains and ferries, or use a go card. Tap off as well.'],r:[['dep','To and from the airport','Airtrain to the city in about 20 min.'],['ferry','Ferries','CityCat ferries along the river.'],['car','Taxis and ride apps','Uber, DiDi or taxis.']]},
+ PER:{p:['Tap your bank card or phone','On Transperth trains, buses and ferries, or use a SmartRider. Tap off as well.'],r:[['dep','To and from the airport','Airport line train to the city in about 20 min.'],['car','Taxis and ride apps','Uber, DiDi or taxis.']]},
+ ADL:{p:['Tap your bank card or phone','On Adelaide Metro buses, trams and trains, or use a metroCARD.'],r:[['dep','To and from the airport','JetBus, or a taxi in about 15 min.'],['train','Free tram','The tram through the city centre costs nothing.'],['car','Taxis and ride apps','Uber, DiDi or taxis.']]},
+ AKL:{p:['Tap your bank card or phone','On Auckland buses, trains and ferries, or use an AT HOP card. Tap off as well.'],r:[['dep','To and from the airport','No train: the AirportLink bus to Puhinui station for trains, or a taxi, about 30–40 min to the city.'],['ferry','Ferries','From the Downtown ferry terminal, e.g. Devonport in about 12 min.'],['car','Taxis and ride apps','Uber or taxis.']]},
+ LHR:{p:['Tap your bank card or phone','On the Tube, buses, Overground, DLR and Elizabeth line. Same fares as Oyster, capped by day and week: keep to one card or phone.'],r:[['dep','To and from Heathrow','Elizabeth line (about 35 min to the centre), Piccadilly line (about 50 min, cheapest) or Heathrow Express to Paddington (15 min, pricier).'],['moon','Night','Night Tube on some lines on Friday and Saturday nights; night buses every night.'],['car','Taxis and ride apps','Black cabs take cards; Uber, Bolt and FreeNow.']]},
+ LGW:{c:'LHR',r:[['dep','To and from Gatwick','Gatwick Express to Victoria in about 30 min, or Thameslink and Southern trains. Contactless works on these trains.']]},
+ MAN:{p:['Tap your bank card or phone','On Metrolink trams and Bee Network buses.'],r:[['dep','To and from the airport','Train to Piccadilly in about 20 min, or the tram.'],['car','Taxis and ride apps','Uber, Bolt or black cabs.']]},
+ BHX:{p:['Tap your bank card or phone','On West Midlands Metro trams and National Express buses.'],r:[['dep','To and from the airport','Free Air-Rail Link to Birmingham International, then a train to New Street in about 10 min.'],['car','Taxis and ride apps','Uber or taxis.']]},
+ NCL:{r:[['dep','To and from the airport','Metro to the city centre in about 25 min.'],['car','Taxis and ride apps','Uber or taxis.']]},
+ GLA:{r:[['dep','To and from the airport','Airport Express bus 500 to the city centre in about 25 min.'],['car','Taxis and ride apps','Uber or black cabs.']]},
+ EDI:{p:['Tap your bank card or phone','On the trams and Lothian buses.'],r:[['dep','To and from the airport','Tram to the city centre in about 35 min, or the Airlink 100 bus.'],['car','Taxis and ride apps','Uber or black cabs.']]},
+ DUB:{p:['Leap card','From shops and machines; buses, Luas trams and DART trains, cheaper than cash.'],r:[['dep','To and from the airport','No train: Airlink and Aircoach buses, or a taxi, about 30 min to the centre.'],['car','Taxis and apps','Taxis, booked in the FREENOW or Uber app.']]},
+ CDG:{p:['Tickets on your phone','Tickets or a Navigo Easy pass in the Île-de-France Mobilités app or Apple Wallet, or at the machines.'],r:[['dep','To and from the airport','RER B to the centre in about 35 min, or the Roissybus to Opéra.'],['car','Taxis and ride apps','Taxis have a fixed fare from the airport into Paris; Uber, Bolt and G7.']]},
+ NCE:{r:[['dep','To and from the airport','Tram line 2 to the centre in about 25 min.'],['car','Taxis and ride apps','Uber or taxis.']]},
+ LYS:{r:[['dep','To and from the airport','Rhônexpress tram to Part-Dieu in about 30 min.'],['car','Taxis and ride apps','Uber or taxis.']]},
+ AMS:{p:['Tap your bank card or phone','At the gates and on trams, metro, buses and Dutch trains. Check in and out with the same card.'],r:[['dep','To and from the airport','Train to Centraal in about 15 min.'],['bike','Bikes','Keep off the red bike lanes.'],['car','Taxis and ride apps','Uber, Bolt or taxis.']]},
+ BRU:{p:['Tap your bank card or phone','On STIB metro, trams and buses in Brussels.'],r:[['dep','To and from the airport','Train to Brussels Central in about 20 min (with an airport fee).'],['car','Taxis and ride apps','Uber, Bolt or taxis.']]},
+ FRA:{p:['Ticket before you board','No gates: buy from the machines or the RMV app. The Deutschlandticket covers local transport across Germany.'],r:[['dep','To and from the airport','S-Bahn S8 or S9 to the centre in about 15 min.'],['car','Taxis and ride apps','Taxis take cards; Uber, FreeNow and Bolt.']]},
+ MUC:{p:['Ticket before you board','No gates: buy from the machines or the MVV app. The Deutschlandticket covers it too.'],r:[['dep','To and from the airport','S-Bahn S1 or S8 to the centre in about 40 min, or the Lufthansa Express Bus.'],['car','Taxis and ride apps','Taxis, Uber or FreeNow.']]},
+ DUS:{p:['Ticket before you board','No gates: buy from the machines or the Rheinbahn app. The Deutschlandticket covers it too.'],r:[['dep','To and from the airport','S-Bahn S11 from the terminal, or the SkyTrain to the airport station and a train to the main station in about 10–15 min.'],['car','Taxis and ride apps','Taxis, Uber or FreeNow.']]},
+ HAM:{p:['Ticket before you board','Buy from the machines or the HVV app. The Deutschlandticket covers it too.'],r:[['dep','To and from the airport','S-Bahn S1 to the main station in about 25 min.'],['car','Taxis and ride apps','Taxis, Uber or FreeNow.']]},
+ VIE:{p:['Ticket before you board','No gates: buy from the machines or the WienMobil app and validate paper tickets. A 24-hour ticket covers metro, trams and buses.'],r:[['dep','To and from the airport','S7 train in about 25 min, or the CAT to Wien Mitte in 16 min (pricier).'],['car','Taxis and ride apps','Uber, Bolt or taxis.']]},
+ ZRH:{p:['One ticket for everything','Trains, trams, buses and boats share tickets: the machines or the SBB app.'],r:[['dep','To and from the airport','Train to Zürich HB in about 12 min.'],['car','Taxis and ride apps','Taxis or Uber; both expensive.']]},
+ GVA:{p:['Free transport card','Hotels give a Geneva Transport Card for buses, trams and trains while you stay.'],r:[['dep','To and from the airport','Train to Cornavin in about 7 min. Take the free ticket from the machine in baggage claim.'],['car','Taxis and ride apps','Taxis or Uber.']]},
+ PRG:{p:['Ticket before you board','Buy in the PID Lítačka app or at the machines; validate paper tickets.'],r:[['dep','To and from the airport','Bus 119 to the metro (line A), or the Airport Express bus to the main station.'],['car','Taxis and ride apps','Uber, Bolt or Liftago.']]},
+ WAW:{p:['Ticket before you board','From the machines (they take cards) or apps like Jakdojade; validate paper tickets on board.'],r:[['dep','To and from the airport','Train (SKM or KM) to the centre in about 25 min, or bus 175.'],['car','Taxis and ride apps','Uber, Bolt or FreeNow.']]},
+ CPH:{p:['App or Rejsekort','Tickets in the DOT app or at the machines.'],r:[['dep','To and from the airport','Metro M2 to the centre in about 15 min, day and night.'],['car','Taxis','Taxis take cards; no Uber in Denmark.']]},
+ ARN:{p:['Tap your bank card or phone','At SL gates and on buses in Stockholm.'],r:[['dep','To and from the airport','Arlanda Express to Central in 20 min, or the commuter train.'],['car','Taxis and ride apps','Uber or Bolt; check the price sticker on a taxi first.']]},
+ OSL:{p:['App tickets','Buy in the Ruter app or at the machines.'],r:[['dep','To and from the airport','Flytoget to the centre in about 20 min, or the cheaper regional train.'],['car','Taxis and ride apps','Uber, Bolt or taxis.']]},
+ HEL:{p:['App tickets','Buy in the HSL app or at the machines.'],r:[['dep','To and from the airport','Train (I or P) to Central in about 30 min.'],['car','Taxis and ride apps','Uber, Bolt or taxis.']]},
+ MAD:{p:['Tap your bank card','At the Metro gates, or buy a Multi card at the machines.'],r:[['dep','To and from the airport','Metro line 8 to Nuevos Ministerios in about 15 min (airport supplement), or the Airport Express bus.'],['car','Taxis and ride apps','Fixed taxi fare to the centre; Cabify, Uber and FreeNow.']]},
+ BCN:{p:['T-casual card','Ten trips on metro, buses and trams, from the machines.'],r:[['dep','To and from the airport','Aerobús to Plaça de Catalunya in about 35 min, or metro L9 (airport fare).'],['car','Taxis and ride apps','Taxis, Uber or Cabify.']]},
+ LIS:{p:['Navegante card','A reusable card from the machines, loaded with credit (zapping): metro, trams and buses.'],r:[['dep','To and from the airport','Metro red line to the centre in about 20 min.'],['car','Taxis and ride apps','Uber, Bolt or taxis.']]},
+ OPO:{r:[['dep','To and from the airport','Metro line E to the centre in about 30 min.'],['car','Taxis and ride apps','Uber, Bolt or taxis.']]},
+ FCO:{p:['Tap your bank card or phone','At the Metro gates and on buses and trams.'],r:[['dep','To and from the airport','Leonardo Express to Termini in 32 min, or the FL1 train.'],['car','Taxis and ride apps','Fixed taxi fare into the centre (inside the walls); FreeNow or itTaxi.']]},
+ MXP:{p:['Tap your bank card or phone','At the Metro gates in Milan.'],r:[['dep','To and from the airport','Malpensa Express to Cadorna or Centrale in about 40–50 min.'],['car','Taxis and ride apps','Fixed taxi fare into Milan; FreeNow or itTaxi.']]},
+ VCE:{p:['Vaporetto ticket','Water buses use ACTV tickets from the machines or the app; a day pass pays off quickly.'],r:[['dep','To and from the airport','Bus to Piazzale Roma in about 20 min, or the Alilaguna boat.']]},
+ ATH:{r:[['dep','To and from the airport','Metro line 3 to Syntagma in about 40 min, or the X95 bus.'],['car','Taxis and ride apps','Taxis have a fixed fare from the airport; FREENOW or Uber.']]},
+ IST:{p:['İstanbulkart','From the machines; metro, trams, ferries and buses.'],r:[['dep','To and from the airport','Metro M11 to Gayrettepe for the M2, or Havaist buses.'],['ferry','Ferries','Ferries across the Bosphorus take the İstanbulkart too.'],['car','Taxis and ride apps','BiTaksi or Uber (both taxis); make sure the meter runs.']]},
+ SAW:{c:'IST',r:[['dep','To and from Sabiha Gökçen','Metro M4 towards Kadıköy, or Havabüs buses.']]},
+ JFK:{p:['Tap your bank card or phone','OMNY readers on every subway gate and bus. Fares stop after 12 rides in 7 days on the same card or phone.'],r:[['dep','To and from JFK','AirTrain to Jamaica (LIRR, or subway E, J, Z) or Howard Beach (A); about an hour to Midtown.'],['moon','Night','The subway runs all night.'],['car','Taxis and ride apps','Yellow cabs: flat fare from JFK to Manhattan. Uber and Lyft.']]},
+ EWR:{c:'JFK',r:[['dep','To and from Newark','AirTrain to Newark Airport station, then NJ Transit to Penn Station in about 30 min.']]},
+ BOS:{p:['Tap your bank card or phone','On MBTA buses, subway and light rail, or use a CharlieCard.'],r:[['dep','To and from the airport','Free Silver Line SL1 bus to South Station, or the shuttle to Airport station (Blue Line).'],['car','Taxis and ride apps','Uber, Lyft or taxis.']]},
+ IAD:{p:['SmarTrip on your iPhone','Add SmarTrip to Apple Wallet for Metro and buses.'],r:[['dep','To and from Dulles','Silver Line Metro to downtown in about 50 min.'],['car','Taxis and ride apps','Uber, Lyft or taxis.']]},
+ ORD:{p:['Tap your bank card or phone','On CTA trains and buses (Ventra).'],r:[['dep','To and from O’Hare','Blue Line to the Loop in about 45 min, day and night.'],['car','Taxis and ride apps','Uber, Lyft or taxis.']]},
+ DFW:{p:['GoPass app','DART and Trinity Metro tickets in the GoPass app.'],r:[['dep','To and from the airport','DART Orange Line to Dallas in about 50 min, or TEXRail to Fort Worth.'],['car','Taxis and ride apps','Uber or Lyft; distances are long.']]},
+ IAH:{r:[['dep','To and from the airport','No train: Uber, Lyft or a taxi, about 30–40 min to downtown.']]},
+ LAX:{p:['TAP on your iPhone','Add a TAP card to Apple Wallet for Metro trains and buses.'],r:[['dep','To and from LAX','FlyAway bus to Union Station, or Uber, Lyft or a taxi.'],['car','Taxis and ride apps','Uber or Lyft; the city is spread out.']]},
+ SFO:{p:['Clipper on your iPhone','Add Clipper to Apple Wallet: BART, Muni, Caltrain and buses.'],r:[['dep','To and from the airport','BART to downtown in about 30 min.'],['car','Taxis and ride apps','Uber, Lyft or Waymo.']]},
+ SEA:{p:['ORCA','An ORCA card or the Transit GO app.'],r:[['dep','To and from the airport','Link light rail to downtown in about 40 min.'],['car','Taxis and ride apps','Uber, Lyft or taxis.']]},
+ MCO:{r:[['dep','To and from the airport','Mostly Uber, Lyft or a taxi; Brightline trains to Miami leave from the airport.']]},
+ MIA:{p:['EASY Card','Or the GO Miami-Dade app, for Metrorail and buses. The Metromover downtown is free.'],r:[['dep','To and from the airport','MIA Mover to Metrorail, then downtown in about 15 min.'],['car','Taxis and ride apps','Uber, Lyft or taxis.']]},
+ YYZ:{p:['Tap your bank card or phone','On the TTC subway, streetcars and buses, or use a PRESTO card.'],r:[['dep','To and from the airport','UP Express to Union Station in about 25 min.'],['car','Taxis and ride apps','Uber, Lyft or taxis.']]},
+ YUL:{p:['OPUS card','Or tickets from the machines: metro and buses.'],r:[['dep','To and from the airport','Bus 747 to downtown, day and night.'],['car','Taxis and ride apps','Uber or taxis.']]},
+ GRU:{r:[['dep','To and from the airport','Line 13 train to the city, or the Airport Bus Service; a taxi takes about an hour.'],['car','Taxis and ride apps','Uber or 99.']]},
+ GIG:{r:[['dep','To and from the airport','Taxis from the official desks, or Uber or 99.'],['train','Metro','The metro reaches Copacabana and Ipanema; use Uber or 99 at night.']]},
+ EZE:{p:['SUBE card','For the subway and buses in Buenos Aires.'],r:[['dep','To and from the airport','Official taxi desks or Uber, about 45 min to the centre.'],['car','Taxis and ride apps','Uber or Cabify.']]},
+ HND:{p:['Suica on your iPhone','Add Suica to Apple Wallet and top it up with Apple Pay. Tap at the gates: trains, metro, buses, even convenience stores.'],r:[['dep','To and from Haneda','Keikyu line to Shinagawa in about 15 min, or the monorail to Hamamatsuchō.'],['moon','Last trains','Around midnight to 00:30; the first ones about 05:00.'],['car','Taxis','GO or Uber app, cards taken. The back door opens by itself.']]},
+ NRT:{c:'HND',r:[['dep','To and from Narita','Narita Express to Tokyo Station in about 1 h, or the Keisei Skyliner to Ueno in about 45 min.']]},
+ KIX:{p:['Suica or ICOCA','A Suica works in Osaka too; tap at the gates.'],r:[['dep','To and from the airport','Haruka to Shin-Osaka and Kyoto, or the Nankai rapi:t to Namba in about 35 min.'],['car','Taxis','GO or Uber app; cards taken.']]},
+ ICN:{p:['T-money card','From convenience stores, topped up with cash: subway, buses and taxis.'],r:[['dep','To and from the airport','AREX express to Seoul Station in about 45 min.'],['car','Taxis','Kakao T app; most taxis take cards.']]},
+ PEK:{p:['Alipay or WeChat Pay','Add your card in Alipay, then scan its transit QR code at the metro gates. Machines sell single tickets too.'],r:[['dep','To and from the airport','Capital Airport Express to Dongzhimen in about 20 min.'],['car','Taxis','DiDi (inside Alipay) or taxis; have the address in Chinese.']]},
+ PKX:{c:'PEK',r:[['dep','To and from Daxing','Daxing Airport Express to Caoqiao in about 20 min.']]},
+ PVG:{c:'PEK',r:[['dep','To and from Pudong','Maglev to Longyang Road in 8 min, then metro line 2; or line 2 all the way.']]},
+ CAN:{c:'PEK',r:[['dep','To and from the airport','Metro line 3 to the city in about 45 min.']]},
+ HKG:{p:['Octopus on your iPhone','Add Octopus to Apple Wallet; tap on the MTR, buses, trams, ferries and in shops.'],r:[['dep','To and from the airport','Airport Express to Hong Kong station in 24 min.'],['ferry','Star Ferry','Across the harbour, Central to Tsim Sha Tsui, in a few minutes.'],['car','Taxis','Red taxis in the city; Uber too.']]},
+ TPE:{p:['EasyCard','From the machines or convenience stores: MRT, buses and shops.'],r:[['dep','To and from the airport','Airport MRT to Taipei Main Station in about 35 min.'],['car','Taxis','Taxis or Uber.']]},
+ SIN:{p:['Tap your bank card or phone','At MRT gates and on buses.'],r:[['dep','To and from Changi','MRT to the city in about 30–40 min (change at Tanah Merah), or a taxi in about 20.'],['car','Taxis and ride apps','Grab, Gojek or taxis.']]},
+ KUL:{p:['Touch ’n Go card','From the machines and convenience stores; or tokens at the stations.'],r:[['dep','To and from the airport','KLIA Ekspres to KL Sentral in about 30 min.'],['car','Taxis and ride apps','Grab.']]},
+ BKK:{p:['Rabbit card or bank card','A Rabbit card on the BTS Skytrain; the MRT takes contactless bank cards. Single tickets at the machines.'],r:[['dep','To and from Suvarnabhumi','Airport Rail Link to Phaya Thai in about 30 min.'],['car','Taxis and ride apps','Grab or Bolt; in a taxi ask for the meter.']]},
+ HKT:{r:[['car','Getting around','No trains: Grab, Bolt or the taxi desk at the airport.']]},
+ CGK:{r:[['dep','To and from the airport','Airport train to the city in about 50 min.'],['car','Taxis and ride apps','Grab, Gojek or Bluebird taxis.']]},
+ DPS:{r:[['car','Getting around','No trains: Grab or Gojek (from their pick-up points), or the airport taxi desk.']]},
+ MNL:{r:[['car','Getting around','Grab is easiest; traffic is heavy, so allow time.']]},
+ HAN:{r:[['car','Getting around','Grab or Xanh SM electric taxis.']]},
+ SGN:{r:[['car','Getting around','Grab or Xanh SM electric taxis.'],['train','Metro','Metro line 1 runs from Bến Thành.']]},
+ DEL:{p:['Metro tokens or QR tickets','From the machines or the DMRC app.'],r:[['dep','To and from the airport','Airport Express (orange) line to New Delhi in about 20 min.'],['car','Taxis and ride apps','Uber or Ola, or a prepaid taxi booth.']]},
+ BOM:{r:[['car','Getting around','Uber or Ola; allow plenty of time for traffic.']]},
+ BLR:{r:[['car','Getting around','Uber, Ola or Namma Yatri; the airport is about an hour from the centre.']]},
+ MAA:{r:[['car','Getting around','Uber or Ola.']]},HYD:{r:[['car','Getting around','Uber or Ola.']]},COK:{r:[['car','Getting around','Uber or Ola.']]},
+ CMB:{r:[['car','Getting around','PickMe or Uber.']]},
+ MLE:{r:[['ferry','To Malé','Across the bridge or by the short ferry from the airport island; resorts by speedboat or seaplane.']]},
+ DAC:{r:[['car','Getting around','Uber or Pathao; traffic is heavy.']]},
+ KHI:{r:[['car','Getting around','Careem, inDrive or Yango.']]},LHE:{r:[['car','Getting around','Careem, inDrive or Yango.']]},ISB:{r:[['car','Getting around','Careem, inDrive or Yango.']]},
+ CAI:{p:['Metro tickets','At the station windows or machines; cheap and quick across the city.'],r:[['dep','To and from the airport','Uber or Careem, about 45 min to the centre.'],['car','Taxis and ride apps','Uber or Careem; agree the price first in other taxis.']]},
+ AMM:{r:[['car','Getting around','Careem or Uber; taxis use the meter.']]},
+ RUH:{r:[['train','Riyadh Metro','Six lines, opened in 2024–25.'],['car','Taxis and ride apps','Uber or Careem.']]},
+ JED:{r:[['car','Getting around','Uber or Careem.']]},DMM:{r:[['car','Getting around','Uber or Careem.']]},MED:{r:[['car','Getting around','Uber or Careem.']]},
+ DOH:{p:['Karwa card','Doha Metro and buses; or day tickets at the machines.'],r:[['dep','To and from the airport','Metro Red Line to the city in about 20 min.'],['car','Taxis and ride apps','Uber, Careem or Karwa taxis.']]},
+ TLV:{p:['Rav-Kav','A Rav-Kav card or app for trains and buses.'],r:[['dep','To and from the airport','Train to Tel Aviv in about 15–20 min (not on Shabbat).'],['car','Taxis and ride apps','Gett, or taxis with the meter on.']]},
+ JNB:{p:['Gautrain card','Bought at the stations: from the airport to Sandton in about 15 min.'],r:[['car','Getting around','Uber or Bolt rather than walking at night.']]},
+ CPT:{p:['MyCiTi buses','With a myconnect card; otherwise Uber or Bolt.'],r:[['car','Getting around','Uber or Bolt.']]},
+ NBO:{r:[['car','Getting around','Uber, Bolt or Little; traffic is heavy.']]}
+};
+function goOf(iata){
+  var g=iata&&GO[iata];if(!g) return null;
+  if(g.c&&GO[g.c]){var b=GO[g.c];return {p:g.p||b.p,r:(g.r||[]).concat(b.r.filter(function(x){return x[0]!=='dep';}))};}
+  return g;
+}
+/* Per country: [tipping, tap water (1 safe, 2 safe but most drink bottled, 0 drink bottled), phrases, shops] */
+var CTRY2={
+ AU:['Not expected; about 10% for good service',1],NZ:['Not expected',1],US:['18–20% in restaurants, 15–20% in taxis, $1–2 a drink',1],CA:['15–20% in restaurants and taxis',1],
+ MX:['10–15%',0,'es'],BR:['10% is usually on the bill',0,'pt-BR'],AR:['About 10%',1,'es'],CO:['10% is often suggested on the bill',2,'es'],CL:['10% is suggested on the bill',1,'es'],
+ GB:['10–12.5%, often already added as service',1,'','Big shops open about six hours on Sunday'],IE:['About 10% in restaurants',1],FR:['Service is included; round up or leave a few euros',1,'fr','Many shops close on Sunday'],
+ DE:['Round up 5–10%: say the total when you pay',1,'de','Shops close on Sunday'],NL:['Round up, or 5–10%',1],BE:['Service is included; round up',1,'fr'],CH:['Service is included; round up',1,'de-CH','Most shops close on Sunday'],
+ AT:['Round up 5–10%: say the total when you pay',1,'de-AT','Shops close on Sunday'],IT:['Not expected (there may be a cover charge); round up',1,'it'],ES:['Round up, or 5–10%',1,'es'],PT:['Round up, or 5–10%',1,'pt-PT'],
+ GR:['5–10% in restaurants',1,'el'],CY:['5–10%, unless service is on the bill',1,'el'],MT:['5–10%',2],HR:['About 10%',1,'hr'],DK:['Not expected; round up',1],SE:['Not expected; round up',1],NO:['Not expected; round up',1],
+ PL:['About 10%',1,'pl','Most shops close on Sunday'],CZ:['About 10%',1,'cs'],HU:['10–15%, unless service is on the bill',1],RU:['About 10%',0,'ru'],TR:['5–10% in restaurants',0,'tr'],
+ IL:['10–15% in restaurants',1,'he','Many places close from Friday afternoon to Saturday evening'],SA:['Service is often included; 10% is kind',2,'ar'],OM:['Not expected; 10% is kind',2,'ar'],BH:['Service is often included; 10% is kind',2,'ar'],
+ KW:['Service is often included; 10% is kind',2,'ar'],QA:['Service is often included; 10% is kind',2,'ar'],JO:['About 10%',0,'ar'],LB:['10–15%',0,'ar'],IQ:['Small tips are welcome',0,'ar'],IR:['Round up',0],
+ IN:['About 10% if there’s no service charge',0],PK:['About 10%',0],BD:['About 10%',0],LK:['A 10% service charge is usually added',0],NP:['About 10%',0],
+ CN:['Not expected',0,'zh'],HK:['A 10% service charge is usually added',2,'zh-HK'],TW:['Not expected; some restaurants add 10%',0,'zh-TW'],JP:['Not done, not even in taxis',1,'ja','Convenience stores open 24 h'],
+ KR:['Not expected',1,'ko','Convenience stores open 24 h'],SG:['Not expected; a 10% service charge is added',1],MY:['Not expected; a service charge is often added',0],TH:['Round up, or leave small change',0,'th'],
+ ID:['Service is often included; round up',0,'id'],PH:['About 10% if there’s no service charge',0],VN:['Not expected, but welcome',0,'vi'],KH:['Small tips are welcome',0],UZ:['5–10%',0,'ru'],KZ:['About 10%',0,'ru'],AZ:['About 10%',0],
+ EG:['Expected: about 10%, and small tips for help',0,'ar'],ZA:['10–15% in restaurants',1],KE:['About 10%',0],NG:['About 10%',0],GH:['About 10%',0],ET:['About 10%',0],TZ:['About 10%',0],UG:['About 10%',0],ZM:['About 10%',0],ZW:['About 10%',0],
+ MU:['Not expected; 10% is kind',0],SC:['A service charge is often added',0],MA:['About 10%',0,'ar'],TN:['About 10%',0,'fr'],DZ:['About 10%',0,'fr'],CI:['About 10%',0,'fr'],SN:['About 10%',0,'fr'],AO:['About 10%',0,'pt-PT'],CD:['About 10%',0,'fr'],SD:['Small tips are welcome',0,'ar']
+};
+var WATER=['Drink bottled water','Safe to drink','Safe, but most people drink bottled'];
+// a few words where English isn’t the language: [as you say it, as it’s written, what it means]; the iPhone reads them out
+var PHR={
+ ja:{n:'Japanese',v:'ja-JP',p:[['Konnichiwa','こんにちは','Hello'],['Arigatō gozaimasu','ありがとうございます','Thank you'],['Sumimasen','すみません','Excuse me · sorry'],['O-kaikei onegaishimasu','お会計お願いします','The bill, please']]},
+ ko:{n:'Korean',v:'ko-KR',p:[['Annyeonghaseyo','안녕하세요','Hello'],['Gamsahamnida','감사합니다','Thank you'],['Jeogiyo','저기요','Excuse me (to call staff)'],['Gyesan-hae juseyo','계산해 주세요','The bill, please']]},
+ zh:{n:'Mandarin',v:'zh-CN',p:[['Nǐ hǎo','你好','Hello'],['Xièxie','谢谢','Thank you'],['Bù hǎo yìsi','不好意思','Excuse me · sorry'],['Mǎidān','买单','The bill, please']]},
+ 'zh-TW':{n:'Mandarin',v:'zh-TW',p:[['Nǐ hǎo','你好','Hello'],['Xièxie','謝謝','Thank you'],['Bù hǎo yìsi','不好意思','Excuse me · sorry'],['Mǎidān','買單','The bill, please']]},
+ 'zh-HK':{n:'Cantonese',v:'zh-HK',p:[['Néih hóu','你好','Hello'],['M̀h gōi','唔該','Thank you (for help)'],['Dō jeh','多謝','Thank you (for a gift)'],['Màaih dāan, m̀h gōi','埋單，唔該','The bill, please']]},
+ th:{n:'Thai',v:'th-TH',p:[['Sawasdee krap','สวัสดีครับ','Hello (women end with ka)'],['Khop khun krap','ขอบคุณครับ','Thank you'],['Kho thot krap','ขอโทษครับ','Excuse me · sorry'],['Check bin krap','เช็คบิลครับ','The bill, please']]},
+ vi:{n:'Vietnamese',v:'vi-VN',p:[['Xin chào','','Hello'],['Cảm ơn','','Thank you'],['Xin lỗi','','Excuse me · sorry'],['Tính tiền','','The bill, please']]},
+ id:{n:'Indonesian',v:'id-ID',p:[['Selamat pagi','','Good morning'],['Terima kasih','','Thank you'],['Permisi','','Excuse me'],['Minta bon','','The bill, please']]},
+ fr:{n:'French',v:'fr-FR',p:[['Bonjour','','Hello'],['Merci','','Thank you'],['Excusez-moi','','Excuse me'],['L’addition, s’il vous plaît','','The bill, please']]},
+ de:{n:'German',v:'de-DE',p:[['Guten Tag','','Hello'],['Danke','','Thank you'],['Entschuldigung','','Excuse me'],['Zahlen, bitte','','The bill, please']]},
+ 'de-AT':{n:'German',v:'de-AT',p:[['Grüß Gott','','Hello'],['Danke','','Thank you'],['Entschuldigung','','Excuse me'],['Zahlen, bitte','','The bill, please']]},
+ 'de-CH':{n:'Swiss German',v:'de-CH',p:[['Grüezi','','Hello'],['Merci','','Thank you'],['Entschuldigung','','Excuse me'],['Zahle, bitte','','The bill, please']]},
+ it:{n:'Italian',v:'it-IT',p:[['Buongiorno','','Hello'],['Grazie','','Thank you'],['Mi scusi','','Excuse me'],['Il conto, per favore','','The bill, please']]},
+ es:{n:'Spanish',v:'es-ES',p:[['Hola','','Hello'],['Gracias','','Thank you'],['Disculpe','','Excuse me'],['La cuenta, por favor','','The bill, please']]},
+ 'pt-PT':{n:'Portuguese',v:'pt-PT',p:[['Olá','','Hello'],['Obrigado','','Thank you (women say obrigada)'],['Com licença','','Excuse me'],['A conta, por favor','','The bill, please']]},
+ 'pt-BR':{n:'Portuguese',v:'pt-BR',p:[['Olá','','Hello'],['Obrigado','','Thank you (women say obrigada)'],['Com licença','','Excuse me'],['A conta, por favor','','The bill, please']]},
+ el:{n:'Greek',v:'el-GR',p:[['Yia sas','Γειά σας','Hello'],['Efharistó','Ευχαριστώ','Thank you'],['Signómi','Συγγνώμη','Excuse me · sorry'],['Ton logariasmó, parakaló','Τον λογαριασμό, παρακαλώ','The bill, please']]},
+ tr:{n:'Turkish',v:'tr-TR',p:[['Merhaba','','Hello'],['Teşekkür ederim','','Thank you'],['Affedersiniz','','Excuse me'],['Hesap, lütfen','','The bill, please']]},
+ ru:{n:'Russian',v:'ru-RU',p:[['Zdravstvuyte','Здравствуйте','Hello'],['Spasibo','Спасибо','Thank you'],['Izvinite','Извините','Excuse me · sorry'],['Schyot, pozhaluysta','Счёт, пожалуйста','The bill, please']]},
+ pl:{n:'Polish',v:'pl-PL',p:[['Dzień dobry','','Hello'],['Dziękuję','','Thank you'],['Przepraszam','','Excuse me · sorry'],['Poproszę rachunek','','The bill, please']]},
+ cs:{n:'Czech',v:'cs-CZ',p:[['Dobrý den','','Hello'],['Děkuji','','Thank you'],['Promiňte','','Excuse me'],['Zaplatím, prosím','','The bill, please']]},
+ hr:{n:'Croatian',v:'hr-HR',p:[['Dobar dan','','Hello'],['Hvala','','Thank you'],['Oprostite','','Excuse me'],['Račun, molim','','The bill, please']]},
+ ar:{n:'Arabic',v:'ar-SA',p:[['Marhaba','مرحبا','Hello'],['Shukran','شكرا','Thank you'],['Law samaḥt','لو سمحت','Excuse me'],['Al-ḥisāb, law samaḥt','الحساب لو سمحت','The bill, please']]},
+ he:{n:'Hebrew',v:'he-IL',p:[['Shalom','שלום','Hello'],['Toda','תודה','Thank you'],['Slicha','סליחה','Excuse me · sorry'],['Heshbon, bevakasha','חשבון, בבקשה','The bill, please']]}
+};
+// where the city speaks differently from the rest of the country
+var PHR_AP={ZRH:'de-CH',BSL:'de-CH',GVA:'fr',MUC:'de',BRU:'fr',YUL:'fr'};
+// the state or region an airport is in, for regional public holidays
+var HOL_SUB={SYD:'NSW',MEL:'VIC',BNE:'QLD',PER:'WA',ADL:'SA',GLA:'SCT',EDI:'SCT',MAN:'ENG',BHX:'ENG',NCL:'ENG',LHR:'ENG',LGW:'ENG',FRA:'HE',MUC:'BY',DUS:'NW',HAM:'HH',MAD:'MD',BCN:'CT',ZRH:'ZH',GVA:'GE',
+  JFK:'NY',EWR:'NJ',BOS:'MA',IAD:'VA',ORD:'IL',DFW:'TX',IAH:'TX',LAX:'CA',SFO:'CA',SEA:'WA',MCO:'FL',MIA:'FL',YYZ:'ON',YUL:'QC',GRU:'SP',GIG:'RJ'};
 function ctryOf(ic){var r=apRecOf(ic);return r&&r.cc?r.cc.toUpperCase():'';}
 function curName(c){try{return new Intl.DisplayNames(['en'],{type:'currency'}).of(c);}catch(_){return c;}}
 // exchange rates against the dirham: from the internet once or twice a day, kept for the flight
@@ -9105,7 +9338,7 @@ function hDiff(m){var a=Math.abs(m),h=Math.floor(a/60),mm=a%60;return (h?h+' h':
 function prepHomeTz(){var r=apRecOf(prepHome()||'OMDB');return r&&r.tz||'Asia/Dubai';}
 function prepHomeCity(){return prepCity(prepHome()||'OMDB')||'home';}
 // the layover from landing to the flight out, as a timeline: the place and home side by side, what you planned, landing, wake-up, pick-up, departure
-var prepCur={};
+var prepCur={},prepTlW=null;
 function prepTlData(t,nx){
   var rec=apRecOf(t.dest),tz=rec&&rec.tz,htz=prepHomeTz(),a=t.sta,b=nx.std,d=prepData(t.id),dn=prepData(nx.id);
   var day=[];
@@ -9117,13 +9350,15 @@ function prepTlData(t,nx){
   }else day.push([a-86400000,b+86400000]);
   var home=[];
   for(var j=-1;j<=Math.ceil((b-a)/86400000)+1;j++){var hy=ymdAt(a+j*86400000,tzOffAt(htz,a+j*86400000));home.push([locUTC(hy,7*60,htz),locUTC(hy,22*60,htz)]);}
-  return {tz:tz,htz:htz,a:a,b:b,day:day,home:home,plan:d.plan||[],wake:dn.wake||0,pick:dn.pick||0,city:prepCity(t.dest)||t.dest,hcity:prepHomeCity()};
+  var W=prepHours(t.dest);if(W&&!(W.t0<b&&W.t0+W.T.length*3600000>a)) W=null;
+  var D={tz:tz,htz:htz,a:a,b:b,day:day,home:home,plan:d.plan||[],wake:dn.wake||0,pick:dn.pick||0,city:prepCity(t.dest)||t.dest,hcity:prepHomeCity(),wx:W};
+  D.win=prepWxWin(W,D);return D;
 }
 function prepTlSVG(D,o){
-  var fit=o.fit,H=fit?212:178,lab=fit?84:0,x0,x1,W,span=D.b-D.a;
+  var oy=D.wx?40:0,fit=o.fit,H=(fit?212:178)+oy,lab=fit?84:0,x0,x1,W,span=D.b-D.a;
   if(fit){W=760;x0=lab;x1=W-10;}else{x0=o.pad;x1=o.pad+span/3600000*o.pxh;W=x1+o.pad;}
   function X(t){return x0+(t-D.a)/span*(x1-x0);}
-  var pxh=(x1-x0)/(span/3600000),step=pxh>=12?3:pxh>=6?6:12,yS=28,hS=38,yL=78,hL=24,yH=112,hH=38;
+  var pxh=(x1-x0)/(span/3600000),step=pxh>=12?3:pxh>=6?6:12,yS=28+oy,hS=38,yL=78+oy,hL=24,yH=112+oy,hH=38;
   var o2=['<svg class="tl-svg" viewBox="0 0 '+W+' '+H+'" style="'+(fit?'width:100%;height:auto':'width:'+W+'px;height:'+H+'px')+'" data-x0="'+x0+'" data-x1="'+x1+'" data-w="'+W+'" aria-label="Timeline of the layover">'];
   o2.push('<defs><clipPath id="tlcS"><rect x="'+x0+'" y="'+yS+'" width="'+(x1-x0)+'" height="'+hS+'" rx="9"/></clipPath><clipPath id="tlcH"><rect x="'+x0+'" y="'+yH+'" width="'+(x1-x0)+'" height="'+hH+'" rx="9"/></clipPath></defs>');
   function band(days,y,h,clip){
@@ -9132,6 +9367,24 @@ function prepTlSVG(D,o){
     return g+'</g>';
   }
   o2.push(band(D.day,yS,hS,'tlcS'),band(D.home,yH,hH,'tlcH'));
+  if(D.wx){
+    // the weather lane: temperature and sky every few hours, rain shaded blue, good hours outside outlined green
+    var Wx=D.wx,yW=22,hW=34,stw=fit?3:2;
+    o2.push('<defs><clipPath id="tlcW"><rect x="'+x0+'" y="'+yW+'" width="'+(x1-x0)+'" height="'+hW+'" rx="9"/></clipPath></defs><g clip-path="url(#tlcW)"><rect class="tl-wb" x="'+x0+'" y="'+yW+'" width="'+(x1-x0)+'" height="'+hW+'"/>');
+    for(var wt=Math.floor(D.a/3600000)*3600000;wt<D.b;wt+=3600000){
+      var wi=wxIdx(Wx,wt);if(wi<0) continue;var wk=wmoIcon(Wx.C[wi]),wp=Wx.P[wi]||0;
+      if(wp>=50||((wk==='rain'||wk==='storm'||wk==='snow')&&wp>=30)) o2.push('<rect class="tl-wr" x="'+X(wt).toFixed(1)+'" y="'+yW+'" width="'+(X(wt+3600000)-X(wt)).toFixed(1)+'" height="'+hW+'" fill-opacity="'+(0.2+Math.min(100,wp)/100*0.8).toFixed(2)+'"/>');
+    }
+    (D.win&&D.win.good||[]).forEach(function(g){o2.push('<rect class="tl-wg" x="'+X(g.s).toFixed(1)+'" y="'+(yW+1.5)+'" width="'+(X(g.e)-X(g.s)).toFixed(1)+'" height="'+(hW-3)+'" rx="7"/>');});
+    for(var ht=Math.ceil(D.a/3600000)*3600000;ht<D.b;ht+=3600000){
+      var hi=wxIdx(Wx,ht);if(hi<0||Wx.T[hi]==null) continue;
+      var lhr=new Date(ht+tzOffAt(D.tz,ht)*60000).getUTCHours(),hx=X(ht);if(lhr%stw||hx-x0<9||x1-hx<9) continue;
+      var ik=wmoIcon(Wx.C[hi]);if(Wx.D[hi]===0&&(ik==='sun'||ik==='part')) ik='moon';
+      o2.push('<g class="tl-wi '+ik+'" transform="translate('+(hx-6.5).toFixed(1)+','+(yW+3)+') scale(.54)">'+WXP[ik]+'</g><text class="tl-wt" x="'+hx.toFixed(1)+'" y="'+(yW+hW-5)+'" text-anchor="middle">'+Math.round(Wx.T[hi])+'°</text>');
+    }
+    o2.push('</g>');
+    if(fit) o2.push('<text class="tl-rl" x="0" y="'+(yW+14)+'">WEATHER</text><text class="tl-rs" x="0" y="'+(yW+29)+'">by the hour</text>');
+  }
   function isDay(days,t){return days.some(function(p){return t>=p[0]&&t<p[1];});}
   function ticks(tz,days,y,h){
     var g='',off=tzOffAt(tz,D.a),t=Math.ceil((D.a+off*60000)/3600000)*3600000-off*60000,n=0;
@@ -9179,16 +9432,16 @@ function prepTlSVG(D,o){
 function inTxt(ms){var m=Math.round(ms/60000),d=Math.floor(m/1440),h=Math.floor(m%1440/60),r=m%60;return d?d+' d '+h+' h':h?h+' h '+r+' min':r+' min';}
 function durTxt(ms){var m=Math.round(ms/60000),h=Math.floor(m/60),r=m%60;return h?(r?h+' h '+pad2(r):h+' h'):r+' min';}
 function prepTlHTML(t,nx,wide){
-  var D=prepTlData(t,nx),cur=prepCur[t.id];
+  var D=prepTlData(t,nx),cur=prepCur[t.id],oy=D.wx?40:0;prepTlW=D.wx;
   if(!cur||cur<D.a||cur>D.b){
     var pl=D.plan.slice().sort(function(p,q){return p.s-q.s;}).filter(function(p){return p.k==='sleep'&&p.e>D.a&&p.e<D.b;})[0],now=Date.now();
     cur=now>D.a&&now<D.b?now:pl?pl.e:Math.min(D.b,Math.round((D.a+12*3600000)/3600000)*3600000);
   }
   var h='<div class="lv-card tl-box" data-trip="'+esc(t.id)+'" data-nx="'+esc(nx.id)+'" data-a="'+D.a+'" data-b="'+D.b+'" data-tz="'+esc(D.tz||'')+'" data-htz="'+esc(D.htz)+'" data-city="'+esc(D.city)+'" data-hcity="'+esc(D.hcity)+'" data-cur="'+cur+'" data-fit="'+(wide?1:0)+'">'+
     '<div class="tl-hd"><span class="lv-l">'+esc(D.city)+' and '+esc(D.hcity)+(wide?' through the layover':'')+'</span><button type="button" class="lv-more" data-act="prepPlan" data-id="'+esc(t.id)+'">'+I.plus+'Add</button></div>';
-  if(wide) h+='<div class="tl-read" id="tlRead"></div>'+prepTlSVG(D,{fit:true});
-  else h+='<div class="tl-big" id="tlRead"></div><div class="tl-tape"><div class="tl-cl"></div><span class="tl-tg" style="top:31px">'+esc(ap3(t.dest))+'</span><span class="tl-tg p" style="top:82px">PLAN</span><span class="tl-tg" style="top:115px">'+esc(ap3(prepHome()||'OMDB'))+'</span>'+
-    '<div class="tl-sc">'+prepTlSVG(D,{fit:false,pxh:17,pad:200})+'</div></div><p class="tl-hint">Slide the timeline · tap the purple lane to add sleep, a nap, a workout…</p>';
+  if(wide) h+='<div class="tl-read" id="tlRead"></div>'+prepTlSVG(D,{fit:true})+wxWinHTML(D);
+  else h+='<div class="tl-big" id="tlRead"></div><div class="tl-tape"><div class="tl-cl"></div>'+(D.wx?'<span class="tl-tg w" style="top:31px">WX</span>':'')+'<span class="tl-tg" style="top:'+(31+oy)+'px">'+esc(ap3(t.dest))+'</span><span class="tl-tg p" style="top:'+(82+oy)+'px">PLAN</span><span class="tl-tg" style="top:'+(115+oy)+'px">'+esc(ap3(prepHome()||'OMDB'))+'</span>'+
+    '<div class="tl-sc">'+prepTlSVG(D,{fit:false,pxh:17,pad:200})+'</div></div>'+wxWinHTML(D)+'<p class="tl-hint">Slide the timeline · tap the purple lane to add sleep, a nap, a workout…</p>';
   var P=D.plan.slice().sort(function(p,q){return p.s-q.s;});
   if(P.length) h+='<div class="tl-list">'+P.map(function(p){var K=PLAN_K[p.k];
     return '<button type="button" class="tl-it" data-act="prepPlan" data-id="'+esc(t.id)+'" data-v="'+p.id+'"><i style="background:'+K[2]+'"></i><b>'+esc(p.t||K[0])+'</b><span>'+wdHm(D.tz,p.s)+'–'+hmAt(D.tz,p.e)+'</span><em>'+esc(D.hcity)+' '+wdHm(D.htz,p.s)+'–'+hmAt(D.htz,p.e)+'</em></button>';}).join('')+
@@ -9207,7 +9460,8 @@ function prepTlBind(){
   function read(t){
     t=Math.round(t/300000)*300000;
     var hh=tzInfo(htz,t),hr=hh?+hh.hm.slice(0,2):12,asleep=hr>=22||hr<7,D=prepData(tid),inP=(D.plan||[]).filter(function(p){return t>=p.s&&t<p.e;})[0];
-    var chip='<span class="tl-chip'+(asleep?' s':'')+'">'+(asleep?'home asleep':'home awake')+'</span>'+(inP?'<span class="tl-chip p">'+esc(inP.t||PLAN_K[inP.k][0])+'</span>':'');
+    var wi=prepTlW?wxIdx(prepTlW,t):-1;
+    var chip='<span class="tl-chip'+(asleep?' s':'')+'">'+(asleep?'home asleep':'home awake')+'</span>'+(inP?'<span class="tl-chip p">'+esc(inP.t||PLAN_K[inP.k][0])+'</span>':'')+(wi>=0&&prepTlW.T[wi]!=null?'<span class="tl-chip w">'+esc(wxDesc(prepTlW,wi))+'</span>':'');
     if(fit) rd.innerHTML='<b>'+wdHm(tz,t)+'</b> in '+esc(city)+' <span class="eq">=</span> <b>'+wdHm(htz,t)+'</b> in '+esc(hcity)+chip;
     else rd.innerHTML='<div><span>'+esc(city)+'</span><b>'+wdHm(tz,t)+'</b></div><i>=</i><div><span>'+esc(hcity)+'</span><b>'+wdHm(htz,t)+'</b></div><p>'+chip+'</p>';
   }
@@ -9262,6 +9516,7 @@ var WXI={
   snow:sv('<path d="M7 14.5h10a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 6 4.3 4.3 0 0 0 7 14.5z"/><path d="M9 18v.1M12 20.5v.1M15 18v.1" stroke-width="2.8" stroke-linecap="round"/>'),
   storm:sv('<path d="M7 14.5h10a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 6 4.3 4.3 0 0 0 7 14.5z"/><path d="M12.5 15l-2 3.5h3l-2 3.5"/>')
 };
+var WXP={moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>'};Object.keys(WXI).forEach(function(k){WXP[k]=WXI[k].replace(/^<svg[^>]*>|<\/svg>$/g,'');});
 function wmoIcon(c){return c===0?'sun':c<=2?'part':c===3?'cloud':c===45||c===48?'fog':c>=95?'storm':(c>=71&&c<=77)||c===85||c===86?'snow':'rain';}
 function apRecOf(ic){if(!ic||!window.AIRPORT_DATA) return null;var l=apIndex().map.get(ic);return l?apRec(l):null;}
 function ap3(ic){var r=apRecOf(ic);return r&&r.iata?r.iata:ic;}
@@ -9298,9 +9553,9 @@ function prepTrips(now){
 function prepNext(t,L){return L.filter(function(x){return x.dep===t.dest&&x.std>t.sta;}).sort(function(a,b){return a.std-b.std;})[0]||null;}
 function prepData(id){
   var P=state.prep||(state.prep={});
-  return P[id]||(P[id]={seen:{},pickup:0,wake:0,pick:0,plan:[],skip:[],before:(state.prepTpl||PREP_TPL).map(function(x){return {id:'tp'+strHash(String(x).toLowerCase()),t:x,done:false};})});
+  return P[id]||(P[id]={seen:{},pickup:0,wake:0,pick:0,hotel:'',room:'',plan:[],skip:[],before:(state.prepTpl||PREP_TPL).map(function(x){return {id:'tp'+strHash(String(x).toLowerCase()),t:x,done:false};})});
 }
-function prepPlace(ic){var P=state.places||(state.places={}),p=P[ic]||(P[ic]={hotel:'',items:[],tel:[]});if(!p.tel) p.tel=[];return p;}
+function prepPlace(ic){var P=state.places||(state.places={}),p=P[ic]||(P[ic]={hotels:[],items:[],tel:[],tips:[],buy:[]});['hotels','items','tel','tips','buy'].forEach(function(k){if(!p[k]) p[k]=[];});return p;}
 function prepAlts(t){var d=state.prep&&state.prep[t.id];return d&&d.alts?d.alts:(t.alts||[]);}
 function prepHome(){var c={};state.apLog.forEach(function(e){if(e.k==='dep') c[e.ic]=(c[e.ic]||0)+1;});(state.trips||[]).forEach(function(t){c[t.dep]=(c[t.dep]||0)+1;});
   var st=state.settings;if(st.dep&&st.dep.icao) c[st.dep.icao]=(c[st.dep.icao]||0)+1;
@@ -9325,6 +9580,7 @@ function prepListHTML(L,now){
   h+=L.length?'<div class="lv-card prep-list'+(ed?' ed':'')+'">'+L.map(function(t){
     var nx=prepNext(t,L);
     var sub=t.src==='flight'?'The flight that’s set':t.dest===home?'Back home':nx?'Layover '+durH(nx.std-t.sta):t.src==='roster'?'From your roster':'';
+    var nb=t.dest!==home?prepBuyCount(t.dest):0;if(nb) sub=(sub?sub+' · ':'')+nb+' to buy';
     if(ed) return '<div class="prep-trip"><button type="button" class="pt-rm" data-act="prepRm" data-id="'+esc(t.id)+'" aria-label="Remove '+esc(t.fno||'this flight')+'"><i></i></button>'+
       '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+(t.rep?'report '+fsHM(t.rep):fsHM(t.std))+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></div>';
     return '<button type="button" class="prep-trip'+(t.id===prepSel?' on':'')+'" data-act="prepOpen" data-id="'+esc(t.id)+'"><span class="pt-flag" aria-hidden="true">'+flagOf(t.dest)+'</span>'+
@@ -9401,9 +9657,9 @@ function prepTripHTML(t,L,now,wide){
   if(!isHome&&nx&&nx.std-t.sta>=6*3600000) h+=prepTlHTML(t,nx,wide);
   else if(!isHome&&!nx) h+='<div class="lv-card"><p class="hint" style="margin:0">Add your flight out of '+esc(prepCity(t.dest)||t.dest)+' (Import roster or Add a trip) to plan the layover on a timeline.</p></div>';
   if(isHome) return h+'<div class="lv-card"><p class="hint" style="margin:0">Back home'+(nx?': '+durH(nx.std-t.sta)+' until '+esc(nx.fno||'the next duty')+' on '+dayLbl(nx.std,tzOffAt(htz,nx.std)):'.')+'</p></div>';
-  var g=[prepFcHTML(t,L,tz)];
+  var ho=tripHotel(t).h,g=[prepFcHTML(t,L,tz),prepGoHTML(t,ho)];
   if(C&&C[0]!=='AED') g.push(prepFxHTML(C[0]));
-  g.push(prepBeforeHTML(t),prepSosHTML(t,C),prepStayHTML(t),prepGoodHTML(t,C,tz,htz,now),prepMyNotesHTML(t));
+  g.push(prepBeforeHTML(t),prepSosHTML(t,C),prepHotelHTML(t),prepPlacesHTML(t,ho),prepBuyHTML(t),prepGoodHTML(t,C,tz,htz,now,L),prepMyNotesHTML(t));
   h+='<div class="prep-grid">'+g.join('')+'</div>';
   h+='<div class="prep-more"><button type="button" class="lv-more" data-act="prepShow" data-v="notes">'+I.chev+(prepTab==='notes'?'Hide':'Read')+' all notes for '+esc(t.dest)+', '+esc(t.dep)+' and the alternates</button>'+(prepTab==='notes'?prepNotesHTML(t):'')+'</div>';
   h+='<div class="prep-more"><button type="button" class="lv-more" data-act="prepShow" data-v="wx">'+I.chev+(prepTab==='wx'?'Hide':'Show')+' live weather (METAR / TAF) and alternates</button>'+(prepTab==='wx'?prepWxHTML(t,now):'')+'</div>';
@@ -9438,8 +9694,8 @@ function prepFxHTML(cur){
   var r=fxCache.rates&&fxCache.rates[cur],h='<div class="lv-card"><div class="pc-h"><span class="lv-l">'+IX.cash+'Money · '+esc(curName(cur))+'</span>'+(fxCache.date?'<i>'+esc(fxCache.date.slice(8,10)+' '+MONS[+fxCache.date.slice(5,7)-1])+'</i>':'')+'</div>';
   setTimeout(function(){fxFetch(false);},0);
   if(!(r>0)) return h+'<p class="hint" style="margin:4px 0 0">'+(fxBusy?'Getting the rate…':navigator.onLine===false?'No internet. The rate comes when you’re online, then it stays for the flight.':'No rate yet.')+'</p><button type="button" class="lv-more" data-act="prepFx">Get the rate</button></div>';
-  var aedPer=1/r,nice=fxNice(r);
-  h+='<div class="fx-r"><b>1 '+cur+' = '+fxFmt(aedPer)+' AED</b><span>100 AED = '+fxFmt(100*r)+' '+cur+'</span></div>'+
+  var aedPer=1/r,nice=fxNice(r),un=1;while(un*aedPer<1&&un<1e6) un*=10;
+  h+='<div class="fx-r"><b>'+fxFmt(un)+' '+cur+' = '+fxFmt(un*aedPer)+' AED</b><span>100 AED = '+fxFmt(100*r)+' '+cur+'</span></div>'+
     '<div class="fx-c"><label><small>'+cur+'</small><input type="text" inputmode="decimal" data-fx="loc" data-r="'+r+'" value="'+fxFmt(nice[1]||nice[0])+'" autocomplete="off"></label><span class="fx-sw">='+'</span>'+
     '<label><small>AED</small><input type="text" inputmode="decimal" data-fx="aed" data-r="'+r+'" value="'+fxFmt((nice[1]||nice[0])*aedPer)+'" autocomplete="off"></label></div>'+
     '<div class="fx-q">'+nice.map(function(v){return '<div><b>'+fxFmt(v)+'</b><span>'+fxFmt(v*aedPer)+' AED</span></div>';}).join('')+'</div>';
@@ -9463,20 +9719,21 @@ function prepSosHTML(t,C){
   h+=pl.tel.map(function(x){return '<div class="ct mine"><a href="'+telA(x.v)+'">'+IX.phone+'<span>'+esc(x.n||'Number')+'</span><b>'+esc(x.v)+'</b></a><button type="button" class="ib" data-act="prepTelDel" data-v="'+t.dest+'" data-id="'+x.id+'" aria-label="Remove '+esc(x.n)+'">'+I.x+'</button></div>';}).join('');
   return h+'<button type="button" class="lv-more" data-act="prepTel" data-v="'+t.dest+'">'+I.plus+'Add a number: hotel, station, embassy…</button></div>';
 }
-function prepStayHTML(t){
-  var pl=prepPlace(t.dest);
-  return '<div class="lv-card ho-in"><div class="pc-h"><span class="lv-l">'+IX.hotel+'Stay</span></div><label class="ho-n"><span>Hotel</span><textarea data-pp="hotel" data-v="'+t.dest+'" rows="2" maxlength="2000" placeholder="Name, address, what to remember">'+esc(pl.hotel)+'</textarea></label>'+
-    '<div class="lv-l prep-sh">Places you saved</div><div class="prep-items">'+pl.items.map(function(x){
-    return '<div class="pi-row"><span>'+esc(x.t)+'</span><button type="button" class="ib" data-act="prepPlDel" data-v="'+t.dest+'" data-id="'+x.id+'" aria-label="Remove">'+I.x+'</button></div>';
-  }).join('')+'<div class="pi-add"><input type="text" id="prepPlIn" maxlength="200" placeholder="A restaurant, a run, a shop…"><button type="button" class="btn small" data-act="prepPlAdd" data-v="'+t.dest+'">Add</button></div></div></div>';
-}
-function prepGoodHTML(t,C,tz,htz,now){
-  var off=tzOffAt(tz,now),dm=off-tzOffAt(htz,now),rows=[];
+function prepGoodHTML(t,C,tz,htz,now,L){
+  var off=tzOffAt(tz,now),dm=off-tzOffAt(htz,now),rows=[],X=CTRY2[ctryOf(t.dest)],r=apRecOf(t.dest);
   if(C) rows.push([IX.plug,'Power','Type '+C[1]+' · '+C[2]+' V'],[IX.car,'Traffic','Drives on the '+(C[3]==='L'?'left':'right')]);
   if(tz) rows.push([IX.evt,'Clock','UTC'+offTxt(off)+' · '+(dm===0?'same as '+prepHomeCity():hDiff(dm)+(dm<0?' behind ':' ahead of ')+prepHomeCity())]);
   if(C) rows.push([IX.cash,'Money',curName(C[0])+' ('+C[0]+')']);
+  if(X){rows.push([IX.coins,'Tipping',X[0]],[IX.drop,'Tap water',WATER[X[1]]]);if(X[3]) rows.push([IX.store,'Shops',X[3]]);}
+  var aq=prepAir(t,L||[]);if(aq!=null) rows.push([IX.wind,'Air quality',aqTxt(aq)+' · AQI up to '+aq+' while you’re there']);
+  var hol=prepHols(t,L||[]);if(hol&&!hol.length) rows.push([IX.cal,'Holidays','None while you’re there']);
   if(!rows.length) return '';
-  return '<div class="lv-card"><div class="pc-h"><span class="lv-l">'+IX.info+'Good to know</span></div><div class="gk">'+rows.map(function(x){return '<div>'+x[0]+'<span><b>'+esc(x[1])+'</b>'+esc(x[2])+'</span></div>';}).join('')+'</div></div>';
+  var lang=(r&&PHR_AP[r.iata])||(X&&X[2])||'',Ph=PHR[lang];
+  var h='<div class="lv-card gk-card"><div class="pc-h"><span class="lv-l">'+IX.info+'Good to know</span></div>';
+  if(hol&&hol.length) h+='<div class="gk-hol">'+IX.cal+'<span>'+hol.map(function(x){var d=new Date(x[0]+'T12:00:00Z');return '<b>'+WDS[d.getUTCDay()]+' '+d.getUTCDate()+' '+MONS[d.getUTCMonth()]+' · '+esc(x[1])+'</b>';}).join('')+(hol.length>1?'Public holidays':'A public holiday')+': shops and restaurants may be closed or keep shorter hours.</span></div>';
+  h+='<div class="gk">'+rows.map(function(x){return '<div>'+x[0]+'<span><b>'+esc(x[1])+'</b>'+esc(x[2])+'</span></div>';}).join('')+'</div>';
+  if(Ph) h+='<div class="gk-ph"><div class="gk-pt">'+IX.talk+'<b>'+esc(Ph.n)+'</b><span>· tap to hear it</span></div>'+Ph.p.map(function(p,i){return '<button type="button" class="gk-pr" data-act="prepSay" data-v="'+lang+'" data-id="'+i+'"><span><strong>'+esc(p[0])+'</strong><em>'+esc(p[2])+(p[1]?' · '+esc(p[1]):'')+'</em></span><i>'+IX.speak+'</i></button>';}).join('')+'</div>';
+  return h+'</div>';
 }
 function prepMyNotesHTML(t){
   var n=state.apNotes[t.dest]||{},lay=(n.s_layover||[]).filter(function(x){return x.text;}),L=logAt(t.dest),last=logLastHTML(t.dest),cnt=apNoteCount(t.dest);
@@ -9485,6 +9742,312 @@ function prepMyNotesHTML(t){
   if(last) h+='<h4>Last time here</h4><div class="lg-last">'+last+'</div>';
   if(!lay.length&&!last) h+='<p class="hint" style="margin:2px 0 0">'+(cnt?cnt+' note'+(cnt>1?'s':'')+' for '+esc(t.dest)+', none in Layover yet.':'Nothing for '+esc(t.dest)+' yet. Add layover tips in Airports → Layover.')+'</p>';
   return h+'</div>';
+}
+/* ---------- Layover: the hotel (one per flight number, changeable per trip), getting around, your places, to buy here ---------- */
+IX.train=sv('<rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/><circle cx="8.5" cy="13.5" r=".7"/><circle cx="15.5" cy="13.5" r=".7"/>');
+IX.tap=sv('<rect x="3" y="7" width="11" height="14" rx="2"/><path d="M15.5 6.5a4 4 0 0 1 0 5M18 4a7.5 7.5 0 0 1 0 10M20.5 1.8a11 11 0 0 1 0 14.4"/>');
+IX.ferry=sv('<path d="M3 19c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0"/><path d="M5 16l-1-4h16l-1 4M8 12V8h8v4M12 5v3"/>');
+IX.bike=sv('<circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5l3 7M10 9l2 7H6M14 6h2.5"/>');
+IX.walk=sv('<circle cx="13" cy="4.3" r="1.8"/><path d="M13.2 7.5l-1.8 6 3 3V21M11.4 13.5L9 21M12.6 9.5l3.6 2.6M12.6 9.5L8.5 11.5"/>');
+IX.run=sv('<circle cx="15" cy="4.3" r="1.8"/><path d="M8 8.5l4-1.5 3 3-2.5 4 3 2.5-1 4.5M12.5 14L9 15.5 6 14M15 10l3 2"/>');
+IX.coffee=sv('<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v3M12 3v3"/>');
+IX.glass=sv('<path d="M6 3h12l-1.5 7a4.5 4.5 0 0 1-9 0z"/><path d="M12 14.5V21M8 21h8"/>');
+IX.fork=sv('<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M16 21V3c-2 1-3 4-3 8h3"/>');
+IX.star=sv('<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>');
+IX.cart=sv('<circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M3 4h2.5l2.2 11h10.6l2-8H6.4"/>');
+IX.gym=sv('<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>');
+IX.laundry=sv('<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4.5"/><path d="M7 6.5h2"/>');
+IX.wifi=sv('<path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.8 16a4.8 4.8 0 0 1 6.4 0"/><circle cx="12" cy="19.2" r=".9"/>');
+IX.door=sv('<path d="M6 21V4h12v17M3 21h18"/><circle cx="14.5" cy="12.5" r=".8"/>');
+IX.pool=sv('<path d="M3 17c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0M3 12.5c1.5 1.2 3 1.2 4.5 0s3-1.2 4.5 0 3 1.2 4.5 0 3-1.2 4.5 0"/><path d="M8 10V5.5a2 2 0 0 1 4 0M13 10V5.5a2 2 0 0 1 4 0"/>');
+IX.quote=sv('<path d="M6 8h4v4c0 3-1.5 4.5-4 5.5M14 8h4v4c0 3-1.5 4.5-4 5.5"/>');
+IX.speak=sv('<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>');
+IX.coins=sv('<ellipse cx="12" cy="6.5" rx="7" ry="3"/><path d="M5 6.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5M5 11.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>');
+IX.drop=sv('<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>');
+IX.store=sv('<path d="M4 10v10h16V10M3 10l2-6h14l2 6zM9 20v-5h6v5"/>');
+IX.wind=sv('<path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/>');
+IX.talk=sv('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/>');
+IX.cal=sv('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>');
+IX.open=sv('<path d="M8 16L16 8M9.5 8H16v6.5"/>');
+function goIcon(k){return k==='moon'?I.moon:k==='dep'?IX.dep:k==='car'?IX.car:IX[k]||IX.train;}
+// a flight number the way the roster writes it: EK414 (from UAE414, EK 0414…)
+function fnoKey(s){
+  var x=String(s||'').toUpperCase().replace(/\s+/g,'').replace(/^UAE(?=\d)/,'EK').replace(/^([A-Z]{2,3}?)0+(?=\d)/,'$1');
+  if(/^\d{1,4}$/.test(x)) x='EK'+x.replace(/^0+(?=\d)/,''); // a bare number is an Emirates flight
+  return x;
+}
+function fnoOk(x){return /^([A-Z]{2,3}|[A-Z]\d|\d[A-Z])\d{1,4}[A-Z]?$/.test(x);}
+function fnoList(v){return String(v||'').toUpperCase().replace(/([A-Z]{2,3})\s+(?=\d)/g,'$1').split(/[\s,;\/]+/).map(fnoKey).filter(function(x,i,A){return fnoOk(x)&&A.indexOf(x)===i;}).slice(0,12);}
+function normHotels(a){
+  if(!Array.isArray(a)) return [];
+  return a.filter(function(h){return h&&typeof h==='object'&&str(h.n).trim();}).map(function(h){
+    function s(k,n){return str(h[k]).slice(0,n);}
+    var f=Array.isArray(h.f)?h.f.map(fnoKey).filter(function(x,i,A){return fnoOk(x)&&A.indexOf(x)===i;}).slice(0,12):[];
+    return {id:str(h.id)||uid(),n:s('n',80),a:s('a',200),w:s('w',60),wp:s('wp',80),bf:s('bf',60),gym:s('gym',60),pool:s('pool',60),co:s('co',60),x:s('x',1000),f:f};
+  }).slice(0,12);
+}
+// the hotel for a trip: chosen for this trip, else the one linked to its flight number, else the only one there
+function tripHotel(t){
+  var H=prepPlace(t.dest).hotels,d=state.prep&&state.prep[t.id],f=fnoKey(t.fno),h;
+  if(!H.length) return {h:null,how:'none'};
+  if(d&&d.hotel&&(h=H.filter(function(x){return x.id===d.hotel;})[0])) return {h:h,how:'trip'};
+  if(f&&(h=H.filter(function(x){return x.f.indexOf(f)>=0;})[0])) return {h:h,how:'flight'};
+  if(H.length===1) return {h:H[0],how:'only'};
+  return {h:null,how:'choose'};
+}
+function hotelQ(h,ic){return h?(h.a?h.n+', '+h.a:h.n+', '+(prepCity(ic)||ic)):'';}
+function mapsQ(q){return 'https://maps.apple.com/?q='+encodeURIComponent(q);}
+function mapsGo(h,ic,to){return 'https://maps.apple.com/?'+(h?'saddr='+encodeURIComponent(hotelQ(h,ic))+'&':'')+'daddr='+encodeURIComponent(to+', '+(prepCity(ic)||ic))+'&dirflg=r';}
+function prepHotelHTML(t){
+  var pl=prepPlace(t.dest),r=tripHotel(t),h=r.h,d=prepData(t.id),f=fnoKey(t.fno),city=prepCity(t.dest)||t.dest;
+  var hd='<div class="pc-h"><span class="lv-l">'+IX.hotel+'Hotel</span>'+(pl.hotels.length?'<button type="button" class="lv-more" data-act="prepHoPick" data-id="'+esc(t.id)+'">Change</button>':'')+'</div>';
+  if(!pl.hotels.length) return '<div class="lv-card ho-card">'+hd+'<p class="hint" style="margin:0 0 4px">Add the hotel once: address, Wi-Fi, breakfast, gym… It’s kept for your next '+esc(city)+' trips'+(f?' and linked to '+esc(f):'')+'.</p>'+
+    '<button type="button" class="lv-more" data-act="prepHoEdit" data-id="'+esc(t.id)+'">'+I.plus+'Add the hotel</button></div>';
+  if(!h) return '<div class="lv-card ho-card">'+hd+'<p class="hint" style="margin:0 0 8px">'+esc(city)+' has '+pl.hotels.length+' hotels. Which one this time?</p><div class="ho-ch">'+
+    pl.hotels.map(function(x){return '<button type="button" class="lvc" data-act="prepHoSet" data-id="'+esc(t.id)+'" data-v="'+esc(x.id)+'">'+IX.hotel+esc(x.n)+(x.f.length?'<small>'+esc(x.f.join(', '))+'</small>':'')+'</button>';}).join('')+'</div></div>';
+  var how=r.how==='flight'?'For '+f:r.how==='trip'?'This trip only'+(f&&pl.hotels.some(function(x){return x!==h&&x.f.indexOf(f)>=0;})?' · '+f+' usually stays elsewhere':''):
+    r.how==='only'&&f&&h.f.length&&h.f.indexOf(f)<0?'Linked to '+h.f.join(', ')+'. Change it if '+f+' stays elsewhere.':'';
+  var kv=[];
+  if(h.w||h.wp) kv.push('<div>'+IX.wifi+'<span><b>Wi-Fi</b>'+esc(h.w||'')+(h.wp?(h.w?' · ':'')+'<i class="ho-pw">'+new Array(Math.min(9,h.wp.length)+1).join('•')+'</i><button type="button" class="ho-cp" data-act="prepHoCopy" data-v="'+t.dest+'" data-id="'+esc(h.id)+'">'+I.copy+'Copy</button>':'')+'</span></div>');
+  kv.push('<div>'+IX.door+'<span><b>Room</b><input type="text" class="ho-rm" data-room="'+esc(t.id)+'" maxlength="20" value="'+esc(d.room||'')+'" placeholder="This trip" autocomplete="off"></span></div>');
+  [[IX.fork,'Breakfast','bf'],[IX.gym,'Gym','gym'],[IX.pool,'Pool','pool'],[IX.evt,'Check-out','co']].forEach(function(x){if(h[x[2]]) kv.push('<div>'+x[0]+'<span><b>'+x[1]+'</b>'+esc(h[x[2]])+'</span></div>');});
+  var q=hotelQ(h,t.dest);
+  return '<div class="lv-card ho-card">'+hd+'<div class="ho-hn"><div><b>'+esc(h.n)+'</b><span>'+esc(h.a||city)+'</span>'+(how?'<em>'+esc(how)+'</em>':'')+'</div><a class="ho-btn" href="'+esc(mapsQ(q))+'" target="_blank" rel="noopener">'+IX.open+'Map</a></div>'+
+    '<div class="ho-kv">'+kv.join('')+'</div>'+(h.x?'<p class="ho-x">'+esc(h.x)+'</p>':'')+
+    '<div class="lv-l prep-sh">Near the hotel</div><div class="go-chips">'+[[IX.cart,'Supermarket'],[IX.plusbox,'Pharmacy'],[IX.coffee,'Coffee'],[IX.gym,'Gym'],[IX.cash,'ATM'],[IX.laundry,'Laundry']].map(function(x){
+      return '<a class="go-chip" href="'+esc(mapsQ(x[1]+' near '+q))+'" target="_blank" rel="noopener">'+x[0]+x[1]+'</a>';}).join('')+'</div>'+
+    '<button type="button" class="lv-more" data-act="prepHoEdit" data-id="'+esc(t.id)+'" data-v="'+esc(h.id)+'">'+I.edit+'Edit '+esc(h.n)+'</button></div>';
+}
+// pick the hotel for this trip, and keep it for the flight number if you like
+function prepHoPick(tid){
+  var t=prepTripOf(tid);if(!t) return;
+  var pl=prepPlace(t.dest),d=prepData(t.id),f=fnoKey(t.fno),cur=tripHotel(t),sel=cur.h?cur.h.id:'';
+  var linked=f?pl.hotels.filter(function(x){return x.f.indexOf(f)>=0;})[0]:null;
+  function rows(){return pl.hotels.map(function(x){return '<button type="button" class="ho-opt'+(x.id===sel?' on':'')+'" data-sact="h" data-v="'+esc(x.id)+'"><i></i><span><b>'+esc(x.n)+'</b><small>'+esc(x.f.length?x.f.join(', '):'No flight linked')+(x.a?' · '+x.a:'')+'</small></span></button>';}).join('');}
+  openSheet('<h3>Hotel for '+esc(t.fno||'this trip')+'</h3><p class="hint">'+esc(prepCity(t.dest)||t.dest)+' · arriving '+esc(dayLbl(t.sta,tzOffAt(apRecOf(t.dest)&&apRecOf(t.dest).tz,t.sta)))+'</p>'+
+    '<div class="ho-opts" id="hoOpts">'+rows()+'</div><button type="button" class="lv-more" data-sact="new">'+I.plus+'Add another hotel</button>'+
+    (f?'<label class="chk"><input type="checkbox" id="hoAlw"'+(linked?'':' checked')+'> Use it for every '+esc(f)+' from now on</label>':'')+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Save</button></div>',
+  function(act,btn){
+    if(act==='h'){sel=btn.getAttribute('data-v');$('#hoOpts').innerHTML=rows();return;}
+    if(act==='new'){closeSheet();prepHotelSheet(t.dest,null,t.id);return;}
+    if(act!=='save'){closeSheet();return;}
+    if(!sel){toast('Pick a hotel');return;}
+    var alw=f&&$('#hoAlw')&&$('#hoAlw').checked;
+    if(alw){pl.hotels.forEach(function(x){x.f=x.f.filter(function(y){return y!==f;});if(x.id===sel) x.f.push(f);});d.hotel='';}
+    else d.hotel=linked&&linked.id===sel?'':sel;
+    save();closeSheet();refreshTool();
+  });
+}
+// add or change a hotel: the details stay with the city, flight numbers say which trips use it
+function prepHotelSheet(ic,hid,tid){
+  var pl=prepPlace(ic),h=hid?pl.hotels.filter(function(x){return x.id===hid;})[0]:null,t=tid?prepTripOf(tid):null,f=t?fnoKey(t.fno):'';
+  if(hid&&!h) return;
+  function v(k){return esc(h?h[k]||'':'');}
+  function fl(id,lab,k,ph,n,ty){return '<label class="fld"><span class="fl">'+lab+'</span><input type="'+(ty||'text')+'" id="'+id+'" maxlength="'+n+'" value="'+v(k)+'" placeholder="'+esc(ph)+'" autocomplete="off"></label>';}
+  openSheet('<h3>'+(h?'Change the hotel':'Add a hotel in '+esc(prepCity(ic)||ic))+'</h3>'+
+    fl('hoN','Name','n','Hotel name',80)+fl('hoA','Address','a','Street, area',200)+
+    '<div class="fl-2">'+fl('hoW','Wi-Fi network','w','Network name',60)+fl('hoP','Wi-Fi password','wp','Password',80)+'</div>'+
+    '<div class="fl-2">'+fl('hoB','Breakfast','bf','06:00–10:30, level 2',60)+fl('hoG','Gym','gym','24 h, level 5',60)+'</div>'+
+    '<div class="fl-2">'+fl('hoS','Pool','pool','06:00–21:00',60)+fl('hoC','Check-out','co','Late for crew',60)+'</div>'+
+    '<label class="fld"><span class="fl">Notes</span><textarea id="hoX" rows="3" maxlength="1000" placeholder="Crew room, which lift, the good café opposite…">'+v('x')+'</textarea></label>'+
+    '<label class="fld"><span class="fl">Flights that stay here</span><input type="text" id="hoF" maxlength="80" value="'+esc(h?h.f.join(', '):f)+'" placeholder="EK414, EK412" autocapitalize="characters" autocomplete="off"></label>'+
+    '<p class="hint">A flight number belongs to one hotel here. Trips on other flights can still pick this hotel.</p>'+
+    (h?'<div class="tools"><button type="button" class="btn small danger" data-sact="del">'+I.trash+'Delete this hotel</button></div>':'')+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">'+(h?'Save':'Add')+'</button></div>',
+  function(act){
+    if(act==='del'){
+      pl.hotels=pl.hotels.filter(function(x){return x!==h;});
+      Object.keys(state.prep||{}).forEach(function(k){if(state.prep[k].hotel===h.id) state.prep[k].hotel='';});
+      save();closeSheet();refreshTool();toast(h.n+' deleted');return;
+    }
+    if(act!=='save'){closeSheet();return;}
+    var n=String($('#hoN').value||'').trim();if(!n){toast('Type the hotel’s name');$('#hoN').focus();return;}
+    var fs=fnoList($('#hoF').value);
+    var o=h||{id:uid()};
+    o.n=n.slice(0,80);o.a=String($('#hoA').value||'').trim().slice(0,200);o.w=String($('#hoW').value||'').trim().slice(0,60);o.wp=String($('#hoP').value||'').slice(0,80);
+    o.bf=String($('#hoB').value||'').trim().slice(0,60);o.gym=String($('#hoG').value||'').trim().slice(0,60);o.pool=String($('#hoS').value||'').trim().slice(0,60);o.co=String($('#hoC').value||'').trim().slice(0,60);
+    o.x=String($('#hoX').value||'').trim().slice(0,1000);o.f=fs;
+    pl.hotels.forEach(function(x){if(x!==o) x.f=x.f.filter(function(y){return fs.indexOf(y)<0;});});
+    if(!h) pl.hotels.push(o);
+    if(t&&!h){var dd=prepData(t.id);dd.hotel='';if(tripHotel(t).h!==o) dd.hotel=o.id;}
+    save();closeSheet();refreshTool();
+  });
+  setTimeout(function(){var e=$('#hoN');if(e&&!h) e.focus();},60);
+}
+// getting around: the city’s notes, directions from the hotel to your places, your own tips
+function prepGoHTML(t,h){
+  var r=apRecOf(t.dest),g=goOf(r&&r.iata),pl=prepPlace(t.dest),city=prepCity(t.dest)||t.dest,wv='https://en.wikivoyage.org/wiki/'+encodeURIComponent(city.replace(/ /g,'_'))+'#Get_around';
+  var s='<div class="lv-card go-card"><div class="pc-h"><span class="lv-l">'+IX.train+'Getting around '+esc(city)+'</span></div>';
+  if(g&&g.p) s+='<div class="go-pay"><i>'+IX.tap+'</i><span><strong>'+esc(g.p[0])+'</strong>'+esc(g.p[1])+'</span></div>';
+  if(g) s+='<div class="go-rows">'+g.r.map(function(x){return '<div class="ct">'+goIcon(x[0])+'<span><b>'+esc(x[1])+'</b><small>'+esc(x[2])+'</small></span></div>';}).join('')+'</div>';
+  else s+='<p class="hint" style="margin:0 0 6px">No built-in notes for '+esc(city)+' yet. <a href="'+esc(wv)+'" target="_blank" rel="noopener">Get around on Wikivoyage</a></p>';
+  s+='<div class="lv-l prep-sh">'+(h?'By public transport from the hotel':'By public transport from where you are')+'</div><div class="go-chips">'+
+    pl.items.slice(0,10).map(function(x){return '<a class="go-chip" href="'+esc(mapsGo(h,t.dest,x.t))+'" target="_blank" rel="noopener">'+I.pin+esc(x.t.length>34?x.t.slice(0,32)+'…':x.t)+'</a>';}).join('')+
+    '<button type="button" class="go-chip ghost" data-act="prepGoElse" data-id="'+esc(t.id)+'">'+I.search+'Somewhere else</button></div>';
+  s+=pl.tips.map(function(x){return '<div class="go-tip">'+IX.quote+'<span>'+esc(x.t)+'</span><button type="button" class="ib" data-act="prepTipDel" data-v="'+t.dest+'" data-id="'+esc(x.id)+'" aria-label="Remove this tip">'+I.x+'</button></div>';}).join('');
+  s+='<div class="pi-add"><input type="text" id="prepTipIn" maxlength="300" placeholder="Your tip: the quicker bus, the station exit…"><button type="button" class="btn small" data-act="prepTipAdd" data-v="'+t.dest+'">Add</button></div>';
+  return s+'<p class="pc-note">'+(g?'Built-in notes, checked Nov 2026. Things change, so add what you find. ':'')+'Places open Apple Maps with public transport directions. <a href="'+esc(wv)+'" target="_blank" rel="noopener">More on Wikivoyage</a></p></div>';
+}
+function prepGoElse(tid){
+  var t=prepTripOf(tid);if(!t) return;var h=tripHotel(t).h;
+  openSheet('<h3>Where to?</h3><p class="hint">Apple Maps opens with public transport directions'+(h?' from '+esc(h.n):'')+'.</p>'+
+    '<label class="fld"><span class="fl">Place</span><input type="text" id="goTo" maxlength="120" placeholder="A place or an address in '+esc(prepCity(t.dest)||t.dest)+'" autocomplete="off"></label>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="go">Directions</button></div>',
+  function(act){
+    if(act!=='go'){closeSheet();return;}
+    var v=String($('#goTo').value||'').trim();if(!v){toast('Type a place');return;}
+    closeSheet();window.open(mapsGo(h,t.dest,v),'_blank','noopener');
+  });
+  setTimeout(function(){var e=$('#goTo');if(e) e.focus();},60);
+}
+// your places: a type each, and directions by public transport
+var PLACE_K={eat:['Eat',IX.fork,'#d9622b'],drink:['Drinks',IX.glass,'#8a4fd1'],coffee:['Coffee',IX.coffee,'#8b5e3c'],walk:['Walk',IX.walk,'#1a9e5c'],run:['Run',IX.run,'#14804a'],shop:['Shop',IX.bag,'#c2417a'],see:['See',IX.star,'#0a7699'],other:['Other',I.pin,'#6b7280']};
+var prepPlF='';
+function placeGuess(t){
+  var s=String(t||'').toLowerCase();
+  return /coffee|caf[eé]|espresso|roaster/.test(s)?'coffee':/\bbar\b|\bpub\b|brewery|wine|cocktail|rooftop/.test(s)?'drink':/\brun\b|running|jog|\bloop\b/.test(s)?'run':/walk|hike|trail|stroll/.test(s)?'walk':
+    /restaurant|ramen|sushi|pizza|burger|noodle|steak|bistro|dinner|lunch|breakfast|brunch|kitchen|grill|food|eat/.test(s)?'eat':/shop|mall|market|store|outlet|westfield|department/.test(s)?'shop':
+    /museum|gallery|park|beach|temple|shrine|church|cathedral|palace|castle|tower|bridge|view|zoo|garden/.test(s)?'see':'other';
+}
+function prepPlacesHTML(t,h){
+  var pl=prepPlace(t.dest),city=prepCity(t.dest)||t.dest,ks=[];
+  pl.items.forEach(function(x){var k=PLACE_K[x.k]?x.k:'other';if(ks.indexOf(k)<0) ks.push(k);});
+  if(prepPlF&&ks.indexOf(prepPlF)<0) prepPlF='';
+  var L=pl.items.filter(function(x){return !prepPlF||(PLACE_K[x.k]?x.k:'other')===prepPlF;});
+  var s='<div class="lv-card pl-card"><div class="pc-h"><span class="lv-l">'+I.pin+'Your places in '+esc(city)+'</span></div>';
+  if(ks.length>1) s+='<div class="pl-f"><button type="button" class="'+(prepPlF?'':'on')+'" data-act="prepPlF" data-v="">All '+pl.items.length+'</button>'+Object.keys(PLACE_K).filter(function(k){return ks.indexOf(k)>=0;}).map(function(k){return '<button type="button" class="'+(prepPlF===k?'on':'')+'" data-act="prepPlF" data-v="'+k+'">'+PLACE_K[k][0]+'</button>';}).join('')+'</div>';
+  s+=L.map(function(x){var K=PLACE_K[x.k]||PLACE_K.other;
+    return '<div class="pl-row"><button type="button" class="pl-main" data-act="prepPlOpen" data-v="'+t.dest+'" data-id="'+esc(x.id)+'"><i style="background:'+K[2]+'">'+K[1]+'</i><span><b>'+esc(x.t)+'</b><small>'+esc(x.n||K[0])+'</small></span></button>'+
+      '<a class="pl-go" href="'+esc(mapsGo(h,t.dest,x.t))+'" target="_blank" rel="noopener" aria-label="Directions to '+esc(x.t)+'">'+IX.train+'Go</a></div>';}).join('');
+  if(!pl.items.length) s+='<p class="hint" style="margin:0 0 6px">Restaurants, runs, shops you like here: they come back on every '+esc(city)+' trip.</p>';
+  return s+'<div class="pi-add"><input type="text" id="prepPlIn" maxlength="200" placeholder="A restaurant, a run, a shop…"><button type="button" class="btn small" data-act="prepPlAdd" data-v="'+t.dest+'">Add</button></div></div>';
+}
+function prepPlaceSheet(ic,pid){
+  var pl=prepPlace(ic),p=pl.items.filter(function(x){return x.id===pid;})[0];if(!p) return;
+  var k=PLACE_K[p.k]?p.k:'other';
+  function chips(){return Object.keys(PLACE_K).map(function(x){return '<button type="button" class="opt'+(x===k?' on':'')+'" data-sact="k" data-v="'+x+'">'+PLACE_K[x][0]+'</button>';}).join('');}
+  openSheet('<h3>'+esc(p.t)+'</h3>'+
+    '<label class="fld"><span class="fl">Name</span><input type="text" id="plN" maxlength="200" value="'+esc(p.t)+'" autocomplete="off"></label>'+
+    '<div class="opts" id="plK">'+chips()+'</div>'+
+    '<label class="fld"><span class="fl">Note</span><input type="text" id="plX" maxlength="120" value="'+esc(p.n||'')+'" placeholder="Sunset drinks, 5 min walk, closed Mondays…" autocomplete="off"></label>'+
+    '<div class="tools"><button type="button" class="btn small danger" data-sact="del">'+I.trash+'Delete</button></div>'+
+    '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="save">Save</button></div>',
+  function(act,btn){
+    if(act==='k'){k=btn.getAttribute('data-v');$('#plK').innerHTML=chips();return;}
+    if(act==='del'){pl.items=pl.items.filter(function(x){return x!==p;});save();closeSheet();refreshTool();return;}
+    if(act!=='save'){closeSheet();return;}
+    var n=String($('#plN').value||'').trim();if(!n){toast('Type the name');return;}
+    p.t=n.slice(0,200);p.k=k;p.n=String($('#plX').value||'').trim().slice(0,120);save();closeSheet();refreshTool();
+  });
+}
+// to buy here: stays on the list until you tick it, on every trip to the city
+function prepBuyHTML(t){
+  var pl=prepPlace(t.dest),now=Date.now(),city=prepCity(t.dest)||t.dest;
+  var L=pl.buy.filter(function(x){return !x.done||now-(x.at||0)<60*86400000;}).sort(function(a,b){return (a.done?1:0)-(b.done?1:0);}),n=pl.buy.filter(function(x){return !x.done;}).length,nd=L.filter(function(x){return x.done;}).length;
+  return '<div class="lv-card prep-items buy-card"><div class="pc-h"><span class="lv-l">'+IX.bag+'To buy in '+esc(city)+(n?' · '+n:'')+'</span>'+(nd?'<button type="button" class="lv-more" data-act="prepBuyClr" data-v="'+t.dest+'">Clear ticked</button>':'')+'</div>'+
+    L.map(function(x){var d=x.done&&x.at?new Date(x.at):null;
+      return '<div class="pi-row bi'+(x.done?' done':'')+'"><button type="button" class="pi-cb" data-act="prepBuy" data-v="'+t.dest+'" data-id="'+esc(x.id)+'" aria-pressed="'+!!x.done+'">'+(x.done?I.check:'')+'</button><span>'+esc(x.t)+(d?'<i>bought '+d.getDate()+' '+MONS[d.getMonth()]+'</i>':'')+'</span>'+
+        '<button type="button" class="ib" data-act="prepBuyDel" data-v="'+t.dest+'" data-id="'+esc(x.id)+'" aria-label="Remove">'+I.x+'</button></div>';}).join('')+
+    (L.length?'':'<p class="hint" style="margin:0 0 6px">Something to get here? It stays on the list until you tick it, on every '+esc(city)+' trip.</p>')+
+    '<div class="pi-add"><input type="text" id="prepBuyIn" maxlength="80" placeholder="Something to buy here"><button type="button" class="btn small" data-act="prepBuyAdd" data-v="'+t.dest+'">Add</button></div></div>';
+}
+function prepBuyCount(ic){var p=state.places&&state.places[ic];return p&&p.buy?p.buy.filter(function(x){return !x.done;}).length:0;}
+// the phrases, read out by the iPhone
+function prepSay(lang,i){
+  var P=PHR[lang],p=P&&P.p[+i];if(!p) return;
+  if(!window.speechSynthesis||typeof SpeechSynthesisUtterance==='undefined'){toast('Speech isn’t available here');return;}
+  try{
+    var u=new SpeechSynthesisUtterance(p[1]||p[0]),vs=speechSynthesis.getVoices()||[],lc=P.v.toLowerCase();u.lang=P.v;u.rate=.85;
+    var m=vs.filter(function(v){return String(v.lang).replace('_','-').toLowerCase()===lc;})[0]||vs.filter(function(v){return String(v.lang).toLowerCase().indexOf(lc.slice(0,2))===0;})[0];
+    if(m) u.voice=m;speechSynthesis.cancel();speechSynthesis.speak(u);
+  }catch(_){toast('Speech isn’t available here');}
+}
+/* ---------- the hour-by-hour forecast, air quality and public holidays (online when there is a connection, then kept) ---------- */
+function prepHours(ic){var c=prepCache[ic];return c&&c.hours&&c.hours.t0?c.hours:null;}
+function wxIdx(W,t){var i=Math.floor((t-W.t0)/3600000);return i>=0&&i<W.T.length?i:-1;}
+function wxDesc(W,i){
+  var c=W.C[i],p=W.P[i],k=wmoIcon(c),day=W.D[i]!==0;
+  var w=k==='rain'?(c>=51&&c<=57?'drizzle':'rain'):k==='storm'?'storm':k==='snow'?'snow':k==='fog'?'fog':k==='cloud'?'cloudy':k==='part'?'some cloud':day?'sunny':'clear night';
+  return Math.round(W.T[i])+'° · '+w+(p!=null&&p>=30&&(k==='rain'||k==='storm'||k==='snow'||p>=50)?' '+p+'%':'');
+}
+// good hours to be outside (daylight, dry, 8–28°, not when you sleep) and the rain, during the layover
+function prepWxWin(W,D){
+  var out={good:[],rain:[]};if(!W) return out;
+  var end=D.pick&&D.pick>D.a&&D.pick<D.b?D.pick:D.b,sl=(D.plan||[]).filter(function(p){return p.k==='sleep'||p.k==='nap';});
+  function runs(test,from,to){
+    var R=[],cur=null;
+    for(var t=Math.ceil(from/3600000)*3600000;t+3600000<=to;t+=3600000){
+      var i=wxIdx(W,t);if(i<0||!test(i,t)){cur=null;continue;}
+      if(cur&&cur.e===t){cur.e=t+3600000;cur.i.push(i);}else{cur={s:t,e:t+3600000,i:[i]};R.push(cur);}
+    }
+    return R;
+  }
+  out.good=runs(function(i,t){var c=W.C[i];return W.D[i]!==0&&(W.P[i]==null||W.P[i]<30)&&c<=3&&W.T[i]>=8&&W.T[i]<=28&&!sl.some(function(p){return t<p.e&&t+3600000>p.s;});},D.a+3600000,end-3600000)
+    .filter(function(r){return r.e-r.s>=7200000;}).sort(function(a,b){return (b.e-b.s)-(a.e-a.s);}).slice(0,3).sort(function(a,b){return a.s-b.s;})
+    .map(function(r){var T=r.i.map(function(i){return W.T[i];});return {s:r.s,e:r.e,lo:Math.round(Math.min.apply(null,T)),hi:Math.round(Math.max.apply(null,T))};});
+  out.rain=runs(function(i){var k=wmoIcon(W.C[i]);return (W.P[i]!=null&&W.P[i]>=50)||((k==='rain'||k==='storm'||k==='snow')&&(W.P[i]==null||W.P[i]>=30));},D.a,D.b)
+    .sort(function(a,b){return (b.e-b.s)-(a.e-a.s);}).slice(0,2).sort(function(a,b){return a.s-b.s;})
+    .map(function(r){return {s:r.s,e:r.e,p:Math.max.apply(null,r.i.map(function(i){return W.P[i]||0;})),snow:r.i.some(function(i){return wmoIcon(W.C[i])==='snow';})};});
+  return out;
+}
+function wxHH(tz,t){return hmAt(tz,t).slice(0,2);}
+function wxWinHTML(D){
+  var w=D.win;if(!w||(!w.good.length&&!w.rain.length)) return '';
+  return '<div class="tl-wx"><span>Good for outside:</span>'+(w.good.length?w.good.map(function(g){return '<span class="tl-chip">'+esc(WDS[new Date(g.s+tzOffAt(D.tz,g.s)*60000).getUTCDay()])+' '+wxHH(D.tz,g.s)+'–'+wxHH(D.tz,g.e)+' · '+(g.lo===g.hi?g.lo:g.lo+'–'+g.hi)+'° · dry</span>';}).join(''):'<span class="tl-chip n">none in the forecast</span>')+
+    w.rain.map(function(r){return '<span class="tl-chip r">'+(r.snow?'Snow ':'Rain ')+esc(WDS[new Date(r.s+tzOffAt(D.tz,r.s)*60000).getUTCDay()])+' '+wxHH(D.tz,r.s)+'–'+wxHH(D.tz,r.e)+(r.p?' · '+r.p+'%':'')+'</span>';}).join('')+'</div>';
+}
+// air quality (US AQI) during the stay, from the hourly forecast (5 days ahead)
+function aqTxt(v){return v<=50?'Good':v<=100?'Moderate':v<=150?'Unhealthy for sensitive people':v<=200?'Unhealthy':v<=300?'Very unhealthy':'Hazardous';}
+function prepAir(t,L){
+  var c=prepCache[t.dest],A=c&&c.aq;if(!A||!A.t0) return null;
+  var nx=prepNext(t,L),a=Math.max(t.sta,Date.now()-3600000),b=nx?nx.std:t.sta+48*3600000,mx=-1;
+  for(var x=Math.floor(a/3600000)*3600000;x<=b;x+=3600000){var i=Math.floor((x-A.t0)/3600000);if(i>=0&&i<A.A.length&&A.A[i]!=null&&A.A[i]>mx) mx=A.A[i];}
+  return mx<0?null:Math.round(mx);
+}
+// public holidays: from Nager.Date when it answers, else worked out by the date-holidays library; kept by country, region and year
+var HOLKEY='flightChecklist.hol',holBusy={};
+var holCache=(function(){try{var o=JSON.parse(localStorage.getItem(HOLKEY)||'{}');return o&&typeof o==='object'?o:{};}catch(_){return {};}})();
+function holSave(){try{localStorage.setItem(HOLKEY,JSON.stringify(holCache));}catch(_){}}
+function holKey(cc,sub,y){return cc+(sub?'-'+sub:'')+'-'+y;}
+function holGet(cc,sub,y){
+  var k=holKey(cc,sub,y),c=holCache[k];if(c&&c.d) return c.d;
+  if(holBusy[k]||navigator.onLine===false||(c&&c.err&&Date.now()-c.err<6*3600000)) return null;
+  holBusy[k]=1;
+  function done(list){holCache[k]={at:Date.now(),d:list};holSave();delete holBusy[k];if(toolOpen&&toolKind==='prep') refreshTool();}
+  function fail(){holCache[k]={err:Date.now()};holSave();delete holBusy[k];}
+  fetch('https://date.nager.at/api/v3/PublicHolidays/'+y+'/'+cc,{cache:'no-store'}).then(function(r){if(!r.ok) throw new Error('hol');return r.json();}).then(function(j){
+    if(!Array.isArray(j)) throw new Error('hol');
+    done(j.filter(function(x){return x&&x.date&&(!x.types||x.types.indexOf('Public')>=0)&&(x.global!==false||(sub&&(x.counties||[]).indexOf(cc+'-'+sub)>=0));}).map(function(x){return [String(x.date).slice(0,10),str(x.name||x.localName).slice(0,60)];}));
+  }).catch(function(){
+    holLib().then(function(Hl){
+      var hd;try{hd=sub?new Hl(cc,sub,{languages:['en']}):new Hl(cc,{languages:['en']});}catch(_){hd=null;}
+      if(!hd||!hd.getHolidays) hd=new Hl(cc,{languages:['en']});
+      var L=hd.getHolidays(y)||[];
+      done(L.filter(function(x){return x&&x.type==='public';}).map(function(x){return [String(x.date).slice(0,10),str(x.name).slice(0,60)];}));
+    }).catch(fail);
+  });
+  return null;
+}
+var holLibP=null;
+function holLib(){
+  if(window.Holidays) return Promise.resolve(window.Holidays.default||window.Holidays);
+  if(holLibP) return holLibP;
+  holLibP=new Promise(function(ok,no){
+    var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/date-holidays@3/dist/umd.min.js';s.async=true;
+    s.onload=function(){var H=window.Holidays;if(H) ok(H.default||H);else no(new Error('hol'));};
+    s.onerror=function(){holLibP=null;no(new Error('hol'));};document.head.appendChild(s);
+  });
+  return holLibP;
+}
+// the holidays on the days you are there (local dates from landing to the flight out)
+function prepHols(t,L){
+  var r=apRecOf(t.dest),cc=ctryOf(t.dest),tz=r&&r.tz;if(!cc||!tz) return null;
+  var nx=prepNext(t,L),d0=ymdAt(t.sta,tzOffAt(tz,t.sta)),d1=ymdAt(nx?nx.std:t.sta+36*3600000,tzOffAt(tz,nx?nx.std:t.sta)),sub=HOL_SUB[r.iata]||'';
+  var ys=[d0.slice(0,4)];if(d1.slice(0,4)!==ys[0]) ys.push(d1.slice(0,4));
+  var out=[],known=true;
+  ys.forEach(function(y){var d=holGet(cc,sub,+y);if(!d){known=false;return;}d.forEach(function(x){if(x[0]>=d0&&x[0]<=d1&&!out.some(function(o){return o[0]===x[0];})) out.push(x);});});
+  return known?out:(out.length?out:null);
 }
 // wake-up or pick-up for a flight out: a local time at that airport, on the day of the flight (or the day before, if it’s later than departure)
 function prepTimeSheet(id,k){
@@ -9596,14 +10159,28 @@ function prepFcHTML(t,L,tz){
 }
 function prepFetch(ic,force){
   var rec=apRecOf(ic);if(!rec||rec.lat==null||prepBusy[ic]) return;
-  var c=prepCache[ic];if(!force&&c&&c.at&&Date.now()-c.at<3*3600000&&c.days&&c.days.some(function(x){return 'uv' in x;})) return;
+  var c=prepCache[ic];if(!force&&c&&c.at&&Date.now()-c.at<3*3600000&&c.days&&c.days.some(function(x){return 'uv' in x;})&&'hours' in c) return;
   if(!force&&c&&c.err&&Date.now()-c.err<600000) return;
   if(navigator.onLine===false) return;
   prepBusy[ic]=1;
-  var u='https://api.open-meteo.com/v1/forecast?latitude='+rec.lat+'&longitude='+rec.lon+'&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&timezone='+encodeURIComponent(rec.tz||'auto')+'&forecast_days=16';
-  fetch(u,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-    var d=j&&j.daily;if(!d||!Array.isArray(d.time)) throw new Error('no forecast');
-    prepCache[ic]={at:Date.now(),days:d.time.map(function(x,i){return {d:x,c:+d.weather_code[i],hi:+d.temperature_2m_max[i],lo:+d.temperature_2m_min[i],p:d.precipitation_probability_max?d.precipitation_probability_max[i]:null,uv:d.uv_index_max&&d.uv_index_max[i]!=null?+d.uv_index_max[i]:null};})};
+  var ll='latitude='+rec.lat+'&longitude='+rec.lon;
+  var u='https://api.open-meteo.com/v1/forecast?'+ll+'&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&timezone='+encodeURIComponent(rec.tz||'auto')+'&forecast_days=16';
+  var u2='https://api.open-meteo.com/v1/forecast?'+ll+'&hourly=temperature_2m,precipitation_probability,weather_code,is_day&timezone=GMT&forecast_days=16';
+  var u3='https://air-quality-api.open-meteo.com/v1/air-quality?'+ll+'&hourly=us_aqi&timezone=GMT&forecast_days=5';
+  function get(x){return fetch(x,{cache:'no-store'}).then(function(r){return r.json();});}
+  // hourly values in UTC, one an hour from t0
+  function hrs(j,keys){
+    var h=j&&j.hourly;if(!h||!Array.isArray(h.time)||!h.time.length) return null;
+    var t0=Date.parse(String(h.time[0]).length<=16?h.time[0]+':00Z':h.time[0]+'Z');if(!isFinite(t0)) return null;
+    var o={t0:t0};keys.forEach(function(k){o[k[0]]=Array.isArray(h[k[1]])?h[k[1]].map(function(v){return v==null||!isFinite(+v)?null:Math.round(+v*10)/10;}):[];});
+    return o[keys[0][0]].length?o:null;
+  }
+  Promise.all([get(u),get(u2).catch(function(){return null;}),get(u3).catch(function(){return null;})]).then(function(R){
+    var j=R[0],d=j&&j.daily;if(!d||!Array.isArray(d.time)) throw new Error('no forecast');
+    prepCache[ic]={at:Date.now(),days:d.time.map(function(x,i){return {d:x,c:+d.weather_code[i],hi:+d.temperature_2m_max[i],lo:+d.temperature_2m_min[i],p:d.precipitation_probability_max?d.precipitation_probability_max[i]:null,uv:d.uv_index_max&&d.uv_index_max[i]!=null?+d.uv_index_max[i]:null};}),
+      hours:hrs(R[1],[['T','temperature_2m'],['P','precipitation_probability'],['C','weather_code'],['D','is_day']]),aq:hrs(R[2],[['A','us_aqi']])};
+    // only recent places keep their hour-by-hour data
+    Object.keys(prepCache).forEach(function(k){var e=prepCache[k];if(e&&e.at&&Date.now()-e.at>5*86400000){delete e.hours;delete e.aq;}});
     prepCacheSave();prepAuto(ic);
   }).catch(function(){prepCache[ic]=Object.assign({},prepCache[ic]||{},{err:Date.now()});}).then(function(){
     delete prepBusy[ic];if(toolOpen&&toolKind==='prep') refreshTool();
@@ -9706,7 +10283,28 @@ function prepAct(act,el){
     case 'prepPkCd':
       var dp=prepData(id),tp=prepTripOf(id);if(!dp.pickup||!tp) return;
       var c=newCd();c.title='Pick-up '+ap3(tp.dest);c.target=dp.pickup;state.tools.cds.push(c);save();toast('Added to Timers');return;
-    case 'prepPlAdd': var pi=$('#prepPlIn'),pv=String(pi&&pi.value||'').trim();if(!pv) return;prepPlace(v).items.push({id:uid(),t:pv.slice(0,200)});save();refreshTool();return;
+    case 'prepPlAdd': var pi=$('#prepPlIn'),pv=String(pi&&pi.value||'').trim();if(!pv) return;prepPlace(v).items.push({id:uid(),t:pv.slice(0,200),k:placeGuess(pv),n:''});save();refreshTool();return;
+    case 'prepPlOpen': prepPlaceSheet(v,id);return;
+    case 'prepPlF': prepPlF=v||'';refreshTool();return;
+    case 'prepHoPick': prepHoPick(id);return;
+    case 'prepHoEdit': var th=prepTripOf(id);if(th) prepHotelSheet(th.dest,v||null,id);return;
+    case 'prepHoSet':
+      var ts=prepTripOf(id);if(!ts) return;
+      var ps=prepPlace(ts.dest),fs=fnoKey(ts.fno),ds=prepData(ts.id);
+      // the first time a flight number meets a hotel, they stay together
+      if(fs&&!ps.hotels.some(function(x){return x.f.indexOf(fs)>=0;})){ps.hotels.forEach(function(x){if(x.id===v) x.f.push(fs);});ds.hotel='';toast('Linked to '+fs);}else ds.hotel=v;
+      save();refreshTool();return;
+    case 'prepHoCopy':
+      var hc=prepPlace(v).hotels.filter(function(x){return x.id===id;})[0];if(!hc||!hc.wp) return;
+      (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(hc.wp):Promise.reject()).then(function(){toast('Wi-Fi password copied');},function(){toast(hc.wp,4000);});return;
+    case 'prepGoElse': prepGoElse(id);return;
+    case 'prepTipAdd': var ti=$('#prepTipIn'),tv=String(ti&&ti.value||'').trim();if(!tv) return;prepPlace(v).tips.push({id:uid(),t:tv.slice(0,300)});save();refreshTool();return;
+    case 'prepTipDel': var pq=prepPlace(v);pq.tips=pq.tips.filter(function(x){return x.id!==id;});save();refreshTool();return;
+    case 'prepBuy': prepPlace(v).buy.forEach(function(x){if(x.id===id){x.done=!x.done;x.at=x.done?Date.now():0;}});save();refreshTool();return;
+    case 'prepBuyAdd': var bu=$('#prepBuyIn'),bw=String(bu&&bu.value||'').trim();if(!bw) return;prepPlace(v).buy.push({id:uid(),t:bw.slice(0,80),done:false,at:0});save();refreshTool();var b4=$('#prepBuyIn');if(b4) b4.focus();return;
+    case 'prepBuyDel': var pb=prepPlace(v);pb.buy=pb.buy.filter(function(x){return x.id!==id;});save();refreshTool();return;
+    case 'prepBuyClr': var pc=prepPlace(v);pc.buy=pc.buy.filter(function(x){return !x.done;});save();refreshTool();return;
+    case 'prepSay': prepSay(v,id);return;
     case 'prepPlDel': var pp=prepPlace(v);pp.items=pp.items.filter(function(x){return x.id!==id;});save();refreshTool();return;
     case 'prepBi': var db=prepData(id);db.before.forEach(function(x){if(x.id===v) x.done=!x.done;});save();refreshTool();return;
     case 'prepBiDel': var dd=prepData(id);dd.before.forEach(function(x){if(x.id===v&&x.auto){(dd.skip||(dd.skip=[])).push(x.t.toLowerCase());}});dd.before=dd.before.filter(function(x){return x.id!==v;});save();refreshTool();return;
@@ -9907,7 +10505,7 @@ function prepInput(e){
     var r=+t.getAttribute('data-r'),v=fxNum(t.value),loc=t.getAttribute('data-fx')==='loc',o=toolPanel.querySelector('[data-fx="'+(loc?'aed':'loc')+'"]');
     if(o) o.value=v===null?'':fxFmt(loc?v/r:v*r);return;
   }
-  if(t.hasAttribute('data-pp')){prepPlace(t.getAttribute('data-v')).hotel=String(t.value||'').slice(0,2000);saveSoon();}
+  if(t.hasAttribute('data-room')){prepData(t.getAttribute('data-room')).room=String(t.value||'').slice(0,20);saveSoon();}
 }
 function prepChange(e){
   var t=e.target;if(!t.getAttribute||!t.hasAttribute('data-pk')) return;
@@ -9929,7 +10527,7 @@ toolPanel.addEventListener('keydown',function(e){
 });
 toolPanel.addEventListener('keydown',function(e){
   if(e.key!=='Enter'||!e.target.id) return;
-  var m={prepAltIn:'prepAltAdd',prepPlIn:'prepPlAdd',prepBiIn:'prepBiAdd'}[e.target.id];if(!m) return;
+  var m={prepAltIn:'prepAltAdd',prepPlIn:'prepPlAdd',prepBiIn:'prepBiAdd',prepTipIn:'prepTipAdd',prepBuyIn:'prepBuyAdd'}[e.target.id];if(!m) return;
   e.preventDefault();var b=e.target.parentNode.querySelector('[data-act="'+m+'"]');if(b) b.click();
 });
 window.addEventListener('resize',function(){

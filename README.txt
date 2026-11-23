@@ -39,22 +39,39 @@ each with the country's flag.
   leaving again. Wake-up and Pick-up are set by hand for each flight out, in local time; the app remembers how long
   before departure they were at that airport and offers it next time. Each can add a countdown to Timers.
 - The timeline: the place and Dubai side by side, from landing to departure. Drag the red line (iPad) or slide the
-  strip (iPhone): "Sat 12:25 in New York = Sat 21:25 in Dubai", with home awake or asleep. Dark is night at the place,
-  and the hours home is asleep (22-07). Tap the purple lane, or Add, to put in sleep, a nap, a workout, a meal, a call
-  home or anything else, with a note; tap one to change or delete it. Wake-up and pick-up show on it too.
+  strip (iPhone): "Sat 12:25 in New York = Sat 21:25 in Dubai", with home awake or asleep and the weather then. Dark is
+  night at the place, and the hours home is asleep (22-07). Tap the purple lane, or Add, to put in sleep, a nap, a
+  workout, a meal, a call home or anything else, with a note; tap one to change or delete it. Wake-up and pick-up show
+  on it too. On top, the weather hour by hour (Open-Meteo): temperature and sky, rain shaded blue, and good hours to
+  be outside outlined green (daylight, dry, 8-28 degrees, not while you sleep), listed under it with the rain.
 - Weather for your stay (Open-Meteo, with the UV), money (the rate to AED from a free daily source, a converter both
   ways; kept for offline), Before you go (your list; the app adds an adaptor when the plugs differ from Dubai's,
   sunscreen for a high UV, an umbrella or a warm jacket from the forecast; one you delete stays away), emergency
   numbers (built in for the countries Emirates flies to, tap to call) and your own numbers for that airport (hotel,
-  station, embassy), the hotel and places you saved, good to know (plugs, volts, driving side, clock, money), your
-  Layover notes and last time there. Below: all the notes for its airports, and live METAR/TAF with alternates.
+  station, embassy), good to know (plugs, volts, driving side, clock, money, tipping, tap water, shop hours, air
+  quality during the stay, public holidays while you're there, and a few phrases the iPhone reads out where English
+  isn't spoken), your Layover notes and last time there. Below: all the notes for its airports, and live METAR/TAF.
+- Getting around: built in for about 100 airports crews stay at (checked November 2026): how to pay (tap your bank
+  card, Suica in Apple Wallet...), the airport train, ferries or night trains, taxis and ride apps. Your places and
+  "Somewhere else" open Apple Maps with public transport directions from the hotel. Add your own tips. Elsewhere it
+  links to Wikivoyage.
+- Hotel: a city can have several hotels, each with its address, Wi-Fi (Copy for the password), breakfast, gym, pool,
+  check-out and notes, and the flight numbers that stay there (EK414, EK412). A trip uses the hotel of its flight
+  number; Change picks another one for this trip only, or for every trip on that flight. With several hotels and none
+  for the flight, it asks once and remembers. The room number is kept for the trip. Near the hotel opens Maps for a
+  supermarket, pharmacy, coffee, gym, ATM or laundry. (The old single hotel note became the first hotel.)
+- Your places: each has a type (eat, drinks, coffee, walk, run, shop, see) and a note, a filter, and Go for directions.
+- To buy here: a shopping list per city that stays until you tick it, on every trip there; the trip list shows "2 to buy".
+Holidays come from Nager.Date, or are worked out by the date-holidays library (jsDelivr) when that doesn't answer;
+air quality from Open-Meteo. Both are fetched when online and kept.
 Import roster reads the roster report from the crew portal ("Emirates Crew Roster (Detailed Report)", the PDF or its
 text), or CrewPulse's event notes. Only the flights are read (no names, days off, standby or training); times are
 local at each airport. It shows what's new, changed or the same before adding; a changed flight keeps your wake-up,
 pick-up and plan.
 With sync on (More → Settings), Layover syncs like the notes: trips, wake-up and pick-up, what you planned on the
-timeline, Before you go (ticks too), the hotel, places and numbers, removed duties and the list for new trips. The same
-item added on both devices before they synced shows once. The event log stays on each device. The sync file is now
+timeline, Before you go (ticks too), hotels (with Wi-Fi and flight numbers), the hotel and room picked for a trip,
+places, tips, the shopping lists, numbers, removed duties and the list for new trips. The same item added on both
+devices before they synced shows once. The event log stays on each device. The sync file is now
 format 3: a device still on an older version says it can't read it until you tap Update there.
 
 THE FLIGHT STRIP under the clock appears once Set flight has an ETD and an ETA: a plane at the time now, the time
