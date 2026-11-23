@@ -8266,7 +8266,7 @@ function synGet(m){
   return p.then(function(txt){
     var d=null;try{d=JSON.parse(txt);}catch(e){}
     // format 2 (v100) holds Previous flights, format 3 (v102) Prepare: a device still on an older version can't read it, so it can't drop them
-    if(!d||(d.format!=='flight-checklists-sync'&&d.format!=='flight-checklists-sync-2'&&d.format!=='flight-checklists-sync-3')||!d.flat||!d.flat.e||!d.flat.c) throw new Error('The synced copy online can’t be read. If this device has an Update button, tap it.');
+    if(!d||(d.format!=='flight-checklists-sync'&&d.format!=='flight-checklists-sync-2'&&d.format!=='flight-checklists-sync-3'&&d.format!=='flight-checklists-sync-4')||!d.flat||!d.flat.e||!d.flat.c) throw new Error('The synced copy online can’t be read. If this device has an Update button, tap it.');
     return d;
   });
 }
@@ -8290,7 +8290,7 @@ function synPut(text,sha){
 function synPush(F,Fs,sha,at,n){
   return synUpPhotos(F).then(function(){
     synProg='Syncing…';synPaint();
-    return synPut(JSON.stringify({format:'flight-checklists-sync-3',v:3,n:n,at:at,dev:devName(),flat:F}),sha);
+    return synPut(JSON.stringify({format:'flight-checklists-sync-4',v:4,n:n,at:at,dev:devName(),flat:F}),sha);
   }).then(function(nsha){
     syn.sha=nsha;syn.n=n;syn.etag='';syn.last=Date.now();synPushAt=Date.now();
     return synBaseSave(Fs);

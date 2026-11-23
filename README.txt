@@ -72,7 +72,8 @@ With sync on (More → Settings), Layover syncs like the notes: trips, wake-up a
 timeline, Before you go (ticks too), hotels (with Wi-Fi and flight numbers), the hotel and room picked for a trip,
 places, tips, the shopping lists, numbers, removed duties and the list for new trips. The same item added on both
 devices before they synced shows once. The event log stays on each device. The sync file is now
-format 3: a device still on an older version says it can't read it until you tap Update there.
+format 4 (it carries the hotels and shopping lists): a device still on an older version says it can't read it until you
+tap Update there, so it can't drop what it doesn't know.
 
 THE FLIGHT STRIP under the clock appears once Set flight has an ETD and an ETA: a plane at the time now, the time
 flown, the time to go, and your break from Crew rest in purple with a countdown ("rest in 2:40", then "1:10 left").
