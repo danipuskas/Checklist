@@ -30,13 +30,25 @@ A Flight log block in a checklist has the same buttons for the current flight; a
 arrival and departure at the destination (or departure). The old flight log was moved over: each flight became a
 departure and an arrival with its stand, taxi, runway, route and notes as lines; taxi times and registrations went.
 
-PREPARE in More: your next trips (added by hand, plus the flight that's set), each with tabs for the Place (local time,
-arrival, layover, sunrise and sunset, a forecast for your stay, last time there), your Notes for its airports, the Weather
-(METAR and TAF around your arrival, alternates you add) and the Layover (hotel, pick-up time with a countdown, places you
-saved, a Before you go list). On a wide iPad the trips sit on the left; in Slide Over and on the iPhone, one at a time.
-The forecast comes from Open-Meteo when you're online and stays on the device for the flight.
-Paste roster reads CrewPulse's event notes (flight number, then "DXB - 12 Nov 2026 08:30" and the arrival line, local
-times), from the clipboard or a box; Claude can read the Work calendar and hand the text over. Pasting again replaces them.
+PREPARE in More: your next trips, one page each (no tabs). On a wide iPad the trips sit on the left.
+- At the top: the city, the local time there and how far it is from Dubai, and a countdown to report.
+- Times: leaving Dubai (report, off blocks), landing (local, Dubai time and UTC, daylight or dark), the layover, and
+  leaving again. Wake-up and Pick-up are set by hand for each flight out, in local time; the app remembers how long
+  before departure they were at that airport and offers it next time. Each can add a countdown to Timers.
+- The timeline: the place and Dubai side by side, from landing to departure. Drag the red line (iPad) or slide the
+  strip (iPhone): "Sat 12:25 in New York = Sat 21:25 in Dubai", with home awake or asleep. Dark is night at the place,
+  and the hours home is asleep (22-07). Tap the purple lane, or Add, to put in sleep, a nap, a workout, a meal, a call
+  home or anything else, with a note; tap one to change or delete it. Wake-up and pick-up show on it too.
+- Weather for your stay (Open-Meteo, with the UV), money (the rate to AED from a free daily source, a converter both
+  ways; kept for offline), Before you go (your list; the app adds an adaptor when the plugs differ from Dubai's,
+  sunscreen for a high UV, an umbrella or a warm jacket from the forecast; one you delete stays away), emergency
+  numbers (built in for the countries Emirates flies to, tap to call) and your own numbers for that airport (hotel,
+  station, embassy), the hotel and places you saved, good to know (plugs, volts, driving side, clock, money), your
+  Layover notes and last time there. Below: all the notes for its airports, and live METAR/TAF with alternates.
+Import roster reads the roster report from the crew portal ("Emirates Crew Roster (Detailed Report)", the PDF or its
+text), or CrewPulse's event notes. Only the flights are read (no names, days off, standby or training); times are
+local at each airport. It shows what's new, changed or the same before adding; a changed flight keeps your wake-up,
+pick-up and plan.
 
 THE FLIGHT STRIP under the clock appears once Set flight has an ETD and an ETA: a plane at the time now, the time
 flown, the time to go, and your break from Crew rest in purple with a countdown ("rest in 2:40", then "1:10 left").
