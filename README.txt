@@ -85,8 +85,9 @@ On a wide iPad the trips sit on the left, each with the country's flag.
 - Your places: type a name and Add: the app searches OpenStreetMap and lists the matches nearest the hotel first, so
   you pick the right branch of a chain; or paste a place shared from Apple Maps or Google Maps (Share > Copy); or keep
   just the name (offline it's kept by name to pin later). A pinned place has its exact spot and address, a type from
-  the map (cafe, restaurant, shop...) and its distance from the hotel; Go takes you there by public transport from
-  where you are now, in Apple Maps or Google Maps (the places under Getting around still go from the hotel). Tap a place to change its name, type or note, or find it again.
+  the map (cafe, restaurant, shop...) and its distance from the hotel; Maps opens that place in Apple Maps or Google
+  Maps (the exact one: from its link or its pin), and Go is there if you want to go. The places under Getting around
+  still give public transport directions from the hotel. Tap a place to change its name, type or note, or find it again.
   A map above the list shows the hotel (H) and the pinned places, numbered as in the list: drag, pinch, double-tap
   or + and - to zoom, the square to see everything, tap a pin for Go. Pin the hotel from its card. The map is
   OpenStreetMap; the parts you've looked at are kept, so it works offline on the layover.
@@ -98,7 +99,7 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   Links from Maps: a long link (with the spot in it) pins the place straight away, also pasted into Add. The short
   links the iPhone shares now (maps.apple/p/..., maps.app.goo.gl/...) don't say where the place is, so the app keeps
   the link and asks you to pick the place from the list or on the map; then it has its distance and its pin. Just
-  the link saves it unpinned (Go then opens the link).
+  the link saves it unpinned (Maps then opens the link).
   Airport positions are now to about 1 km, so distances from the airport are right.
   Before you go has left the Layover page: make it a checklist of your own among the checklists.
 - To buy here: a shopping list per city that stays until you tick it, on every trip there; the trip list shows "2 to buy".

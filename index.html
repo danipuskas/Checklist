@@ -3053,7 +3053,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='113';
+var APP_VERSION='114';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -10133,7 +10133,7 @@ function prepPlacesHTML(t,h){
   var pts=[],num={},n=0;
   if(hg) pts.push({lat:hg.lat,lon:hg.lon,lbl:'H',cls:'h',name:h.n,sub:h.a||''});
   pl.items.forEach(function(x){var g=geoPt(x);if(!g) return;num[x.id]=++n;var K=PLACE_K[x.k]||PLACE_K.other;
-    pts.push({lat:g.lat,lon:g.lon,lbl:String(n),bg:K[2],name:x.t,sub:(x.n||K[0])+(from&&!from.ap?' · '+kmTxt(geoKm(from,g)):''),go:mapsHere(t.dest,x)});});
+    pts.push({lat:g.lat,lon:g.lon,lbl:String(n),bg:K[2],name:x.t,sub:(x.n||K[0])+(from&&!from.ap?' · '+kmTxt(geoKm(from,g)):''),go:mapsPlace(t.dest,x)});});
   var L=pl.items.filter(function(x){return !prepPlF||(PLACE_K[x.k]?x.k:'other')===prepPlF;});
   var s='<div class="lv-card pl-card"><div class="pc-h"><span class="lv-l">'+I.pin+'Your places in '+esc(city)+'</span></div>';
   if(pts.length) s+='<div class="pl-map" data-k="'+t.dest+'" data-pts="'+esc(JSON.stringify(pts))+'"></div>';
@@ -10142,7 +10142,7 @@ function prepPlacesHTML(t,h){
   s+=L.map(function(x){var K=PLACE_K[x.k]||PLACE_K.other,g=geoPt(x);
     var sub=(x.n||K[0])+(g&&from?' · '+kmTxt(geoKm(from,g))+(from.ap?' from the airport':''):'')+(!g&&x.url?' · from a link':'')+(!g&&!x.url?' · not pinned':'');
     return '<div class="pl-row"><button type="button" class="pl-main" data-act="prepPlOpen" data-v="'+t.dest+'" data-id="'+esc(x.id)+'"><i style="background:'+K[2]+'">'+K[1]+(num[x.id]?'<em>'+num[x.id]+'</em>':'')+'</i><span><b>'+esc(x.t)+'</b><small>'+esc(sub)+'</small></span></button>'+
-      '<a class="pl-go" href="'+esc(mapsHere(t.dest,x))+'" target="_blank" rel="noopener" aria-label="Directions from where you are to '+esc(x.t)+'">'+IX.train+'Go</a></div>';}).join('');
+      '<a class="pl-go" href="'+esc(mapsPlace(t.dest,x))+'" target="_blank" rel="noopener" aria-label="Open '+esc(x.t)+' in '+mapsName()+'">'+IX.open+'Maps</a></div>';}).join('');
   if(!pl.items.length) s+='<p class="hint" style="margin:0 0 6px">Restaurants, runs, shops you like here: search for the exact one, and they come back on every '+esc(city)+' trip.</p>';
   return s+'<div class="pi-add"><input type="text" id="prepPlIn" maxlength="200" placeholder="A restaurant, a run, a shop…"><button type="button" class="btn small" data-act="prepPlAdd" data-v="'+t.dest+'">Add</button></div></div>';
 }
@@ -10352,11 +10352,12 @@ function mapsTo(h,ic,p){
   return mapsG()?'https://www.google.com/maps/dir/?api=1'+(o?'&origin='+encodeURIComponent(o):'')+'&destination='+encodeURIComponent(d)+'&travelmode=transit':
     'https://maps.apple.com/?'+(o?'saddr='+encodeURIComponent(o)+'&':'')+'daddr='+encodeURIComponent(d)+'&dirflg=r';
 }
-// directions from where you are now, by public transport: to the pin, else the link, else the name in the city
-function mapsHere(ic,p){
-  var g=geoPt(p);if(!g&&p.url) return p.url;
-  var d=g?g.lat+','+g.lon:p.t+', '+(prepCity(ic)||ic);
-  return mapsG()?'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(d)+'&travelmode=transit':'https://maps.apple.com/directions?destination='+encodeURIComponent(d)+'&mode=transit';
+// open the place itself in Maps (from there, Go if you want to go): its shared link, else its pin, else its name in the city
+function mapsPlace(ic,p){
+  if(p.url) return p.url;
+  var g=geoPt(p);if(!g) return mapsQ(p.t+', '+(prepCity(ic)||ic));
+  if(mapsG()) return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.a?p.t+', '+p.a:g.lat+','+g.lon);
+  return 'https://maps.apple.com/?ll='+g.lat+','+g.lon+'&q='+encodeURIComponent(p.t);
 }
 function mapsNear(h,ic,what){var g=geoPt(h);return g&&!mapsG()?'https://maps.apple.com/?q='+encodeURIComponent(what)+'&sll='+g.lat+','+g.lon+'&z=15':mapsQ(what+' near '+hotelQ(h,ic));}
 
@@ -10394,7 +10395,7 @@ function miniMap(box,pts,key){
     var c=mmPx(v.lat,v.lon,v.z),g=mmLL(c[0]-W/2+mx,c[1]-H/2+my,v.z),q=mmPx(g.lat,g.lon,nz),cc=mmLL(q[0]-mx+W/2,q[1]-my+H/2,nz);
     v.lat=cc.lat;v.lon=cc.lon;v.z=nz;for(var k in imgs){imgs[k].remove();}imgs={};draw();
   }
-  function showPop(i){var p=pts[i];pop._i=i;pop.innerHTML='<b>'+esc(p.name)+'</b>'+(p.sub?'<small>'+esc(p.sub)+'</small>':'')+(p.go?'<a href="'+esc(p.go)+'" target="_blank" rel="noopener">'+IX.train+'Go</a>':'');pop.hidden=false;draw();}
+  function showPop(i){var p=pts[i];pop._i=i;pop.innerHTML='<b>'+esc(p.name)+'</b>'+(p.sub?'<small>'+esc(p.sub)+'</small>':'')+(p.go?'<a href="'+esc(p.go)+'" target="_blank" rel="noopener">'+IX.open+mapsName()+'</a>':'');pop.hidden=false;draw();}
   var P={},sx=0,sy=0,moved=false,lastTap=0,pinch=null,tapEl=null;
   box.addEventListener('pointerdown',function(e){
     if(e.target.closest('.mm-pop,.mm-ctl,.mm-cr')) return;
