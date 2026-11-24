@@ -4,7 +4,8 @@ FLIGHT CHECKLISTS – OFFLINE SETUP (about 10 minutes, once)
 2. Sign in or sign up at github.com in Safari.
 3. Tap + > New repository. Give it a name (e.g. checklists), set it to Public, create it.
 4. Tap "uploading an existing file" and add every file from the unzipped folder:
-   index.html, airports.js, runways.js, sw.js, manifest.webmanifest, icon-180.png, icon-192.png, icon-512.png,
+   index.html, airports.js, runways.js, sw.js, manifest.webmanifest, manifest-classic.webmanifest,
+   icon-180.png, icon-192.png, icon-512.png, icon-classic-180.png, icon-classic-192.png, icon-classic-512.png,
    and the lib folder (pdf.js and pdf.worker.js, used to read the LIDO package).
    Tap Commit changes.
 5. In the repository: Settings > Pages > Source: Deploy from a branch > Branch: main, folder / (root) > Save.
@@ -35,6 +36,12 @@ More > Edit the tab bar (or hold the bar, or More > Settings > Tab bar): up to f
 out or put it in, the arrow moves it left. Flight log and Event log can be tabs too. What isn't in the bar is in More.
 Each device keeps its own choice. The app also opens where you left off: the page you had open (and the trip on
 Layover) when it was closed less than 12 hours ago.
+
+THE APP ICON: More > Settings > App icon: Contrail (the new one: a plane drawing the check at sunset) or Checklist (the original).
+  Each device keeps its own. The Home Screen keeps the icon the app was added with, so to change it there add the app
+  again: in Safari (Settings gives you the link, ending ?icon=classic or ?icon=contrail), Share > Add to Home Screen.
+  The new one has its own storage: bring your things over with Online backup, or Back up and Restore, then remove
+  the old one.
 
 LAYOVER (its own tab, with the flag of where you are or go next; it was called Prepare): your next trips, one page
 each. The tab opens the trip you're on, or the next one; the trip you're on stays in the list until you fly out.

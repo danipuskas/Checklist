@@ -5,8 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
 <title>Flight Checklists</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest" id="lnkMan">
+<link rel="apple-touch-icon" href="icon-180.png" id="lnkIcon">
+<script>
+/* the app icon: Contrail (new) or Checklist (the original). Each device keeps its own; ?icon=classic or ?icon=contrail in the address sets it */
+(function(){try{
+  var re=/([?&])icon=(classic|contrail)(&|$)/,m=re.exec(location.search);
+  if(m){localStorage.setItem('flightChecklist.icon',m[2]);var q=location.search.replace(re,function(a,p,v,e){return e?p:'';}).replace(/[?&]$/,'');history.replaceState(null,'',location.pathname+q+location.hash);}
+  if(localStorage.getItem('flightChecklist.icon')==='classic'){document.getElementById('lnkIcon').href='icon-classic-180.png';document.getElementById('lnkMan').href='manifest-classic.webmanifest';}
+}catch(e){}})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Checklists">
@@ -276,6 +284,16 @@ body.finger .canvas-wrap canvas{touch-action:none}
 .menu button{appearance:none;border:0;background:none;color:var(--text);display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:12px;text-align:left;font-size:calc(17px*var(--ts));font-weight:500;line-height:1.25}
 .menu button:active{background:var(--press)}
 .menu button > svg{width:22px;height:22px;color:var(--accent)}
+.menu .mi-ic{width:24px;height:24px;border-radius:6px;flex:none;box-shadow:0 0 0 1px var(--line)}
+.ai-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 12px}
+.ai-o{appearance:none;position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 8px 12px;border-radius:16px;border:2px solid var(--line);background:var(--surface2);color:var(--text);font:inherit;cursor:pointer}
+.ai-o.on{border-color:var(--accent);background:var(--accent-weak)}
+.ai-o img{width:72px;height:72px;border-radius:16px;margin-bottom:6px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.ai-o b{font-size:calc(15px*var(--ts))}.ai-o small{font-size:calc(12.5px*var(--ts));color:var(--muted)}
+.ai-o i{position:absolute;top:8px;right:8px;width:22px;height:22px;color:var(--accent)}.ai-o i svg{width:22px;height:22px}
+.ai-steps{margin:0 0 10px;padding-left:22px;font-size:calc(14.5px*var(--ts));line-height:1.45;color:var(--text)}.ai-steps li{margin:0 0 4px}
+.ai-url{display:flex;gap:8px;align-items:center;padding:8px 8px 8px 12px;border-radius:12px;background:var(--surface2);border:1px solid var(--line)}
+.ai-url code{flex:1;min-width:0;font-size:calc(13px*var(--ts));overflow-wrap:anywhere;color:var(--text)}
 .menu .mt{flex:1;min-width:0}
 .menu small{display:block;color:var(--muted);font-size:calc(13px*var(--ts));font-weight:400;margin-top:2px}
 .tog{flex:none;width:48px;height:29px;border-radius:999px;background:var(--line-strong);position:relative;transition:background-color .2s}
@@ -3035,7 +3053,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='112';
+var APP_VERSION='113';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -7738,6 +7756,30 @@ function openMenu(){
   sheetWrap.classList.add('at-bottom');document.documentElement.classList.add('more-open');paintTabs();
 }
 // choose the tabs: up to five, More always last; it changes as you tap, so the bar below shows it
+// the app icon: the Home Screen keeps the one the app was added with, so a change shows when it's added again
+var APP_ICONS={contrail:['Contrail','icon-192.png','icon-180.png','manifest.webmanifest'],classic:['Checklist (the original)','icon-classic-192.png','icon-classic-180.png','manifest-classic.webmanifest']};
+function appIcon(){try{return localStorage.getItem('flightChecklist.icon')==='classic'?'classic':'contrail';}catch(_){return 'contrail';}}
+function appStandalone(){return !!(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches));}
+function setAppIcon(k){
+  try{localStorage.setItem('flightChecklist.icon',k);}catch(_){}
+  var a=APP_ICONS[k],li=document.getElementById('lnkIcon'),lm=document.getElementById('lnkMan');
+  if(li) li.href=a[2];if(lm) lm.href=a[3];
+}
+function openIconPick(){
+  var cur=appIcon(),home=appStandalone(),url=location.origin+location.pathname+'?icon='+cur;
+  openSheet('<h3>App icon</h3><div class="ai-pick">'+Object.keys(APP_ICONS).map(function(k){var a=APP_ICONS[k],on=k===cur;
+      return '<button type="button" class="ai-o'+(on?' on':'')+'" data-sact="pick" data-v="'+k+'" role="radio" aria-checked="'+on+'"><img src="'+a[1]+'" alt=""><b>'+esc(a[0].replace(' (the original)',''))+'</b><small>'+(k==='classic'?'The original':'New')+'</small><i>'+(on?I.check:'')+'</i></button>';}).join('')+'</div>'+
+    '<p class="hint">The Home Screen keeps the icon the app was added with. To change it there:</p>'+
+    (home?'<ol class="ai-steps"><li>Copy the link below and open it in Safari.</li><li>Share → Add to Home Screen. It comes with this icon.</li><li>Bring your things over with Online backup, or Back up and Restore, then remove the old one.</li></ol>'+
+       '<div class="ai-url"><code>'+esc(url)+'</code><button type="button" class="btn small" data-sact="copy">Copy</button></div>'
+     :'<ol class="ai-steps"><li>Share → Add to Home Screen, here in Safari. It comes with this icon.</li><li>The app on the Home Screen keeps its own things: bring them over with Online backup, or Back up and Restore, then remove the old one.</li></ol>')+
+    '<div class="sh-actions"><button type="button" class="btn primary" data-sact="done">Done</button></div>',
+  function(act,btn){
+    if(act==='pick'){setAppIcon(btn.getAttribute('data-v'));openIconPick();return;}
+    if(act==='copy'){copyText(url,sheetEl);return;}
+    closeSheet();openSettings();
+  });
+}
 function openTabsEdit(from){
   var on=tabsOn().slice();
   function row(k,i){var t=TAB_K[k],inb=on.indexOf(k)>=0;
@@ -7772,6 +7814,7 @@ function openSettings(){
     '<button type="button" data-sact="finger" role="switch" aria-checked="'+fd+'">'+I.hand+'<span class="mt">Draw with finger<small>'+(fd?'On: one finger draws in notepads':'Off: Apple Pencil draws, finger scrolls')+'</small></span><span class="tog'+(fd?' on':'')+'"></span></button>'+
     '<button type="button" data-sact="sound" role="switch" aria-checked="'+snd+'">'+I.bell+'<span class="mt">Alert sound<small>'+(snd?'On: alerts beep while the app is open':'Off: alerts are silent')+'</small></span><span class="tog'+(snd?' on':'')+'"></span></button>'+
     '<button type="button" data-sact="tabs">'+I.list+'<span class="mt">Tab bar<small>'+esc(tabsOn().map(function(k){return TAB_K[k][0];}).join(', '))+', More</small></span></button>'+
+    '<button type="button" data-sact="icon"><img class="mi-ic" src="'+APP_ICONS[appIcon()][1]+'" alt=""><span class="mt">App icon<small>'+esc(APP_ICONS[appIcon()][0])+'</small></span></button>'+
     '</div><div class="set-h">Backup</div><div class="menu">'+
     '<button type="button" data-sact="cloud">'+I.cloud+'<span class="mt">Online backup<small'+(cloud.on&&cloud.err?' class="warn"':'')+'>'+esc(cloudMenuText())+'</small></span></button>'+
     '<button type="button" data-sact="export">'+I.share+'<span class="mt">Back up<small>Copy or share everything as a backup</small></span></button>'+
@@ -7797,6 +7840,7 @@ function openSettings(){
         state.settings.fingerDraw=!fd;save();document.body.classList.toggle('finger',state.settings.fingerDraw);openSettings();break;
       case 'cloud': openCloud();break;
       case 'tabs': openTabsEdit('settings');break;
+      case 'icon': openIconPick();break;
       case 'export': openExport();break;
       case 'import': openImport();break;
       case 'upd': appRestart();break;
