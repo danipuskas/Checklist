@@ -2840,7 +2840,15 @@ try{localStorage.setItem('__fc','1');localStorage.removeItem('__fc');}catch(e){s
 /* ---------- Data ---------- */
 function newCheck(text){return {id:uid(),type:'check',text:text||'',note:'',links:[],imgs:[],info:false,done:false,open:true,children:[]};}
 function newCalc(){return {id:uid(),type:'calc',title:'Calculator',expr:'',hist:[],collapsed:false};}
-function newPad(){return {id:uid(),type:'pad',title:'Notepad',mode:'draw',text:'',strokes:[],h:300,collapsed:false};}
+function newPad(){return {id:uid(),type:'pad',title:'Notepad',mode:'draw',text:'',strokes:[],h:300,ext:0,collapsed:false};}
+// a notepad's height: h is the size you chose (S, M, L, XL); ext is what More space added, for this flight only (New flight takes it away).
+// Pads from before ext grew their h instead: a size plus some 200s is split back into the size and the extra.
+function padBase(it){
+  var h=Math.min(2400,Math.max(160,+it.h||300)),x=+it.ext;
+  if(isFinite(x)&&x>=0&&it.ext!=null) return {h:h,ext:Math.min(x,2400-h)};
+  var b=[300,200,480,720].filter(function(s){return h>s&&(h-s)%200===0;})[0];
+  return b?{h:b,ext:h-b}:{h:h,ext:0};
+}
 function newCd(){return {id:uid(),type:'cd',title:'Countdown',target:null,lead:0,aL:false,aZ:false,collapsed:false};}
 function newRest(){return {id:uid(),type:'rest',title:'Crew rest',start:'',end:'',n:2,buffer:0,round:true,labels:[],mine:-1,collapsed:false};}
 
@@ -2885,7 +2893,7 @@ function normItem(it){
     hist:Array.isArray(it.hist)?it.hist.filter(function(h){return h&&typeof h.r==='string';}).slice(-8):[],collapsed:!!it.collapsed};
   if(it.type==='pad') return {id:str(it.id)||uid(),type:'pad',title:str(it.title,'Notepad'),mode:it.mode==='type'?'type':'draw',text:str(it.text),
     strokes:Array.isArray(it.strokes)?it.strokes.filter(function(s){return s&&Array.isArray(s.pts)&&s.pts.length>=3;}):[],
-    h:Math.min(2400,Math.max(160,+it.h||300)),collapsed:!!it.collapsed};
+    h:padBase(it).h,ext:padBase(it).ext,collapsed:!!it.collapsed};
   var o={id:str(it.id)||uid(),type:'check',text:str(it.text),note:str(it.note),
     links:Array.isArray(it.links)?it.links.filter(function(l){return l&&l.url;}).map(function(l){return {label:str(l.label),url:str(l.url)};}):[],
     imgs:Array.isArray(it.imgs)?it.imgs.filter(function(x){return typeof x==='string'&&x;}):[],
@@ -3053,7 +3061,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='115';
+var APP_VERSION='116';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -3332,7 +3340,7 @@ function newFlight(){
     untickItems(s.items,true);
     s.items.forEach(function(n){
       if(n.type==='calc'){n.expr='';n.hist=[];fresh.delete(n.id);}
-      if(n.type==='pad'){n.strokes=[];n.text='';}
+      if(n.type==='pad'){n.strokes=[];n.text='';n.ext=0;}
       if(n.type==='hot'){n.fluid='';n.t0=0;n.hm='';n.min='';n.max='';n.aMin=n.aMax=false;alerting.delete(n.id);}
     });
   });});
@@ -6896,7 +6904,7 @@ function mountPad(el,m){
     var w=wrap.clientWidth;if(!w) return;
     if(w===lastW&&!force) return;
     lastW=w;scale=w/LW;
-    var hpx=Math.round(m.h*scale),d=dpr();
+    var hpx=Math.round((m.h+(m.ext||0))*scale),d=dpr();
     cv.style.height=hpx+'px';
     cv.width=Math.round(w*d);cv.height=Math.round(hpx*d);
     ctx.setTransform(d*scale,0,0,d*scale,0,0);
@@ -6988,7 +6996,7 @@ function padClear(id){
 }
 function padExtend(id){
   var f=find(id);if(!f) return;
-  f.node.h=Math.min(f.node.h+200,2400);save();
+  f.node.ext=Math.min((f.node.ext||0)+200,2400-f.node.h);save();
   var c=ctl.get(id);if(c) c.resize();
 }
 
@@ -8238,7 +8246,7 @@ function sj(v){
   return '{'+Object.keys(v).sort().filter(function(k){return v[k]!==undefined;}).map(function(k){return JSON.stringify(k)+':'+sj(v[k]);}).join(',')+'}';
 }
 // what stays on this device, by kind of item
-var SYN_LOCAL={_:{id:1,collapsed:1,children:1,dq:1},check:{done:1,ans:1,open:1,rem:1},calc:{expr:1,hist:1},pad:{strokes:1,text:1,mode:1},
+var SYN_LOCAL={_:{id:1,collapsed:1,children:1,dq:1},check:{done:1,ans:1,open:1,rem:1},calc:{expr:1,hist:1},pad:{strokes:1,text:1,mode:1,ext:1},
   cd:{target:1,aL:1,aZ:1},rest:{start:1,end:1,mine:1,until:1,ukey:1},hot:{fluid:1,t0:1,hm:1,min:1,max:1,aMin:1,aMax:1},apn:{fold:1}};
 function synOwn(n){
   var o={},L=SYN_LOCAL[n.type]||{};

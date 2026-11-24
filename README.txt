@@ -157,6 +157,8 @@ a level, duplicate, move, delete); Cancel and Done stay at the top. In a new ite
 to move a line, or hold it over an item to put it inside. "+ Add item or header" ends each section. Select picks several items
 to move, indent, duplicate, change or delete at once. The round arrow next to Done undoes your edits one step at a time.
 On an iPad in full screen the outline stays on the left and the page opens on the right.
+NOTEPADS: the height you pick in the notepad's settings (S, M, L, XL) is its size. "+ More space" adds room for the flight
+you're on; New flight clears the drawing and takes the notepad back to its size.
 QUICK CHANGES: without Edit, press and hold an item for Edit, add a note, a link, a sub-item or an item below, duplicate,
 move or delete.
 Write a check and its response with dots between them, like "Parking brake .... SET", and the response lines up on the right. Three spaces instead of the dots, like "Fuel   12.4 t", put the rest on the right without dots.
