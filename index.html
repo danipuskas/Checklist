@@ -3035,7 +3035,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='111';
+var APP_VERSION='112';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -9813,9 +9813,10 @@ function prepTripHTML(t,L,now,wide){
   if(!isHome&&nx&&nx.std-t.sta>=6*3600000) h+=prepTlHTML(t,nx,wide);
   else if(!isHome&&!nx) h+='<div class="lv-card"><p class="hint" style="margin:0">Add your flight out of '+esc(prepCity(t.dest)||t.dest)+' (Import roster or Add a trip) to plan the layover on a timeline.</p></div>';
   if(isHome) return h+'<div class="lv-card"><p class="hint" style="margin:0">Back home'+(nx?': '+durH(nx.std-t.sta)+' until '+esc(nx.fno||'the next duty')+' on '+dayLbl(nx.std,tzOffAt(htz,nx.std)):'.')+'</p></div>';
-  var ho=tripHotel(t).h,g=[prepFcHTML(t,L,tz),prepGoHTML(t,ho)];
+  // weather, then the hotel and your places, then getting around and the rest; the emergency numbers last
+  var ho=tripHotel(t).h,g=[prepFcHTML(t,L,tz),prepHotelHTML(t),prepPlacesHTML(t,ho),prepGoHTML(t,ho)];
   if(C&&C[0]!=='AED') g.push(prepFxHTML(C[0]));
-  g.push(prepHotelHTML(t),prepPlacesHTML(t,ho),prepBuyHTML(t),prepGoodHTML(t,C,tz,htz,now,L),prepMyNotesHTML(t),prepSosHTML(t,C));
+  g.push(prepBuyHTML(t),prepGoodHTML(t,C,tz,htz,now,L),prepMyNotesHTML(t),prepSosHTML(t,C));
   h+='<div class="prep-grid">'+g.join('')+'</div>';
   h+='<div class="prep-more"><button type="button" class="lv-more" data-act="prepShow" data-v="notes">'+I.chev+(prepTab==='notes'?'Hide':'Read')+' all notes for '+esc(t.dest)+', '+esc(t.dep)+' and the alternates</button>'+(prepTab==='notes'?prepNotesHTML(t):'')+'</div>';
   h+='<div class="prep-more"><button type="button" class="lv-more" data-act="prepShow" data-v="wx">'+I.chev+(prepTab==='wx'?'Hide':'Show')+' live weather (METAR / TAF) and alternates</button>'+(prepTab==='wx'?prepWxHTML(t,now):'')+'</div>';

@@ -57,7 +57,8 @@ On a wide iPad the trips sit on the left, each with the country's flag.
   station, embassy), good to know (plugs, volts, driving side, clock, money, tipping, tap water, shop hours, air
   quality during the stay, public holidays while you're there, and a few phrases the iPhone reads out where English
   isn't spoken), your Layover notes and last time there. Below: all the notes for its airports, and live METAR/TAF.
-  The emergency numbers are the last card on the page.
+  Under the weather come the hotel and your places, then getting around and the rest; the emergency numbers are the
+  last card on the page.
 - On the iPhone the page is more compact (about a quarter shorter; the iPad stays as it was): the photo and the top
   of the timeline keep their size, everything else sits closer. The report countdown is in the Leave Dubai line; each
   plan is one line with the Dubai time short (DXB 15:00-23:30); the time in the weather title updates the forecast;
