@@ -3053,7 +3053,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='114';
+var APP_VERSION='115';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -9723,6 +9723,9 @@ function prepCity(ic){
 }
 function dayLbl(t,off){var d=new Date(t+(off||0)*60000);return WDS[d.getUTCDay()]+' '+d.getUTCDate()+' '+MONS[d.getUTCMonth()];}
 function ymdAt(t,off){return new Date(t+(off||0)*60000).toISOString().slice(0,10);}
+// the layover (rest): from the end of duty, 30 minutes after landing, to the next report; without a report time, to the departure
+function layRest(t,nx){return (nx.rep||nx.std)-(t.sta+30*60000);}
+function layTxt(ms){return ms>0?durHM(ms/60000):'–';}
 function durH(ms){var h=Math.round(ms/3600000);return h<=72?h+' h':Math.round(h/24*10)/10+' days';}
 function myTZ(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'';}catch(_){return '';}}
 function sunTimes(lat,lon,ymd){
@@ -9780,7 +9783,7 @@ function prepListHTML(L,now){
   var h=L.length?'<div class="prep-lh"><span class="lv-l">Your trips</span><button type="button" class="lv-more" data-act="prepEditL">'+(ed?'Done':'Edit')+'</button></div>':'';
   h+=L.length?'<div class="lv-card prep-list'+(ed?' ed':'')+'">'+L.map(function(t){
     var nx=prepNext(t,L);
-    var sub=t.src==='flight'?'The flight that’s set':t.dest===home?'Back home':nx?'Layover '+durH(nx.std-t.sta):t.src==='roster'?'From your roster':'';
+    var sub=t.src==='flight'?'The flight that’s set':t.dest===home?'Back home':nx?'Layover '+layTxt(layRest(t,nx)):t.src==='roster'?'From your roster':'';
     var nb=t.dest!==home?prepBuyCount(t.dest):0;if(nb) sub=(sub?sub+' · ':'')+nb+' to buy';
     if(ed) return '<div class="prep-trip"><button type="button" class="pt-rm" data-act="prepRm" data-id="'+esc(t.id)+'" aria-label="Remove '+esc(t.fno||'this flight')+'"><i></i></button>'+
       '<span class="pt-t"><i>'+dayLbl(t.std)+' · '+(t.rep?'report '+fsHM(t.rep):fsHM(t.std))+'</i><b>'+esc((t.fno?t.fno+' ':'')+ap3(t.dep)+' → '+ap3(t.dest))+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</span></div>';
@@ -9879,7 +9882,8 @@ function prepTimesHTML(t,nx,isHome,now){
   h+='<div class="pt-row"><div><div class="pt-tt">'+IX.land+'Land · '+dayMo(t.sta,tzOffAt(tzb,t.sta))+'</div>'+hm2(tzb,t.sta,cb)+prepSunTxt(t,rb,tzb)+'</div>';
   if(!isHome&&nx){
     var rn=apRecOf(nx.dep),tzn=rn&&rn.tz;
-    h+='<div class="pt-mid"><span>Layover</span><b>'+durTxt(nx.std-t.sta)+'</b><span>'+(Math.round((nx.std-t.sta)/86400000)||'<1')+' night'+(Math.round((nx.std-t.sta)/86400000)===1?'':'s')+'</span></div>'+
+    var lr=layRest(t,nx),nn=Math.round(lr/86400000);
+    h+='<div class="pt-mid" title="From the end of duty (landing + 30 min) to '+(nx.rep?'the report':'the departure')+'"><span>Layover</span><b>'+layTxt(lr)+'</b><span>'+(nx.rep?(nn||'<1')+' night'+(nn===1?'':'s'):'to departure')+'</span></div>'+
       '<div><div class="pt-tt">'+IX.dep+'Leave · '+dayMo(nx.std,tzOffAt(tzn,nx.std))+(nx.fno?'<span class="pt-mo"> · '+esc(nx.fno)+'</span>':'')+'</div>'+hm2(tzn,nx.std,prepCity(nx.dep)||nx.dep)+
       '<div class="pt-chips">'+prepTimeChip(nx,'wake',tzn)+prepTimeChip(nx,'pick',tzn)+'</div></div>';
   }

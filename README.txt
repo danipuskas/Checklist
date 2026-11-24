@@ -46,6 +46,8 @@ THE APP ICON: More > Settings > App icon: Contrail (the new one: a plane drawing
 LAYOVER (its own tab, with the flag of where you are or go next; it was called Prepare): your next trips, one page
 each. The tab opens the trip you're on, or the next one; the trip you're on stays in the list until you fly out.
 On a wide iPad the trips sit on the left, each with the country's flag.
+- The layover is the rest: from the end of duty (landing + 30 minutes) to the report for the flight out, shown as
+  hours:minutes (e.g. 24:25). Without a report time for that flight it counts to the departure and says so.
 - At the top: a photo of the city (Wikipedia's picture for the city, fetched once when online and kept for offline;
   without one, the colour of the sky there now), the city, the local time there and how far it is from Dubai, and a
   countdown to report.
