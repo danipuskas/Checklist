@@ -180,6 +180,19 @@ lines for it, and says when the TAF ends before (or starts after) your time. Thi
 is the flight set in the app and that time is still ahead; a package you read just to brief shows its weather plainly.
 New weather goes into the cards where they are: the page doesn't redraw, so the NOTAM you're reading stays where it is
 and a search you're typing keeps the keyboard.
+FORECAST CHART IN THE BRIEFING (v117): under the METAR and TAF of the departure, destination, alternates and take-off
+alternate (and under From, To and the alternates before a package is loaded) there's a forecast chart like AeroWeather's:
+UTC hours, temperature with the dew point under it (amber when they're within 2°), wind arrow and speed with the
+gust in red when it's 5 kt or more above the wind, a line graph of wind and gust, the crosswind on your runway
+(gusts counted; T = tailwind) or on the best runway for that hour when none is set, rain/snow/fog/thunder with the
+chance in %, cloud cover in octas, visibility (∞ = 10 km or more, amber under 8, red under 3) and local time.
+Night hours are shaded. "24 h" shows every hour; "84 h" every 3 hours (gust and chance of rain are the most in those
+3 hours); your choice is kept. Swipe sideways for later hours.
+The forecast is DWD MOSMIX (Deutscher Wetterdienst), read from the nearest MOSMIX station within 30 km through Bright
+Sky (api.brightsky.dev, free, no key); the footer names the station and how far away it is. Where there's no station
+it uses Open-Meteo's model forecast and says so. It's kept on the device for an hour (12 airports); Update on the
+package card loads it again. It needs no weather relay. Not in it yet: the cloud ceiling (Bright Sky doesn't give it),
+so there's no ceiling row or VFR/IFR bar.
 NOTAMs follow the same rule: for your flight (until 2 h after its ETA) they're read against your ETD/ETA, the ones
 not active then dimmed as "Not at your time"; for a package you read just to brief, or a flight that's over, every
 NOTAM is shown at full strength, rated on its content only, with "From …" when it starts later than now.
