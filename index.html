@@ -754,6 +754,8 @@ textarea.fl-in{resize:vertical;min-height:58px}
 .wxst span{flex:1;min-width:0}
 .wxst.old{color:var(--warn)}
 .wxst .ib{width:34px;height:34px;color:var(--accent);flex:none}
+.ofp-day{display:flex;gap:8px;align-items:flex-start;margin:10px 0 12px;padding:9px 11px;border-radius:10px;background:var(--accent-weak,var(--surface2));font-size:calc(14px*var(--ts));line-height:1.35}
+.ofp-day svg{flex:none;width:18px;height:18px;margin-top:1px;color:var(--accent)}
 .wxc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:9px 11px 10px;margin-top:8px}
 /* the forecast chart */
 .mx-card{--cw:36px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:9px 0 9px;margin:8px 0 10px;overflow:hidden}
@@ -3105,7 +3107,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='117';
+var APP_VERSION='118';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -5292,12 +5294,14 @@ function ntCards(L,rw){return L.map(function(x){return ntCardHTML(x,rw);}).join(
 function brFlightHTML(){
   var f=brief.flight,n=brief.notams,d=f.etd?new Date(f.etd):null,same=brSame();
   var t1=(f.fno||'LIDO package')+(f.dep||f.dest?' · '+(f.dep||'?')+' → '+(f.dest||'?'):'');
-  var t2=[d?d.getUTCDate()+' '+MON[d.getUTCMonth()]:'',f.type?f.type.split('-')[0]:'',f.reg||''].filter(Boolean).join(' · ');
+  var st=state.settings,moved=same&&f.etd&&st.etdT&&Math.abs(st.etdT-f.etd)>=6*3600000,my=same&&!moved?brTripFor(f):null;
+  var t2=[d?d.getUTCDate()+' '+MON[d.getUTCMonth()]+(moved?' OFP, for your flight '+brDay(st.etdT):''):'',f.type?f.type.split('-')[0]:'',f.reg||''].filter(Boolean).join(' · ');
   var t3=n.count+' NOTAM'+(n.count===1?'':'s')+(brief.wxMade?' · weather '+hmOf(brief.wxMade):'');
   return '<div class="nt-pkg"><div class="nt-pkg-t"><b>'+esc(t1)+'</b><span>'+esc(t2)+'</span></div>'+
     '<small>'+esc(t3)+' · <button type="button" class="lnkbtn" data-act="brRemove">Remove</button></small>'+brChgBanHTML()+brWxStatusHTML()+
     (crewOK()?'<button type="button" class="crew-go" data-act="crewOpen">'+IC_DOC+'<span>Crew brief<small>The flight on one page: show it, print it or send it</small></span>'+I.right+'</button>':'')+
-    (!same&&f.dest?'<p class="nt-other">Your flight isn’t set to this route. <button type="button" class="lnkbtn" data-act="brFill">Fill the flight from it</button></p>':'')+'</div>';
+    (!same&&f.dest?'<p class="nt-other">Your flight isn’t set to this route. <button type="button" class="lnkbtn" data-act="brFill">Fill the flight from it</button></p>':'')+
+    (my&&Math.abs((st.etdT||0)-f.etd)<6*3600000?'<p class="nt-other">This OFP is from '+brDay(f.etd)+'. Your '+esc(fnoKey(my.fno)||f.fno)+' is on '+brDay(my.std)+'. <button type="button" class="lnkbtn" data-act="brMine">Set the flight to '+brDay(my.std)+'</button></p>':'')+'</div>';
 }
 // ---- the runway in use: the OFP's, or the one you pick when it changes ----
 // Setting one keeps the OFP's in depRwyOfp / arrRwyOfp, so you can go back. Everything that reads depRwy / arrRwy follows it.
@@ -5630,8 +5634,18 @@ document.addEventListener('change',function(e){
   var fl=t.files[0];t.value='';brReadFile(fl,m);
 });
 // From, To, alternates with their diversion times, ETD, ETA, call sign and the TOD countdown
+// your own flight for an OFP from another day: the same flight number and route in your trips, within 4 days
+// (a plan of the same flight read a day or two early). None when the OFP is that day's own (6 hours either way).
+function brTripFor(f){
+  if(!f||!f.dep||!f.dest||!f.etd) return null;
+  var k=fnoKey(f.fno),L=(state.trips||[]).filter(function(t){return t.dep===f.dep&&t.dest===f.dest&&(!k||!t.fno||fnoKey(t.fno)===k);});
+  if(L.some(function(t){return Math.abs(t.std-f.etd)<6*3600000;})) return null;
+  return L.filter(function(t){var d=Math.abs(t.std-f.etd);return d<=4*86400000&&t.sta>Date.now()-2*3600000;})
+    .sort(function(a,b){return Math.abs(a.std-f.etd)-Math.abs(b.std-f.etd);})[0]||null;
+}
+function brDay(t){var d=new Date(t);return WDS[d.getUTCDay()]+' '+d.getUTCDate()+' '+MON[d.getUTCMonth()];}
 function brApply(P){
-  var st=state.settings,f=P.flight,now=Date.now();
+  var st=state.settings,f=P.flight,now=Date.now(),my=brTripFor(f);
   function pick(ic){var r=apLookup(ic);return r?{icao:r.icao,tz:r.tz||'UTC',name:r.name+(r.cc&&r.cc!=='--'?' ('+r.cc+')':'')}:{icao:ic,tz:'UTC',name:''};}
   if(f.dep) st.dep=pick(f.dep);
   if(f.dest) st.dest=pick(f.dest);
@@ -5644,9 +5658,10 @@ function brApply(P){
   }
   if(f.etd) st.etdT=f.etd;
   if(f.eta) st.etaT=f.eta;
+  if(my){st.etdT=my.std;st.etaT=my.sta;} // an OFP from another day: the flight is yours, on your day and at your times
   if(f.cs) st.csign=String(f.cs).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
-  var tod=f.tod&&f.tod>now&&state.tools.cds.filter(function(c){return /^TOD\b/i.test(c.title);})[0];
-  if(tod) cdSetTarget(tod,f.tod,now);
+  var todT=f.tod?f.tod+(my&&f.etd?my.std-f.etd:0):0,tod=todT&&todT>now&&state.tools.cds.filter(function(c){return /^TOD\b/i.test(c.title);})[0];
+  if(tod) cdSetTarget(tod,todT,now);
   locEl.removeAttribute('data-k');
 }
 function brTodCd(){return state.tools.cds.filter(function(c){return /^TOD\b/i.test(c.title);})[0];}
@@ -5822,6 +5837,8 @@ function brConfirm(P,mode){
     h+='<p class="ofp-none">'+(upd?'No OFP in it. It updates the briefing for '+esc(who)+'.':'No OFP in it. The flight stays as it is.')+'</p>';
   }
   h+='<p class="ofp-pk">'+esc(pk)+'</p></div>';
+  var my=hasOfp&&(mode==='new'||canFill)?brTripFor(f):null;
+  if(my) h+='<p class="ofp-day">'+IX.evt+'<span>This OFP is from <b>'+brDay(f.etd)+'</b>. Your '+esc(fnoKey(my.fno)||f.fno||'flight')+' is on <b>'+brDay(my.std)+'</b>, so the flight is set for then: ETD '+hmOf(my.std)+', ETA '+hmOf(my.sta)+'. The NOTAMs and weather are read for your times.</span></p>';
   if(mode==='new') h+='<p class="hint">Every checklist starts clean. '+(hasOfp?'Countdowns, crew rest and the flight are replaced with the OFP’s.':'Countdowns, crew rest, ETD and ETA are cleared.')+'</p>'+
     '<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="start">Start flight</button></div>';
   else if(upd) h+='<div class="sh-actions"><button type="button" class="btn" data-sact="cancel">Cancel</button><button type="button" class="btn primary" data-sact="merge">Update</button></div>';
@@ -5834,9 +5851,9 @@ function brConfirm(P,mode){
     if(act==='start'){
       var before=JSON.stringify(state),oldB=brief;
       var keep=brHint();newFlight();brSetFrom(P,keep);if(hasOfp) brApply(P);save();closeSheet();render();window.scrollTo(0,0);wxMaybe();clockTick();
-      toast(hasOfp?'Flight ready: '+(f.fno?f.fno+' ':'')+route:'Ready for a new flight',6500,'Undo',function(){undoTo(before);brief=oldB;brRv=null;brSave();wxRefreshViews();});
+      toast(hasOfp?'Flight ready: '+(f.fno?f.fno+' ':'')+route+(my?', '+brDay(my.std):''):'Ready for a new flight',6500,'Undo',function(){undoTo(before);brief=oldB;brRv=null;brSave();wxRefreshViews();});
     }else if(act==='fill'){
-      brSetFrom(P);brApply(P);save();closeSheet();render();wxMaybe();clockTick();wxRefreshViews();if(!brChgAfter()) toast('Briefing and flight filled in');
+      brSetFrom(P);brApply(P);save();closeSheet();render();wxMaybe();clockTick();wxRefreshViews();if(!brChgAfter()) toast(my?'Briefing loaded; flight set for '+brDay(my.std):'Briefing and flight filled in');
     }else if(act==='only'){
       brSetFrom(P);closeSheet();wxRefreshViews();if(!brChgAfter()) toast('Briefing loaded');
     }else if(act==='merge'){
@@ -13129,6 +13146,7 @@ function onAct(e){
     case 'brSetup': brSetup=true;refreshTool();break;
     case 'brGo': brGo(el.getAttribute('data-v'));break;
     case 'brRemove': confirmSheet('Remove the LIDO package? Its NOTAMs and weather leave the briefing.','Remove',function(){brief=null;brRv=null;brSave();wxRefreshViews();toast('Package removed');});break;
+    case 'brMine': if(brief&&brTripFor(brief.flight)){var bm=brTripFor(brief.flight);brApply({flight:brief.flight});save();render();clockTick();wxRefreshViews();toast('Flight set for '+brDay(bm.std));}break;
     case 'brFill': if(brief) confirmSheet('Fill the flight from the package? From, To, alternates, ETD, ETA and the call sign are replaced.','Fill',function(){brApply({flight:brief.flight});save();render();wxMaybe();clockTick();refreshTool();toast('Flight filled in');});break;
     case 'wxChangeUrl': confirmSheet('Change the weather relay address?','Change',function(){state.settings.wxUrl='';save();openTool('wx');});break;
     case 'wxWatch':

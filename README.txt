@@ -194,6 +194,12 @@ it uses Open-Meteo's model forecast and says so. Online, it loads a fresh one wh
 the last one stays on the device (12 airports) and keeps working offline, e.g. in flight: the columns start from the
 time now, up to about 3½ days after it was loaded, and the footer says when. Update on the package card loads it again. It needs no weather relay. Not in it yet: the cloud ceiling (Bright Sky doesn't give it),
 so there's no ceiling row or VFR/IFR bar.
+AN OFP FROM ANOTHER DAY (v118): load yesterday's plan of the flight you'll have (the same flight number and route as a
+flight in your trips, within 4 days) and the flight is set to YOUR day and times from the roster, not the OFP's:
+ETD, ETA and the TOD countdown move to your day, the NOTAMs and TAFs are read for your times, and the Layover keeps
+your trip and its layover. The sheet says so before you fill the flight, and the package card says "24 Oct OFP,
+for your flight Sun 25 Oct". If the flight was filled with the OFP's own day (before v118), the package card offers
+"Set the flight to …".
 NOTAMs follow the same rule: for your flight (until 2 h after its ETA) they're read against your ETD/ETA, the ones
 not active then dimmed as "Not at your time"; for a package you read just to brief, or a flight that's over, every
 NOTAM is shown at full strength, rated on its content only, with "From …" when it starts later than now.
