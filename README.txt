@@ -138,11 +138,19 @@ limited to that repository with Contents: Read and write. The steps are shown in
 SYNC BETWEEN iPAD AND iPHONE (optional, needs Online backup): on the iPad, More > Settings > Online backup and sync >
 turn on "Sync with your other devices". On the iPhone, open the same address in Safari > Share > Add to Home Screen,
 open it, then More > Settings > Online backup and sync, enter the same repository and token and choose
-"Use the synced checklists". From then on checklists, airport notes, previous flights, Layover (trips, wake-up and
-pick-up, timeline plans, hotels, places and their pins, numbers), countdown and crew rest set-up and photos stay the same on both, while the app is open and online: a change is sent a few seconds after you make it,
-and the other device checks every 20 seconds and whenever it is opened. Changes made offline are sent when you are
-back online. Edits to different items on both devices are combined; if the same item was changed on both, the later
-change wins. Ticks, answers, filled-in fields, times, reminders, folding and the event log stay on each device.
+"Use the synced checklists". From then on these stay the same on both, while the app is open and online:
+checklists with their ticks, answers, filled-in fields, calculators and notepads; the flight that's set (From, To,
+alternates, ETD, ETA, call sign); the Briefing (the LIDO package, the NOTAMs you kept, the runways you set, the airports
+you watch); countdown times, crew rest and holdover times; the event log; airport notes, previous flights, Layover
+(trips, wake-up and pick-up, timeline plans, hotels, places and their pins, numbers) and photos. A change is sent a
+few seconds after you make it, and the other device checks every 20 seconds and whenever it is opened. Changes made
+offline are sent when you are back online. Edits to different items on both devices are combined; if the same item
+was changed on both, the later change wins. New flight on one device starts the other one clean too.
+The LIDO package goes to the repository once, as briefs/<number>.json (about 300 KB), and the other device downloads
+it once; only what you keep and change in it travels after that. Older packages there are deleted (the last few stay).
+What stays on each device: folding, reminders, alarms that already went off, the "More space" of a notepad, theme and
+text size. (Before v119 ticks, answers, times, the flight and the briefing stayed on each device. Both devices need
+v119: one on an older version says the synced copy can't be read until it updates.)
 
 PHOTOS: each photo is kept on the device in three sizes: a small one for the lists, a 2048-pixel copy that the
 viewer opens, and the original (up to 8 megapixels), which the viewer loads only when you zoom in past the copy. Big

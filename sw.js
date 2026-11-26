@@ -1,5 +1,5 @@
 // Offline cache: serves the app from the iPad and checks GitHub for a newer version when online.
-const CACHE = 'flight-checklists-v118';
+const CACHE = 'flight-checklists-v119';
 const ASSETS = ['./', './index.html', './airports.js', './runways.js', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './icon-classic-180.png', './icon-classic-192.png', './icon-classic-512.png', './manifest-classic.webmanifest', './lib/pdf.js', './lib/pdf.worker.js'];
 
 self.addEventListener('install', e => {
