@@ -1989,7 +1989,12 @@ line.tl-tk{opacity:.5}line.tl-tk.mid{opacity:.9;stroke-width:1.6}text.tl-tk{stro
 .gk svg{width:18px;height:18px;flex:none;color:var(--accent);margin-top:1px}
 .gk b{display:block;font-size:calc(11.5px*var(--ts));font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .pn-mine h4{margin:6px 0 2px;font-size:calc(11.5px*var(--ts));font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.pn-mine ul{margin:2px 0 6px;padding-left:20px}.pn-mine li{font-size:calc(14.5px*var(--ts));line-height:1.45;margin:1px 0}
+.pn-mine>ul{margin:2px 0 6px;padding-left:20px}.pn-mine>ul>li{font-size:calc(14.5px*var(--ts));line-height:1.45;margin:1px 0}
+.pn-notes{margin:0 0 4px}
+.pn-notes>.rf-i{padding:7px 0 8px;font-size:calc(15.5px*var(--ts));line-height:1.4}
+.pn-notes>.rf-i+.rf-i{border-top:1px solid var(--line-soft)}
+.pn-notes .rf-n{font-size:calc(14.5px*var(--ts))}
+.pn-notes .rf-ul{font-size:calc(15px*var(--ts))}
 .prep-more{margin:0 0 10px}.prep-more>.lv-more{display:flex;align-items:center;gap:6px;margin:0 0 8px 2px}.prep-more>.lv-more svg{width:16px;height:16px}
 .ho-in .prep-sh{margin:10px 0 2px}.ho-in .prep-items{padding:0}
 .ri-pick{display:flex;gap:10px;margin:0 0 12px}
@@ -3107,7 +3112,7 @@ function normDest(d){
   if(!d||typeof d!=='object'||typeof d.tz!=='string'||!d.tz) return null;
   return {icao:str(d.icao).toUpperCase().slice(0,4),tz:d.tz,name:str(d.name).slice(0,80)};
 }
-var APP_VERSION='119';
+var APP_VERSION='120';
 var TEXT_SIZES=[[0.7,'Extra small',10],[0.8,'Small',12],[0.9,'Medium',14],[1,'Default',16],[1.2,'Large',20]];
 var THEMES=[['auto','Auto','Follows the iPad, light or dark'],['light','Light','Always light'],['dark','Dark','Always dark'],['night','Night','Dimmed colours for the flight deck at night'],['red','Red','Red only, to keep your night vision']],themeMeta=null;
 function applyTheme(){
@@ -10263,10 +10268,20 @@ function prepGoodHTML(t,C,tz,htz,now,L){
   if(Ph) h+='<div class="gk-ph"><div class="gk-pt">'+IX.talk+'<b>'+esc(Ph.n)+'</b><span>· tap to hear it</span></div>'+Ph.p.map(function(p,i){return '<button type="button" class="gk-pr" data-act="prepSay" data-v="'+lang+'" data-id="'+i+'"><span><strong>'+esc(p[0])+'</strong><em>'+esc(p[2])+(p[1]?' · '+esc(p[1]):'')+'</em></span><i>'+IX.speak+'</i></button>';}).join('')+'</div>';
   return h+'</div>';
 }
+// a layover note as you wrote it in Airports: its text, the note under it, links, photos and the notes under it. Nothing to tick here.
+function prepNoteRO(it){
+  var c=JSON.parse(JSON.stringify(it));
+  (function ro(x){
+    x.info=true;x.done=false;x.rem=null;delete x.dq;delete x.end;
+    if(x.fld){if(x.fld.val) x.text=x.text+'   '+x.fld.val;delete x.fld;}
+    x.links=x.links||[];x.children=(x.children||[]).filter(function(k){return k&&k.type==='check';});x.children.forEach(ro);
+  })(c);
+  return c;
+}
 function prepMyNotesHTML(t){
-  var n=state.apNotes[t.dest]||{},lay=(n.s_layover||[]).filter(function(x){return x.text;}),L=logAt(t.dest),last=logLastHTML(t.dest),cnt=apNoteCount(t.dest);
+  var n=state.apNotes[t.dest]||{},lay=(n.s_layover||[]).filter(function(x){return x&&x.type==='check'&&(x.text||x.note||(x.children||[]).length);}),L=logAt(t.dest),last=logLastHTML(t.dest),cnt=apNoteCount(t.dest);
   var h='<div class="lv-card pn-mine"><div class="pc-h"><span class="lv-l">'+IX.note+'Your notes for '+esc(prepCity(t.dest)||t.dest)+'</span><button type="button" class="lv-more" data-act="prepNotesEdit" data-v="'+t.dest+'">Airports</button></div>';
-  if(lay.length) h+='<h4>Layover</h4><ul>'+lay.slice(0,8).map(function(x){return '<li>'+esc(x.text)+'</li>';}).join('')+'</ul>';
+  if(lay.length) h+='<h4>Layover</h4><div class="pn-notes">'+lay.map(function(x){return rfItemHTML(prepNoteRO(x));}).join('')+'</div>';
   if(last) h+='<h4>Last time here</h4><div class="lg-last">'+last+'</div>';
   if(!lay.length&&!last) h+='<p class="hint" style="margin:2px 0 0">'+(cnt?cnt+' note'+(cnt>1?'s':'')+' for '+esc(t.dest)+', none in Layover yet.':'Nothing for '+esc(t.dest)+' yet. Add layover tips in Airports → Layover.')+'</p>';
   return h+'</div>';

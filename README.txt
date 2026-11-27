@@ -202,6 +202,9 @@ it uses Open-Meteo's model forecast and says so. Online, it loads a fresh one wh
 the last one stays on the device (12 airports) and keeps working offline, e.g. in flight: the columns start from the
 time now, up to about 3½ days after it was loaded, and the footer says when. Update on the package card loads it again. It needs no weather relay. Not in it yet: the cloud ceiling (Bright Sky doesn't give it),
 so there's no ceiling row or VFR/IFR bar.
+YOUR NOTES ON THE LAYOVER PAGE (v120): "Your notes for <city>" shows the Layover section of that airport's notes in
+full, as in Airports: each note with the text under it, its links and photos, the notes under it (a bus or train
+route under the hotel, say) and filled-in answers. Nothing to tick there; Airports opens them to edit.
 AN OFP FROM ANOTHER DAY (v118): load yesterday's plan of the flight you'll have (the same flight number and route as a
 flight in your trips, within 4 days) and the flight is set to YOUR day and times from the roster, not the OFP's:
 ETD, ETA and the TOD countdown move to your day, the NOTAMs and TAFs are read for your times, and the Layover keeps
